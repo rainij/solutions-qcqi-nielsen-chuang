@@ -1,0 +1,68 @@
+;; -*- org-confirm-babel-evaluate: nil -*-
+
+#+title:  Notes on the book `Quantum Computation and Quantum Information` by Chuang-Nielsen
+#+author: Reinhard Stahn
+
+* quantum bible
+** ACTIVE chapter 4
+  :PROPERTIES:
+  :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent
+  :END:
+*** notes
+Setup sympy
+
+#+name: setup-chapter-4
+#+begin_src python
+  import sympy as sp
+
+  nx, ny, nz = sp.symbols('nx ny nz')
+#+end_src
+
+The Pauli matrices, and some of their friends
+
+#+name: paulis-and-friends
+#+begin_src python
+  # The Paulis:
+  X = sp.Matrix([[0, 1], [1, 0]])
+  Y = sp.Matrix([[0, -1j], [1j, 0]])
+  Z = sp.Matrix([[1, 0], [0, -1]])
+
+  # Hadamard Gate
+  H = sp.Matrix([[1, 1], [1, -1]]) / sp.sqrt(2)
+  # Phase Gate (sqrt(Z))
+  S = sp.Matrix([[1, 0], [0, 1j]])
+  # pi/8 Gate
+  T = sp.Matrix([[1, 0], [0, sp.exp(sp.pi * 1j / 4)]])
+#+end_src
+
+*** exercises
+**** TODO exercise 4.5
+Prove that (n̂ · σ)² = I, and use this to verify Equation (4.8).
+
+One example:
+
+#+name: exercise-4.5-1
+#+begin_src python :results replace
+  nx = sp.Integer(1) / sp.sqrt(14)
+  ny = sp.Integer(2) / sp.sqrt(14)
+  nz = sp.Integer(3) / sp.sqrt(14)
+
+  V = nx * X + ny * Y + nz * Z
+  sp.simplify(V*V)  # comment
+#+end_src
+
+#+RESULTS: exercise-4.5-1
+: Matrix([[1.00000000000000, 0], [0, 1.00000000000000]])
+
+** chapter 5
+  :PROPERTIES:
+  :header-args:python: :session *chapter-5* :tangle yes :comments link :results silent
+  :END:
+*** notes
+#+begin_src python :results replace
+  test = 123
+  test
+#+end_src
+
+#+RESULTS:
+: 123
