@@ -14,8 +14,7 @@ Setup sympy
 #+name: setup-chapter-4
 #+begin_src python
   import sympy as sp
-
-  nx, ny, nz = sp.symbols('nx ny nz')
+  from sympy import exp, Matrix, pi, sqrt
 #+end_src
 
 The Pauli matrices, and some of their friends
@@ -23,16 +22,16 @@ The Pauli matrices, and some of their friends
 #+name: paulis-and-friends
 #+begin_src python
   # The Paulis:
-  X = sp.Matrix([[0, 1], [1, 0]])
-  Y = sp.Matrix([[0, -1j], [1j, 0]])
-  Z = sp.Matrix([[1, 0], [0, -1]])
+  X = Matrix([[0, 1], [1, 0]])
+  Y = Matrix([[0, -1j], [1j, 0]])
+  Z = Matrix([[1, 0], [0, -1]])
 
   # Hadamard Gate
-  H = sp.Matrix([[1, 1], [1, -1]]) / sp.sqrt(2)
+  H = Matrix([[1, 1], [1, -1]]) / sqrt(2)
   # Phase Gate (sqrt(Z))
-  S = sp.Matrix([[1, 0], [0, 1j]])
+  S = Matrix([[1, 0], [0, 1j]])
   # pi/8 Gate
-  T = sp.Matrix([[1, 0], [0, sp.exp(sp.pi * 1j / 4)]])
+  T = Matrix([[1, 0], [0, exp(pi * 1j / 4)]])
 #+end_src
 
 *** exercises
@@ -43,9 +42,9 @@ One example:
 
 #+name: exercise-4.5-1
 #+begin_src python :results replace
-  nx = sp.Integer(1) / sp.sqrt(14)
-  ny = sp.Integer(2) / sp.sqrt(14)
-  nz = sp.Integer(3) / sp.sqrt(14)
+  nx = 1 / sqrt(14)
+  ny = 2 / sqrt(14)
+  nz = 3 / sqrt(14)
 
   V = nx * X + ny * Y + nz * Z
   sp.simplify(V*V)  # comment
@@ -59,10 +58,11 @@ One example:
   :header-args:python: :session *chapter-5* :tangle yes :comments link :results silent
   :END:
 *** notes
+#+name: dummy
 #+begin_src python :results replace
   test = 123
   test
 #+end_src
 
-#+RESULTS:
+#+RESULTS: dummy
 : 123
