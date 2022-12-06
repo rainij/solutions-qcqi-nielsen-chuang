@@ -3,6 +3,9 @@
 #+title:  Notes on the book `Quantum Computation and Quantum Information` by Chuang-Nielsen
 #+author: Reinhard Stahn
 
+#+STARTUP: latexpreview
+#+STARTUP: inlineimages
+
 * quantum bible
 ** ACTIVE chapter 4
   :PROPERTIES:
@@ -14,7 +17,7 @@ Setup sympy
 #+name: setup-chapter-4
 #+begin_src python
   import sympy as sp
-  from sympy import exp, Matrix, pi, sqrt
+  from sympy import cos, exp, Matrix, pi, sin, sqrt
 #+end_src
 
 The Pauli matrices, and some of their friends
@@ -26,17 +29,77 @@ The Pauli matrices, and some of their friends
   Y = Matrix([[0, -1j], [1j, 0]])
   Z = Matrix([[1, 0], [0, -1]])
 
+  # Identity
+  Id = Matrix([[1, 0], [0, 1]])
   # Hadamard Gate
   H = Matrix([[1, 1], [1, -1]]) / sqrt(2)
   # Phase Gate (sqrt(Z))
   S = Matrix([[1, 0], [0, 1j]])
   # pi/8 Gate
   T = Matrix([[1, 0], [0, exp(pi * 1j / 4)]])
+
+  # roation operators
+  # - Rz: Phase Shift
+  # - Rx: "Strange" Rotation
+  # - Ry: Real Rotation
+  theta = sp.symbols('theta')
+  Rz = Matrix([[exp(-1j*theta/2), 0], [0, exp(1j*theta/2)]])
+  Rx = Matrix([[cos(theta/2), -1j*sin(theta/2)], [-1j*sin(theta/2), cos(theta/2)]])
+  Ry = Matrix([[cos(theta/2), -sin(theta/2)], [sin(theta/2), cos(theta/2)]])
 #+end_src
 
+The rotation operators correspond to a rotation of angle $\theta$ around the respective axis in the
+*Bloch Sphere*.
+
+#+caption: The Bloch Sphere
+#+name: fig:bloch-sphere.svg
+#+attr_org: :width 400px
+[[./images/bloch-sphere.svg]]
+
 *** exercises
+**** exercise 4.1
+In Exercise 2.11, which you should do now if you haven’t already done
+it, you computed the eigenvectors of the Pauli matrices. Find the
+points on the Bloch sphere which correspond to the normalized
+eigenvectors of the different Pauli matrices.
+
+Eigenvalues are +1 and -1 for all Paulis.
+
+Eigenvectors (non-normalized, tip: ~Y.eigenvects()~):
+
+| Pauli | EV +1    | EV -1    |
+|-------+----------+----------|
+| Z     | (1, 0)   | (0, 1)   |
+| X     | (1, 1)   | (1, -1)  |
+| Y     | (1j, -1) | (-1, 1j) |
+**** exercise 4.2
+Let $x$ be a real number and $A$ a matrix such that $A^2 = I$. Show that
+
+\begin{align*}
+% \label{eq:exercise-4.2-1}
+\exp(ixA) = \cos(x)I + i\sin(x)A
+\end{align*}
+
+Use this result to verify Equations (4.4) through (4.6).
+
+*Solution:* The equation is obvious from polynomial series of ~exp, sin, cos~.
+
+**** exercise 4.3
+Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
+
+*Solution:* It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. Demonstration:
+
+#+name: exercise-4.3-1
+#+begin_src python :results replace
+  rz = Rz.subs(theta, pi/4)
+  exp(1j*pi/8) * rz - T  # should be zero
+#+end_src
+
+#+RESULTS: exercise-4.3-1
+: Matrix([[0, 0], [0, 0]])
+
 **** TODO exercise 4.5
-Prove that (n̂ · σ)² = I, and use this to verify Equation (4.8).
+Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 
 One example:
 
@@ -66,3 +129,13 @@ One example:
 
 #+RESULTS: dummy
 : 123
+
+
+* tasks
+** TODO Using venv is wastefull
+Possible options
+- use pyenv
+- repair global installation
+- use conda
+
+** TODO Do we have to live with all these garbage latex images?
