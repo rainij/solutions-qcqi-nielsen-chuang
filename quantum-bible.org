@@ -58,10 +58,9 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 
 *** exercises
 **** exercise 4.1
-In Exercise 2.11, which you should do now if you haven’t already done
-it, you computed the eigenvectors of the Pauli matrices. Find the
-points on the Bloch sphere which correspond to the normalized
-eigenvectors of the different Pauli matrices.
+In Exercise 2.11, which you should do now if you haven’t already done it, you computed the
+eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which correspond to the
+normalized eigenvectors of the different Pauli matrices.
 
 Eigenvalues are +1 and -1 for all Paulis.
 
@@ -98,6 +97,55 @@ Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 #+RESULTS: exercise-4.3-1
 : Matrix([[0, 0], [0, 0]])
 
+**** exercise 4.4
+Express the Hadamard gate H as a product of Rx and Rz rotations and e^{iφ} for some φ.
+
+*Solution:* Clearly a mere product of two factors can't produce the Hadamard gate. Hence we try to
+find $\alpha,\beta,\gamma$ such that $R_z(\alpha)\cdot R_x(\gamma) \cdot R_z(\beta)$ is the Hadamard
+up to the phase factor. Due to the sqrt of 2 factor appearing in $H$ we deduce that $\gamma=\pm\pi/2$
+is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
+
+#+name: exercise-4.4-1
+#+begin_src python :results value latex replace
+  a, b = sp.symbols('\\alpha \\beta')
+
+  ra = Rz.subs(theta, a)
+  rb = Rz.subs(theta, b)
+  rx = Rx.subs(theta, pi/2)
+
+  h0 = ra * rx * rb
+  simp = sp.simplify(sqrt(2)*h0)
+  latex_formula = sp.latex(simp)
+
+  #sp.preview(simp, viewer='file', filename='output.png', euler=False,
+  #           dvioptions=['-D', '200', '-T', 'tight', '-bg', 'Transparent', '-fg', 'rgb 0.2 0.6 1.0'])
+  #"output.png"
+
+  latex_formula
+#+end_src
+
+# Have a look into `org-preview-latex-process-alist'
+# See also https://www.nongnu.org/dvipng/
+
+A short calculation leads to:
+
+#+RESULTS: exercise-4.4-1
+#+begin_export latex
+\left[\begin{matrix}e^{0.5 i \left(- \alpha - \beta\right)} & - 1.0 i e^{- 0.5 i \left(\alpha - \beta\right)}\\- 1.0 i e^{0.5 i \left(\alpha - \beta\right)} & e^{0.5 i \left(\alpha + \beta\right)}\end{matrix}\right]
+#+end_export
+
+# RHS is result above
+$$
+R_z(\alpha)\cdot R_x(\pi/2) \cdot R_z(\beta) = \frac{1}{\sqrt{2}} \cdot
+\left[\begin{matrix}e^{0.5 i \left(- \alpha - \beta\right)} & - 1.0 i e^{- 0.5 i \left(\alpha - \beta\right)}\\- 1.0 i e^{0.5 i \left(\alpha - \beta\right)} & e^{0.5 i \left(\alpha + \beta\right)}\end{matrix}\right]
+$$
+
+Hence setting $\alpha = \beta = \pi/2$ and $\phi = \pi/2$ we get
+
+$$
+H = e^{i\pi/2} \cdot R_z(\pi/2)\cdot R_x(\pi/2) \cdot R_z(\pi/2)
+$$
+
 **** TODO exercise 4.5
 Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 
@@ -132,7 +180,8 @@ One example:
 
 
 * tasks
-** TODO Using venv is wastefull
+** DONE Using venv is wastefull
+CLOSED: [2022-12-14 Wed 17:17]
 Possible options
 - use pyenv
 - repair global installation
