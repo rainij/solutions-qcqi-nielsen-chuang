@@ -1,10 +1,9 @@
 ;; -*- org-confirm-babel-evaluate: nil -*-
-
-#+title:  Notes on the book `Quantum Computation and Quantum Information` by Chuang-Nielsen
+#+title:  Notes on the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
+#+startup: inlineimages latexpreview show2levels
 
-#+STARTUP: latexpreview
-#+STARTUP: inlineimages
+Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
 
 * quantum bible
 ** ACTIVE chapter 4
@@ -17,7 +16,7 @@ Setup sympy
 #+name: setup-chapter-4
 #+begin_src python
   import sympy as sp
-  from sympy import cos, exp, Matrix, pi, sin, sqrt
+  from sympy import cos, exp, I, Matrix, pi, sin, sqrt
 #+end_src
 
 The Pauli matrices, and some of their friends
@@ -26,7 +25,7 @@ The Pauli matrices, and some of their friends
 #+begin_src python
   # The Paulis:
   X = Matrix([[0, 1], [1, 0]])
-  Y = Matrix([[0, -1j], [1j, 0]])
+  Y = Matrix([[0, -I], [I, 0]])
   Z = Matrix([[1, 0], [0, -1]])
 
   # Identity
@@ -34,17 +33,17 @@ The Pauli matrices, and some of their friends
   # Hadamard Gate
   H = Matrix([[1, 1], [1, -1]]) / sqrt(2)
   # Phase Gate (sqrt(Z))
-  S = Matrix([[1, 0], [0, 1j]])
+  S = Matrix([[1, 0], [0, I]])
   # pi/8 Gate
-  T = Matrix([[1, 0], [0, exp(pi * 1j / 4)]])
+  T = Matrix([[1, 0], [0, exp(pi * I / 4)]])
 
   # roation operators
   # - Rz: Phase Shift
   # - Rx: "Strange" Rotation
   # - Ry: Real Rotation
   theta = sp.symbols('theta')
-  Rz = Matrix([[exp(-1j*theta/2), 0], [0, exp(1j*theta/2)]])
-  Rx = Matrix([[cos(theta/2), -1j*sin(theta/2)], [-1j*sin(theta/2), cos(theta/2)]])
+  Rz = Matrix([[exp(-I*theta/2), 0], [0, exp(I*theta/2)]])
+  Rx = Matrix([[cos(theta/2), -I*sin(theta/2)], [-I*sin(theta/2), cos(theta/2)]])
   Ry = Matrix([[cos(theta/2), -sin(theta/2)], [sin(theta/2), cos(theta/2)]])
 #+end_src
 
@@ -54,6 +53,7 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 #+caption: The Bloch Sphere
 #+name: fig:bloch-sphere.svg
 #+attr_org: :width 400px
+#+attr_html: :style width: 50%
 [[./images/bloch-sphere.svg]]
 
 *** exercises
@@ -95,7 +95,7 @@ Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 #+end_src
 
 #+RESULTS: exercise-4.3-1
-: Matrix([[0, 0], [0, 0]])
+: Matrix([[0, 0], [0, -exp(I*pi/4) + exp(0.25*I*pi)]])
 
 **** exercise 4.4
 Express the Hadamard gate H as a product of Rx and Rz rotations and e^{iφ} for some φ.
@@ -124,14 +124,11 @@ is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
   latex_formula
 #+end_src
 
-# Have a look into `org-preview-latex-process-alist'
-# See also https://www.nongnu.org/dvipng/
-
 A short calculation leads to:
 
 #+RESULTS: exercise-4.4-1
 #+begin_export latex
-\left[\begin{matrix}e^{0.5 i \left(- \alpha - \beta\right)} & - 1.0 i e^{- 0.5 i \left(\alpha - \beta\right)}\\- 1.0 i e^{0.5 i \left(\alpha - \beta\right)} & e^{0.5 i \left(\alpha + \beta\right)}\end{matrix}\right]
+\left[\begin{matrix}e^{\frac{i \left(- \alpha - \beta\right)}{2}} & - i e^{- \frac{i \left(\alpha - \beta\right)}{2}}\\- i e^{\frac{i \left(\alpha - \beta\right)}{2}} & e^{\frac{i \left(\alpha + \beta\right)}{2}}\end{matrix}\right]
 #+end_export
 
 # RHS is result above
@@ -146,23 +143,173 @@ $$
 H = e^{i\pi/2} \cdot R_z(\pi/2)\cdot R_x(\pi/2) \cdot R_z(\pi/2)
 $$
 
-**** TODO exercise 4.5
+**** exercise 4.5
 Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 
-One example:
+*Solution:* This is easy to see from the following calculation:
 
 #+name: exercise-4.5-1
-#+begin_src python :results replace
-  nx = 1 / sqrt(14)
-  ny = 2 / sqrt(14)
-  nz = 3 / sqrt(14)
+#+begin_src python :results replace :exports both
+  nx, ny, nz = sp.symbols('n_x n_y n_z')
+  r = nx*X + ny*Y + nz*Z
 
-  V = nx * X + ny * Y + nz * Z
-  sp.simplify(V*V)  # comment
+  sp.simplify(r*r)
 #+end_src
 
 #+RESULTS: exercise-4.5-1
-: Matrix([[1.00000000000000, 0], [0, 1.00000000000000]])
+: Matrix([[n_x**2 + n_y**2 + n_z**2, 0], [0, n_x**2 + n_y**2 + n_z**2]])
+
+By assumption we have ~nx**2 + ny**2 + nz**2 = 1~, hence follows the claim.
+
+**** exercise 4.6
+Show that the rotation operators $R_{\hat{n}}(\theta)$ corresponds to a rotation of angle $\theta$
+around the axis given by $\hat{n}$.
+
+*Solution:* We divide the proof into several steps.
+
+Let $|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi} \sin\left(\theta
+/2\right) |1\rangle$ and recall the parameterization $p = (\sin\theta \cos\varphi,\;
+\sin\theta \sin\varphi,\; \cos\theta)$
+of the sphere.
+
+*A:* The claim is true for the special case $\hat{n} = (0, 0, 1)$.
+
+PROOF: The standard basis $(|0\rangle, |1\rangle)$ diagonalizes $Z$. Hence, $Z$ trivially acts on
+$\varphi$ which corresponds to a rotation around the z-axis. QED.
+
+*B:* The claim is true for the special case $\hat{n} = (0, 1, 0)$.
+
+PROOF: It is sufficient to prove this for infinitesimal small angles. More precisely, we consider
+$\delta \to 0$ and use $\approx$ for equality up to $O(\delta^2)$.
+
+Let $r_y(\delta)$ be the rotation of angle $\delta$ around y-axis. Let $\theta' = \theta + a\delta$ and $\varphi'=\varphi+b\delta$
+be the coordinates of $r_y(\delta)p$. We want to calculate $a, b$. We have:
+
+\begin{align*}
+r_y(\delta)p &\approx (\sin(\theta)\cos(\varphi) + \delta\cos(\theta),\;
+  a \sin(\theta)\sin(\varphi),\;
+  a \cos(\theta) - \delta\sin(\theta)\cos(\varphi)) \\
+  &\approx (\sin\theta' \cos\varphi',\; \sin\theta' \sin\varphi',\; \cos\theta')
+\end{align*}
+
+It is advisable to first calculate $a$ from the third components and then $b$ from the second:
+
+$$
+  a = \cos(\varphi),\quad b = - \frac{\cos(\theta)\sin(\varphi)}{\sin(\theta)}
+$$
+
+Next we abbreviate $c=\cos(\theta/2)$, $s=\sin(\theta/2)$ and similarly $c', s'$ with $\theta'$ in place of $\theta$.
+
+$$
+  R_y(\delta) |\psi\rangle \approx (c - \frac{\delta}{2} e^{i\varphi} s) |0\rangle + (\frac{\delta}{2} c + e^{i\varphi}s) |1\rangle
+$$
+
+It is to be shown that this equals (up to $O(\delta^2)$)
+
+$$
+  e^{i\delta f} (c'|0\rangle + e^{i\varphi'}s'|1\rangle)
+$$
+
+for some real $x$. A calculation yields that this is indeed true for $f=-s\sin(\varphi)/2c$. QED.
+
+*C:* The claim is true for the special case $\hat{n} = (1, 0, 0)$.
+
+PROOF: Observe that:
+
+$$
+  R_x(\theta) = R_y(\pi/2) R_z(\theta) R_y(-\pi/2)
+$$
+
+Moreover, recall that a similar formula holds for the rotations within the Bloch Sphere:
+
+$$
+  r_x(\theta) = r_y(\pi/2) r_z(\theta) r_y(-\pi/2)
+$$
+
+This together with (A) and (B) implies the claim. QED.
+
+Let $\hat{n} = (x, y, z)$, and $a = x + iy$. Then
+
+$$
+  N := \hat{n}\cdot(X, Y, Z) = \left(\begin{matrix} z & \overline{a} \\ a & -z \end{matrix}\right)
+$$
+
+It remains to show the claim for $N$.
+
+*D:* There exist $\alpha,\beta$ such that:
+
+$$
+  R_{\hat{n}}(\theta) = R_x(\alpha) R_y(\beta) \cdot R_z(\theta) \cdot R_y(-\beta) R_x(-\alpha)
+$$
+
+PROOF: The expression on the right simplifies to
+
+\begin{bmatrix}
+  \cos(\alpha)\cos(\beta) & \sin(\beta) + i \sin(\alpha)\cos(\beta) \\
+  \sin(\beta) - i \sin(\alpha)\cos(\beta) & -\cos(\alpha)\cos(\beta)
+\end{bmatrix}
+
+It is not hard to see that $\alpha,\beta$ can be chosen such that this equals $N$. The concrete
+values would be needed to determine the axis of rotation. However, we determine it another way. QED.
+
+*E:* $R_{\hat{n}}(\alpha)$ corresponds to a rotation of angle $\alpha$ around /some/ axis (which is
+independent of the angle).
+
+PROOF: This is a direct consequence of (D), together with (B) and (C). QED.
+
+*F:* The angle in (E) is indeed $\hat{n}$, which concludes the solution of exercise 4.6.
+
+PROOF: We have to show that the positive eigenvector $v_+$ of $R_{\hat{n}(\alpha)}$ corresponds to
+$\hat{n}$ on the Bloch sphere. Therefore let us calculate the eigenvalues:
+
+#+name: exercise-4.6
+#+begin_src python :results replace output
+  x, y, z = sp.symbols('x y z')
+  N = Matrix([[z, x - I*y], [x + I*y, -z]])
+  ev = N.eigenvects()
+
+  # Keep in mind that x^2 + y^2 +z^2
+  for i in [0, 1]:
+      print(f"eigenvalue = {ev[i][0]}\neigenvector = {ev[i][2]}\n")
+#+end_src
+
+#+RESULTS: exercise-4.6
+: eigenvalue = -sqrt(x**2 + y**2 + z**2)
+: eigenvector = [Matrix([
+: [z/(x + I*y) - sqrt(x**2 + y**2 + z**2)/(x + I*y)],
+: [                                               1]])]
+:
+: eigenvalue = sqrt(x**2 + y**2 + z**2)
+: eigenvector = [Matrix([
+: [z/(x + I*y) + sqrt(x**2 + y**2 + z**2)/(x + I*y)],
+: [                                               1]])]
+
+We see that the normalized eigenvectors for $\pm 1$ are:
+
+$$
+  v_{\pm} = \frac{1}{\sqrt{2}} \left(
+    \pm \sqrt{1 \pm z}\cdot|0\rangle + \frac{x + iy}{\sqrt{1 \pm z}} \cdot |1\rangle \right)
+$$
+
+Let $\theta,\varphi$ such that
+
+$$
+  \hat{n} =: (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta)
+$$
+
+Let us abbreviate $c=\cos(\theta/2)$, $s=\sin(\theta/2)$. By the usual trigonometric identities we have:
+
+$$
+  \hat{n} = (2sc\cos(\varphi), 2sc\sin(\varphi), c^2 - s^2)
+$$
+
+Plugging this into the above formula for $v_+$ we see that indeed
+
+$$ |\psi\rangle = c |0\rangle + e^{i\varphi}s |1\rangle $$
+
+which proofs the claim. QED.
+
+QED[exercise 4.6].
 
 ** chapter 5
   :PROPERTIES:
@@ -177,14 +324,3 @@ One example:
 
 #+RESULTS: dummy
 : 123
-
-
-* tasks
-** DONE Using venv is wastefull
-CLOSED: [2022-12-14 Wed 17:17]
-Possible options
-- use pyenv
-- repair global installation
-- use conda
-
-** TODO Do we have to live with all these garbage latex images?
