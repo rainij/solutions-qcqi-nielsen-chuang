@@ -165,19 +165,20 @@ By assumption we have ~nx**2 + ny**2 + nz**2 = 1~, hence follows the claim.
 Show that the rotation operators $R_{\hat{n}}(\theta)$ corresponds to a rotation of angle $\theta$
 around the axis given by $\hat{n}$.
 
-*Solution:* We divide the proof into several steps.
+***** Solution
+We divide the proof into several steps.
 
 Let $|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi} \sin\left(\theta
 /2\right) |1\rangle$ and recall the parameterization $p = (\sin\theta \cos\varphi,\;
 \sin\theta \sin\varphi,\; \cos\theta)$
 of the sphere.
 
-*A:* The claim is true for the special case $\hat{n} = (0, 0, 1)$.
+****** (A) The claim is true for the special case $\hat{n} = (0, 0, 1)$.
 
 PROOF: The standard basis $(|0\rangle, |1\rangle)$ diagonalizes $Z$. Hence, $Z$ trivially acts on
 $\varphi$ which corresponds to a rotation around the z-axis. QED.
 
-*B:* The claim is true for the special case $\hat{n} = (0, 1, 0)$.
+****** (B) The claim is true for the special case $\hat{n} = (0, 1, 0)$.
 
 PROOF: It is sufficient to prove this for infinitesimal small angles. More precisely, we consider
 $\delta \to 0$ and use $\approx$ for equality up to $O(\delta^2)$.
@@ -212,7 +213,7 @@ $$
 
 for some real $x$. A calculation yields that this is indeed true for $f=-s\sin(\varphi)/2c$. QED.
 
-*C:* The claim is true for the special case $\hat{n} = (1, 0, 0)$.
+****** (C) The claim is true for the special case $\hat{n} = (1, 0, 0)$.
 
 PROOF: Observe that:
 
@@ -228,6 +229,7 @@ $$
 
 This together with (A) and (B) implies the claim. QED.
 
+****** Intermezzo
 Let $\hat{n} = (x, y, z)$, and $a = x + iy$. Then
 
 $$
@@ -236,7 +238,7 @@ $$
 
 It remains to show the claim for $N$.
 
-*D:* There exist $\alpha,\beta$ such that:
+****** (D) There exist $\alpha,\beta$ such that:
 
 $$
   R_{\hat{n}}(\theta) = R_x(\alpha) R_y(\beta) \cdot R_z(\theta) \cdot R_y(-\beta) R_x(-\alpha)
@@ -252,12 +254,12 @@ PROOF: The expression on the right simplifies to
 It is not hard to see that $\alpha,\beta$ can be chosen such that this equals $N$. The concrete
 values would be needed to determine the axis of rotation. However, we determine it another way. QED.
 
-*E:* $R_{\hat{n}}(\alpha)$ corresponds to a rotation of angle $\alpha$ around /some/ axis (which is
-independent of the angle).
+****** (E) $R_{\hat{n}}(\alpha)$ corresponds to a rotation of angle $\alpha$ around /some/ axis
+(which is independent of the angle).
 
 PROOF: This is a direct consequence of (D), together with (B) and (C). QED.
 
-*F:* The angle in (E) is indeed $\hat{n}$, which concludes the solution of exercise 4.6.
+****** (F) The angle in (E) is indeed $\hat{n}$.
 
 PROOF: We have to show that the positive eigenvector $v_+$ of $R_{\hat{n}(\alpha)}$ corresponds to
 $\hat{n}$ on the Bloch sphere. Therefore let us calculate the eigenvalues:
@@ -309,7 +311,82 @@ $$ |\psi\rangle = c |0\rangle + e^{i\varphi}s |1\rangle $$
 
 which proofs the claim. QED.
 
-QED[exercise 4.6].
+****** Conclusion
+(F) proves the claim QED[exercise 4.6].
+
+**** exercise 4.7
+Show that $XYX = - Y$ and use this to prove that $X R_y(\theta)X = R_y(-\theta)$.
+
+*Solution:* Follows from $(XY)X = iZX = i^2Y$ (see [[id:8fd70970-1282-4a24-ab47-5eecf832498f][Pauli Matrices]]).
+**** exercise 4.8
+An arbitrary single qubit unitary operator can be written in the form
+
+$$ U = \exp(i\alpha) R_{\hat{n}} (\theta) $$
+
+for some real numbers $\alpha$ and $\theta$, and a real three-dimensional unit vector $\hat{n}$.
+
+1. Prove this fact.
+2. Find values for the Hadamard gate $H$.
+3. Find values for the phase gate $S = \sqrt{Z}$.
+
+***** Proof of 1
+PROOF: Clearly every unitary Matrix has the form:
+
+$$
+  U = e^{i\gamma} \begin{pmatrix} e & -\overline{f} \\ f & \overline{e} \end{pmatrix}
+  \text{ where } |e|^2 + |f|^2 = 1,
+$$
+
+since the columns have to be orthogonal. In the following we show that the rotation operators are
+*characterized* as those unitary operators which look like the RHS without the phase factor.
+
+We have:
+
+$$
+R_{\hat{n}}(\theta) = e^{-i\theta N/2} = \left(\begin{matrix}
+  \cos(\theta/2) - iz \sin(\theta/2) & -i\overline{a} \sin(\theta/2) \\
+  -ia \sin(\theta/2) & \cos(\theta/2) + iz \sin(\theta/2) \end{matrix}\right)
+$$
+
+where $\hat{n} = (x, y, z)$ and $a = x + iy$. It is sufficient to show that the First column of the
+rotation opterator can be made equal to $(e, f)$, since the second column of $U$ is fixed
+by unitarity - up to a phase factor (this is where the $\alpha$ kicks in).
+
+Abbreviating $\zeta = \cos(\theta/2) - iz \sin(\theta/2)$ and decomposing $a = e^{i\varphi}|a|$ we
+see that the first columnt of the rotation is:
+
+$$ (\zeta, -i e^{i \varphi} \sqrt{1 - |\zeta|^2}) $$
+
+Clearly $\zeta$ can be chosen to be any complex number with modulus at most $1$. Once this is fixed,
+the second component can be made any number with modulus $\sqrt{1-|\zeta|^2}$. Hence the system
+
+\begin{align*}
+  \alpha &= \gamma \\
+  \zeta &= e \\
+  -i e^{i\varphi} &= f/|f| \text{ if } f \neq 0
+\end{align*}
+
+has a (unique) solution, which proves the claim. QED.
+
+***** Part 2
+We follow the proof of Part 1 and first represent $H$ in this special form:
+
+$$
+  H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+    = \frac{i}{\sqrt{2}} \begin{pmatrix} -i & -i \\ -i & i \end{pmatrix}
+$$
+
+Hence $\zeta=-i/\sqrt{2}$ and $e^{i\varphi}=1$. This in turn leads to $x=z=1/\sqrt{2}$, $z=0$ and
+$\theta=\pi$. In other words:
+
+$$
+  H = i R_{(\hat{x}+\hat{z})/\sqrt{2}}(\pi) = \frac{1}{\sqrt{2}} \left( X + Z \right).
+$$
+
+***** Part 3
+Recall $Z = i R_z(\pi)$, hence:
+
+$$ S = e^{i\pi/4} R_z(\pi/2). $$
 
 ** chapter 5
   :PROPERTIES:
