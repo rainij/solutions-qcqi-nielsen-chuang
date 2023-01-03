@@ -1,6 +1,7 @@
 ;; -*- org-confirm-babel-evaluate: nil -*-
 #+title:  Notes on the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
+#+latex_header: \newcommand{\CC}{\mathbb{C}}
 #+startup: inlineimages latexpreview show2levels
 
 Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
@@ -165,7 +166,10 @@ By assumption we have ~nx**2 + ny**2 + nz**2 = 1~, hence follows the claim.
 Show that the rotation operators $R_{\hat{n}}(\theta)$ corresponds to a rotation of angle $\theta$
 around the axis given by $\hat{n}$.
 
-***** Solution
+In other words: If we identify Qubits which just differ by phase, and identify each Qubit with its
+(unique) Bloch vector, then the action of the quantum rotation is isomorphic to the ordinary
+rotation with said axis and angle within the Bloch Sphere.
+***** Proof
 We divide the proof into several steps.
 
 Let $|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi} \sin\left(\theta
@@ -330,6 +334,9 @@ for some real numbers $\alpha$ and $\theta$, and a real three-dimensional unit v
 3. Find values for the phase gate $S = \sqrt{Z}$.
 
 ***** Proof of 1
+:PROPERTIES:
+:CUSTOM_ID: exercise-4-8-part-1
+:END:
 PROOF: Clearly every unitary Matrix has the form:
 
 $$
@@ -387,6 +394,80 @@ $$
 Recall $Z = i R_z(\pi)$, hence:
 
 $$ S = e^{i\pi/4} R_z(\pi/2). $$
+
+**** exercise 4.9
+Explain why any single qubit unitary operator may be written in the form (4.12).
+
+*Solution:* This essentially follows from the first lines of the proof of part 1 in [[#exercise-4-8-part-1][exercise 4.8]]
+(representation of $U$).
+
+**** exercise 4.10
+By Theorem 4.1 we find the following representation of $HUH$:
+
+$$
+  HUH = e^{i\alpha} R_z(\beta)\cdot R_y(\gamma)\cdot R_z(\delta)
+$$
+
+Conjugating this again with $H$ we get:
+
+$$
+  U = e^{i\alpha} R_x(\beta)\cdot R_y(-\gamma)\cdot R_x(\delta)
+$$
+
+QED.
+
+**** exercise 4.11
+Suppose $\hat{m}$ and $\hat{n}$ are non-parallel real unit vectors in three dimensions. Use Theorem 4.1 to show that
+an arbitrary single qubit unitary $U$ may be written
+
+$$
+  U = e^{i\alpha} R_{\hat{n}}(\beta) R_{\hat{m}}(\gamma) R_{\hat{n}}(\delta)
+$$
+
+for appropriate choices of α, β, γ and δ.
+
+# No idea how to prove it directly from Theorem 4.1.
+
+***** Proof
+Since we consider only products of Gates we may identify Gates resp. Qubits which are equivalent up
+to a phase factor. That is we work on the quotient space $\CC^2/\CC$ for the Qubits and
+$\CC^{2\times2}/\CC$ for the Gates.
+
+We have to proof that:
+
+$$
+  U \equiv R_{\hat{n}}(\beta) R_{\hat{m}}(\gamma) R_{\hat{n}}(\delta)
+$$
+
+In exercise 4.8 we proved that $U\equiv R_{\hat{k}}(\varepsilon)$ for some axis and angle. Let us
+denote by $r$ the (ordinary) rotations in the Bloch Sphere. By exercise 4.6 we know that the quantum
+roations are isomorphic to the corresponding ordinary rotations. That is, we have to show:
+
+$$
+  r_{\hat{k}}(\varepsilon) = r_{\hat{n}}(\beta) r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) .
+$$
+
+On the other hand this is a well known fact about the group of rotations (real orthogonal matrices
+with determinant equal to 1) in three dimensions. We prove it here anyway:
+
+The above equation is equivalent to
+
+$$
+   r_{\hat{n}}(-\beta) = r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) r_{\hat{k}}(-\varepsilon) .
+$$
+
+Since $\beta$ is a free parameter it suffices to show that the RHS maps $\hat{n}$ to itself, for
+appropriate choices of $\gamma$ and $\delta$. Therefore let $\hat{t} = r_{\hat{k}}(-\varepsilon)\hat{n}$ and consider:
+
+$$
+  \hat{n} = r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) \hat{t} .
+$$
+
+Consider the Meridian $M_1$ around $\hat{n}$ which contains $\hat{t}$ and the Meridian $M_2$ around
+$\hat{m}$ which contains $\hat{n}$. Since the two axes are not parallel the two Meridians have two
+intersection points $a$ and $b$ (they can be equal in the trivial case $\hat{t}=\hat{n}$). Clearly
+we can choose $\delta$ in such a way that $\hat{t}$ moves to one of the intersection points, say
+$a$. Now, by definition of $M_2$ we can choose $\gamma$ in sich a way that $a$ moves to $\hat{n}$. QED.
 
 ** chapter 5
   :PROPERTIES:
