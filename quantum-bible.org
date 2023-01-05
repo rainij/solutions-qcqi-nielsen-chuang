@@ -2,6 +2,9 @@
 #+title:  Notes on the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
 #+latex_header: \newcommand{\CC}{\mathbb{C}}
+#+latex_header: \newcommand{\CU}{\mathrm{CU}}
+#+latex_header: \newcommand{\CX}{\mathrm{CX}}
+#+latex_header: \newcommand{\CZ}{\mathrm{CZ}}
 #+startup: inlineimages latexpreview show2levels
 
 Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
@@ -18,6 +21,7 @@ Setup sympy
 #+begin_src python
   import sympy as sp
   from sympy import cos, exp, I, Matrix, pi, sin, sqrt
+  from sympy.physics.quantum import TensorProduct
 #+end_src
 
 The Pauli matrices, and some of their friends
@@ -56,6 +60,20 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 #+attr_org: :width 400px
 #+attr_html: :style width: 50%
 [[./images/bloch-sphere.svg]]
+
+For the definition of the controlled gates we introduce the projections $P_j$ corresponding to the
+computational basis.
+
+#+name: controlled-gates
+#+begin_src python
+  # First define the projections onto the computational basis
+  P1 = Matrix([[1, 0], [0, 0]])
+  P2 = Matrix([[0, 0], [0, 1]])
+
+  # controlled X (NOT), and Z gates
+  CX = TensorProduct(P1, Id) + TensorProduct(P2, X)
+  CZ = TensorProduct(P1, Id) + TensorProduct(P2, Z)
+#+end_src
 
 *** exercises
 **** exercise 4.1
@@ -561,12 +579,13 @@ $$
   (c_{12} + s_{12} N_{\hat{n}_{12}}) = (c_2 + s_2 N_{\hat{n}_2}) \cdot (c_1 + s_1 N_{\hat{n}_1}) .
 $$
 
-To spare us from the tedious work to expand the RHS we use sympy for that. We are only interested in
-algebraic operations and in particular we don't want to see any cumbersome matrix expression. To
-help sympy we use the fact that the Quaterions can be modelled by the Pauli Matrices. Just use the
-Identity matrix as the unit (the real number 1) and $-iX$, $-iY$, $-iZ$ as the three imaginary
-units. Keep in mind that we only use the Quaterions as a trick to tell sympy that we are not
-interested in Matrices. Essentially we still use the Pauli Rotations to proof the claim.
+To spare us from the tedious work to expand the RHS by hand we use sympy for that. We are only
+interested in algebraic operations and in particular we don't want to see any cumbersome matrix
+expression. To help sympy we use the fact that the Quaterions can be modelled by the Pauli
+Matrices. Just use the Identity matrix as the unit (the real number 1) and $-iX$, $-iY$, $-iZ$ as
+the three imaginary units. Keep in mind that we only use the Quaterions as a trick to tell sympy
+that we are not interested in Matrices. Essentially we still use the Pauli Rotations to prove the
+claim.
 
 #+name: exercise-4.15
 #+begin_src python :results replace
@@ -598,6 +617,141 @@ Rearranging the result for better readability:
 #+end_example
 
 From here we can directly read out the claim! QED.
+
+**** TODO exercise 4.16
+What is the 4×4 unitary matrix for the following circuits
+- $I\otimes H$
+- $H\otimes I$
+
+# TODO: use drawings instead of writing down the tensor products!
+
+***** Solution
+According the convention of the book, the Kronecker Product yields the matrices:
+
+$$
+  I\otimes H = \frac{1}{\sqrt{2}}
+  \,\begin{bmatrix}
+    1 &  1 & 0 &  0 \\
+    1 & -1 & 0 &  0 \\
+    0 &  0 & 1 &  1 \\
+    0 &  0 & 1 & -1
+  \,\end{bmatrix}
+$$
+
+$$
+  H\otimes I = \frac{1}{\sqrt{2}}
+  \,\begin{bmatrix}
+    1 & 0 &  1 &  0 \\
+    0 & 1 &  0 &  1 \\
+    1 & 0 & -1 &  0 \\
+    0 & 1 &  0 & -1
+  \,\end{bmatrix}
+$$
+
+**** exercise 4.17
+Construct a =CNOT= (CX) gate from a =CZ= using two Hadamard Gates.
+
+***** Solution
+The general form of a CU-gate is ($P_j$ being projections):
+
+$$
+  \CU = P_1 \otimes I + P_2 \otimes U
+$$
+
+Hence by $HZH=X$:
+
+$$
+  CX = I\otimes H \cdot CZ \cdot I\otimes H
+$$
+
+**** TODO exercise 4.18
+Show that swapping the two qubits leaves $\CZ$ invariant.
+
+# TODO: use drawings instead of explanations.
+
+***** Proof
+This follows from
+
+$$
+  \CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
+$$
+
+**** exercise 4.19
+The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
+the matrix. Write out this action explicitly in the computational basis.
+
+***** Solution
+The density matrix for two qubits in the computational basis looks as follows:
+
+$$
+  \rho = \sum_{i,j=0}^1 p_{ij} |ij\rangle .
+$$
+
+$\CX$ maps $|0j\rangle$ to itself, and it swaps $|10\rangle$ with $|11\rangle$. Hence, as a mapping
+on the density matrix it acts as follows on the density matrix:
+
+$$
+  p_{0i} \mapsto p_{0i},\quad p_{10} \mapsto p_{11},\quad p_{11} \mapsto p_{10} .
+$$
+
+**** TODO exercise 4.20
+Show $H\otimes H \cdot CX \cdot H\otimes H$ is the CX gate with the qubits reversed.
+
+Moreover the effect of the CX gate on the eigenbasis of $X$ is as follows:
+
+$$
+  \,|\pm+\rangle \mapsto |\pm+\rangle,\quad |\pm-\rangle \mapsto |\mp-\rangle
+$$
+
+In other words: With respect to the eigenbasis of $X$ the CX gate acts again like a CX gate but with
+the control and target qubit switched.
+
+# TODO: make drawings of the circuits.
+
+***** Proof
+The statement after "Moreover" is direct consequence of the first statement. Therefore we only prove
+the first one.
+
+First, let us recall the projections on the eigenbasis of $X$:
+
+\begin{align*}
+  P_+ &= |+\rangle \otimes \langle+| = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}, \\
+  P_- &= |-\rangle \otimes \langle-| = \begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}.
+\end{align*}
+
+Consider
+
+$$
+  H\otimes H \cdot CX \cdot H\otimes H = P_+ \otimes I + P_- \otimes Z .
+$$
+
+We have to show that, after swapping the two qubits the RHS equals $CX$. In fact:
+
+$$
+  I \otimes P_+ + Z \otimes P_- = \frac{1}{2}
+      \,\begin{bmatrix}
+         1 &  1 &  0 &  0 \\
+         1 &  1 &  0 &  0 \\
+         0 &  0 &  1 &  1 \\
+         0 &  0 &  1 &  1
+      \,\end{bmatrix}
+    \,+ \frac{1}{2}
+      \,\begin{bmatrix}
+         1 & -1 &  0 &  0 \\
+        -1 &  1 &  0 &  0 \\
+         0 &  0 & -1 &  1 \\
+         0 &  0 &  1 & -1
+      \,\end{bmatrix}
+    =
+      \,\begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0
+      \,\end{bmatrix} = \CX .
+$$
+
+
 
 ** chapter 5
   :PROPERTIES:
