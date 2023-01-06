@@ -15,15 +15,23 @@ Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
   :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent
   :END:
 *** notes
-Setup sympy
-
+**** Setup sympy
 #+name: setup-chapter-4
 #+begin_src python
   import sympy as sp
   from sympy import cos, exp, I, Matrix, pi, sin, sqrt
   from sympy.physics.quantum import TensorProduct
+
+
+  def tprod(A1, *As):
+      """Generalize TensorProduct to one and more then two arguments."""
+      P = A1
+      for A in As:
+          P = TensorProduct(P, A)
+      return P
 #+end_src
 
+**** Pauli- and Rotation-Matrices
 The Pauli matrices, and some of their friends
 
 #+name: paulis-and-friends
@@ -61,18 +69,23 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 #+attr_html: :style width: 50%
 [[./images/bloch-sphere.svg]]
 
+**** TODO Controlled Gates
 For the definition of the controlled gates we introduce the projections $P_j$ corresponding to the
 computational basis.
+
+# TODO draw some nice pictures
 
 #+name: controlled-gates
 #+begin_src python
   # First define the projections onto the computational basis
-  P1 = Matrix([[1, 0], [0, 0]])
-  P2 = Matrix([[0, 0], [0, 1]])
+  P0 = Matrix([[1, 0], [0, 0]])
+  P1 = Matrix([[0, 0], [0, 1]])
 
   # controlled X (NOT), and Z gates
-  CX = TensorProduct(P1, Id) + TensorProduct(P2, X)
-  CZ = TensorProduct(P1, Id) + TensorProduct(P2, Z)
+  CX = tprod(P0, Id) + tprod(P1, X)
+  CZ = tprod(P0, Id) + tprod(P1, Z)
+
+
 #+end_src
 
 *** exercises
@@ -752,6 +765,112 @@ $$
 $$
 
 
+**** exercise 4.21
+Verify that Figure 4.8 implements the $C^2(U)$ operation.
+
+***** Solution
+The easiest solution might be to just try out all four possibilities to plugin the computational
+basis into the first two wires.
+
+Another approach is to just calculate the corresponding algebraic expression:
+
+\begin{align*}
+        &(P_0 \otimes I \otimes I + P_1 \otimes I \otimes V) \\
+  \cdot &(P_0 \otimes I \otimes I + P_1 \otimes X \otimes I) \\
+  \cdot &(I \otimes P_0 \otimes I + I \otimes P_1 \otimes V^\dagger) \\
+  \cdot &(P_0 \otimes I \otimes I + P_1 \otimes X \otimes I) \\
+  \cdot &(I \otimes P_0 \otimes I + I \otimes P_1 \otimes V)
+\end{align*}
+
+Using $XP_0X=P_1$ and $XP_1X=P_0$ we get, that this is:
+
+$$
+  P_0 \otimes P_0 \otimes I + P_1 \otimes P_0 \otimes I + P_0 \otimes P_1 \otimes I + P_1 \otimes P_1 \otimes V^2 .
+$$
+
+Which is indeed $C^2(U)$.
+
+**** exercise 4.22
+Prove that a $C^2(U)$ gate (for any single qubit unitary $U$) can be constructed using at most eight
+one-qubit gates, and six $\CX$.
+
+***** Proof
+If we combine the construction of $C^2(U)$ from figure 4.8 (the $U=V^2$ thing) with the construction
+of $C(U)$ from figure 4.6 (the $AXBXC=U$ thing), we immediately see that we can construct a circuit
+with six $CX$ and ten one-qubit gates (two of the three phase gates cancel each other). However, we
+can reduce the number of one qubit gates by two, since two pairs can actually be merged into a
+single one-qubit operator.
+
+**** TODO exercise 4.23
+Construct a $C^1(U)$ gate for $U=R_x(\theta)$ and $U=R_y(\theta)$, using only CNOT and single qubit
+gates. Can you reduce the number of single qubit gates needed in the construction from three to two?
+
+# TODO Draw nice pictures of the circuits in the solutions!
+
+***** Solution
+For the y-rotation this is easy:
+
+$$
+  C^1(R_y(\theta)) = \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{y,2}(\theta/2) .
+$$
+
+We get the same result if we use the proof of Corollary 4.2. For the x-rotation we first deduce from
+exercise 4.6 (interpretation as 3D rotations):
+
+$$
+  R_x(\theta) = R_z(-\pi/2) \cdot R_y(\theta) \cdot R_z(\pi/2) .
+$$
+
+Now the proof of Corollary 4.2 shows:
+
+$$
+  C^1(R_x(\theta)) = R_{z,2}(-\pi/2) \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
+$$
+
+**** exercise 4.24
+Verify that Figure 4.9 implements the Toffoli gate.
+
+***** Proof
+Preliminaries: Recall that $T=e^{i\pi/8}R_z(\pi/4)$ and $XZX=-Z$. It suffices to prove the claim for
+states of the form $|ij\rangle\otimes|\psi\rangle$ (the basis states in the first two wires), by
+linearity.
+
+The first wire always acts as $T$. This does nothing to $|0\rangle$ and applies a phase shift to    $|1\rangle$.
+
+Now we consider the first two wires (the upper wires) states of the form $|01\rangle$ (that is, the
+control qubit is turned off). Then, the second wire acts as $ST^\dagger T^\dagger=I$. Hence
+$|01\rangle$ is mapped to itself. Now consider $|1i\rangle$. The second wire now acts as
+
+$$
+  SX T\dagger XT\dagger = e^{-i\pi/4} S XR_z(\pi/4)XR_z(\pi/4) = e^{-i\pi/4} S .
+$$
+
+Hence $|1i\rangle$$ is mapped to $|1\rangle\otimes S|i\rangle$. We summarize: The first two wires act as:
+
+$$
+  \,|ij\rangle \mapsto \begin{cases}
+      i|11\rangle  & \text{if } i=j=1 \\
+      \,|ij\rangle & \text{else.}
+  \,\end{cases}
+$$
+
+Now consider the third wire. It is not hard to see that if one of the first two qubits is
+$|0\rangle$, then all operators cancel each other (equalize to $I$) due to $X^2=-1$ and $T^\dagger T=I$.
+
+So the only interesting case is if the first to qubits are both on (equal state 1). In that case we
+have to show that the operator in the third row is equal to $-iX$. We have:
+
+$$
+  T X T^\dagger X = R_z(\pi/4) X R_z(-\pi/4) X = R_z(\pi/2) .
+$$
+
+Hence the operator in the third row is:
+
+$$
+  H R_z(\pi/2) R_z(\pi/2) H = R_x(\pi) = -iX.
+$$
+
+QED.
 
 ** chapter 5
   :PROPERTIES:
