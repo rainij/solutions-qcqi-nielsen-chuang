@@ -9,12 +9,18 @@
 
 Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
 
+TODOs:
+- [ ] Write Exercise x.y instead of exercise x.y in headings.
+- [ ] Remove the numbers from (at least some) headings in the HTML output.
+- [ ] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
+- [ ] Remove toplevel Heading "quantum bible", Make Chapters toplevel?
+
 * quantum bible
-** ACTIVE chapter 4
+** ACTIVE Chapter 4
   :PROPERTIES:
-  :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent
+  :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent :exports both
   :END:
-*** notes
+*** Notes
 **** Setup sympy
 #+name: setup-chapter-4
 #+begin_src python
@@ -22,6 +28,7 @@ Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
   from sympy import cos, exp, I, Matrix, pi, sin, sqrt
   from sympy.physics.quantum import TensorProduct
 
+  from qiskit import QuantumCircuit
 
   def tprod(A1, *As):
       """Generalize TensorProduct to one and more then two arguments."""
@@ -73,8 +80,6 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 For the definition of the controlled gates we introduce the projections $P_j$ corresponding to the
 computational basis.
 
-# TODO draw some nice pictures
-
 #+name: controlled-gates
 #+begin_src python
   # First define the projections onto the computational basis
@@ -84,11 +89,9 @@ computational basis.
   # controlled X (NOT), and Z gates
   CX = tprod(P0, Id) + tprod(P1, X)
   CZ = tprod(P0, Id) + tprod(P1, Z)
-
-
 #+end_src
 
-*** exercises
+*** Exercises
 **** exercise 4.1
 In Exercise 2.11, which you should do now if you haven’t already done it, you computed the
 eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which correspond to the
@@ -631,15 +634,27 @@ Rearranging the result for better readability:
 
 From here we can directly read out the claim! QED.
 
-**** TODO exercise 4.16
+**** exercise 4.16
 What is the 4×4 unitary matrix for the following circuits
-- $I\otimes H$
-- $H\otimes I$
 
-# TODO: use drawings instead of writing down the tensor products!
+#+RESULTS: exercise-4.16-appendix
+#+begin_example
+
+q_0: ─────
+     ┌───┐
+q_1: ┤ H ├
+     └───┘
+
+     ┌───┐
+q_0: ┤ H ├
+     └───┘
+q_1: ─────
+#+end_example
 
 ***** Solution
-According the convention of the book, the Kronecker Product yields the matrices:
+According the convention of the book, these two circuits are represented by $I\otimes H$,
+$H\otimes I$ (in that order). We note here that Qiskit uses the reverse order. The Kronecker Product
+yields the matrices (since the basis vectors are ordered in a canonical way: 00, 01, 10, 11):
 
 $$
   I\otimes H = \frac{1}{\sqrt{2}}
@@ -661,6 +676,21 @@ $$
   \,\end{bmatrix}
 $$
 
+***** Appendix
+Code which produces the circuits:
+
+#+name: exercise-4.16-appendix
+#+begin_src python :results output replace
+  qc1 = QuantumCircuit(2)
+  qc1.h(1)
+
+  qc2 = QuantumCircuit(2)
+  qc2.h(0)
+
+  print(qc1.draw('text'), "\n")
+  print(qc2.draw('text'))
+#+end_src
+
 **** exercise 4.17
 Construct a =CNOT= (CX) gate from a =CZ= using two Hadamard Gates.
 
@@ -677,10 +707,30 @@ $$
   CX = I\otimes H \cdot CZ \cdot I\otimes H
 $$
 
-**** TODO exercise 4.18
-Show that swapping the two qubits leaves $\CZ$ invariant.
+**** exercise 4.18
+Show that swapping the two qubits leaves $\CZ$ invariant. That is, these two circuits are equal:
 
-# TODO: use drawings instead of explanations.
+#+begin_example
+
+q_0: ──■──
+     ┌─┴─┐
+q_1: ┤ Z ├
+     └───┘
+
+     ┌───┐
+q_0: ┤ Z ├
+     └─┬─┘
+q_1: ──■──
+#+end_example
+
+For this reason, the $CZ$ is often denoted in a symmetric form:
+
+#+RESULTS: exercise-4.18-appendix
+:
+: q_0: ─■─
+:       │
+: q_1: ─■─
+
 
 ***** Proof
 This follows from
@@ -688,6 +738,17 @@ This follows from
 $$
   \CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
 $$
+
+***** Appendix
+Code which produces the circuits (at least the plot of the symmetric CZ gate):
+
+#+name: exercise-4.18-appendix
+#+begin_src python :results output replace
+  qc = QuantumCircuit(2)
+  qc.cz(0, 1)
+
+  print(qc.draw('text'))
+#+end_src
 
 **** exercise 4.19
 The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
@@ -707,8 +768,20 @@ $$
   p_{0i} \mapsto p_{0i},\quad p_{10} \mapsto p_{11},\quad p_{11} \mapsto p_{10} .
 $$
 
-**** TODO exercise 4.20
-Show $H\otimes H \cdot CX \cdot H\otimes H$ is the CX gate with the qubits reversed.
+**** exercise 4.20
+Show that the following two circuits are equal:
+
+#+RESULTS: exercise-4.20-appendix
+:      ┌───┐     ┌───┐
+: q_0: ┤ H ├──■──┤ H ├
+:      ├───┤┌─┴─┐├───┤
+: q_1: ┤ H ├┤ X ├┤ H ├
+:      └───┘└───┘└───┘
+:      ┌───┐
+: q_0: ┤ X ├
+:      └─┬─┘
+: q_1: ──■──
+
 
 Moreover the effect of the CX gate on the eigenbasis of $X$ is as follows:
 
@@ -724,6 +797,8 @@ the control and target qubit switched.
 ***** Proof
 The statement after "Moreover" is direct consequence of the first statement. Therefore we only prove
 the first one.
+
+We have to show that $H\otimes H \cdot CX \cdot H\otimes H$ is the CX gate with the qubits reversed.
 
 First, let us recall the projections on the eigenbasis of $X$:
 
@@ -764,6 +839,24 @@ $$
       \,\end{bmatrix} = \CX .
 $$
 
+***** Appendix
+Code which produces the circuits:
+
+#+name: exercise-4.20-appendix
+#+begin_src python :results output replace
+  qc1 = QuantumCircuit(2)
+  qc1.h(0)
+  qc1.h(1)
+  qc1.cx(0, 1)
+  qc1.h(0)
+  qc1.h(1)
+
+  qc2 = QuantumCircuit(2)
+  qc2.cx(1, 0)
+
+  print(qc1.draw('text'))
+  print(qc2.draw('text'))
+#+end_src
 
 **** exercise 4.21
 Verify that Figure 4.8 implements the $C^2(U)$ operation.
@@ -801,11 +894,9 @@ with six $CX$ and ten one-qubit gates (two of the three phase gates cancel each 
 can reduce the number of one qubit gates by two, since two pairs can actually be merged into a
 single one-qubit operator.
 
-**** TODO exercise 4.23
+**** exercise 4.23
 Construct a $C^1(U)$ gate for $U=R_x(\theta)$ and $U=R_y(\theta)$, using only CNOT and single qubit
 gates. Can you reduce the number of single qubit gates needed in the construction from three to two?
-
-# TODO Draw nice pictures of the circuits in the solutions!
 
 ***** Solution
 For the y-rotation this is easy:
@@ -813,6 +904,11 @@ For the y-rotation this is easy:
 $$
   C^1(R_y(\theta)) = \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{y,2}(\theta/2) .
 $$
+
+: q_0: ─────────────■────────────────■──
+:      ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
+: q_1: ┤ Rx(θ/2) ├┤ X ├┤ Rx(-θ/2) ├┤ X ├
+:      └─────────┘└───┘└──────────┘└───┘
 
 We get the same result if we use the proof of Corollary 4.2. For the x-rotation we first deduce from
 exercise 4.6 (interpretation as 3D rotations):
@@ -827,6 +923,48 @@ $$
   C^1(R_x(\theta)) = R_{z,2}(-\pi/2) \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
 $$
 
+: q_0: ─────────────────────────■────────────────■──────────────
+:      ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
+: q_1: ┤ Ry(θ/2) ├┤ Rz(-π/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├┤ Rz(-π/2) ├
+:      └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
+
+***** Appendix
+The code for the circuit plots:
+
+#+name: exercise-4.22-appendix
+#+begin_src python :results output replace :exports code
+  qc1 = QuantumCircuit(2)
+  qc1.rx(123, 1)  # modify angle in plot
+  qc1.cx(0, 1)
+  qc1.rx(1234, 1)  # modify angle in plot
+  qc1.cx(0, 1)
+
+  qc2 = QuantumCircuit(2)
+  qc2.ry(123, 1)  # modify angle in plot
+  qc2.rz(1234, 1)  # modify angle in plot
+  qc2.cx(0, 1)
+  qc2.ry(1234, 1)  # modify angle in plot
+  qc2.cx(0, 1)
+  qc2.rz(1234, 1)  # modify angle in plot
+
+  print(qc1.draw('text'))
+  print(qc2.draw('text'))
+#+end_src
+
+#+RESULTS: exercise-4.22-appendix
+#+begin_example
+
+q_0: ─────────────■────────────────■──
+     ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
+q_1: ┤ Rx(123) ├┤ X ├┤ Rx(1234) ├┤ X ├
+     └─────────┘└───┘└──────────┘└───┘
+
+q_0: ─────────────────────────■────────────────■──────────────
+     ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
+q_1: ┤ Ry(123) ├┤ Rz(1234) ├┤ X ├┤ Ry(1234) ├┤ X ├┤ Rz(1234) ├
+     └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
+#+end_example
+
 **** exercise 4.24
 Verify that Figure 4.9 implements the Toffoli gate.
 
@@ -835,7 +973,7 @@ Preliminaries: Recall that $T=e^{i\pi/8}R_z(\pi/4)$ and $XZX=-Z$. It suffices to
 states of the form $|ij\rangle\otimes|\psi\rangle$ (the basis states in the first two wires), by
 linearity.
 
-The first wire always acts as $T$. This does nothing to $|0\rangle$ and applies a phase shift to    $|1\rangle$.
+The first wire always acts as $T$. This does nothing to $|0\rangle$ and applies a phase shift to $|1\rangle$.
 
 Now we consider the first two wires (the upper wires) states of the form $|01\rangle$ (that is, the
 control qubit is turned off). Then, the second wire acts as $ST^\dagger T^\dagger=I$. Hence
@@ -845,7 +983,7 @@ $$
   SX T\dagger XT\dagger = e^{-i\pi/4} S XR_z(\pi/4)XR_z(\pi/4) = e^{-i\pi/4} S .
 $$
 
-Hence $|1i\rangle$$ is mapped to $|1\rangle\otimes S|i\rangle$. We summarize: The first two wires act as:
+Hence $|1i\rangle$ is mapped to $|1\rangle\otimes S|i\rangle$. We summarize: The first two wires act as:
 
 $$
   \,|ij\rangle \mapsto \begin{cases}
