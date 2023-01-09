@@ -14,6 +14,7 @@ TODOs:
 - [ ] Remove the numbers from (at least some) headings in the HTML output.
 - [ ] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
 - [ ] Remove toplevel Heading "quantum bible", Make Chapters toplevel?
+- [ ] move latex_header to separate file
 
 * quantum bible
 ** ACTIVE Chapter 4
@@ -76,6 +77,17 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 #+attr_html: :style width: 50%
 [[./images/bloch-sphere.svg]]
 
+**** TODO Misc Gates
+#+name: misc-gates
+#+begin_src python
+  SWAP = Matrix([
+    [1, 0, 0, 0],
+    [0, 0, 1, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 1]
+  ])
+#+end_src
+
 **** TODO Controlled Gates
 For the definition of the controlled gates we introduce the projections $P_j$ corresponding to the
 computational basis.
@@ -89,6 +101,64 @@ computational basis.
   # controlled X (NOT), and Z gates
   CX = tprod(P0, Id) + tprod(P1, X)
   CZ = tprod(P0, Id) + tprod(P1, Z)
+
+  # Toffoli Gate
+  Toff = tprod(P0, P0, Id) + tprod(P0, P1, Id) + tprod(P1, P0, Id) + tprod(P1, P1, X)
+
+  # Fredkin Gate
+  Fred = tprod(P0, Id, Id) + tprod(P1, SWAP)
+#+end_src
+
+#+name: make-controlled-gates
+#+begin_src python
+  def make_CU(num_wires, control, target, U):
+      """Returns a controlled U Gate. U must be single qubit gate. Wires are
+      numbered 0 to num_wires-1."""
+      assert 0 <= control < num_wires
+      assert 0 <= target < num_wires
+      assert control != target
+
+      t0 = [Id]*num_wires
+      t1 = [Id]*num_wires
+
+      t0[control] = P0
+      t1[control] = P1
+      t1[target] = U
+
+      return tprod(*t0) + tprod(*t1)
+
+
+  def make_CnU(num_wires, controls, target, U):
+      """Generalization of make_CU to several controls."""
+      assert all([0 <= c < num_wires for c in controls])
+      assert 0 <= target < num_wires
+      assert all([c != target for c in controls])
+
+      from itertools import product
+      P = [P0, P1]
+
+      CnU = None
+      ts = []
+      for bitlist in product(*[[0, 1]]*len(controls)):
+          t = [Id]*num_wires
+
+          for i, bit in enumerate(bitlist):
+              t[controls[i]] = P[bit]
+
+          ts.append(t)
+      ts[-1][target] = U
+
+      tensors = [tprod(*t) for t in ts]
+      CnU = None
+      for tensor in tensors:
+          CnU = tensor if CnU is None else CnU + tensor
+
+      return CnU
+
+
+  # Unit Tests for very pour people:
+  assert make_CU(2, 0, 1, X) == CX, "Expected CX Gate"
+  assert make_CnU(3, [0, 1], 2, X) == Toff, "Expected Toffoli Gate"
 #+end_src
 
 *** Exercises
@@ -1010,7 +1080,107 @@ $$
 
 QED.
 
-** chapter 5
+**** TODO Exercise 4.25 [3/4]
+Recall that the Fredkin (controlled-swap) gate performs the transform:
+
+\begin{bmatrix}
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+
+
+1. [X] Give a quantum circuit which uses three Toffoli gates to construct the Fredkin gate (Hint: think
+   of the swap gate construction – you can control each gate, one at a time).
+2. [X] Show that the first and last Toffoli gates can be replaced by gates.
+3. [X] Now replace the middle Toffoli gate with the circuit in Figure 4.8 to obtain a Fredkin gate
+   construction using only six two-qubit gates.
+4. [ ] Can you come up with an even simpler construction, with only five two-qubit gates?
+
+***** Solution to 1
+Taking the swap-gate construction from Figure 1.7 we may deduce that the following circuit might do
+what we want:
+
+#+RESULTS: exercise-4-25-appendix-1
+:
+: q_0: ──■────■────■──
+:        │  ┌─┴─┐  │
+: q_1: ──■──┤ X ├──■──
+:      ┌─┴─┐└─┬─┘┌─┴─┐
+: q_2: ┤ X ├──■──┤ X ├
+:      └───┘     └───┘
+
+In fact, a short calculation yields the desired result.
+
+#+begin_src python
+  T01 = make_CnU(3, [0, 1], 2, X)
+  T02 = make_CnU(3, [0, 2], 1, X)
+
+  assert T01 * T02 * T01 == Fred, "Exercise 4.25, Solution to 1."
+#+end_src
+
+***** Solution to 2
+The following circuit equals the Fredkin Gate too:
+
+#+RESULTS: exercise-4-25-appendix-2
+:
+: q_0: ───────■───────
+:           ┌─┴─┐
+: q_1: ──■──┤ X ├──■──
+:      ┌─┴─┐└─┬─┘┌─┴─┐
+: q_2: ┤ X ├──■──┤ X ├
+:      └───┘     └───┘
+
+In fact:
+
+#+begin_src python
+  C12 = make_CU(3, 1, 2, X)
+
+  assert C12 * T02 * C12 == Fred, "Exercise 4.25, Solution to 2."
+#+end_src
+
+***** Solution to 3
+Apriori this new circuit uses 8 = 6 + 2 two-qubit gates. However the first two of these can be
+merged into one (together with the Hadamard in between). Observe that the a similar fact is true for
+the last two two-qubit gates of the construction from Figure 4.9. Hence we only need 6 such gates.
+
+***** Solution to 4
+So far I have no solution. My first guess was to use the construction from Firgure 4.8 (the thing
+with $V^2=X$). With the same trick as in Solution 3 (merging adjacent gates) one gets a solution
+with 6 two-qubit gates. I tried to move around gates at the right end (via commutator relations)
+hoping the find an equivalent circuit with on gate less - so far without success.
+
+***** Appendix
+This code produces the images to the solutions.
+
+#+name: exercise-4-25-appendix-1
+#+begin_src python :results output replace :exports both
+  qc1 = QuantumCircuit(3)
+  qc1.ccx(0, 1, 2)
+  qc1.ccx(0, 2, 1)
+  qc1.ccx(0, 1, 2)
+
+  print(qc1.draw('text'))
+#+end_src
+
+#+name: exercise-4-25-appendix-2
+#+begin_src python :results output replace :exports both
+  qc2 = QuantumCircuit(3)
+  qc2.cx(1, 2)
+  qc2.ccx(0, 2, 1)
+  qc2.cx(1, 2)
+
+  print(qc2.draw('text'))
+#+end_src
+
+
+
+** Chapter 5
   :PROPERTIES:
   :header-args:python: :session *chapter-5* :tangle yes :comments link :results silent
   :END:
