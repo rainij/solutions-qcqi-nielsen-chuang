@@ -10,7 +10,7 @@
 Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
 
 TODOs:
-- [ ] Write Exercise x.y instead of exercise x.y in headings.
+- [X] Write Exercise x.y instead of exercise x.y in headings.
 - [ ] Remove the numbers from (at least some) headings in the HTML output.
 - [ ] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
 - [ ] Remove toplevel Heading "quantum bible", Make Chapters toplevel?
@@ -162,7 +162,7 @@ computational basis.
 #+end_src
 
 *** Exercises
-**** exercise 4.1
+**** Exercise 4.1
 In Exercise 2.11, which you should do now if you haven’t already done it, you computed the
 eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which correspond to the
 normalized eigenvectors of the different Pauli matrices.
@@ -176,7 +176,7 @@ Eigenvectors (non-normalized, tip: ~Y.eigenvects()~):
 | Z     | (1, 0)   | (0, 1)   |
 | X     | (1, 1)   | (1, -1)  |
 | Y     | (1j, -1) | (-1, 1j) |
-**** exercise 4.2
+**** Exercise 4.2
 Let $x$ be a real number and $A$ a matrix such that $A^2 = I$. Show that
 
 \begin{align*}
@@ -188,7 +188,7 @@ Use this result to verify Equations (4.4) through (4.6).
 
 *Solution:* The equation is obvious from polynomial series of ~exp, sin, cos~.
 
-**** exercise 4.3
+**** Exercise 4.3
 Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 
 *Solution:* It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. Demonstration:
@@ -202,7 +202,7 @@ Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 #+RESULTS: exercise-4.3-1
 : Matrix([[0, 0], [0, -exp(I*pi/4) + exp(0.25*I*pi)]])
 
-**** exercise 4.4
+**** Exercise 4.4
 Express the Hadamard gate H as a product of Rx and Rz rotations and e^{iφ} for some φ.
 
 *Solution:* Clearly a mere product of two factors can't produce the Hadamard gate. Hence we try to
@@ -248,7 +248,7 @@ $$
 H = e^{i\pi/2} \cdot R_z(\pi/2)\cdot R_x(\pi/2) \cdot R_z(\pi/2)
 $$
 
-**** exercise 4.5
+**** Exercise 4.5
 Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 
 *Solution:* This is easy to see from the following calculation:
@@ -266,7 +266,7 @@ Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 
 By assumption we have ~nx**2 + ny**2 + nz**2 = 1~, hence follows the claim.
 
-**** exercise 4.6
+**** Exercise 4.6
 Show that the rotation operators $R_{\hat{n}}(\theta)$ corresponds to a rotation of angle $\theta$
 around the axis given by $\hat{n}$.
 
@@ -422,11 +422,11 @@ which proofs the claim. QED.
 ****** Conclusion
 (F) proves the claim QED[exercise 4.6].
 
-**** exercise 4.7
+**** Exercise 4.7
 Show that $XYX = - Y$ and use this to prove that $X R_y(\theta)X = R_y(-\theta)$.
 
 *Solution:* Follows from $(XY)X = iZX = i^2Y$ (see [[id:8fd70970-1282-4a24-ab47-5eecf832498f][Pauli Matrices]]).
-**** exercise 4.8
+**** Exercise 4.8
 An arbitrary single qubit unitary operator can be written in the form
 
 $$ U = \exp(i\alpha) R_{\hat{n}} (\theta) $$
@@ -499,13 +499,16 @@ Recall $Z = i R_z(\pi)$, hence:
 
 $$ S = e^{i\pi/4} R_z(\pi/2). $$
 
-**** exercise 4.9
+**** Exercise 4.9
 Explain why any single qubit unitary operator may be written in the form (4.12).
 
 *Solution:* This essentially follows from the first lines of the proof of part 1 in [[#exercise-4-8-part-1][exercise 4.8]]
 (representation of $U$).
 
-**** exercise 4.10
+**** Exercise 4.10
+Give a decomposition analogous to Theorem 4.1 but using $R_x$ instead of $R_z$.
+
+***** Solution
 By Theorem 4.1 we find the following representation of $HUH$:
 
 $$
@@ -520,7 +523,7 @@ $$
 
 QED.
 
-**** exercise 4.11
+**** Exercise 4.11
 Suppose $\hat{m}$ and $\hat{n}$ are non-parallel real unit vectors in three dimensions. Use Theorem 4.1 to show that
 an arbitrary single qubit unitary $U$ may be written
 
@@ -573,7 +576,7 @@ intersection points $a$ and $b$ (they can be equal in the trivial case $\hat{t}=
 we can choose $\delta$ in such a way that $\hat{t}$ moves to one of the intersection points, say
 $a$. Now, by definition of $M_2$ we can choose $\gamma$ in sich a way that $a$ moves to $\hat{n}$. QED.
 
-**** exercise 4.12
+**** Exercise 4.12
 Give A, B, C, and α (in Corollary 4.2) for the Hadamard gate.
 
 ***** Solution
@@ -606,7 +609,7 @@ Hence:
       0 & e^{\frac{i \pi}{4}}
     \end{pmatrix}
 \end{align*}
-**** exercise 4.13
+**** Exercise 4.13
 It is useful to be able to simplify circuits by inspection, using well-known identities. Prove the
 following three identities:
 
@@ -620,12 +623,12 @@ $$ H = \frac{1}{\sqrt{2}} \left( X + Z \right). $$
 
 and the commutator properties of the Paulis, e.g. $XY=iZ$ and its cyclic variations. Of course the
 first two identities could also be proved like that.
-**** exercise 4.14
+**** Exercise 4.14
 Use the previous exercise to show that $HTH=R_x(\pi/4)$, up to a global phase.
 
 ***** Proof
 This follows from $T\equiv R_z(\pi/4)$ (up to phase factor) and $HZH=X$.
-**** exercise 4.15
+**** Exercise 4.15
 The Bloch representation gives a nice way to visualize the effect of composing two rotations.
 
 1. Prove that if a rotation through an angle β1 about the axis n̂1 is followed by a
@@ -704,7 +707,7 @@ Rearranging the result for better readability:
 
 From here we can directly read out the claim! QED.
 
-**** exercise 4.16
+**** Exercise 4.16
 What is the 4×4 unitary matrix for the following circuits
 
 #+RESULTS: exercise-4.16-appendix
@@ -761,7 +764,7 @@ Code which produces the circuits:
   print(qc2.draw('text'))
 #+end_src
 
-**** exercise 4.17
+**** Exercise 4.17
 Construct a =CNOT= (CX) gate from a =CZ= using two Hadamard Gates.
 
 ***** Solution
@@ -777,7 +780,7 @@ $$
   CX = I\otimes H \cdot CZ \cdot I\otimes H
 $$
 
-**** exercise 4.18
+**** Exercise 4.18
 Show that swapping the two qubits leaves $\CZ$ invariant. That is, these two circuits are equal:
 
 #+begin_example
@@ -820,7 +823,7 @@ Code which produces the circuits (at least the plot of the symmetric CZ gate):
   print(qc.draw('text'))
 #+end_src
 
-**** exercise 4.19
+**** Exercise 4.19
 The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
 the matrix. Write out this action explicitly in the computational basis.
 
@@ -838,7 +841,7 @@ $$
   p_{0i} \mapsto p_{0i},\quad p_{10} \mapsto p_{11},\quad p_{11} \mapsto p_{10} .
 $$
 
-**** exercise 4.20
+**** Exercise 4.20
 Show that the following two circuits are equal:
 
 #+RESULTS: exercise-4.20-appendix
@@ -928,7 +931,7 @@ Code which produces the circuits:
   print(qc2.draw('text'))
 #+end_src
 
-**** exercise 4.21
+**** Exercise 4.21
 Verify that Figure 4.8 implements the $C^2(U)$ operation.
 
 ***** Solution
@@ -953,7 +956,7 @@ $$
 
 Which is indeed $C^2(U)$.
 
-**** exercise 4.22
+**** Exercise 4.22
 Prove that a $C^2(U)$ gate (for any single qubit unitary $U$) can be constructed using at most eight
 one-qubit gates, and six $\CX$.
 
@@ -964,7 +967,7 @@ with six $CX$ and ten one-qubit gates (two of the three phase gates cancel each 
 can reduce the number of one qubit gates by two, since two pairs can actually be merged into a
 single one-qubit operator.
 
-**** exercise 4.23
+**** Exercise 4.23
 Construct a $C^1(U)$ gate for $U=R_x(\theta)$ and $U=R_y(\theta)$, using only CNOT and single qubit
 gates. Can you reduce the number of single qubit gates needed in the construction from three to two?
 
@@ -1035,7 +1038,7 @@ q_1: ┤ Ry(123) ├┤ Rz(1234) ├┤ X ├┤ Ry(1234) ├┤ X ├┤ Rz(123
      └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
 #+end_example
 
-**** exercise 4.24
+**** Exercise 4.24
 Verify that Figure 4.9 implements the Toffoli gate.
 
 ***** Proof
