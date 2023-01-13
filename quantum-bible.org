@@ -207,6 +207,98 @@ Some very simple Unit Tests:
   assert make_CnU(4, [1, 2], 3, X) == tprod(Id, Toff), "Expected Toffoli Gate (2)"
 #+end_src
 
+**** The Search for Circuits
+In the following we document some /very basic/ approaches to find circuits consisting if
+(relatively) simple gates to construct more complex gates.
+
+The simplest non-trivial test case is to find the construction of $C^2U$ by a circuit consisting
+only of controlled $X$, $V$, and $V^\dagger$, where $V$ is unitary with $V^2=U$.
+
+***** Approach 1 via Sympy - Don't do this!
+Here I document the approach via Sympy. This is not really a feasable approach since Matrix
+Multiplication in Sympy is *extremely* slow. Of course this is not entirely unexpected since sympy
+is not meant to be used in a brute force environment.
+
+In fact, finding the circuit of Figure 4.8 via brute force is out of reach for this approach. It
+can't be done within "reasonable" time limits. Going through all combinations of *just two gates*
+(just 25=5*5 cases for the five admissible gates) already takes one second. For three gates the
+number raises to almost nine seconds. So several minutes are to be expected in case of five gates. I
+count this as "unreasonable" since this is still a very small problem.
+
+*Conclusion:* Do not use sympy to calculate lots of matrix products.
+
+Just for completeness here is the code:
+
+#+name: search-for-circuits-approach-via-sympy
+#+begin_src python
+  def make_all_CU(num_wires: int, U: Matrix, name: str, pred=None):
+      """Generate all CU gates, whose control/target wires satisfy an optional predicate."""
+      if pred is None:
+          pred = (lambda c, t: True)
+
+      # All possible combinations of (control, target).
+      all_cts = list(product(range(num_wires), range(num_wires)))
+      all_cts = [(c, t) for (c, t) in all_cts if c != t and pred(c, t)]
+
+      gates = []
+      for c, t in all_cts:
+          gate = make_CU(num_wires, c, t, U)
+          gates.append(dict(  # The output is a list of dicts
+              name=name,
+              ct=(c, t),
+              gate=gate,
+          ))
+
+      return gates
+
+
+  def sp_search_circuits(n: int, admissible_gates, Wanted_Gate):
+      """Find all circuits with n gates implementing Wanted_Gate."""
+      solutions = []
+      for gates in product(*([admissible_gates]*n)):
+          gs = [g["gate"] for g in gates]
+          prod = reduce((lambda x, y: x*y), gs)
+          if sp.simplify(prod) == Wanted_Gate:  # wanted gate should already be simplified
+              solutions.append(" * ".join([f"{g['name']}{g['ct']}" for g in gates]))
+      return solutions
+#+end_src
+
+Here we try it out. You can use ipython magic function ~%time~ to measure how slow this approach is.
+
+#+name: search-for-circuits-approach-via-sympy-tests
+#+begin_src python
+  V = Matrix([[1 - I, 1 + I], [1 + I, 1 - I]]) / 2
+  assert sp.simplify(V*V) == X, "Exercise 28: V must be sqrt(X)."
+
+
+  def make_pred_CX(num_wires):
+      def pred_CX(c, t):
+          return c < t and t < num_wires - 1
+      return pred_CX
+
+
+  def make_pred_CV(num_wires: int):
+      def pred_CV(c, t):
+          return c < t and t == num_wires - 1
+      return pred_CV
+
+
+  adm_CX = make_all_CU(3, X, "CX", make_pred_CX(3))
+  adm_CV = make_all_CU(3, V, "CV", make_pred_CV(3))
+  adm_CVh = make_all_CU(3, V.H, "CVh", make_pred_CV(3))
+
+  admissible_gates = adm_CX + adm_CV + adm_CVh
+
+  CX01 = make_CU(3, 0, 1, X)
+  CX02 = make_CU(3, 0, 2, X)
+  CV02 = make_CU(3, 0, 2, V)
+  assert sp_search_circuits(1, admissible_gates, CX01) == ['CX(0, 1)'], "sp_search_circuits: CX01"
+  assert sp_search_circuits(1, admissible_gates, CV02) == ['CV(0, 2)'], "sp_search_circuits: CV02"
+  # We comment this out since it takes about a second:
+  # result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])
+  # assert sorted(sp_search_circuits(2, admissible_gates, CX01 * CV02)) == result, "sp_search_circuits: CX01 * CV02"
+#+end_src
+
 *** Exercises
 **** Exercise 4.1
 In Exercise 2.11, which you should do now if you haven’t already done it, you computed the
@@ -1442,85 +1534,6 @@ This code produces the circuit drawings.
 For $U=V^2$ with $V$ unitary, construct a $C^5(U)$ gate analogous to that in Figure 4.10, but using no
 work qubits. You may use controlled-$V$ and controlled-$V^\dagger$ gates.
 
-***** Solution 1 - Failed Attempt
-The following code tries to search for solutions similarly as in exercise 4.27 but operates directly
-on (sympy) matrices.
-
-This was a mistake since the code is extremely slow. To test out the approach we tried to solve the
-simpler problem of finding the circuit from Figure 4.8 - but even this is impossible within
-reasonable time limits. Going through all combinations of *just two gates* (just 25=5*5 cases for
-the five admissible gates) already takes one second. For three gates the number raises to almost
-nine seconds.
-
-*Conclusion:* Do not use sympy to calculate lots of matrix products.
-
-#+name: exercise-4-28-attempt-1-1
-#+begin_src python
-  V = Matrix([[1 - I, 1 + I], [1 + I, 1 - I]]) / 2
-  assert sp.simplify(V*V) == X, "Exercise 28: V must be sqrt(X)."
-
-
-  def make_all_CU(num_wires, U, name, pred=None):
-      if pred is None:
-          pred = (lambda c, t: True)
-
-      pairs = list(product(range(num_wires), range(num_wires)))
-      pairs = [(c, t) for (c, t) in pairs if c != t and pred(c, t)]
-
-      gates = []
-      for c, t in pairs:
-          gate = make_CU(num_wires, c, t, U)
-          gates.append(dict(
-              name=name,
-              ct=(c, t),
-              gate=gate,
-          ))
-
-      return gates
-
-
-  def make_pred_CX(num_wires):
-      def pred_CX(c, t):
-          return c < t and t < num_wires - 1
-      return pred_CX
-
-
-  def make_pred_CV(num_wires: int):
-      def pred_CV(c, t):
-          return c < t and t == num_wires - 1
-      return pred_CV
-
-
-  def search_ex4_28(n: int, admissible_gates, Wanted_Gate):
-      """Find all solutions to exercise 4.28 with n gates."""
-      solutions = []
-      for gates in product(*([admissible_gates]*n)):
-          gs = [g["gate"] for g in gates]
-          prod = reduce((lambda x, y: x*y), gs)
-          if sp.simplify(prod) == Wanted_Gate:  # wanted gate should already be simplified
-              solutions.append(" * ".join([f"{g['name']}{g['ct']}" for g in gates]))
-      return solutions
-#+end_src
-
-Unit tests for very poor man:
-
-#+name: exercise-4-28-attempt-1-2
-#+begin_src python
-  cxs = make_all_CU(3, X, "CX", make_pred_CX(3))
-  cvs = make_all_CU(3, V, "CV", make_pred_CV(3))
-  cvts = make_all_CU(3, V.H, "CVt", make_pred_CV(3))
-
-  admissible_gates = cxs + cvs + cvts
-
-  CX01 = make_CU(3, 0, 1, X)
-  CX02 = make_CU(3, 0, 2, X)
-  CV02 = make_CU(3, 0, 2, V)
-  assert search_ex4_28(1, admissible_gates, CX01) == ['CX(0, 1)'], "Exercise 28, CX01"
-  assert search_ex4_28(1, admissible_gates, CV02) == ['CV(0, 2)'], "Exercise 28, CV02"
-  # We comment this out since it takes about a second:
-  # result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])
-  # assert sorted(search_ex4_28(2, admissible_gates, CX01 * CV02)) == result, "Exercise 28, CX01 * CV02"
-#+end_src
 
 ***** Solution 2
 
