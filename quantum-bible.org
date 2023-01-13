@@ -1761,12 +1761,101 @@ This code produces the circuit drawings.
   qc.draw('text')
 #+end_src
 
-**** TODO Exercise 4.28
-For $U=V^2$ with $V$ unitary, construct a $C^5(U)$ gate analogous to that in Figure 4.10, but using no
-work qubits. You may use controlled-$V$ and controlled-$V^\dagger$ gates.
+**** Exercise 4.28
+*Original Formulation:* For $U=V^2$ with $V$ unitary, construct a $C^5(U)$ gate analogous to that in
+Figure 4.10, but using no work qubits. You may use controlled-$V$ and controlled-$V^\dagger$ gates.
+
+*Remark:* In my opinion the formulation of the exercise is bad. The way I understand it there is
+indeed no solution. Some sources in the internet claim that some slight variation of the circuit in
+Figure 8 (for n=3 add a wire above the others, and let this wire be an additional control of the two
+CX and the rightmost CV) solves the problem (see reference in the solution). But in fact, I also
+found this solution but since it involves a $C^{n-1}V$ gate to construct $C^nU$ I rejected it as an
+invalid solution. To get rid of all these control qubits on $V$ one would again take further roots
+of $V$ which seems to be not very usefull for a real implementations. So at best it is a *pseudo
+solution* (in my opinion).
+
+*Alternate Version:* Let $n\geq3$, $V$ unitary and $U=V^2$. Prove that it is impossible to obtain a
+construction of $C^n(U)$ on $n+1$ wires from $X$, $V$, $V^\dagger$, $U$, $C(X)$, $C(V)$,
+$C(V^\dagger)$, and $C(U)$ alone which works for arbitrary $U$ (for $n=2$ it is possible as Figure
+4.8 shows).
+
+***** Proof (of the alternate version)
+The idea for the proof is surprisingly simple - watch out for the determinant of the circuit! The
+credits for the idea go to [[https://cs.stackexchange.com/q/138853][this stackoverflow answer]]. The overall discussion contains also a
+reference to the pseudo-solution mentioned in the remark above.
+
+Consider $n+1$ wires and recall that with all controls being on the first $n$ wires we have:
+
+$$
+  C^n(U) = \mathrm{diag}(I,I,\ldots,I,U) \text{ with } 2^n - 1 \text{ copies of }
+  I=\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}.
+$$
+
+That is, $C^n(U)$ is a diagonal matrix up to a tiny 2 by 2 sub-matrix $U$ in the lower right
+corner. This follows from the ordering of the basis vectors (counting in binary, like 000, 001, 010,
+..., 111). Hence:
+
+$$
+  \det(C^n(U)) = \det(U).
+$$
+
+Note that this formula also holds if the controls are elsewhere. This follows from the fact that the
+determinant is invariant with respect to a change of basis.
+
+Now consider the more general case of $C^m(W)$ (for a unitary $W$) with $m\leq n$ on $n+1$
+wires. Assume for the moment that $W$ sits on the last wire and the controls being immediately
+before. Again by the ordering of the basis vectors we see that:
+
+$$
+  C^m(W) = \mathrm{diag}(W_m, W_m,\ldots, W_m) \text{ with } 2^{n-m} \text{ copies of } W_m,
+$$
+
+where $W_m$ looks like in the special case $m=n$ above. Since the determinant of $W_m$ is $\det(W)$, we deduce:
+
+$$
+  \det(C^m(W)) = \det(W)^{2^{n-m}} .
+$$
+
+Again this still holds if the controls and the target are elsewhere on the $n$ wires.
+
+Now suppose the construction was possible:
+
+$$
+  C^n(U) = \prod_i G_i,
+$$
+
+where each $G_i$ is one of the allowed gates. By well known properties of the determinant we have:
+
+$$
+  \det(U) = \prod_i \det(G_i) .
+$$
+
+The analysis above, together with $n-m\geq 2$, shows that $\det(G_i)=\det(W)^{4k}$ for some $k$ and
+$W$ one of $V$, $V^\dagger$, $U$ or $X$. Since $\det(X)=-1$ we have:
+
+$$
+  \det(U) = \left(\det(V)^{k_V} \cdot \det(V^\dagger)^{k_{V^\dagger}} \cdot \det(U)^{k_U}\right)^4.
+$$
+
+This can't be satisfied for /arbitrary/ $U$. To be specific consider $U=X$. In that case the LHS is
+$-1$ and the RHS is $+1$ because $\det(V),\det(V^\dagger)\in\{+i,-i\}$. QED.
 
 **** TODO Exercise 4.29
+Find a circuit containing $O(n^2)$ Toffoli, =CNOT= and single qubit gates which implements a
+$C^n(X)$ gate (for $n>3$), using no work qubits.
+
+*TODO:* In the light of the discussion of Exercise 4.28 this seems to be not possible - at least how
+I interpret the exercise. Maybe one can find a different interpretation, state the exercise less
+vague, and give a solution.
+
 **** TODO Exercise 4.30
+Suppose $U$ is a single qubit unitary operation. Find a circuit containing $O(n^2)$ Toffoli, =CNOT= and single
+qubit gates which implements a $C^n(U)$ gate (for $n>3$), using no work qubits.
+
+*TODO:* In the light of the discussion of Exercise 4.28 this seems to be not possible - at least how
+I interpret the exercise. Maybe one can find a different interpretation, state the exercise less
+vague, and give a solution.
+
 **** Exercise 4.31
 Let subscripts denote which qubit an operator acts on, and let $C$ be a =CNOT= with qubit 1 the
 control qubit and qubit 2 the target qubit. Prove the following identities:
