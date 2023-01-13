@@ -7,7 +7,7 @@
 #+latex_header: \newcommand{\CZ}{\mathrm{CZ}}
 #+startup: inlineimages latexpreview show2levels
 
-Notes on the [cite:Quantum Computation Bible @ChuangNielsen2011].
+Notes on the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
 
 TODOs:
 - [X] Write Exercise x.y instead of exercise x.y in headings.
@@ -18,6 +18,7 @@ TODOs:
 - [X] Use ~qiskit.circuit.Parameter~ ([[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html][link]]) to draw some of the circuits.
 - [X] Use ~print~ less often in code blocks to not pollute ipython when using ~%run quantum-bible.py~.
 - [ ] Should these "Inline" Appendices be commented (not for export)?
+- [ ] Setup some nice CSS.
 
 * Part I
 So far nothing to see here ... .
@@ -27,8 +28,8 @@ So far nothing to see here ... .
   :PROPERTIES:
   :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent :exports both
   :END:
-*** Notes
-**** Setup sympy
+*** Setup
+**** Setup Python Libraries
 #+name: setup-chapter-4
 #+begin_src python
   from functools import reduce
@@ -42,17 +43,10 @@ So far nothing to see here ... .
   import numpy as np
 
   from qiskit.circuit import QuantumCircuit, Parameter as Param
-
-  def tprod(A1, *As):
-      """Generalize TensorProduct to one and more then two arguments."""
-      P = A1
-      for A in As:
-          P = TensorProduct(P, A)
-      return P
 #+end_src
 
 **** Pauli- and Rotation-Matrices
-The Pauli matrices, and some of their friends
+The Pauli matrices, and some related matrices:
 
 #+name: paulis-and-friends
 #+begin_src python
@@ -70,7 +64,7 @@ The Pauli matrices, and some of their friends
   # pi/8 Gate
   T = Matrix([[1, 0], [0, exp(pi * I / 4)]])
 
-  # roation operators
+  # Rotation Operators
   # - Rz: Phase Shift
   # - Rx: "Strange" Rotation
   # - Ry: Real Rotation
@@ -81,7 +75,7 @@ The Pauli matrices, and some of their friends
 #+end_src
 
 The rotation operators correspond to a rotation of angle $\theta$ around the respective axis in the
-*Bloch Sphere*.
+*Bloch Sphere* (See Exercise 4.6).
 
 #+caption: The Bloch Sphere
 #+name: bloch-sphere.svg
@@ -89,8 +83,10 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
 #+attr_html: :style width: 50%
 [[./images/bloch-sphere.svg]]
 
-**** TODO Misc Gates
-#+name: misc-gates
+**** SWAP - a two-qubit Gate
+The =SWAP= Gate takes two qubits and exchanges their state. It is a permutation on the basis vectors:
+
+#+name: swap-gate
 #+begin_src python
   SWAP = Matrix([
     [1, 0, 0, 0],
@@ -100,35 +96,43 @@ The rotation operators correspond to a rotation of angle $\theta$ around the res
   ])
 #+end_src
 
-**** TODO Controlled Gates
+**** Controlled Gates
 For the definition of the controlled gates we introduce the projections $P_j$ corresponding to the
-computational basis.
+computational basis. Moreover we generalize the Tensor Product (Kronecker Product on Matrices) to
+take more then two argumentes (sympy only allows two arguments, which is not convenient).
 
-#+name: controlled-gates
+#+name: projection-operators
 #+begin_src python
   # First define the projections onto the computational basis
   P0 = Matrix([[1, 0], [0, 0]])
   P1 = Matrix([[0, 0], [0, 1]])
 
-  # controlled X (NOT), and Z gates
-  CX = tprod(P0, Id) + tprod(P1, X)
-  CZ = tprod(P0, Id) + tprod(P1, Z)
-
-  # Toffoli Gate
-  Toff = tprod(P0, P0, Id) + tprod(P0, P1, Id) + tprod(P1, P0, Id) + tprod(P1, P1, X)
-
-  # Fredkin Gate
-  Fred = tprod(P0, Id, Id) + tprod(P1, SWAP)
+  def tprod(A1, *As):
+      """Generalize TensorProduct to one and more then two arguments."""
+      P = A1
+      for A in As:
+          P = TensorProduct(P, A)
+      return P
 #+end_src
 
-#+name: make-controlled-gates
+The most basic controlled gates are the controlled Pauli Gates on two qubits. The function ~make_CU~
+generalizes this construction to arbitrary single-qubit gates on arbitrary many wires:
+
+#+name: controlled-pauli-gates
 #+begin_src python
-  def make_CU(num_wires, control, target, U):
+  # controlled X (NOT), Y, and Z gates
+  CX = tprod(P0, Id) + tprod(P1, X)
+  CY = tprod(P0, Id) + tprod(P1, Y)
+  CZ = tprod(P0, Id) + tprod(P1, Z)
+
+
+  def make_CU(num_wires: int, control: int, target: int, U: Matrix):
       """Returns a controlled U Gate. U must be single qubit gate. Wires are
-      numbered 0 to num_wires-1."""
-      assert 0 <= control < num_wires
-      assert 0 <= target < num_wires
-      assert control != target
+      numbered 0 to num_wires - 1."""
+      assert 0 <= control < num_wires, "control out of range"
+      assert 0 <= target < num_wires, "target out of range"
+      assert control != target, "target must differ from control"
+      assert U.rows == U.cols == 2, "U must be single-qubit gate"
 
       t0 = [Id]*num_wires
       t1 = [Id]*num_wires
@@ -138,13 +142,38 @@ computational basis.
       t1[target] = U
 
       return tprod(*t0) + tprod(*t1)
+#+end_src
 
+There are a few straightforward ways to generalize the above defined simple controlled gates.
 
-  def make_CnU(num_wires, controls, target, U):
+- One can allow for multiple controls ($C^nU$ gates). One instance is the /Toffoli Gate/ aka $CCX$
+  aka $C^2X$.
+- Normally, e.g. $C^3X$ is "activated" by the bit pattern =111=. One can generalize this to let a
+  different bit pattern, like =101=, activate it.
+- One can also allow for $U$ to be a multi-qubit gate (multiple targets). In general this requires
+  to specify how to wire the targets into $U$ (in which order) but for some examples like the
+  /Fredkin Gate/ (aka =CSWAP=) this is an irrelevant question since the =SWAP= gate is symmetric in
+  its inputs.
+
+#+name: other-controlled-gates
+#+begin_src python
+  # Toffoli Gate aka CCX
+  Toff = tprod(P0, P0, Id) + tprod(P0, P1, Id) + tprod(P1, P0, Id) + tprod(P1, P1, X)
+
+  # Fredkin Gate aka CSWAP
+  Fred = tprod(P0, Id, Id) + tprod(P1, SWAP)
+#+end_src
+
+Since we need them sometimes, in the following we define a factory for controlled gates with multiple controls.
+
+#+name: make-CnU-gates
+#+begin_src python
+  def make_CnU(num_wires: int, controls: list[int], target: int, U: Matrix):
       """Generalization of make_CU to several controls."""
       assert all([0 <= c < num_wires for c in controls])
       assert 0 <= target < num_wires
       assert all([c != target for c in controls])
+      assert U.rows == U.cols == 2, "U must be single-qubit gate"
 
       P = [P0, P1]
 
@@ -165,11 +194,17 @@ computational basis.
           CnU = tensor if CnU is None else CnU + tensor
 
       return CnU
+#+end_src
 
+Some very simple Unit Tests:
 
-  # Unit Tests for very pour people:
-  assert make_CU(2, 0, 1, X) == CX, "Expected CX Gate"
-  assert make_CnU(3, [0, 1], 2, X) == Toff, "Expected Toffoli Gate"
+#+name: unit-tests-for-controlled-gates
+#+begin_src python
+  assert make_CU(2, 0, 1, X) == CX, "Expected CX Gate (1)"
+  assert make_CU(3, 1, 2, X) == tprod(Id, CX), "Expected CX Gate (2)"
+
+  assert make_CnU(3, [0, 1], 2, X) == Toff, "Expected Toffoli Gate (1)"
+  assert make_CnU(4, [1, 2], 3, X) == tprod(Id, Toff), "Expected Toffoli Gate (2)"
 #+end_src
 
 *** Exercises
