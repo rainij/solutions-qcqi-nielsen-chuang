@@ -19,6 +19,7 @@ TODOs:
 - [X] Use ~print~ less often in code blocks to not pollute ipython when using ~%run quantum-bible.py~.
 - [ ] Should these "Inline" Appendices be commented (not for export)?
 - [ ] Setup some nice CSS.
+- [ ] Comment out "Search for circuits" - it might be distracting?
 
 * Part I
 So far nothing to see here ... .
@@ -34,6 +35,7 @@ So far nothing to see here ... .
 #+begin_src python
   from functools import reduce
   from itertools import product
+  from typing import Any
 
   import sympy as sp
   from sympy import cos, exp, I, Matrix, pi, sin, sqrt
@@ -41,6 +43,7 @@ So far nothing to see here ... .
   from sympy.combinatorics import Permutation as Perm
 
   import numpy as np
+  import numpy.typing as npt
 
   from qiskit.circuit import QuantumCircuit, Parameter as Param
 #+end_src
@@ -126,7 +129,7 @@ generalizes this construction to arbitrary single-qubit gates on arbitrary many 
   CZ = tprod(P0, Id) + tprod(P1, Z)
 
 
-  def make_CU(num_wires: int, control: int, target: int, U: Matrix):
+  def make_CU(num_wires: int, control: int, target: int, U: Matrix) -> Matrix:
       """Returns a controlled U Gate. U must be single qubit gate. Wires are
       numbered 0 to num_wires - 1."""
       assert 0 <= control < num_wires, "control out of range"
@@ -168,11 +171,11 @@ Since we need them sometimes, in the following we define a factory for controlle
 
 #+name: make-CnU-gates
 #+begin_src python
-  def make_CnU(num_wires: int, controls: list[int], target: int, U: Matrix):
+  def make_CnU(num_wires: int, controls: list[int], target: int, U: Matrix) -> Matrix:
       """Generalization of make_CU to several controls."""
-      assert all([0 <= c < num_wires for c in controls])
-      assert 0 <= target < num_wires
-      assert all([c != target for c in controls])
+      assert all([0 <= c < num_wires for c in controls]), "controls out of range"
+      assert 0 <= target < num_wires, "target out of range"
+      assert all([c != target for c in controls]), "target must differ from controls"
       assert U.rows == U.cols == 2, "U must be single-qubit gate"
 
       P = [P0, P1]
@@ -208,13 +211,20 @@ Some very simple Unit Tests:
 #+end_src
 
 **** The Search for Circuits
-In the following we document some /very basic/ approaches to find circuits consisting if
+In the following we document some /very basic/ approaches to find circuits consisting of
 (relatively) simple gates to construct more complex gates.
 
 The simplest non-trivial test case is to find the construction of $C^2U$ by a circuit consisting
-only of controlled $X$, $V$, and $V^\dagger$, where $V$ is unitary with $V^2=U$.
+only of controlled $X$, $V$, and $V^\dagger$, where $V$ is unitary with $V^2=U$. That is, we want to
+find the construction from Figure 4.8 by exhausive search.
 
-***** Approach 1 via Sympy - Don't do this!
+Possible Approaches (checkbox means that it is tried out within this document):
+- [X] via sympy directly on matrices
+- [X] via numpy (on matrices)
+- [ ] via sympy but replacing matrices by permutations (in the spirit of the solution to exercise 4.27).
+- [ ] outside python to avoid slow loops
+
+***** Approach 1: via Sympy - Don't do this!
 Here I document the approach via Sympy. This is not really a feasable approach since Matrix
 Multiplication in Sympy is *extremely* slow. Of course this is not entirely unexpected since sympy
 is not meant to be used in a brute force environment.
@@ -227,11 +237,12 @@ count this as "unreasonable" since this is still a very small problem.
 
 *Conclusion:* Do not use sympy to calculate lots of matrix products.
 
+****** The search routine
 Just for completeness here is the code:
 
 #+name: search-for-circuits-approach-via-sympy
 #+begin_src python
-  def make_all_CU(num_wires: int, U: Matrix, name: str, pred=None):
+  def make_all_CU(num_wires: int, U: Matrix, name: str, pred=None) -> list[Any]:
       """Generate all CU gates, whose control/target wires satisfy an optional predicate."""
       if pred is None:
           pred = (lambda c, t: True)
@@ -252,7 +263,7 @@ Just for completeness here is the code:
       return gates
 
 
-  def sp_search_circuits(n: int, admissible_gates, Wanted_Gate):
+  def sp_search_circuits(n: int, admissible_gates: list[Matrix], Wanted_Gate: Matrix) -> str:
       """Find all circuits with n gates implementing Wanted_Gate."""
       solutions = []
       for gates in product(*([admissible_gates]*n)):
@@ -263,6 +274,7 @@ Just for completeness here is the code:
       return solutions
 #+end_src
 
+****** Testing the search routine
 Here we try it out. You can use ipython magic function ~%time~ to measure how slow this approach is.
 
 #+name: search-for-circuits-approach-via-sympy-tests
@@ -298,6 +310,225 @@ Here we try it out. You can use ipython magic function ~%time~ to measure how sl
   # result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])
   # assert sorted(sp_search_circuits(2, admissible_gates, CX01 * CV02)) == result, "sp_search_circuits: CX01 * CV02"
 #+end_src
+
+***** Approach 2: via Numpy
+*IMPORTANT:* Complex numbers in numpy are always implemented via floats. To avoid the typical
+floating point arithmetic issues we assume that all numbers are either integrals or more generally
+multiples of some ~2**(-n)~. In that case floating point arithmetic is exact (up to overflow).
+
+****** Reimplement some basic auxiliary functions for numpy
+First we have to reimplement some functions we already use at the sympy side:
+
+#+name: numpy-make-controlled-gates
+#+begin_src python
+  def np_kron(A1: npt.ArrayLike, *As: list[npt.ArrayLike]) -> np.ndarray:
+      """Generalize TensorProduct to one and more then two arguments."""
+      P = A1
+      for A in As:
+          P = np.kron(P, A)
+      return P
+
+
+  def np_make_CU(num_wires: int, control: int, target: int, U: np.ndarray) -> np.ndarray:
+      """Returns a controlled U Gate. U must be single qubit gate. Wires are
+      numbered 0 to num_wires - 1."""
+      assert 0 <= control < num_wires, "control out of range"
+      assert 0 <= target < num_wires, "target out of range"
+      assert control != target, "target must differ from control"
+      assert U.shape == (2, 2), "U must be single-qubit gate"
+
+      t0 = [np_Id]*num_wires
+      t1 = [np_Id]*num_wires
+
+      t0[control] = np_P0
+      t1[control] = np_P1
+      t1[target] = U
+
+      return np_kron(*t0) + np_kron(*t1)
+
+
+  def np_make_CnU(num_wires: int, controls: list[int], target: int, U: np.ndarray) -> np.ndarray:
+      """Generalization of make_CU to several controls."""
+      assert all([0 <= c < num_wires for c in controls]), "controls out of range"
+      assert 0 <= target < num_wires, "target out of range"
+      assert all([c != target for c in controls]), "target must differ from controls"
+      assert U.shape == (2, 2), "U must be single-qubit gate"
+
+      P = [np_P0, np_P1]
+
+      CnU = None
+      ts = []
+      for bitlist in product(*[[0, 1]]*len(controls)):
+          t = [np_Id]*num_wires
+
+          for i, bit in enumerate(bitlist):
+              t[controls[i]] = P[bit]
+
+          ts.append(t)
+      ts[-1][target] = U
+
+      tensors = [np_kron(*t) for t in ts]
+      CnU = None
+      for tensor in tensors:
+          CnU = tensor if CnU is None else CnU + tensor
+
+      return CnU
+#+end_src
+
+****** Implementation of the search routine
+Now we can implement the search routine:
+
+#+begin_src python
+  def np_make_all_CU(num_wires: int, U: Matrix, name: str, pred=None) -> list[Any]:
+      if pred is None:
+          pred = (lambda c, t: True)
+
+      pairs = list(product(range(num_wires), range(num_wires)))
+      pairs = [(c, t) for (c, t) in pairs if c != t and pred(c, t)]
+
+      gates = []
+      for c, t in pairs:
+          gate = np_make_CU(num_wires, c, t, U)
+          gates.append(dict(
+              name=name,
+              ct=(c, t),
+              gate=gate,
+          ))
+
+      return gates
+
+
+  def np_make_all_C2U(num_wires: int, U: np.ndarray, name: str, pred=None) -> list[Any]:
+      if pred is None:
+          pred = (lambda c, t: True)
+
+      triples = list(product(*([range(num_wires)]*3)))
+      triples = [(c0, c1, t) for (c0, c1, t) in triples if c0 < c1 and c0 != t and c1 != t and pred((c0, c1), t)]
+
+      gates = []
+      for c0, c1, t in triples:
+          gate = np_make_CnU(num_wires, [c0, c1], t, U)
+          gates.append(dict(
+              name=name,
+              ct=((c0, c1), t),
+              gate=gate,
+          ))
+
+      return gates
+
+
+  def np_search_circuit(n: int, admissible_gates: list[np.ndarray], Wanted_Gate: np.ndarray) -> str:
+      """Find all solutions to exercise 4.28 with n gates."""
+      solutions = []
+      for gates in product(*([admissible_gates]*n)):
+          gs = [g["gate"] for g in gates]
+          prod = reduce((lambda x, y: x @ y), gs)
+          if np.alltrue(prod == Wanted_Gate):
+              solutions.append(" @ ".join([f"{g['name']}{g['ct']}" for g in gates]))
+      return solutions
+
+
+  def make_pred_CX(num_wires):
+      def pred_CX(c, t):
+          return c < t and t < num_wires - 1
+      return pred_CX
+
+
+  def make_pred_CV(num_wires: int):
+      def pred_CV(c, t):
+          return c < t and t == num_wires - 1
+      return pred_CV
+
+
+  def make_pred_CCX(num_wires: int):
+      def pred_CCX(c, t):
+          return c[0] < t and c[1] < t and t < num_wires - 1
+      return pred_CCX
+#+end_src
+
+****** Pauli Matrices (and friends) for numpy
+Now let us redefine the Pauli Matrices within numpy:
+
+#+name: numpy-paul-matrices
+#+begin_src python
+  np_X = np.array([[0, 1], [1, 0]])
+  np_Y = np.array([[0, -1j], [1j, 0]])
+  np_Z = np.array([[1, 0], [0, -1]])
+
+  np_Id = np.eye(2)
+  np_P0 = np.array([[1, 0], [0, 0]])
+  np_P1 = np.array([[0, 0], [0, 1]])
+
+  # Half-integral-numbers should be OK too since floats are binary
+  np_V = np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
+  np_Vt = np_V.conj().T
+  assert np.alltrue(np_V @ np_V == np_X), "np_V must be sqrt(np_X)."
+#+end_src
+
+****** Basic Unit Tests
+Very simple unit tests:
+
+#+name: numpy-unit-tests-for-search-circuit
+#+begin_src python
+  np_adm_CX = np_make_all_CU(3, np_X, "CX", make_pred_CX(3))
+  np_adm_CV = np_make_all_CU(3, np_V, "CV", make_pred_CV(3))
+  np_adm_CVh = np_make_all_CU(3, np_Vt, "CVh", make_pred_CV(3))
+
+  np_admissible_gates = np_adm_CX + np_adm_CV + np_adm_CVh
+
+  # For convenience:
+  def shorten_admissible_gates(admissible_gates):
+      return [dict(name=ag["name"], ct=ag["ct"]) for ag in admissible_gates]
+
+
+  np_CX01 = np_make_CU(3, 0, 1, np_X)
+  np_CX02 = np_make_CU(3, 0, 2, np_X)
+  np_CV02 = np_make_CU(3, 0, 2, np_V)
+  np_CVt02 = np_make_CU(3, 0, 2, np_Vt)
+  assert np_search_circuit(1, np_admissible_gates, np_CX01) == ['CX(0, 1)'], "np_search_circuit: CX01"
+  assert sorted(np_search_circuit(1, np_admissible_gates, np_CV02)) == ['CV(0, 2)'], "np_search_circuit: CV02"
+  result = sorted(['CX(0, 1) @ CV(0, 2)', 'CV(0, 2) @ CX(0, 1)'])
+  assert sorted(np_search_circuit(2, np_admissible_gates, np_CX01 @ np_CV02)) == result, "np_search_circuit: CX01 @ CV02"
+#+end_src
+
+****** Find all minimal implementations of the Toffoli Gate
+Finally we can actually search for all realizations of the Toffoli Gate (=CCX=):
+
+#+name: numpy-search-toffoli
+#+begin_src python
+  np_Toff = np.array(Toff)
+
+  # we deactivate the code since it takes around 10 seconds to execute
+  if False:
+      np_search_circuit(5, np_admissible_gates, np_Toff)
+  # Produces among 19 others the solution from the book:
+  # 'CV(0, 2) @ CX(0, 1) @ CVt(1, 2) @ CX(0, 1) @ CV(1, 2)',
+#+end_src
+
+We obtain 20 solutions using exactly 5 gates to represent the Toffoli (with less gates it is not possible):
+
+#+begin_example
+CX(0, 1) @ CV(0, 2) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2)
+CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(0, 2) @ CVh(1, 2)
+CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CVh(0, 2)
+CX(0, 1) @ CV(1, 2) @ CVh(0, 2) @ CX(0, 1) @ CVh(1, 2)
+CX(0, 1) @ CVh(0, 2) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2)
+CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(0, 2) @ CV(1, 2)
+CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CV(0, 2)
+CX(0, 1) @ CVh(1, 2) @ CV(0, 2) @ CX(0, 1) @ CV(1, 2)
+CV(0, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2)
+CV(0, 2) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1)
+CV(1, 2) @ CX(0, 1) @ CV(0, 2) @ CVh(1, 2) @ CX(0, 1)
+CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(0, 2)
+CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CV(0, 2) @ CX(0, 1)
+CV(1, 2) @ CV(0, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1)
+CVh(0, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2)
+CVh(0, 2) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1)
+CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(0, 2)
+CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CVh(0, 2) @ CX(0, 1)
+CVh(1, 2) @ CX(0, 1) @ CVh(0, 2) @ CV(1, 2) @ CX(0, 1)
+CVh(1, 2) @ CVh(0, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1)
+#+end_example
 
 *** Exercises
 **** Exercise 4.1
@@ -1533,184 +1764,6 @@ This code produces the circuit drawings.
 **** TODO Exercise 4.28
 For $U=V^2$ with $V$ unitary, construct a $C^5(U)$ gate analogous to that in Figure 4.10, but using no
 work qubits. You may use controlled-$V$ and controlled-$V^\dagger$ gates.
-
-
-***** Solution 2
-
-#+name: exercise-4-28-attempt-2-1
-#+begin_src python
-  np_X = np.array([[0, 1], [1, 0]])
-  np_Y = np.array([[0, -1j], [1j, 0]])
-  np_Z = np.array([[1, 0], [0, -1]])
-
-  np_Id = np.eye(2)
-  np_P0 = np.array([[1, 0], [0, 0]])
-  np_P1 = np.array([[0, 0], [0, 1]])
-
-  # We take V to be the sqrt of Z because it might ease floating point arithmetic (only integral numbers).
-  # np_V = np.array([[1, 0], [0, 1j]])
-  # assert np.alltrue(np_V @ np_V == np_Z), "Exercise 28: V must be sqrt(Z)."
-
-  # Half numbers should be OK too since floats are binary
-  np_V = np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
-  np_Vt = np_V.conj().T
-  assert np.alltrue(np_V @ np_V == np_X), "Exercise 28: V must be sqrt(X)."
-
-
-  def np_kron(A1, *As):
-      """Generalize TensorProduct to one and more then two arguments."""
-      P = A1
-      for A in As:
-          P = np.kron(P, A)
-      return P
-
-
-  def np_make_CU(num_wires, control, target, U):
-      """Returns a controlled U Gate. U must be single qubit gate. Wires are
-      numbered 0 to num_wires-1."""
-      assert 0 <= control < num_wires
-      assert 0 <= target < num_wires
-      assert control != target
-
-      t0 = [np_Id]*num_wires
-      t1 = [np_Id]*num_wires
-
-      t0[control] = np_P0
-      t1[control] = np_P1
-      t1[target] = U
-
-      return np_kron(*t0) + np_kron(*t1)
-
-
-  def np_make_CnU(num_wires, controls, target, U):
-      """Generalization of make_CU to several controls."""
-      assert all([0 <= c < num_wires for c in controls])
-      assert 0 <= target < num_wires
-      assert all([c != target for c in controls])
-
-      P = [np_P0, np_P1]
-
-      CnU = None
-      ts = []
-      for bitlist in product(*[[0, 1]]*len(controls)):
-          t = [np_Id]*num_wires
-
-          for i, bit in enumerate(bitlist):
-              t[controls[i]] = P[bit]
-
-          ts.append(t)
-      ts[-1][target] = U
-
-      tensors = [np_kron(*t) for t in ts]
-      CnU = None
-      for tensor in tensors:
-          CnU = tensor if CnU is None else CnU + tensor
-
-      return CnU
-
-
-  def np_make_all_CU(num_wires, U, name, pred=None):
-      if pred is None:
-          pred = (lambda c, t: True)
-
-      pairs = list(product(range(num_wires), range(num_wires)))
-      pairs = [(c, t) for (c, t) in pairs if c != t and pred(c, t)]
-
-      gates = []
-      for c, t in pairs:
-          gate = np_make_CU(num_wires, c, t, U)
-          gates.append(dict(
-              name=name,
-              ct=(c, t),
-              gate=gate,
-          ))
-
-      return gates
-
-
-  def np_make_all_C2U(num_wires, U, name, pred=None):
-      if pred is None:
-          pred = (lambda c, t: True)
-
-      triples = list(product(*([range(num_wires)]*3)))
-      triples = [(c0, c1, t) for (c0, c1, t) in triples if c0 < c1 and c0 != t and c1 != t and pred((c0, c1), t)]
-
-      gates = []
-      for c0, c1, t in triples:
-          gate = np_make_CnU(num_wires, [c0, c1], t, U)
-          gates.append(dict(
-              name=name,
-              ct=((c0, c1), t),
-              gate=gate,
-          ))
-
-      return gates
-
-
-  def np_search_ex4_28(n: int, admissible_gates, Wanted_Gate):
-      """Find all solutions to exercise 4.28 with n gates."""
-      solutions = []
-      for gates in product(*([admissible_gates]*n)):
-          gs = [g["gate"] for g in gates]
-          prod = reduce((lambda x, y: x @ y), gs)
-          if np.alltrue(np.abs(prod - Wanted_Gate) < 0.1):  # TODO: for integrals equality should be OK
-              solutions.append(" @ ".join([f"{g['name']}{g['ct']}" for g in gates]))
-      return solutions
-#+end_src
-
-Unit tests for very poor man:
-
-#+name: exercise-4-28-attempt-2-2
-#+begin_src python
-  np_cxs = np_make_all_CU(3, np_X, "CX", make_pred_CX(3))
-  np_cvs = np_make_all_CU(3, np_V, "CV", make_pred_CV(3))
-  np_cvts = np_make_all_CU(3, np_Vt, "CVt", make_pred_CV(3))
-
-  np_admissible_gates = np_cxs + np_cvs + np_cvts
-
-  np_CX01 = np_make_CU(3, 0, 1, np_X)
-  np_CX02 = np_make_CU(3, 0, 2, np_X)
-  np_CV02 = np_make_CU(3, 0, 2, np_V)
-  np_CVt02 = np_make_CU(3, 0, 2, np_Vt)
-  assert np_search_ex4_28(1, np_admissible_gates, np_CX01) == ['CX(0, 1)'], "Exercise 28, CX01"
-  assert sorted(np_search_ex4_28(1, np_admissible_gates, np_CV02)) == ['CV(0, 2)'], "Exercise 28, CV02"
-  result = sorted(['CX(0, 1) @ CV(0, 2)', 'CV(0, 2) @ CX(0, 1)'])
-  assert sorted(np_search_ex4_28(2, np_admissible_gates, np_CX01 @ np_CV02)) == result, "Exercise 28, CX01 @ CV02"
-#+end_src
-
-#+name: exercise-4-28-attempt-2-stuff
-#+begin_src python
-  # Takes 13 seconds
-  np_Toff = np.array(Toff)
-  # np_search_ex4_28(5, np_admissible_gates, np_Toff)
-  # Produces among 19 others the solution from the book:
-  # 'CV(0, 2) @ CX(0, 1) @ CVt(1, 2) @ CX(0, 1) @ CV(1, 2)',
-
-  def make_pred_CCX(num_wires):
-      def pred_CCX(c, t):
-          return c[0] < t and c[1] < t and t < num_wires - 1
-      return pred_CCX
-
-  np_cxs_4 = np_make_all_CU(4, np_X, "CX", make_pred_CX(4))
-  np_cvs_4 = np_make_all_CU(4, np_V, "CV", make_pred_CV(4))
-  np_cvts_4 = np_make_all_CU(4, np_Vt, "CVt", make_pred_CV(4))
-
-  np_ccxs_4 = np_make_all_C2U(4, np_X, "CCX", make_pred_CCX(4))
-
-  # functioniert auch bei 8 gates nicht (takes 3min 45s):
-  #np_admissible_gates_4 = np_ccxs_4 + np_cvs_4 + np_cvts_4
-
-  # does not solve the problem even for 7 gates:
-  np_admissible_gates_4 = np_ccxs_4 + np_cxs_4 + np_cvs_4 + np_cvts_4
-
-  def shorten_admissible_gates(admissible_gates):
-      return [dict(name=ag["name"], ct=ag["ct"]) for ag in admissible_gates]
-
-
-  np_CCCX = np_make_CnU(4, [0, 1, 2], 3, np_X)
-
-  #np_search_ex4_28(4, np_admissible_gates_4, np_CCCX))
-#+end_src
 
 **** TODO Exercise 4.29
 **** TODO Exercise 4.30
