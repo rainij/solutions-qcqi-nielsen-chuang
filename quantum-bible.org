@@ -1,17 +1,50 @@
 ;; -*- org-confirm-babel-evaluate: nil -*-
 #+title:  Solutions for the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
-#+options: tex: t
+#+startup: inlineimages nolatexpreview show2levels
+
+# TODO:
+#+options: toc:3
+
+#+name: insert-latex-macros-function-for-dynamic-block
+#+begin_src emacs-lisp :results silent :exports none
+  (defun org-dblock-write:insert-latex-macros (params)
+    "Function of the dynamic block for latex macros."
+    (let ((lines nil) (file (plist-get params :file)))
+        (with-temp-buffer
+            (insert-file-contents file)
+            (setq lines (split-string (buffer-string) "\n" t)))
+        (insert (mapconcat (lambda (str) (concat "#+latex_header: " str)) lines "\n"))
+        (insert "\n#+begin_html\n\\[\n")
+        (insert (mapconcat 'identity lines "\n"))
+        (insert "\n\\]\n#+end_html")))
+#+end_src
+
+# This dynamic block defines the relevant latex macros so that org mode catches them up. Define new
+# macros in ./latex-macros.tex. Execute org-dblock-update to sync with latex-macros.tex. Don't
+# forget to execute the source block of org-dblock-write:insert-latex-macros before!
+#+BEGIN: insert-latex-macros :file "latex-macros.tex"
 #+latex_header: \newcommand{\CC}{\mathbb{C}}
 #+latex_header: \newcommand{\RR}{\mathbb{R}}
 #+latex_header: \newcommand{\CU}{\mathrm{CU}}
 #+latex_header: \newcommand{\CX}{\mathrm{CX}}
 #+latex_header: \newcommand{\CZ}{\mathrm{CZ}}
-#+latex_header: \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
-#+latex_header: \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 #+latex_header: \newcommand{\norm}[1]{\|#1\|}
-#+startup: inlineimages latexpreview show2levels
-
+#+latex_header: \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+#+latex_header: \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+#+begin_html
+\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CU}{\mathrm{CU}}
+\newcommand{\CX}{\mathrm{CX}}
+\newcommand{\CZ}{\mathrm{CZ}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+#+end_html
+#+END:
 
 Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
 
