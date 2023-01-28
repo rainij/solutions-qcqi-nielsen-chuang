@@ -1,4 +1,4 @@
-;; -*- org-confirm-babel-evaluate: nil -*-
+;;; -*- org-confirm-babel-evaluate: nil -*-
 #+title:  Solutions for the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
 #+startup: inlineimages nolatexpreview show2levels
@@ -587,7 +587,7 @@ unitary operators satisfy the claim.
 
 **** Exercise 2.81
 Let $|AR_1\rangle$ and $|AR_2\rangle$ be two purifications of a state $\rho^A$ to a composite system
-AR. Prove that there exists a unitary transformation UR acting on system R such that
+AR. Prove that there exists a unitary transformation $U_R$ acting on system R such that
 
 $$
 \,|AR_1\rangle = (I_A \otimes U_R ) |AR_2\rangle .
@@ -600,7 +600,7 @@ $$
   \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A|
 $$
 
-be a Schmidt-Decomposition of $\rho$ (in particular all the vectors involved form an orthonormal
+be a Spectral-Decomposition of $\rho^A$ (in particular all the vectors involved form an orthonormal
 set). Without loss of generality we may assume that $|AR_2\rangle$ adheres to the generic
 construction from the book, that is
 
@@ -608,7 +608,7 @@ $$
 \, |AR_2\rangle = \sum_{i=1}^r |i_A\rangle \otimes |i_R\rangle
 $$
 
-with an orthonnomal set $(|i_R\rangle)$. A priori the Hilbert Space of $R$ could have dimension
+with an orthonormal set $(|i_R\rangle)$. A priori the Hilbert Space of $R$ could have dimension
 smaller then $r$. But in that case we could simply augment $R$ by some additional dimensions.
 
 Since $|AR_1\rangle$ and $|AR_2\rangle$ are purifications of the same state they have the same
@@ -647,7 +647,7 @@ $$
 \, |AR_1\rangle = (I_A \otimes U_R) |AR_2\rangle .
 $$
 
-The general case follows by decomposing $|AR_1\rangle$ and $|AR_2$ into direct sums over the
+The general case follows by decomposing $|AR_1\rangle$ and $|AR_2\rangle$ into direct sums over the
 eigenspaces of $\rho^A$ and repeating the above reasoning for each one. Note that in the above
 reasoning for the special case the particular value of the trace was unimportant! QED.
 
@@ -661,6 +661,10 @@ for a quantum system A. Introduce a system R with orthonormal basis $|i\rangle$.
 3. Let $|AR\rangle$ be any purification of $\rho$ to the system AR. Show that there exists an
    orthonormal basis $|i\rangle$ in which R can be measured such that the corresponding
    post-measurement state for system A is $|\psi_i\rangle$ with probability $p_i$.
+
+Remark (which is missing in the book): In sub-exercise 3 one may assume that the space $R$ is large
+enough to hold all the $|i\rangle$ even if the purification does not need that many dimensions (two
+ensembles always have at least $r$ (rank) members but might have more, see also Theorem 2.6).
 
 ***** Proof of 1
 This was /essentially/ shown in the book right before Exercise 2.79! In the book it was /implicitly/
@@ -717,7 +721,13 @@ of purifications) there is a unitary operator $U_R$ such that:
 
 $$ |AR\rangle = I\otimes U_R \; |AR_0\rangle $$
 
-Hence we may use the basis $(|i\rangle=U_R|i_0\rangle)$ to achieve the desired goal. QED.
+Hence we may use the basis $(|i\rangle=U_R|i_0\rangle)$ to achieve the desired goal.
+
+But note a subtle issue here: A priori $U_R$ is not necessarily defined on each individual
+$|i_0\rangle$. The reason is, that each density operator has ensembles with arbitrary many states
+(of course they are all linearly dependent to some $r$ dimensional set due to Theorem 2.6). This
+implies that R0 can be arbitrary large if one takes the construction in sub-exercise 1. On the
+other hand one can just "add some dimensions" to R if necessary and extend $U_R$ unitarily. QED.
 
 * Part II
 ** ACTIVE Chapter 4
