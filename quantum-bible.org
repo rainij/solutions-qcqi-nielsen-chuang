@@ -4,7 +4,7 @@
 #+startup: inlineimages nolatexpreview show2levels
 
 # TODO:
-#+options: toc:3
+#+options: num:nil toc:3
 
 #+name: insert-latex-macros-function-for-dynamic-block
 #+begin_src emacs-lisp :results silent :exports none
@@ -198,10 +198,11 @@ Very simple unit tests:
 
 *** Exercises
 **** Exercise 2.71
-Let $\rho$ be a density operator. Show that $\trace{\rho^2}\leq1$, with equality if and only if $\rho$ is a pure state.
+Let $\rho$ be a density operator. Show that $\trace{\rho^2}\leq1$, with equality if and only if
+$\rho$ is a pure state.
 
 ***** Proof
-By the characterization of density operators (Theorem 2.5) there are $0<p_i\leq1$ and orthonormal
+By the characterization of density operators (Theorem 2.5) there are $0<p_i\leq 1$ and orthonormal
 $\{|\psi_i\rangle\}$ such that:
 
 $$
@@ -2611,6 +2612,211 @@ Identity (6) follows the same way as (5).
 Identity (7) follows from the fact that $Z$, and hence $R_z$, commutes with $P_0$ and $P_1$.
 
 Identitiy (8) follows from the fact $X$, and hence $R_x$, commutes with $X$.
+
+**** Exercise 4.32
+Suppose $\rho$ is the density matrix describing a two qubit system.
+Suppose we perform a projective measurement in the computational basis of the
+second qubit. Let $P_0=|0\rangle\langle0|$ and $P_1=|1\rangle\langle1|$ be the projectors onto the $|0\rangle$ and
+$|1\rangle$ states of the second qubit, respectively. Let $\rho'$ be the density matrix which
+would be assigned to the system after the measurement by an observer who did
+not learn the measurement result. Show that
+
+$$
+  \rho' = P_0 \rho P_0 + P_1 \rho P_1 .
+$$
+
+Also show that the reduced density matrix for the first qubit is not affected by
+the measurement, that is, $\ptrace{2}{\rho}=\ptrace{2}{\rho'}$.
+
+***** Proof
+First of all observe that the formulation of the exercise clearly identifies $P_i$ with
+$I_1\otimes P_i$. We keep this identification in the following.
+
+If the interpret the measurement postulate "the right way" we see that it immediately implies that
+a measurement with respect to $P$ leaves the system in the post measurement state
+
+$$
+  \left\{ \left(\trace{P_0\rho}, P_0 \rho P_0\right),
+          \left(\trace{P_1\rho}, P_1 \rho P_1\right) \right\} ,
+$$
+
+which is an /ensemble/. I suppose it only "collapses" into one of its members if "some classical
+information flows". I suppose that "an observer who did not learn the measurement result" means that
+this flow of information did not happen, hence the state of the system is still in the ensemble. The
+corresponding density operator is:
+
+$$
+  P_0 \rho P_0 + P_1 \rho P_1 = \rho' .
+$$
+
+This proves the first claim. To prove the second claim we may assume wlog that
+$\rho=\alpha\otimes\beta$ - by linearity of the trace. Indeed:
+
+$$
+  \sum_i \ptrace{2}{P_i\,\rho\,P_i}
+  = \sum_i \ptrace{2}{I\otimes P_i \, \alpha\otimes\beta \, I\otimes P_i}
+  = \alpha \sum_i \trace{P_i \beta P_i} = \alpha = \ptrace{2}{\rho} ,
+$$
+
+which concludes the solution of the exercise. QED.
+
+**** Exercise 4.33
+The measurement model we have specified for the quantum circuit model is that measurements are
+performed only in the computational basis. However, often we want to perform a measurement in some
+other basis, defined by a complete set of orthonormal states. To perform this measurement, simply
+unitarily transform from the basis we wish to perform the measurement in to the computational basis,
+then measure. For example, show that the circuit
+
+#+name: exercise-4.33-bell-measurement
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(2, 2)
+  qc.cx(0, 1)
+  qc.h(0)
+  qc.barrier(range(2)) # just to make the drawing nicer
+  qc.measure(range(2), range(2))
+
+  str(qc.draw('text'))
+#+end_src
+
+#+RESULTS: exercise-4.33-bell-measurement
+:           ┌───┐ ░ ┌─┐
+: q_0: ──■──┤ H ├─░─┤M├───
+:      ┌─┴─┐└───┘ ░ └╥┘┌─┐
+: q_1: ┤ X ├──────░──╫─┤M├
+:      └───┘      ░  ║ └╥┘
+: c: 2/══════════════╩══╩═
+:                    0  1
+
+
+performs a measurement in the basis of the Bell states. More precisely, show that
+this circuit results in a measurement being performed with corresponding
+POVM elements the four projectors onto the Bell states. What are the
+corresponding measurement operators?
+
+***** Proof
+Let $x,y\in\{0,1\}$. Observe
+
+$$
+  CX \cdot H\otimes I \; |xy\rangle
+  = \frac{1}{\sqrt{2}} (|0y\rangle + (-1)^x |1\overline{y})
+  = |\beta_{xy}\rangle .
+$$
+
+Hence the circuit first maps $|\beta_{xy}\rangle$ to $|xy\rangle$ and then measures in the
+computational basis. This already shows that the circuit indeed "measures in the Bell Basis" in some
+sense.
+
+The measurement operators can be read directly from the circuit:
+
+$$
+  Q_{ij} = P_{ij} \cdot H\otimes I \cdot CX =: P_{ij} \cdot U ,
+$$
+
+where the $P_{ij}$ are the standard projections (for the measurement in the computational basis
+after the barrier). Observe that these are no projections ($U$ and hence the $P_{ij}U$ map the Bell
+Basis to the standard basis as implied by the introductory calculations). This is in line with the
+observation that two times applying the circuit results in a potentially different outcome.
+
+The corresponding POVMs are indeed the projections on the Bell Basis:
+
+$$
+  Q_{ij}^\dagger Q_{ij} = U^\dagger P_{ij} U ,
+$$
+
+since $U$ maps the Bell Basis to the standard basis. QED.
+
+**** Exercise 4.34 (Measuring an operator)
+Suppose we have a single qubit operator $U$ with eigenvalues $\pm1$, so that $U$ is both Hermitian and
+unitary, so it can be regarded both as an observable and a quantum gate. Suppose we wish to measure
+the observable $U$. That is, we desire to obtain a measurement result indicating one of the two
+eigenvalues, and leaving a post-measurement state which is the corresponding eigenvector. How can
+this be implemented by a quantum circuit?  Show that the following circuit implements a measurement
+of $U$:
+
+#+name: exercise-4.34-measure-observable
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(2, 1)
+  qc.h(0)
+  qc.cx(0, 1)  # this is CX but we hack it to CU below
+  qc.h(0)
+  qc.barrier(range(2)) # just to make the drawing nicer
+  qc.measure(range(1), range(1))
+
+  str(qc.draw('text'))\
+      .replace('X', 'U')\
+      .replace('q_0', '|0>')\
+      .replace('q_1', '|ψ>')
+#+end_src
+
+#+RESULTS: exercise-4.34-measure-observable
+:      ┌───┐     ┌───┐ ░ ┌─┐
+: |0>: ┤ H ├──■──┤ H ├─░─┤M├
+:      └───┘┌─┴─┐└───┘ ░ └╥┘
+: |ψ>: ─────┤ U ├──────░──╫─
+:           └───┘      ░  ║
+: c: 1/═══════════════════╩═
+:                         0
+
+***** Proof
+Observe that the projections on the eigenvalues of $U$ are given by:
+
+$$
+  Q_{\pm} = \frac{1}{2} (I \pm U) .
+$$
+
+This and a short calculation shows that the result of the circuit at the position of the barrier
+(before measurement) is:
+
+$$
+  H_1 \cdot C(U) \cdot H_1 \; |0\psi\rangle
+  = |0\rangle \otimes Q_+ |\psi\rangle + |1\rangle \otimes Q_- |\psi\rangle .
+$$
+
+Now we see that finally applying the measurement in the first qubit "reveals" the corresponding
+projection of $|\psi\rangle$ in the second wire. QED.
+
+**** Exercise 4.35 (Measurement commutes with controls)
+A consequence of the principle of deferred measurement is that measurements commute with quantum
+gates when the qubit being measured is a control qubit. That is, applying $C(U)$ first and then
+measure the first qubit is the same as first measuring (first qubit) and then applying $U$
+conditionally on the second qubit depending on the measurement outcome.
+
+***** Proof
+Let us consider a generic state $|\psi\rangle=\sum_{ij}\alpha_{ij}|ij\rangle$.
+
+*Case 1 (Measure first):* Directly after measuring, the state of the system is an ensemble (of the
+possible measurement outcomes):
+
+$$
+  \{ (p_0, |\psi_0\rangle), (p_1, |\psi_1\rangle) \} ,
+$$
+
+where
+
+$$
+  p_i = \sqrt{|\alpha_{i0}|^2 + |\alpha_{i1}|^2}, \quad
+  \,|\psi_i\rangle = \frac{1}{p_i} (\alpha_{i0} |i0\rangle + \alpha_{i1} |i1\rangle) .
+$$
+
+The conditional application of $U$ leaves the system in state
+
+$$
+  \{ (p_0, |\psi_0\rangle), (p_1, I\otimes U \; |\psi_1\rangle) \} .
+$$
+
+*Case 1 (CU first):* After applying the controlled $U$ the state is:
+
+$$
+  C(U) |\psi\rangle = \sum_j (\alpha_{0j} |0j\rangle + \alpha_{1j} |1\rangle \otimes U|j\rangle) .
+$$
+
+Measuring this, leaves us in the same final state as in case 1:
+
+$$
+  \{ (p_0, |\psi_0\rangle), (p_1, I\otimes U \; |\psi_1\rangle) \} .
+$$
+
+QED.
 
 ** Chapter 5
   :PROPERTIES:
