@@ -1304,15 +1304,32 @@ In Exercise 2.11, which you should do now if you haven’t already done it, you 
 eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which correspond to the
 normalized eigenvectors of the different Pauli matrices.
 
-Eigenvalues are +1 and -1 for all Paulis.
-
-Eigenvectors (non-normalized, tip: ~Y.eigenvects()~):
+***** Solution
+The eigenvalues are $\pm1$ for all Pauli matrices. The non-normalized eigenvectors (tip:
+~Y.eigenvects()~) are:
 
 | Pauli | EV +1    | EV -1    |
 |-------+----------+----------|
 | Z     | (1, 0)   | (0, 1)   |
 | X     | (1, 1)   | (1, -1)  |
 | Y     | (1j, -1) | (-1, 1j) |
+
+Recall the correspondence between the state vector and the parameterization of the Bloch Sphere:
+
+$$
+  ​|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi}  \sin\left(\theta /2\right) |1\rangle
+  \quad \text{ for } 0 \leq \theta \leq \pi \text{ and } 0 \leq \varphi \leq 2\pi
+$$
+
+and
+
+$$
+  (x, y, z) = (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta) .
+$$
+
+It is not hard to see that the $+1$-eigenvectors of $X$, $Y$, $Z$ correspond to $\hat{x}$,
+$\hat{y}$, $\hat{z}$. The $-1$-eigenvectors correspond to $-\hat{x}$, $-\hat{y}$, $-\hat{z}$.
+
 **** Exercise 4.2
 Let $x$ be a real number and $A$ a matrix such that $A^2 = I$. Show that
 
@@ -1323,12 +1340,14 @@ Let $x$ be a real number and $A$ a matrix such that $A^2 = I$. Show that
 
 Use this result to verify Equations (4.4) through (4.6).
 
-*Solution:* The equation is obvious from polynomial series of ~exp, sin, cos~.
+***** Solution
+The equation follows directly from the polynomial series of $\exp$, $\sin$, and $\cos$.
 
 **** Exercise 4.3
 Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 
-*Solution:* It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. Demonstration:
+***** Proof
+It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. We let ~sympy~ do the job:
 
 #+name: exercise-4.3-1
 #+begin_src python :results replace
@@ -1339,16 +1358,20 @@ Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 #+RESULTS: exercise-4.3-1
 : Matrix([[0, 0], [0, -exp(I*pi/4) + exp(0.25*I*pi)]])
 
-**** Exercise 4.4
-Express the Hadamard gate H as a product of Rx and Rz rotations and e^{iφ} for some φ.
+QED.
 
-*Solution:* Clearly a mere product of two factors can't produce the Hadamard gate. Hence we try to
+**** Exercise 4.4
+Express the Hadamard gate $H$ as a product of $R_x$ and $R_z$ rotations and $e^{i\varphi}$ for some
+$\varphi$.
+
+***** Solution
+Clearly a mere product of two factors can't produce the Hadamard gate. Hence we try to
 find $\alpha,\beta,\gamma$ such that $R_z(\alpha)\cdot R_x(\gamma) \cdot R_z(\beta)$ is the Hadamard
 up to the phase factor. Due to the sqrt of 2 factor appearing in $H$ we deduce that $\gamma=\pm\pi/2$
 is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
 
 #+name: exercise-4.4-1
-#+begin_src python :results value latex replace
+#+begin_src python
   a, b = sp.symbols('\\alpha \\beta')
 
   ra = Rz.subs(theta, a)
@@ -1357,8 +1380,13 @@ is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
 
   h0 = ra * rx * rb
   simp = sp.simplify(sqrt(2)*h0)
-  latex_formula = sp.latex(simp)
+#+end_src
 
+A short calculation leads to (use the code above to do it):
+
+#+name: exercise-4.4-2
+#+begin_src python :results value latex replace :exports none
+  latex_formula = sp.latex(simp)
   #sp.preview(simp, viewer='file', filename='output.png', euler=False,
   #           dvioptions=['-D', '200', '-T', 'tight', '-bg', 'Transparent', '-fg', 'rgb 0.2 0.6 1.0'])
   #"output.png"
@@ -1366,9 +1394,7 @@ is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
   latex_formula
 #+end_src
 
-A short calculation leads to:
-
-#+RESULTS: exercise-4.4-1
+#+RESULTS: exercise-4.4-2
 #+begin_export latex
 \left[\begin{matrix}e^{\frac{i \left(- \alpha - \beta\right)}{2}} & - i e^{- \frac{i \left(\alpha - \beta\right)}{2}}\\- i e^{\frac{i \left(\alpha - \beta\right)}{2}} & e^{\frac{i \left(\alpha + \beta\right)}{2}}\end{matrix}\right]
 #+end_export
