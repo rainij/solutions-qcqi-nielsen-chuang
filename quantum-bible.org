@@ -1,10 +1,28 @@
 ;;; -*- org-confirm-babel-evaluate: nil -*-
 #+title:  Solutions for the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
-#+startup: inlineimages nolatexpreview show2levels
+#+startup: inlineimages nolatexpreview show3levels
 
 # TODO:
 #+options: num:nil toc:3
+
+Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
+
+TODOs:
+- [X] Write Exercise x.y instead of exercise x.y in headings.
+- [X] Remove the numbers from (at least some) headings in the HTML output.
+- [X] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
+- [X] Remove toplevel Heading "quantum bible", Make Parts toplevel.
+- [X] move latex_header to separate file
+- [X] Use ~qiskit.circuit.Parameter~ ([[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html][link]]) to draw some of the circuits.
+- [X] Use ~print~ less often in code blocks to not pollute ipython when using ~%run quantum-bible.py~.
+- [ ] Don't use these "Inline" Appendices. Use ~:exports results~ and so on.
+- [ ] Setup some nice CSS.
+- [ ] Comment out "Search for circuits" - it might be distracting?
+- [ ] Do not replace (most) results of code blocks. If a result is already there do not recompute if
+  block was not changed (or similar criterion).
+- [ ] Can we have some "proof-environment"?
+
 
 #+name: insert-latex-macros-function-for-dynamic-block
 #+begin_src emacs-lisp :results silent :exports none
@@ -15,9 +33,9 @@
             (insert-file-contents file)
             (setq lines (split-string (buffer-string) "\n" t)))
         (insert (mapconcat (lambda (str) (concat "#+latex_header: " str)) lines "\n"))
-        (insert "\n#+begin_html\n\\[\n")
+        (insert "\n#+begin_export html\n\\[\n")
         (insert (mapconcat 'identity lines "\n"))
-        (insert "\n\\]\n#+end_html")))
+        (insert "\n\\]\n#+end_export")))
 #+end_src
 
 # This dynamic block defines the relevant latex macros so that org mode catches them up. Define new
@@ -32,7 +50,7 @@
 #+latex_header: \newcommand{\norm}[1]{\|#1\|}
 #+latex_header: \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 #+latex_header: \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
-#+begin_html
+#+begin_export html
 \[
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\RR}{\mathbb{R}}
@@ -43,25 +61,8 @@
 \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
 \]
-#+end_html
+#+end_export
 #+END:
-
-Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
-
-TODOs:
-- [X] Write Exercise x.y instead of exercise x.y in headings.
-- [ ] Remove the numbers from (at least some) headings in the HTML output.
-- [ ] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
-- [X] Remove toplevel Heading "quantum bible", Make Parts toplevel.
-- [ ] move latex_header to separate file
-- [X] Use ~qiskit.circuit.Parameter~ ([[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html][link]]) to draw some of the circuits.
-- [X] Use ~print~ less often in code blocks to not pollute ipython when using ~%run quantum-bible.py~.
-- [ ] Should these "Inline" Appendices be commented (not for export)?
-- [ ] Setup some nice CSS.
-- [ ] Comment out "Search for circuits" - it might be distracting?
-- [ ] Do not replace (most) results of code blocks. If a result is already there do not recompute if
-  block was not changed (or similar criterion).
-- [ ] Can we have some "proof-environment"?
 
 * Common Notation
 :PROPERTIES:
@@ -479,12 +480,12 @@ $$
 
 cannot be decomposed as required:
 
-#+name: exercise-2-77-1
+#+name: exercise-2-77-2
 #+begin_src python :results replace
   get_eigenvals_of_ABC((bra('000') + bra('010') + bra('011')) / sqrt(3))
 #+end_src
 
-#+RESULTS: exercise-2-77-1
+#+RESULTS: exercise-2-77-2
 : Eigenvalues in A: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
 : Eigenvalues in B: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
 : Eigenvalues in C: {1: 1, 0: 1}.
@@ -513,7 +514,6 @@ $$
 Since $\sum_i\lambda_i^2=1$ and $\lambda_i>0$ this can only be a pure state (a projection operator,
 i.e. $\rho^2=\rho$) if $r=1$. This is the same as $|\psi\rangle$ being a product state. QED.
 
-****
 **** Exercise 2.79
 Consider a composite system consisting of two qubits. Find the Schmidt decompositions of the states
 
@@ -914,6 +914,68 @@ Some very simple Unit Tests:
 
   assert make_CnU(3, [0, 1], 2, X) == Toff, "Expected Toffoli Gate (1)"
   assert make_CnU(4, [1, 2], 3, X) == tprod(Id, Toff), "Expected Toffoli Gate (2)"
+#+end_src
+
+**** Two-Level Gates
+Two-Level gates are gates which act non-trivially only on two base vectors (computational
+base). They are a direct generalization of /fully controlled/ single-qubit gates, whose two base
+vectors must additionally satisfy the property that the bit-representation of their index must be
+equal up to a single bit-flip.
+
+In the following we provide a utility function to quickly generate a two-level matrix. It is
+designed to work well together with the procedure to decompose general matrices into two-level
+matrices outlined in chapter 4.5.1 of the book.
+
+#+name: make-two-level-gates
+#+begin_src python
+  def make_twolevel(dim: int, indices: list[int], row: list) -> Matrix:
+      """Make a two level unitary matrix essentially by giving an unnormalized row.
+
+      Let i,j=indices, a,b=row, n=norm((a,b)). The resulting unitary matrix U satisfies
+      (U_{ii},U_{ij}=(a,b)/n if i<j, else (U_{ij},U_{ii}=(a,b)/n. The other is derived from
+      conjugation, like that (a,b) -> (-b*,a*).
+      """
+      assert len(indices) == len(row) == 2, "Expected only two indices/rows."
+      assert all([0 <= i < dim for i in indices]), "Indices out of range."
+      i, j = indices
+      assert i != j, "Indices must not be equal."
+      i1, j1 = sorted([i, j])
+
+      U = [[1 if i == j else 0 for j in range(dim)] for i in range(dim)]
+
+      norm = sqrt(row[0]*row[0].conjugate() + row[1]*row[1].conjugate())
+      r0, r1 = row[0]/norm, row[1]/norm
+
+      U[i][i1], U[i][j1] = r0, r1
+      U[j][i1], U[j][j1] = -r1.conjugate(), r0.conjugate()
+
+      return Matrix(U)
+
+
+  def make_onelevel(dim: int, index: int, factor) -> Matrix:
+    """Make a diagonal matrix with `factor` at position `index`."""
+    U = [[1 if i == j else 0 for j in range(dim)] for i in range(dim)]
+    U[index][index] = factor
+    return Matrix(U)
+#+end_src
+
+The following tests also illustrate how the function works. Take the first test as an example. The
+first index, which is 1 in test 1, determines in which row we put ~[4,3]~. The columns are specified
+by the /sorted/ indices: 0 and 1. Then the corresponding "conjugate row" is inserted and finally we
+normalize.
+
+#+name: test-two-level-gates
+#+begin_src python
+  assert make_twolevel(4, [1,0], [3, 4]) == Matrix([
+      [-4, 3, 0, 0],
+      [ 3, 4, 0, 0],
+      [ 0, 0, 5, 0],
+      [ 0, 0, 0, 5]]) / 5, "test: make_twolevel 1"
+  assert make_twolevel(4, [2,1], [3, 4*I]) == Matrix([
+      [5,   0,   0, 0],
+      [0, 4*I,   3, 0],
+      [0,   3, 4*I, 0],
+      [0,   0,   0, 5]]) / 5, "test: make_twolevel 2"
 #+end_src
 
 **** The Search for Circuits
@@ -1509,7 +1571,7 @@ which proofs the claim. QED.
 **** Exercise 4.7
 Show that $XYX = - Y$ and use this to prove that $X R_y(\theta)X = R_y(-\theta)$.
 
-*Solution:* Follows from $(XY)X = iZX = i^2Y$ (see [[id:8fd70970-1282-4a24-ab47-5eecf832498f][Pauli Matrices]]).
+*Solution:* Follows from $(XY)X = iZX = i^2Y$.
 **** Exercise 4.8
 An arbitrary single qubit unitary operator can be written in the form
 
@@ -2804,7 +2866,7 @@ $$
   \{ (p_0, |\psi_0\rangle), (p_1, I\otimes U \; |\psi_1\rangle) \} .
 $$
 
-*Case 1 (CU first):* After applying the controlled $U$ the state is:
+*Case 2 (CU first):* After applying the controlled $U$ the state is:
 
 $$
   C(U) |\psi\rangle = \sum_j (\alpha_{0j} |0j\rangle + \alpha_{1j} |1\rangle \otimes U|j\rangle) .
@@ -2817,6 +2879,513 @@ $$
 $$
 
 QED.
+
+**** Exercise 4.36
+Construct a quantum circuit to add two two-bit numbers $x$ and $y$ modulo 4. That is, the circuit
+should perform the transformation $|x,y\rangle\rightarrow|x,x+y\mod4\rangle$.
+
+***** Solution
+To find a possible solution let us write the operation in a slightly more explicit bit-wise form:
+
+$$
+  \, |x_0,x_1,y_0,y_1\rangle \mapsto |x_0,x_1,x_0\oplus y_0, x_1\oplus c \oplus y_1\rangle ,
+$$
+
+where $c=x_0\cdot y_0$ is the carry-bit. Recall that $C(X)$ implements binary addition
+modulo 2. Hence the following circuit, which is inspired by the above equation, does what we want:
+
+#+RESULTS: exercise-4.36-solution
+:
+: q_0: ──■────■───────
+:        │    │
+: q_1: ──┼────┼────■──
+:        │  ┌─┴─┐  │
+: q_2: ──■──┤ X ├──┼──
+:      ┌─┴─┐└───┘┌─┴─┐
+: q_3: ┤ X ├─────┤ X ├
+:      └───┘     └───┘
+
+#+name: exercise-4.36-solution
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(4)
+  qc.ccx(0, 2, 3)
+  qc.cx(0, 2)
+  qc.cx(1, 3)
+
+  str(qc.draw('text'))
+#+end_src
+
+**** Exercise 4.37
+Provide a decomposition of the transform
+
+$$
+\frac{1}{2}
+\,\begin{bmatrix}
+  1 & 1 & 1 & 1 \\
+  1 & i & -1 & - i \\
+  1 & -1 & 1 & -1 \\
+  1 & - i & -1 & i
+\,\end{bmatrix}
+$$
+
+into a product of two-level unitaries. This is a special case of the quantum Fourier transform,
+which we study in more detail in the next chapter.
+
+***** Solution
+We semi-automate the task with sympy. First we have to set up the matrix:
+
+#+name: exercise-4.37-1
+#+begin_src python
+  F = Matrix([[I**(x*y) for x in range(4)] for y in range(4)]) / 2
+#+end_src
+
+Using the the utility function src_python{make_twolevel} it is relatively easy to follow the
+procedure from the book (note that in general we also had to use src_python{make_onelevel}, but here
+we don't need it)):
+
+#+name: exercise-4.37-2
+#+begin_src python
+  U1 = sp.simplify(make_twolevel(4, [1,0], [1, -1]))
+  U2 = sp.simplify(make_twolevel(4, [2,0], [1, -sqrt(2)]))
+  U3 = sp.simplify(make_twolevel(4, [3,0], [1, -sqrt(3)]))
+  U4 = sp.simplify(make_twolevel(4, [2,1], [sqrt(3) * (3 + I), -3 * (1 - I)]))
+  U5 = sp.simplify(make_twolevel(4, [3,1], [I, -sqrt(2)]))
+
+  F0 = make_CU(2, 0, 1, Matrix([[1, I], [-1, I]]) / sqrt(2))
+  assert sp.simplify(U5*U4*U3*U2*U1*F) == F0
+#+end_src
+
+From this we can easily readout the decomposition:
+
+$$
+\left[\begin{matrix}\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} & 0 & 0\\\frac{\sqrt{2}}{2} & - \frac{\sqrt{2}}{2} & 0 & 0\\0 & 0 & 1 & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}\frac{\sqrt{6}}{3} & 0 & \frac{\sqrt{3}}{3} & 0\\0 & 1 & 0 & 0\\\frac{\sqrt{3}}{3} & 0 & - \frac{\sqrt{6}}{3} & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}\frac{\sqrt{3}}{2} & 0 & 0 & \frac{1}{2}\\0 & 1 & 0 & 0\\0 & 0 & 1 & 0\\\frac{1}{2} & 0 & 0 & - \frac{\sqrt{3}}{2}\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & - \frac{\sqrt{3} i \left(1 + i\right)}{4} & \frac{3}{4} - \frac{i}{4} & 0\\0 & \frac{3}{4} + \frac{i}{4} & - \frac{\sqrt{3} \cdot \left(1 + i\right)}{4} & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & \frac{\sqrt{6}}{3} & 0 & - \frac{\sqrt{3} i}{3}\\0 & 0 & 1 & 0\\0 & \frac{\sqrt{3} i}{3} & 0 & - \frac{\sqrt{6}}{3}\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & 1 & 0 & 0\\0 & 0 & \frac{\sqrt{2}}{2} & \frac{\sqrt{2} i}{2}\\0 & 0 & - \frac{\sqrt{2}}{2} & \frac{\sqrt{2} i}{2}\end{matrix}\right]
+$$
+
+
+The following code was used to produce the above latex expression:
+
+#+name: exercise-4.37-3
+#+begin_src python
+  def get_latex_for_exercise_4_37():
+      Vs = [U1.H, U2.H, U3.H, U4.H, U5.H, F0]
+      return " \\cdot ".join([sp.latex(V) for V in Vs])
+#+end_src
+
+**** Exercise 4.38
+Prove that there exists a $d\times d$ unitary matrix $U$ which cannot be decomposed as a product of
+fewer than $d-1$ two-level unitary matrices.
+
+***** Proof
+For each unitary matrix $U$ let us define an equivalence relation $\sim_U$ on $\{0,\ldots,d-1\}$
+as follows. First of all define:
+
+$$
+  i \sim^0_U j :\Leftrightarrow \langle i|U|j\rangle \neq 0
+$$
+
+Now let $\sim_U$ be the reflexive and transitive closure $\mathrm{closure}(\sim^0_U)$ of
+$\sim^0_U$. We remark that we actually only care about $i,j$ with $i\neq j$. But it is
+convenient to have an /equivalence/ relation, hence we require reflexivity.
+
+Let us call equivalence classes with at least two elements /non-trivial/. In a sense, the
+non-trivial equivalence classes correspond to those subspaces, spanned by base vectors, on which the
+matrix acts /non-trivially/. Note that this is a /slightly/ stricter notion then in the book. Merely
+multiplying a base vector with a complex number of modulus one does not count. Instead we require
+some "interaction" /between/ the basis vectors.
+
+Note that two-Level matrices have at most one non-trivial equivalence class $A$, and this $A$ has
+/exactly/ two elements.
+
+Let us define the /score/ of an equivalence relation $\sim$ by:
+
+$$
+  \mathrm{score}(\sim) = \sum_A (|A| - 1),
+$$
+
+where $A$ ranges over all (non-trivial) equivalence classes of $\sim$. Observe that the score of a
+two-level matrix is at most $1$. Let us write $\mathrm{score}(U):=\mathrm{score}(\sim_U)$. The score
+has the following easy to prove properties (we only sketch their proofs)
+
+- monotonicity :: $\sim_1\;\subset\;\sim_2\quad\Rightarrow\quad\mathrm{score}(\sim_1)\leq\mathrm{score}(\sim_2)$
+- sub-additivity :: $\mathrm{score}(\mathrm{closure}(\sim_1\cup\sim_2))\leq\mathrm{score}(\sim_1)+\mathrm{score}(\sim_2)$.
+
+The key to prove monotonicity is to observe that the equivalence classes of $\sim_1$ are subsets of
+equivalence classes of $\sim_2$. Note that the claim would even be true without the $-1$
+"punishment" for each equivalence class.
+
+For sub-additivity first observe that the equivalence classes of the combined relation is
+"essentially" the set of the "old" equivalence classes. In the extreme case where this is "realy"
+true equality holds. In general, there can be old equivalence classes which overlap. This means that
+we have to merge them. This "merger" of two old equivalence classes decreases the score by $m-1$,
+where $m$ is the number of common elements of the two old equivalence classes. Of course the merging
+has to be repeated until the equivalence classes are disjoint.
+
+To say something about $\sim_{UV}$ recall:
+
+$$
+  \langle i|UV|j\rangle = \sum_k \langle i|U|k\rangle\langle k|V|j\rangle .
+$$
+
+This implies that
+
+$$
+  \sim^0_{UV} \; \subseteq \; \sim_U \circ \sim_V \; \subseteq \; \mathrm{closure}(\sim_U \cup \sim_V)
+  \; =: \; \sim_{U,V} .
+$$
+
+In particular $\sim_{UV}\;\subseteq\;\sim_{U,V}$ (note the comma between $U$ and $V$ in the
+RHS). Hence, by monotonicity and sub-additivity:
+
+$$
+  \mathrm{score}(UV) \leq \mathrm{score}(\sim_{U,V}) \leq \mathrm{score}(U) + \mathrm{score}(V) .
+$$
+
+In particular the score of a matrix which can be decomposed into $k$ two-level matrices is at most
+$k$. On the other hand there are matrices whose score is $d-1$ (the maximal possible value). Take
+for example the cyclic permuation which maps $|i\rangle$ to $|i+1\mod d\rangle$. Such a matrix
+cannot be expressend by fewer than $d-1$ matrices. QED.
+
+**** Exercise 4.39
+Find a quantum circuit using single qubit operations and =CNOT=​s to implement the transformation
+
+\begin{bmatrix}
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & a & 0 & 0 & 0 & 0 & c \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & b & 0 & 0 & 0 & 0 & d
+\end{bmatrix}
+
+where $\tilde{U}=\begin{bmatrix}a&c\\b&d\end{bmatrix}$ is an arbitrary $2\times2$ unitary matrix.
+
+***** Solution
+Let us call the matrix $M$. Clearly $M$ represents a two-level operation at $s=010$, $t=111$. The
+following gray code connects the two bit-patterns:
+
+| $g_1$ | 010 |
+| $g_2$ | 011 |
+| $g_3$ | 111 |
+
+Let $P$ be the permutation matrix corresponding to the permuation $(7)(2,3)$ in cycle notation (it
+swaps $|g_1\rangle$ and $|g_2\rangle$). It can be implemented by a controlled $X$. $PMP$ is a
+controlled $\tilde{U}$ gate with target $0$ and controls at all remaining wires. Hence the following
+circuit implements $M$:
+
+#+name: exercise-4.39-1
+#+begin_src python :results replace :exports results
+  qcU = QuantumCircuit(1, name="Ũ")
+  ccu = qcU.to_gate().control(2)
+
+  qc = QuantumCircuit(3)
+  qc.ccx(0, 1, 2, '10')  # note: qiskit uses different bite-order
+  qc.append(ccu, [1, 2, 0])
+  qc.ccx(0, 1, 2, '10')
+
+  str(qc.draw('text'))
+#+end_src
+
+#+RESULTS: exercise-4.39-1
+:           ┌───┐
+: q_0: ──o──┤ Ũ ├──o──
+:        │  └─┬─┘  │
+: q_1: ──■────■────■──
+:      ┌─┴─┐  │  ┌─┴─┐
+: q_2: ┤ X ├──■──┤ X ├
+:      └───┘     └───┘
+
+Figure 4.9 shows how to implement the controlled $X$ from fundamental gates (take also into account
+the "trick" from Figure 4.11). Use Figure 4.8 and Figure 4.6 to implement the controlled
+$\tilde{U}$.
+
+**** Exercise 4.40
+For arbitrary $\alpha$ and $\beta$ show that
+
+$$
+  \norm{R_{\hat{n}}(\alpha) - R_{\hat{n}}(\alpha + \beta)} = |1 - \exp(i\beta/2)| .
+$$
+
+and use this to justify (4.76).
+
+***** Proof
+This directly follows from the fact that the /spectral radius/ of a normal operator is equal to its
+operator norm (for non-normal operators it might be strictly smaller). For diagonal matrices this is
+easy to see. For the general case, recall that normal operators are those operators which can be
+diagonalized by unitary operators.
+
+Let us return to the particular exercise. By the spectral theorem, and the fact that the rotation
+operators are unitary we have:
+
+$$
+  \norm{R_{\hat{n}}(\alpha) - R_{\hat{n}}(\alpha + \beta)}
+  = \norm{ R_{\hat{n}}(\alpha) (I-R_{\hat{n}}(\beta)) }
+  = \norm{I-R_{\hat{n}}(\beta)} .
+$$
+
+Again by the spectral theorem the eigenvalues of $I-R_{\hat{n}}(\beta)$ are $1-\exp(\mp i\beta/2)$
+(because the eigenvalues of $\hat{n}\cdot(X,Y,Z)$ are $\pm1$). Hence the spectral radius is
+$|1-\exp(i\beta/2)|$. Putting everything together we proved the claim.
+
+Formula (4.76) follows directly from this and $R_{\hat{n}}(\theta)^n=R_{\hat{n}}(n\theta)$ (again
+spectral theorem) for an appropriate choice of $n$ (so that $\alpha$ and $n\theta$ are close
+enough (as elements of the unit circle)). QED.
+
+**** Exercise 4.41
+This and the next two exercises develop a construction showing that the Hadamard, phase, controlled-
+and Toffoli gates are universal. Show that this circuit
+
+#+RESULTS: exercise-4.41
+:      ┌───┐               ┌───┐┌─┐
+: |0>: ┤ H ├──■─────────■──┤ H ├┤M├───
+:      ├───┤  │         │  ├───┤└╥┘┌─┐
+: |0>: ┤ H ├──■─────────■──┤ H ├─╫─┤M├
+:      └───┘┌─┴─┐┌───┐┌─┴─┐└───┘ ║ └╥┘
+: |ψ>: ─────┤ X ├┤ S ├┤ X ├──────╫──╫─
+:           └───┘└───┘└───┘      ║  ║
+: c: 2/══════════════════════════╩══╩═
+:                                0  1
+
+applies the operation $R_z(\theta)$ to the third (target) qubit if the measurement outcomes are both
+$0$, where $\cos\theta=3/5$, and otherwise applies $Z$ to the target qubit. Show that the
+probability of both measurement outcomes being $0$ is $5/8$, and explain how repeated use of this
+circuit and $Z=S^2$ gates may be used to apply a $R_z(\theta)$ gate with probability approaching
+$1$.
+
+#+name: exercise-4.41
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(3, 2)
+  qc.h(0)
+  qc.h(1)
+  qc.ccx(0, 1, 2)
+  qc.s(2)
+  qc.ccx(0, 1, 2)
+  qc.h(1)
+  qc.h(0)
+  qc.measure(range(2), range(2))
+
+  str(qc.draw('text')) \
+    .replace('q_0', '|0>') \
+    .replace('q_1', '|0>') \
+    .replace('q_2', '|ψ>')
+#+end_src
+
+***** Proof
+The initial state is $|00\psi\rangle$, however let us consider the more general situation where the
+initial state is $|ab\psi\rangle$ for $a,b\in\{0,1\}$. Observe that
+
+$$
+  H\otimes H |ab\rangle = \frac{1}{2} \sum_{ij} (-1)^{ai+bj} |ij\rangle .
+$$
+
+It is easy to calculate the state /directly/ after the second =CCX=. It is:
+
+$$
+\, |\zeta_0\rangle = \frac{1}{2} \sum_{ij} \, (-1)^{ai+bj} \, |ij\rangle \, X^{ij} S X^{ij} \, |\psi\rangle .
+$$
+
+Before applying the last two Hadamard gates it comes in handy to represent this in a slightly
+different way:
+
+$$
+\, |\zeta_0\rangle = \frac{1}{2} \sum_{ij} \, (-1)^{ai+bj} \, |ij\rangle \, S \, |\psi\rangle
+   \, + \, \frac{1}{2} \, (-1)^{a+b} \, |11\rangle \, (XSX - S) \, |\psi\rangle .
+$$
+
+Applying the last two Hadamards leads to
+
+\begin{align*}
+\, |\zeta\rangle &= H\otimes H\otimes I |\zeta_0\rangle
+  = |ab\rangle |\psi\rangle + \frac{1}{4} \sum_{ij} (-1)^{i+j+a+b} |ij\rangle \, (XSX-S) \, |\psi\rangle \\
+  &= |ab\rangle \left( \frac{3}{4}S+\frac{1}{4}XSX \right)|\psi\rangle
+  \,+\, \underbrace{\left(\sum_{ij\neq ab} \frac{1}{4} (-1)^{i+j+a+b} |ij\rangle \right)}_{=:A|ab\rangle}
+  \, (XSX-S) \, |\psi\rangle .
+\end{align*}
+
+Note that the thus defined linear operator $A$ is /not/ unitary but invertible. It has the nice
+property that $\norm{A|ab\rangle}=\sqrt{3}/4$ (independent of $a,b$) and that $A|ab\rangle$ is
+orthogonal to $|ab\rangle$. On the other hand these properties do not generalize to arbitrary
+states.
+
+Clearly
+
+$$
+  XSX - S = (i-1) Z .
+$$
+
+The other operator which is applied to the first occurrence of $|\psi\rangle$ is a bit more tricky
+to make sense of. We make use of the functional calculus for $Z$ (more specifically: we use the
+Pauli-Rotation formalism). First of all recall that $S=e^{i\pi/4}R_z(\pi/2)$ and
+$R_z(-\pi)=iZ$. Using this, with $XZX=-Z$ we get:
+
+\begin{align*}
+  \frac{3}{4}S+\frac{1}{4}XSX &= \frac{1}{4} e^{i\pi/4} (3R_z(\pi/2) + R_z(-\pi/2))
+  = \frac{1}{4} e^{i\pi/4} R_z(\pi/2) \cdot (3 + R_z(-\pi)) \\
+  &= \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\pi/2) \cdot
+    \underbrace{\left(\frac{3}{\sqrt{10}} + \frac{i}{\sqrt{10}} Z \right)}_{=:R_z(\theta_0)} .
+\end{align*}
+
+Observe that $\sin\theta_0=2\sin(\theta_0/2)\cos(\theta_0/2)=-3/5$. Let
+$\theta=\theta_0+\pi/2$. Hence $\cos(\theta)=3/5$ and
+
+$$
+  \frac{3}{4}S+\frac{1}{4}XSX = \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\theta) .
+$$
+
+Let us summarize what we found out. The final state of the qubits is:
+
+$$
+\,  |\zeta\rangle = |ab\rangle \, \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\theta) |\psi\rangle
+      \,+\, A|ab\rangle (i-1) Z |\psi\rangle
+$$
+
+*Conclusion:* If the initial state is $|ab\rangle|\psi\rangle$ then we measure $|ab\rangle$ with
+probability $5/8$. In that case the final state of the "payload" is $R_z(\theta)|\psi\rangle$ (up to
+a global phase). Otherwise the payload ends up in state $Z|\psi\rangle$ (up to a global phase). The
+angle satisfies $\cos\theta=3/5$. This proves the first part of the exercise.
+
+Let us sketch a possibility to improve the probability of success. One can introduce two more
+ancillary qubits (initialized to $|0\rangle$) and put another such circuit on them (connected to the
+"main" qubit as the first one). To cancel the $Z$ from the first circuit, in case it "fails", one
+can use three =CCZ= gates (for the three "failing" measurement outcomes). To prevent a double
+rotation (if both circuits succeed) one can put a controls on the $S$ gate (or simpler: put a
+controlled $S^3$ next to it) of the second circuit making it dependent on success of the first
+one. My the principle of deferred measurement all measurements can be done at the end of the
+circuit. To improve the probability even further, just repeat the procedure.
+
+**** Exercise 4.42
+Suppose $\cos\theta=3/5$. We give a proof by contradiction that $\theta$ is an irrational multiple
+of $2\pi$.
+
+1. Using the fact that $e^{i\theta}=(3+4i)/5$, show that if $\theta$ is rational, then there must
+   exist a positive integer $m$ such that $(3+4i)^m=5m$.
+2. Show that $(3 + 4i)^m=3+4i\mod5$ for all $m>0$, and conclude that no $m$ such that $(3+4i)^m=5^m$
+   can exist.
+
+***** Proof
+The exercise essentially contains the solution. If $\theta$ was rational, then there would be
+integers $k,m$ such that $\theta=2k\pi/m$. Hence
+
+$$
+  (3 + 4i)^m = 5^m \cdot e^{2k\pi i} = 5^m .
+$$
+
+On the other hand
+
+$$
+  (3+4i)^2 = -7 + 24i \equiv 3 + 4i \mod 5 .
+$$
+
+Clearly the same is true for higher powers. Hence $(3+4i)^m$ cannot be real - which contradicts a
+previous statement. Hence $\theta$ can not be rational. QED.
+
+**** Exercise 4.43
+Use the results of the previous two exercises to show that the Hadamard, phase, controlled-~NOT~ and
+Toffoli gates are universal for quantum computation.
+
+***** Proof
+We already know that if we add the $T$ gate then we have a universal set of gates. Hence it suffices
+to be able to approximate the $T$ gate. Note that the $T$ gate is $R_z(\pi/4)$ up to a global
+phase. Exercises 4.41 and 4.42 show that /any/ $R_z(\theta)$ can be approximated arbitrarily
+well. QED.
+
+Of course, contrary to the construction from the main-text, /this/ construction with the Toffoli
+gate needs some ancillary qubits. So we proved a /weaker/ kind of universality then what is proved
+for the "original" set of universal gates!
+
+**** Exercise 4.44
+Show that the three qubit gate
+
+$$ G = C^2(iR_x(\pi\alpha)) $$
+
+is universal for quantum computation whenever $\alpha$ is irrational.
+
+***** Proof
+We show universality for the situation where one has access to a reservoir of ancillary qubits in
+state $|0\rangle$ or $|1\rangle$.
+
+By irrationality of $\alpha$ one can approximate $C^2(R_x(\theta))$ for any angle $\theta$ (we drop
+the factor $i$ because we ignore the global phase here and in the following). By the use of
+ancillary qubits in state $|1\rangle$ one can thus implement $R_x(\theta)$ for any $\theta$.
+
+Moreover the Toffoli =CCX= can be implemented. By the use of ancillary qubits in state $|1\rangle$
+it is easy to implement =CX= and =X= from it.
+
+To proof universality it suffices to implement $R_z(\theta)$ for arbitrary $\theta$. To see this,
+first recall that according to exercise 4.11 any single qubit gate has the form
+$R_z(\beta)R_x(\gamma)R_z(\delta)$ (up to a global phase). On the other hand, the book shows that
+single qubit gates together with =CX= is a universal set.
+
+Let $|\pm\rangle$ be eigenstates of $X$ corresponding to the eigenvalues $\pm1$. By the spectral
+theorem we have:
+
+$$
+  C(R_x(\theta)) |k-\rangle =
+  \,\begin{cases}
+    \, |0-\rangle & \text{for } k=0 \\
+    e^{i\theta/2} \, |1-\rangle & \text{for } k=1
+  \,\end{cases}
+  = (e^{i\theta/4} R_z(\theta/2) |k\rangle) \otimes |-\rangle .
+$$
+
+That is, if we had access to an ancillary qubit in state $|-\rangle$ we could implement all
+$R_z(\theta)$ gates. To see that, in a sense, we have access to such a qubit, consider:
+
+$$
+  C = R_x(\pi/2)_1 \cdot C(X) \cdot R_x(\pi/2)_1 .
+$$
+
+As usual the index $1$ means that we apply the rotation gate to the first qubit. Observe that
+
+$$
+  C |00\rangle = \frac{1}{\sqrt{2}} (|0\rangle|-\rangle - i|1\rangle|+\rangle) .
+$$
+
+That is, the circuit $C$, feeded with the initial state $|00\rangle$ and measured at the first qubit
+produces $|-\rangle$ with a probability of $1/2$ (in that case $0$ is the measurement outcome). One
+can make the probability as close to one as needed by running sufficiently many of these circuits,
+but with the same "output" qubit. Of course, we have to prevent "multiple successes". To accomplish
+this, we add additional controls to the $C(X)$ gate making it dependent on the measurement outcomes
+of the "previous" runs of $C$. Of course measurements can be deferred to the end.
+
+For the argument above it is of course sufficient to be able to generate $|-\rangle$ with /merely/
+high probability. This proves the claim. QED.
+
+**** Exercise 4.45
+Suppose $U$ is a unitary transform implemented by an n qubit quantum circuit constructed from $H$,
+$S$, and Toffoli gates. Show that $U$ is of the form $2^{-k/2}M$, for some integer $k$, where $M$ is
+a $2^n\times2^n$ matrix with only complex integer entries. Repeat this exercise with the Toffoli gate
+replaced by the π/8 gate.
+
+***** Proof
+Observe that except for the Hadamard gate all mentioned gates have complex integer coefficients (and
+Kronecker products of these gates with the identity obviously does not change this
+property). Moreover we have
+
+$$
+  H = 2^{-1/2} \tilde{H} ,
+$$
+
+for a matrix $\tilde{H}$ with (real - but this does not matter) integer coefficients. Hence we can
+choose $k$ to be the number of Hadamard gates and $M$ to be the product of the matrices where $H$ is
+replaced by $\tilde{H}$.
+
+Now consider the $T$ gate. Observe that
+
+$$
+  T = \frac{1}{\sqrt{2}} \begin{bmatrix} \sqrt{2} & 0 \\ 0 & i+1 \end{bmatrix} .
+$$
+
+By a similar reasoning as above (technically by mathematical induction) we can easily show that any
+gate composed of the mentioned base gates has the form
+
+$$
+  2^{-k/2} (M_1 + \sqrt{2} M_2) ,
+$$
+
+where $M_1$ and $M_2$ have only complex integer coefficients and $k$ is the number of $T$ gates
+involved. QED.
 
 ** Chapter 5
   :PROPERTIES:
@@ -2831,6 +3400,8 @@ QED.
 
 #+RESULTS: dummy
 : 123
+
+test.
 
 * References
 #+print_bibliography:
