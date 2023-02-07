@@ -460,7 +460,7 @@ examples). As output it reports the eigenvalues of the density matrix of each su
 #+begin_src python
   def get_eigenvals_of_ABC(state_vector: Matrix):
       """Calculate eigenvals of subsystems of three-qubit system (for Exercise 2.77)."""
-      density = state_vector.H * state_vector
+      density = state_vector * state_vector.H
       DA = ptrace(density, [1, 2])
       DB = ptrace(density, [0, 2])
       DC = ptrace(density, [0, 1])
@@ -482,7 +482,7 @@ cannot be decomposed as required:
 
 #+name: exercise-2-77-2
 #+begin_src python :results replace
-  get_eigenvals_of_ABC((bra('000') + bra('010') + bra('011')) / sqrt(3))
+  get_eigenvals_of_ABC((ket('000') + ket('010') + ket('011')) / sqrt(3))
 #+end_src
 
 #+RESULTS: exercise-2-77-2
@@ -731,7 +731,7 @@ implies that R0 can be arbitrary large if one takes the construction in sub-exer
 other hand one can just "add some dimensions" to R if necessary and extend $U_R$ unitarily. QED.
 
 * Part II
-** ACTIVE Chapter 4
+** Chapter 4
   :PROPERTIES:
   :header-args:python: :session *chapter-4* :tangle yes :comments link :results silent :exports both
   :END:
@@ -1305,30 +1305,31 @@ eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which co
 normalized eigenvectors of the different Pauli matrices.
 
 ***** Solution
-The eigenvalues are $\pm1$ for all Pauli matrices. The non-normalized eigenvectors (tip:
-~Y.eigenvects()~) are:
+The eigenvalues are $\pm1$ for all Pauli matrices. The eigenvectors (tip: ~Z.eigenvects()~) are:
 
-| Pauli | EV +1    | EV -1    |
-|-------+----------+----------|
-| Z     | (1, 0)   | (0, 1)   |
-| X     | (1, 1)   | (1, -1)  |
-| Y     | (1j, -1) | (-1, 1j) |
+| Pauli | Eigenvector for $+1$                     | Eigenvector for $-1$                      |
+|-------+------------------------------------------+-------------------------------------------|
+| Z     | $\vert0\rangle$                          | $\vert1\rangle$                           |
+| X     | $2^{-1/2}(\vert0\rangle+\vert1\rangle)$  | $2^{-1/2}(\vert0\rangle-\vert1\rangle)$   |
+| Y     | $2^{-1/2}(i\vert0\rangle-\vert1\rangle)$ | $2^{-1/2}(-\vert0\rangle+i\vert1\rangle)$  |
 
 Recall the correspondence between the state vector and the parameterization of the Bloch Sphere:
 
-$$
-  ​|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi}  \sin\left(\theta /2\right) |1\rangle
-  \quad \text{ for } 0 \leq \theta \leq \pi \text{ and } 0 \leq \varphi \leq 2\pi
-$$
+\begin{align*}
+  ​|\psi\rangle &= \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi}  \sin\left(\theta /2\right) |1\rangle
+  \quad \text{ for } 0 \leq \theta \leq \pi \text{ and } 0 \leq \varphi \leq 2\pi \\
+  &=: c |0\rangle + e^{i\varphi} s |1\rangle
+\end{align*}
 
-and
+and (using $\sin\theta=2sc$, $\cos\theta=c^2-s^2$)
 
-$$
-  (x, y, z) = (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta) .
-$$
+\begin{align*}
+  (x, y, z) &= (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta) \\
+  &= (2sc\cdot\cos\varphi,\; 2sc\cdot\sin\varphi,\; c^2 - s^2) .
+\end{align*}
 
-It is not hard to see that the $+1$-eigenvectors of $X$, $Y$, $Z$ correspond to $\hat{x}$,
-$\hat{y}$, $\hat{z}$. The $-1$-eigenvectors correspond to $-\hat{x}$, $-\hat{y}$, $-\hat{z}$.
+From this it is not hard to see that the $+1$ eigenvectors of $X$, $Y$, $Z$ correspond to $\hat{x}$,
+$\hat{y}$, $\hat{z}$. The $-1$ eigenvectors correspond to $-\hat{x}$, $-\hat{y}$, $-\hat{z}$.
 
 **** Exercise 4.2
 Let $x$ be a real number and $A$ a matrix such that $A^2 = I$. Show that
@@ -1352,11 +1353,11 @@ It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. We let ~sympy~ do th
 #+name: exercise-4.3-1
 #+begin_src python :results replace
   rz = Rz.subs(theta, pi/4)
-  exp(1j*pi/8) * rz - T  # should be zero
+  exp(I*pi/8) * rz - T  # should be zero
 #+end_src
 
 #+RESULTS: exercise-4.3-1
-: Matrix([[0, 0], [0, -exp(I*pi/4) + exp(0.25*I*pi)]])
+: Matrix([[0, 0], [0, 0]])
 
 QED.
 
@@ -3413,21 +3414,305 @@ $$
 where $M_1$ and $M_2$ have only complex integer coefficients and $k$ is the number of $T$ gates
 involved. QED.
 
-** Chapter 5
-  :PROPERTIES:
-  :header-args:python: :session *chapter-5* :tangle yes :comments link :results silent
-  :END:
-*** notes
-#+name: dummy
-#+begin_src python :results replace
-  test = 123
-  test
+**** Exercise 4.46
+Let $\rho$ be a density matrix describing the state of $n$ qubits. Show that describing $\rho$
+requires $4n-1$ independent real numbers.
+
+***** Proof
+We know that $\rho\in\CC^{2n\times2n}$. Hence, a priori we need $2\cdot4^n$ real numbers to describe
+it. Since $\rho$ is (positive) hermitian, the diagonal entries are real and the off-diagonal entries
+above the diagonl determine the off-diagonal entries below the diagonal completely. Hence we are
+left with $4^n$ reals. This again reduces by one to $4^n-1$ by the trace condition.
+
+**** Exercise 4.47
+For $H=\sum_k^LH_k$, prove that $e^{-iHt}=\prod_ke^{-iH_kt}$ for all $t$ if $[H_j,H_k]=0$, for all
+$j$, $k$.
+
+***** Proof
+First of all let us observe that it is sufficient to prove the statement for the special case $L=2$
+since the general case directly follows from it. Let us restate a "cleaned up" version of the
+statement:
+
+Let $A$, $B$ two /commuting/ bounded operators (on the same Hilbert Space). Then
+$e^{A+B}=e^Ae^B$. We will prove this statement.
+
+The proof has two key ingredients. The first one is the *Binomial Formula*
+
+$$
+  (A + B)^k = \sum_{i=0}^k \binom{k}{i} A^{k-i} B^i .
+$$
+
+This formula can be easily proved by mathematical induction on $k$. The commutativity of $A$ and $B$
+is needed in the proof and in fact it allows us to take the standard proof, where $A$ and $B$ are
+real (or complex) numbers, as a template.
+
+The second ingredient is the *Cauchy Product Formula*:
+
+$$
+  \left( \sum_{i=0}^\infty a_i \right) \cdot \left( \sum_{i=0}^\infty b_j \right)
+  = \sum_{k=0}^\infty \sum_{i=0}^k a_{k-i} b_i .
+$$
+
+This formula holds under rather general conditions. One sufficient condition is that the two series
+on the left are both absolutely convergent series (in a space of bounded operators over a Hilbert
+Space). In fact, no commutativity is required and even associativity is unnecessary (the results
+holds in abstract Banach Algebras).
+
+Now let us come back to our problem. From the binomial formula we deduce:
+
+$$
+  e^{A+B} = \sum_{k=0}^\infty \frac{1}{k!} (A+B)^k
+  = \sum_{k=0}^\infty \frac{1}{k!} \sum_{i=0}^k \binom{k}{i} A^{k-i} B^i
+  = \sum_{k=0}^\infty \sum_{i=0}^k \frac{1}{(k-i)!} A^{k-i} \cdot \frac{1}{i!} B^i .
+$$
+
+The RHS has the form of the RHS of the Cauchy Product formula. Hence
+
+$$
+  e^{A+B} = e^A e^B
+$$
+
+as desired. QED.
+
+**** Exercise 4.48
+Show that the restriction of $H_k$ to involve at most $c$ particles implies that in the sum (4.97):
+
+$$
+  H = \sum_{k=1}^L H_k .
+$$
+
+$L$ is upper bounded by a polynomial in $n$.
+
+***** Proof
+I suppose that $n$ is the number of qubits. We assume that any particle is described by at most $m$
+qubits. This implies that each Hamiltonian involves at most $mc$ qubits.
+
+Moreover we assume that there are only a finite number $K$ of /types/ of interactions. As an example
+consider a special case of the (quantum) Ising Model (aka [[https://en.wikipedia.org/wiki/Quantum_Heisenberg_model][Heisenberg Model]]) with periodic boundary
+conditions:
+
+$$
+  H = -\frac{J}{2} \sum_{i=0}^n X_i X_{i+1} - h \sum_{j=1}^n Z_j .
+$$
+
+Here we have $c=2$, $m=1$ and $K=2$. More generally the two particle interaction could also involve
+$Y_iY_{i+1}$ and $Z_iZ_{i+1}$ contributions, in which case we had $K=4$.
+
+In the extreme case that each combination of $c$ particles gets a Hamiltonian of each type we get
+the maximum value for $L$. So we get the upper bound
+
+$$
+  K \binom{n/m}{c} = O(Km^{-c} n^c)
+$$
+
+/if/ each particle needs /exactly/ $m$ qubits. In general at least some particles could need less
+qubits. So the save upper bound is:
+
+$$
+  L \leq K \binom{n}{c} = O(K n^c) .
+$$
+
+Note that not each type of Hamiltonian needs to act on all $c$ particles. In that case the
+inequality is already strict, since then the given binomial coefficient overestimates the possible
+combinations. QED.
+
+**** Exercise 4.49 (Baker–Campbell–Hausdorff formula)
+Let $A$ and $B$ be bounded operators (on a Hilbert Space). Prove that
+
+$$
+  e^{(A+B)t} = e^{At} e^{Bt} e^{-\frac{1}{2} [A,B] t^2} + O(t^3)
+$$
+
+near $t=0$ and also prove these equations:
+
+\begin{align}
+  e^{(A + B)t} &= e^{At} e^{Bt} + O(t^2) , \\
+  e^{(A + B)t} &= e^{Bt/2} e^{At} e^{Bt/2} + O(t^3) .
+\end{align}
+
+*Remarks:*
+- I cleaned up the formulation a little bit, but it is essentially the same exercise.
+- According to [[https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula][wikipedia]] the above formula is a variant called the /Zassenhaus/ formula. In fact,
+  BCH deals with the related but slightly different problem of finding the solution $C$ of
+  $e^{Ct}=e^{At}e^{Bt}$.
+
+***** Proofs
+Let us first prove formula (1) - because it is the simplest. In fact, it directly follows from first
+order approximating all involved exponential series:
+
+$$
+  e^{(A+B)t} = I + (A+B)t + O(t^2) = e^{At} e^{Bt} + O(t^2) .
+$$
+
+*Remark:* From this we easily obtain the Trotter Formula (Theorem 4.3) by replacing
+$t\,\leftarrow\,t/n$ and taking the $n$​-th power. We even get a uniform error estimate $O(1/n)$ if
+$t$ is restricted to a fixed interval $[0,t_0]$. Of course the original proof shows the same
+(including the error estimate), but it contains an error: It is not true that
+$\binom{n}{k}/n^k=(1+O(1/n))/k!$. Set $k=n$ to see this.
+
+The other two formulas are also showed by comparing power series. This rather boring task can be
+done by =sympy=. Hence let us define three symbols. Two non-commuting symbols for the operators and
+a commuting symbol for the time:
+
+#+name: exercise-4.49-1
+#+begin_src python
+  A, B = sp.symbols('A B', commutative=False)
+  t = sp.symbols('t', commutative=True)  # commutes with A and B
 #+end_src
 
-#+RESULTS: dummy
-: 123
+For a warm up let us return to formula (1):
 
-test.
+#+name: exercise-4.49-2
+#+begin_src python :results replace
+  E1 = exp((A+B)*t) - exp(A*t)*exp(B*t)
+  E1.series(t, 0, 3)
+#+end_src
+
+#+RESULTS: exercise-4.49-2
+: t**2*(-A*B/2 + B*A/2) + O(t**3)
+
+This of course shows the claim again. But it is slightly more precise. The $t^2$ term as the
+coefficient $-[A,B]/2$. In a sense this already proves the BCH formula (since the exponential's
+leading term is $I$). But let us check it anyway. We increase the order of the series expansion to
+$4$ since we are curious what the first non-vanishing term looks like:
+
+#+name: exercise-4.49-3
+#+begin_src python :results replace
+  E2 = exp((A+B)*t) - exp(A*t)*exp(B*t)*exp(-(A*B-B*A)*t**2/2)
+  E2.series(t, 0, 4)
+#+end_src
+
+#+RESULTS: exercise-4.49-3
+: t**3*(-A*B*A/3 - A*B**2/3 + A**2*B/6 + 2*B*A*B/3 + B*A**2/6 - B**2*A/3) + O(t**4)
+
+Now let us check formula (2):
+
+#+name: exercise-4.49-4
+#+begin_src python :results replace
+  E3 = exp((A+B)*t) - exp(B*t/2)*exp(A*t)*exp(B*t/2)
+  E3.series(t, 0, 4)
+#+end_src
+
+#+RESULTS: exercise-4.49-4
+: t**3*(A*B*A/6 + A*B**2/24 - A**2*B/12 - B*A*B/12 - B*A**2/12 + B**2*A/24) + O(t**4)
+
+Comparing this with the third order term of the BCH formula it looks like this formula has a
+slightly better error estimate (the coefficients are smaller). But this is speculation at this
+point!
+
+QED.
+
+**** Exercise 4.50
+Let $H=\sum_{k=1}^L H_k$, and define
+
+$$
+  U_{t} = \left[ e^{-iH_1 t} e^{-iH_2 t} \ldots e^{-iH_L t}  \right]
+    \left[ e^{-iH_L t} e^{-iH_{L-1} t} \ldots e^{-iH_1 t}  \right] .
+$$
+
+1. Prove that $U_{t}=e^{-2iHt}+O(t^3)$ near $t=0$.
+2. Use the results in Box 4.1 to prove that there exists an $\alpha>0$ such that
+   $$
+     \norm{U^m_t - e^{-2miHt}} \leq m\alpha |t|^3 ,
+   $$
+   for all positive integers $m$.
+
+***** Proof
+The first part is a direct consequence of one of the formulas proved in Exercise 4.49:
+
+$$
+  e^{(A + B)t} = e^{Bt/2} e^{At} e^{Bt/2} + O(t^3) .
+$$
+
+The rest of the proof is just mathematical induction on $L$. The base case $L=0$ is trivial (holds
+even with a zero-error). The induction step uses the above formula.
+
+The case $m=1$ of the second part is /essentially/ a reformulation of the first part. In fact the
+first part shows that there is a $t_0>0$ such that the inequality holds for all
+$t\in[-t_0,t_0]$. But for $t>t_0$ we can use that the LHS is bounded by $2$. Hence the inequality
+also holds in that range after possibly adjusting $\alpha$. The general case follows from the case
+$m=1$ because all involved operators are unitary and hence the error estimates just add up according
+to Box 4.1. QED.
+
+**** Exercise 4.51
+Construct a quantum circuit to simulate the Hamiltonian
+
+$$
+  \mathcal{H} = X_1 \otimes Y_2 \otimes Z_3 .
+$$
+
+performing the unitary transform $e^{-i\Delta t\mathcal{H}}$ for any $\Delta t$.
+
+***** Solution
+Let
+
+$$
+  H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}, \quad
+  K = \frac{1}{\sqrt{2}} \begin{bmatrix} i & -1 \\ -1 & i \end{bmatrix}.
+$$
+
+The first matrix is the Hadamard gate. Recall $HXH=Z$. The second matrix is chosen so that
+$K^\dagger YK=Z$. To construct it we just calculated the eigenvectors of $Y$ and used them as
+columns in $K$. Hence
+
+$$
+  \mathcal{H} = H\otimes K^\dagger\otimes I \cdot Z_1\otimes Z_2\otimes Z_3 \cdot H\otimes K\otimes I .
+$$
+
+Observe that $K=iR_x(\pi/2)$. Note that the factor $i$ in the rotation operator representation of
+$K$ and $K^\dagger$ cancels out when diagonalizing: $R_x(\pi/2)YR_x(-\pi/2)=Z$. Hence
+
+$$
+  \mathcal{H} = H\otimes R_x(\pi/2)\otimes I \cdot Z_1\otimes Z_2\otimes Z_3 \cdot H\otimes R_x(-\pi/2)\otimes I ,
+$$
+
+and thus:
+
+$$
+  e^{-i\mathcal{H} \Delta t} =
+  H\otimes R_x(\pi/2)\otimes I \cdot
+  e^{-i Z_1\otimes Z_2\otimes Z_3 \Delta t}
+  \cdot H\otimes R_x(-\pi/2)\otimes I .
+$$
+
+From the book we already know how to construct the operator in the middle (Figure 4.19). The
+complete circuit is:
+
+#+RESULTS: exercise-4.51
+:         ┌───┐                                                ┌───┐
+: q_0: ───┤ H ├──────■───────────────────────────────────■─────┤ H ├────
+:      ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
+: q_1: ┤ Rx(+π/2) ├──┼────■─────────────────────────■────┼──┤ Rx(-π/2) ├
+:      └──────────┘  │    │                         │    │  └──────────┘
+: q_2: ──────────────┼────┼────■───────────────■────┼────┼──────────────
+:                  ┌─┴─┐┌─┴─┐┌─┴─┐┌─────────┐┌─┴─┐┌─┴─┐┌─┴─┐
+: |0>: ────────────┤ X ├┤ X ├┤ X ├┤ Rz(2Δt) ├┤ X ├┤ X ├┤ X ├────────────
+:                  └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
+
+#+name: exercise-4.51
+#+begin_src python :results replace :exports results
+  params = (Param('+π/2'), Param('-π/2'), Param('2Δt'))
+
+  qc = QuantumCircuit(4)
+
+  qc.h(0)
+  qc.rx(params[0], 1)
+
+  qc.cx(0, 3)
+  qc.cx(1, 3)
+  qc.cx(2, 3)
+
+  qc.rz(params[2], 3)
+
+  qc.cx(2, 3)
+  qc.cx(1, 3)
+  qc.cx(0, 3)
+
+  qc.rx(params[1], 1)
+  qc.h(0)
+
+  str(qc.draw('text')).replace('q_3', '|0>')
+#+end_src
 
 * References
 #+print_bibliography:
