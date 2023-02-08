@@ -18,10 +18,12 @@
 
 (setq org-html-html5-fancy t
     org-html-validation-link t  ;; TODO
-    org-html-head-include-scripts t ;; TODO
-    org-html-head-include-default-style t ;; TODO
-    ;;org-html-head "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" />"
-    ) ;; TODO
+    org-html-head-include-scripts nil
+    org-html-head-include-default-style nil
+    org-html-head (concat
+                      "<link rel=\"stylesheet\" href=\"./css/simple.css\" />\n"
+                      "<link rel=\"stylesheet\" href=\"./css/style.css\" />\n")
+    )
 
 (setq python-indent-guess-indent-offset-verbose nil ; otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4"
     org-cite-global-bibliography (list (expand-file-name "./bibliography.bib")))
@@ -31,6 +33,13 @@
              (pubdir (concat (plist-get  props :publishing-directory) "/")))
         (message "Copy %s to %s" images pubdir)
         (copy-directory images pubdir)))
+
+;; TODO: avoid code duplication
+(defun copy-css (props)
+    (let ((css (concat (plist-get  props :base-directory) "/css"))
+             (pubdir (concat (plist-get  props :publishing-directory) "/")))
+        (message "Copy %s to %s" css pubdir)
+        (copy-directory css pubdir)))
 
 (setq org-publish-project-alist
     (list
@@ -44,7 +53,7 @@
             :headline-levels 6
             :section-numbers nil
             :time-stamp-file t
-            :completion-function '(copy-images)
+            :completion-function '(copy-images copy-css)
             :with-inlinetasks nil
             :with-toc t)))
 

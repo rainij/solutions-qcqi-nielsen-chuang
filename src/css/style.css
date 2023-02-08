@@ -1,0 +1,57 @@
+/* light mode */
+:root {
+  --code: purple; /* e.g. =CNOT= has this color */
+}
+
+/* dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --code: #c586c0;
+  }
+}
+
+
+/* common tags */
+body {
+  grid-template-columns: 1fr min(65rem, 90%) 1fr;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+h2 {
+  font-size: 3.4rem;
+  margin-top: 3rem;
+}
+h3 {
+  font-size: 2.5rem;
+  margin-top: 3rem;
+}
+h4 { font-size: 2.0rem; }
+h5 { font-size: 1.6rem; }
+h6 { font-size: 1.3rem; }
+
+
+/* classes */
+.title { text-align: center; }
+.todo { font-family: monospace; color: red; }
+.done { font-family: monospace; color: green; }
+
+
+/* Show the source language in src blocks on hover */
+pre.src {
+  position: relative;
+  overflow: auto;
+}
+pre.src:before {
+  display: none;
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  padding: 3px;
+  color: var(--text-light);
+}
+pre.src:hover:before { display: inline; margin-top: 14px;}
+pre.src-python:before { content: 'Python'; }
