@@ -24,19 +24,29 @@
     ) ;; TODO
 
 (setq python-indent-guess-indent-offset-verbose nil ; otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4"
-   )
+    org-cite-global-bibliography (list (expand-file-name "./bibliography.bib")))
+
+(defun copy-images (props)
+    (let ((images (concat (plist-get  props :base-directory) "/images"))
+             (pubdir (concat (plist-get  props :publishing-directory) "/")))
+        (message "Copy %s to %s" images pubdir)
+        (copy-directory images pubdir)))
 
 (setq org-publish-project-alist
     (list
         (list "org-site:main"
             :recursive t
-            :base-directory "./src/"
+            :base-directory "./src"
             :publishing-function 'org-html-publish-to-html
             :publishing-directory "./public"
             :with-author nil
             :with-creator t ;; shows emacs and org version
+            :headline-levels 6
             :section-numbers nil
-            :time-stamp-file t)))
+            :time-stamp-file t
+            :completion-function '(copy-images)
+            :with-inlinetasks nil
+            :with-toc t)))
 
 (org-publish-all t)
 
