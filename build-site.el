@@ -30,7 +30,7 @@
     (list
         (list "org-site:main"
             :recursive t
-            :base-directory "." ;; TODO
+            :base-directory "./src/"
             :publishing-function 'org-html-publish-to-html
             :publishing-directory "./public"
             :with-author nil
