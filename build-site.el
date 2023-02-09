@@ -28,35 +28,30 @@
 (setq python-indent-guess-indent-offset-verbose nil ; otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4"
     org-cite-global-bibliography (list (expand-file-name "./bibliography.bib")))
 
-(defun copy-images (props)
-    (let ((images (concat (plist-get  props :base-directory) "/images"))
-             (pubdir (concat (plist-get  props :publishing-directory) "/")))
-        (message "Copy %s to %s" images pubdir)
-        (copy-directory images pubdir)))
-
-;; TODO: avoid code duplication
-(defun copy-css (props)
-    (let ((css (concat (plist-get  props :base-directory) "/css"))
-             (pubdir (concat (plist-get  props :publishing-directory) "/")))
-        (message "Copy %s to %s" css pubdir)
-        (copy-directory css pubdir)))
+(setq rs/default-publish-params
+      (list
+       :recursive t
+       :base-directory "./src"
+       :publishing-directory "./public"))
 
 (setq org-publish-project-alist
-    (list
-        (list "org-site:main"
-            :recursive t
-            :base-directory "./src"
-            :publishing-function 'org-html-publish-to-html
-            :publishing-directory "./public"
-            :with-author nil
-            :with-creator t ;; shows emacs and org version
-            :headline-levels 6
-            :section-numbers nil
-            :time-stamp-file t
-            :completion-function '(copy-images copy-css)
-            :with-inlinetasks nil
-            :with-toc 3)))
+    `(("pages"
+       ,@rs/default-publish-params
+       :base-extension "org"
+       :publishing-function org-html-publish-to-html
+       :with-author nil
+       :with-creator t ;; shows emacs and org version
+       :headline-levels 6
+       :section-numbers nil
+       :time-stamp-file t
+       ;;:completion-function '(copy-images copy-css)
+       :with-inlinetasks nil
+       :with-toc 3)
+      ("static"
+       ,@rs/default-publish-params
+       :base-extension "css\\|svg"
+       :publishing-function org-publish-attachment)
+      ("all" :components ("pages" "static"))))
 
-(org-publish-all t)
-
+(org-publish "all" t)
 (message "DONE")
