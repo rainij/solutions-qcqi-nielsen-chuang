@@ -1,4 +1,3 @@
-;;; -*- org-confirm-babel-evaluate: nil -*-
 #+title:  Solutions for the book `Quantum Computation and Quantum Information`
 #+author: Reinhard Stahn
 #+startup: inlineimages nolatexpreview show3levels
@@ -12,7 +11,7 @@ Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
 TODOs:
 - [X] Write Exercise x.y instead of exercise x.y in headings.
 - [X] Remove the numbers from (at least some) headings in the HTML output.
-- [X] How to tell the HTML exporter to recognize the latex macros (e.g. for \CZ).
+- [X] How to tell the HTML exporter to recognize the latex macros (e.g. for \norm).
 - [X] Remove toplevel Heading "quantum bible", Make Parts toplevel.
 - [X] move latex_header to separate file
 - [X] Use ~qiskit.circuit.Parameter~ ([[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html][link]]) to draw some of the circuits.
@@ -44,9 +43,6 @@ TODOs:
 #+BEGIN: insert-latex-macros :file "latex-macros.tex"
 #+latex_header: \newcommand{\CC}{\mathbb{C}}
 #+latex_header: \newcommand{\RR}{\mathbb{R}}
-#+latex_header: \newcommand{\CU}{\mathrm{CU}}
-#+latex_header: \newcommand{\CX}{\mathrm{CX}}
-#+latex_header: \newcommand{\CZ}{\mathrm{CZ}}
 #+latex_header: \newcommand{\norm}[1]{\|#1\|}
 #+latex_header: \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 #+latex_header: \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
@@ -54,9 +50,6 @@ TODOs:
 \[
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\RR}{\mathbb{R}}
-\newcommand{\CU}{\mathrm{CU}}
-\newcommand{\CX}{\mathrm{CX}}
-\newcommand{\CZ}{\mathrm{CZ}}
 \newcommand{\norm}[1]{\|#1\|}
 \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
@@ -527,7 +520,7 @@ $$
 The first state clearly is already represented as Schmidt-Decomposition.
 
 The second term has Schmidt-Decomposition $|+\rangle\otimes|+\rangle$, where
-$|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ is "the" positive eigenvector of the Pauli Operator $X$.
+$|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ is "the" positive eigenvector of the Pauli Operator =X=.
 
 For the third one we have to calculate something. The proof of the existence of the
 Schmidt-Decomposition gives a procedure to actually calculate it. First let us find the Matrix
@@ -1328,7 +1321,7 @@ and (using $\sin\theta=2sc$, $\cos\theta=c^2-s^2$)
   &= (2sc\cdot\cos\varphi,\; 2sc\cdot\sin\varphi,\; c^2 - s^2) .
 \end{align*}
 
-From this it is not hard to see that the $+1$ eigenvectors of $X$, $Y$, $Z$ correspond to $\hat{x}$,
+From this it is not hard to see that the $+1$ eigenvectors of =X=, =Y=, =Z= correspond to $\hat{x}$,
 $\hat{y}$, $\hat{z}$. The $-1$ eigenvectors correspond to $-\hat{x}$, $-\hat{y}$, $-\hat{z}$.
 
 **** Exercise 4.2
@@ -1453,7 +1446,7 @@ of the sphere.
 
 ****** (A) The claim is true for the special case $\hat{n} = (0, 0, 1)$.
 
-PROOF: The standard basis $(|0\rangle, |1\rangle)$ diagonalizes $Z$. Hence, $Z$ trivially acts on
+PROOF: The standard basis $(|0\rangle, |1\rangle)$ diagonalizes =Z=. Hence, =Z= trivially acts on
 $\varphi$ which corresponds to a rotation around the z-axis. QED.
 
 ****** (B) The claim is true for the special case $\hat{n} = (0, 1, 0)$.
@@ -1790,7 +1783,7 @@ $$ X = HZH,\quad Z = HXH,\quad Y = - HYH $$
 
 ***** Proof
 The first two identities follow from the fact that $H$ is (unitary and) self-adjoint and contains
-eigenvectors of $X$ as columns (and rows). The third identity follows from
+eigenvectors of =X= as columns (and rows). The third identity follows from
 
 $$ H = \frac{1}{\sqrt{2}} \left( X + Z \right). $$
 
@@ -1938,13 +1931,13 @@ Code which produces the circuits:
 #+end_src
 
 **** Exercise 4.17
-Construct a =CNOT= (CX) gate from a =CZ= using two Hadamard Gates.
+Construct a =CNOT= (=CX=) gate from a =CZ= using two Hadamard Gates.
 
 ***** Solution
 The general form of a CU-gate is ($P_j$ being projections):
 
 $$
-  \CU = P_1 \otimes I + P_2 \otimes U
+  CU = P_1 \otimes I + P_2 \otimes U
 $$
 
 Hence by $HZH=X$:
@@ -1954,7 +1947,7 @@ $$
 $$
 
 **** Exercise 4.18
-Show that swapping the two qubits leaves $\CZ$ invariant. That is, these two circuits are equal:
+Show that swapping the two qubits leaves =CZ= invariant. That is, these two circuits are equal:
 
 #+begin_example
 
@@ -1969,7 +1962,7 @@ q_0: ┤ Z ├
 q_1: ──■──
 #+end_example
 
-For this reason, the $CZ$ is often denoted in a symmetric form:
+For this reason, the =CZ= is often denoted in a symmetric form:
 
 #+RESULTS: exercise-4.18-appendix
 :
@@ -1978,16 +1971,15 @@ For this reason, the $CZ$ is often denoted in a symmetric form:
 : q_1: ─■─
 :
 
-
 ***** Proof
 This follows from
 
 $$
-  \CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
+  CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
 $$
 
 ***** Appendix
-Code which produces the circuits (at least the plot of the symmetric CZ gate):
+Code which produces the circuits (at least the plot of the symmetric =CZ= gate):
 
 #+name: exercise-4.18-appendix
 #+begin_src python :results replace
@@ -2008,7 +2000,7 @@ $$
   \rho = \sum_{i,j=0}^1 p_{ij} |ij\rangle .
 $$
 
-$\CX$ maps $|0j\rangle$ to itself, and it swaps $|10\rangle$ with $|11\rangle$. Hence, as a mapping
+=CX= maps $|0j\rangle$ to itself, and it swaps $|10\rangle$ with $|11\rangle$. Hence, as a mapping
 on the density matrix it acts as follows on the density matrix:
 
 $$
@@ -2034,13 +2026,13 @@ q_1: ──■──
 #+end_example
 
 
-Moreover the effect of the CX gate on the eigenbasis of $X$ is as follows:
+Moreover the effect of the =CX= gate on the eigenbasis of =X= is as follows:
 
 $$
   \,|\pm+\rangle \mapsto |\pm+\rangle,\quad |\pm-\rangle \mapsto |\mp-\rangle
 $$
 
-In other words: With respect to the eigenbasis of $X$ the CX gate acts again like a CX gate but with
+In other words: With respect to the eigenbasis of =X= the =CX= gate acts again like a =CX= gate but with
 the control and target qubit switched.
 
 # TODO: make drawings of the circuits.
@@ -2049,9 +2041,9 @@ the control and target qubit switched.
 The statement after "Moreover" is direct consequence of the first statement. Therefore we only prove
 the first one.
 
-We have to show that $H\otimes H \cdot CX \cdot H\otimes H$ is the CX gate with the qubits reversed.
+We have to show that $H\otimes H \cdot CX \cdot H\otimes H$ is the =CX= gate with the qubits reversed.
 
-First, let us recall the projections on the eigenbasis of $X$:
+First, let us recall the projections on the eigenbasis of =X=:
 
 \begin{align*}
   P_+ &= |+\rangle \otimes \langle+| = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}, \\
@@ -2064,7 +2056,7 @@ $$
   H\otimes H \cdot CX \cdot H\otimes H = P_+ \otimes I + P_- \otimes Z .
 $$
 
-We have to show that, after swapping the two qubits the RHS equals $CX$. In fact:
+We have to show that, after swapping the two qubits the RHS equals =CX=. In fact:
 
 $$
   I \otimes P_+ + Z \otimes P_- = \frac{1}{2}
@@ -2087,7 +2079,7 @@ $$
         0 & 1 & 0 & 0 \\
         0 & 0 & 0 & 1 \\
         0 & 0 & 1 & 0
-      \,\end{bmatrix} = \CX .
+      \,\end{bmatrix} = n C(X) .
 $$
 
 ***** Appendix
@@ -2135,24 +2127,24 @@ Which is indeed $C^2(U)$.
 
 **** Exercise 4.22
 Prove that a $C^2(U)$ gate (for any single qubit unitary $U$) can be constructed using at most eight
-one-qubit gates, and six $\CX$.
+one-qubit gates, and six $C(X)$.
 
 ***** Proof
 If we combine the construction of $C^2(U)$ from figure 4.8 (the $U=V^2$ thing) with the construction
 of $C(U)$ from figure 4.6 (the $AXBXC=U$ thing), we immediately see that we can construct a circuit
-with six $CX$ and ten one-qubit gates (two of the three phase gates cancel each other). However, we
+with six =CX= and ten one-qubit gates (two of the three phase gates cancel each other). However, we
 can reduce the number of one qubit gates by two, since two pairs can actually be merged into a
 single one-qubit operator.
 
 **** Exercise 4.23
-Construct a $C^1(U)$ gate for $U=R_x(\theta)$ and $U=R_y(\theta)$, using only CNOT and single qubit
+Construct a $C^1(U)$ gate for $U=R_x(\theta)$ and $U=R_y(\theta)$, using only =CNOT= and single qubit
 gates. Can you reduce the number of single qubit gates needed in the construction from three to two?
 
 ***** Solution
 For the y-rotation this is easy:
 
 $$
-  C^1(R_y(\theta)) = \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{y,2}(\theta/2) .
+  C^1(R_y(\theta)) = C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{y,2}(\theta/2) .
 $$
 
 #+RESULTS: exercise-4.22-appendix-1
@@ -2172,7 +2164,7 @@ $$
 Now the proof of Corollary 4.2 shows:
 
 $$
-  C^1(R_x(\theta)) = R_{z,2}(-\pi/2) \CX \cdot R_{y,2}(-\theta/2) \cdot \CX \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
+  C^1(R_x(\theta)) = R_{z,2}(-\pi/2) C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
 $$
 
 #+RESULTS: exercise-4.22-appendix-2
@@ -2420,7 +2412,7 @@ This code produces the images to the problem.
 #+end_src
 
 **** Exercise 4.27
-Using just CNOTs and Toffoli gates, construct a quantum circuit to perform the transformation
+Using just =CNOT= and Toffoli gates, construct a quantum circuit to perform the transformation
 
 \begin{bmatrix}
   1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -2437,7 +2429,7 @@ This kind of partial cyclic permutation operation will be useful later, in Chapt
 
 ***** Solution
 Since the exercise already speaks about permutations lets dive into the permutation group
-formalism. This works since all involved matrices (CNOT, Toffoli, and the matrix from the exercise
+formalism. This works since all involved matrices (=CNOT=, Toffoli, and the matrix from the exercise
 text) are all /permutation matrices/. These form a group which is isomorphic to a group of
 permuations. The procedure below also works analogously if we would directly use the matrix
 representations but I think it is nice to think it throught in a different formalism.
@@ -2453,7 +2445,7 @@ Recall the Matrix representation for the =CNOT= gate with control at 0 and targe
 wires):
 
 $$
-  \CX_{01} = \begin{bmatrix}
+  C_{01}(X) = \begin{bmatrix}
       1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
       0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
       0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
@@ -2466,7 +2458,7 @@ $$
 $$
 
 If we enumerate the basis vectors from $0$ (for $|000\rangle$) to $7$ (for $|111\rangle$), then this
-corresponds to the permuation $(4\;6)(5\;7)$ (in [[https://en.wikipedia.org/wiki/Permutation#Cycle_notation][cycle-notation]]). The other variations of $\CX$ (with
+corresponds to the permuation $(4\;6)(5\;7)$ (in [[https://en.wikipedia.org/wiki/Permutation#Cycle_notation][cycle-notation]]). The other variations of =CX= (with
 different control/target) can be found by noting that permuting the three wires induces a
 permutation on the basis vectors which in turn translates to an action on the permutation group
 itself. See the code block below for the results (or use ~make_CU~ to make life easier).
@@ -2569,7 +2561,7 @@ Figure 4.10, but using no work qubits. You may use controlled-$V$ and controlled
 *Remark:* In my opinion the formulation of the exercise is bad. The way I understand it there is
 indeed no solution. Some sources in the internet claim that some slight variation of the circuit in
 Figure 8 (for n=3 add a wire above the others, and let this wire be an additional control of the two
-CX and the rightmost CV) solves the problem (see reference in the solution). But in fact, I also
+=CX= and the rightmost =CV=) solves the problem (see reference in the solution). But in fact, I also
 found this solution but since it involves a $C^{n-1}V$ gate to construct $C^nU$ I rejected it as an
 invalid solution. To get rid of all these control qubits on $V$ one would again take further roots
 of $V$ which seems to be not very usefull for a real implementations. So at best it is a *pseudo
@@ -2673,7 +2665,7 @@ control qubit and qubit 2 the target qubit. Prove the following identities:
 \end{align}
 
 ***** Proofs
-Preparations: Let $N$ stand for $X$, $Y$, or $Z$. Recall that $P_0$ and $P_1$ are the projections
+Preparations: Let $N$ stand for =X=, =Y=, or =Z=. Recall that $P_0$ and $P_1$ are the projections
 onto the computational basis, and that:
 
 \begin{align*}
@@ -2698,9 +2690,9 @@ Identity (5) follows from $YX=-iZ=-XY$, and $P_0P_1=P_1P_0=0$, and $X^2=I$, and 
 
 Identity (6) follows the same way as (5).
 
-Identity (7) follows from the fact that $Z$, and hence $R_z$, commutes with $P_0$ and $P_1$.
+Identity (7) follows from the fact that =Z=, and hence $R_z$, commutes with $P_0$ and $P_1$.
 
-Identitiy (8) follows from the fact $X$, and hence $R_x$, commutes with $X$.
+Identitiy (8) follows from the fact =X=, and hence $R_x$, commutes with =X=.
 
 **** Exercise 4.32
 Suppose $\rho$ is the density matrix describing a two qubit system.
@@ -3097,7 +3089,7 @@ following gray code connects the two bit-patterns:
 | $g_3$ | 111 |
 
 Let $P$ be the permutation matrix corresponding to the permuation $(7)(2,3)$ in cycle notation (it
-swaps $|g_1\rangle$ and $|g_2\rangle$). It can be implemented by a controlled $X$. $PMP$ is a
+swaps $|g_1\rangle$ and $|g_2\rangle$). It can be implemented by a controlled =X=. $PMP$ is a
 controlled $\tilde{U}$ gate with target $0$ and controls at all remaining wires. Hence the following
 circuit implements $M$:
 
@@ -3123,7 +3115,7 @@ circuit implements $M$:
 : q_2: ┤ X ├──■──┤ X ├
 :      └───┘     └───┘
 
-Figure 4.9 shows how to implement the controlled $X$ from fundamental gates (take also into account
+Figure 4.9 shows how to implement the controlled =X= from fundamental gates (take also into account
 the "trick" from Figure 4.11). Use Figure 4.8 and Figure 4.6 to implement the controlled
 $\tilde{U}$.
 
@@ -3175,7 +3167,7 @@ and Toffoli gates are universal. Show that this circuit
 :                                0  1
 
 applies the operation $R_z(\theta)$ to the third (target) qubit if the measurement outcomes are both
-$0$, where $\cos\theta=3/5$, and otherwise applies $Z$ to the target qubit. Show that the
+$0$, where $\cos\theta=3/5$, and otherwise applies =Z= to the target qubit. Show that the
 probability of both measurement outcomes being $0$ is $5/8$, and explain how repeated use of this
 circuit and $Z=S^2$ gates may be used to apply a $R_z(\theta)$ gate with probability approaching
 $1$.
@@ -3242,7 +3234,7 @@ $$
 $$
 
 The other operator which is applied to the first occurrence of $|\psi\rangle$ is a bit more tricky
-to make sense of. We make use of the functional calculus for $Z$ (more specifically: we use the
+to make sense of. We make use of the functional calculus for =Z= (more specifically: we use the
 Pauli-Rotation formalism). First of all recall that $S=e^{i\pi/4}R_z(\pi/2)$ and
 $R_z(-\pi)=iZ$. Using this, with $XZX=-Z$ we get:
 
@@ -3274,7 +3266,7 @@ angle satisfies $\cos\theta=3/5$. This proves the first part of the exercise.
 
 Let us sketch a possibility to improve the probability of success. One can introduce two more
 ancillary qubits (initialized to $|0\rangle$) and put another such circuit on them (connected to the
-"main" qubit as the first one). To cancel the $Z$ from the first circuit, in case it "fails", one
+"main" qubit as the first one). To cancel the =Z= from the first circuit, in case it "fails", one
 can use three =CCZ= gates (for the three "failing" measurement outcomes). To prevent a double
 rotation (if both circuits succeed) one can put a controls on the $S$ gate (or simpler: put a
 controlled $S^3$ next to it) of the second circuit making it dependent on success of the first
@@ -3344,7 +3336,7 @@ first recall that according to exercise 4.11 any single qubit gate has the form
 $R_z(\beta)R_x(\gamma)R_z(\delta)$ (up to a global phase). On the other hand, the book shows that
 single qubit gates together with =CX= is a universal set.
 
-Let $|\pm\rangle$ be eigenstates of $X$ corresponding to the eigenvalues $\pm1$. By the spectral
+Let $|\pm\rangle$ be eigenstates of =X= corresponding to the eigenvalues $\pm1$. By the spectral
 theorem we have:
 
 $$
@@ -3652,7 +3644,7 @@ $$
 $$
 
 The first matrix is the Hadamard gate. Recall $HXH=Z$. The second matrix is chosen so that
-$K^\dagger YK=Z$. To construct it we just calculated the eigenvectors of $Y$ and used them as
+$K^\dagger YK=Z$. To construct it we just calculated the eigenvectors of =Y= and used them as
 columns in $K$. Hence
 
 $$
