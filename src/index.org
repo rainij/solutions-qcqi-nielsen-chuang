@@ -5,7 +5,6 @@
 # TODO:
 #+options: num:nil toc:3
 
-# TODO: the build script has no access to my library
 Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
 
 TODOs:
@@ -1876,7 +1875,7 @@ From here we can directly read out the claim! QED.
 **** Exercise 4.16
 What is the 4×4 unitary matrix for the following circuits
 
-#+RESULTS: exercise-4.16-appendix
+#+RESULTS: exercise-4.16-circuit
 #+begin_example
 
 q_0: ─────
@@ -1890,6 +1889,17 @@ q_0: ┤ H ├
 q_1: ─────
 
 #+end_example
+
+#+name: exercise-4.16-circuit
+#+begin_src python :results replace :exports results
+  qc1 = QuantumCircuit(2)
+  qc1.h(1)
+
+  qc2 = QuantumCircuit(2)
+  qc2.h(0)
+
+  str(qc1.draw('text')) + "\n\n" + str(qc2.draw('text'))
+#+end_src
 
 ***** Solution
 According the convention of the book, these two circuits are represented by $I\otimes H$,
@@ -1916,20 +1926,6 @@ $$
   \,\end{bmatrix}
 $$
 
-***** Appendix
-Code which produces the circuits:
-
-#+name: exercise-4.16-appendix
-#+begin_src python :results replace
-  qc1 = QuantumCircuit(2)
-  qc1.h(1)
-
-  qc2 = QuantumCircuit(2)
-  qc2.h(0)
-
-  str(qc1.draw('text')) + "\n\n" + str(qc2.draw('text'))
-#+end_src
-
 **** Exercise 4.17
 Construct a =CNOT= (=CX=) gate from a =CZ= using two Hadamard Gates.
 
@@ -1950,7 +1946,6 @@ $$
 Show that swapping the two qubits leaves =CZ= invariant. That is, these two circuits are equal:
 
 #+begin_example
-
 q_0: ──■──
      ┌─┴─┐
 q_1: ┤ Z ├
@@ -1964,12 +1959,20 @@ q_1: ──■──
 
 For this reason, the =CZ= is often denoted in a symmetric form:
 
-#+RESULTS: exercise-4.18-appendix
+#+RESULTS: exercise-4.18-circuit-1
 :
 : q_0: ─■─
 :       │
 : q_1: ─■─
 :
+
+#+name: exercise-4.18-circuit-1
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(2)
+  qc.cz(0, 1)
+
+  qc.draw('text')
+#+end_src
 
 ***** Proof
 This follows from
@@ -1977,17 +1980,6 @@ This follows from
 $$
   CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
 $$
-
-***** Appendix
-Code which produces the circuits (at least the plot of the symmetric =CZ= gate):
-
-#+name: exercise-4.18-appendix
-#+begin_src python :results replace
-  qc = QuantumCircuit(2)
-  qc.cz(0, 1)
-
-  qc.draw('text')
-#+end_src
 
 **** Exercise 4.19
 The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
@@ -2010,7 +2002,7 @@ $$
 **** Exercise 4.20
 Show that the following two circuits are equal:
 
-#+RESULTS: exercise-4.20-appendix
+#+RESULTS: exercise-4.20-circuit-1
 #+begin_example
      ┌───┐     ┌───┐
 q_0: ┤ H ├──■──┤ H ├
@@ -2035,7 +2027,20 @@ $$
 In other words: With respect to the eigenbasis of =X= the =CX= gate acts again like a =CX= gate but with
 the control and target qubit switched.
 
-# TODO: make drawings of the circuits.
+#+name: exercise-4.20-circuit-1
+#+begin_src python :results replace :exports results
+  qc1 = QuantumCircuit(2)
+  qc1.h(0)
+  qc1.h(1)
+  qc1.cx(0, 1)
+  qc1.h(0)
+  qc1.h(1)
+
+  qc2 = QuantumCircuit(2)
+  qc2.cx(1, 0)
+
+  str(qc1.draw('text')) + "\n\n" + str(qc2.draw('text'))
+#+end_src
 
 ***** Proof
 The statement after "Moreover" is direct consequence of the first statement. Therefore we only prove
@@ -2079,26 +2084,8 @@ $$
         0 & 1 & 0 & 0 \\
         0 & 0 & 0 & 1 \\
         0 & 0 & 1 & 0
-      \,\end{bmatrix} = n C(X) .
+      \,\end{bmatrix} = C(X) .
 $$
-
-***** Appendix
-Code which produces the circuits:
-
-#+name: exercise-4.20-appendix
-#+begin_src python :results replace
-  qc1 = QuantumCircuit(2)
-  qc1.h(0)
-  qc1.h(1)
-  qc1.cx(0, 1)
-  qc1.h(0)
-  qc1.h(1)
-
-  qc2 = QuantumCircuit(2)
-  qc2.cx(1, 0)
-
-  str(qc1.draw('text')) + "\n\n" + str(qc2.draw('text'))
-#+end_src
 
 **** Exercise 4.21
 Verify that Figure 4.8 implements the $C^2(U)$ operation.
@@ -2147,11 +2134,11 @@ $$
   C^1(R_y(\theta)) = C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS: exercise-4.22-appendix-1
+#+RESULTS: exercise-4.22-circuit-1
 :
 : q_0: ─────────────■────────────────■──
 :      ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
-: q_1: ┤ Rx(θ/2) ├┤ X ├┤ Rx(-θ/2) ├┤ X ├
+: q_1: ┤ Ry(θ/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├
 :      └─────────┘└───┘└──────────┘└───┘
 
 We get the same result if we use the proof of Corollary 4.2. For the x-rotation we first deduce from
@@ -2167,24 +2154,23 @@ $$
   C^1(R_x(\theta)) = R_{z,2}(-\pi/2) C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS: exercise-4.22-appendix-2
+#+RESULTS: exercise-4.22-circuit-2
 :
 : q_0: ─────────────────────────■────────────────■──────────────
 :      ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
 : q_1: ┤ Ry(θ/2) ├┤ Rz(-π/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├┤ Rz(-π/2) ├
 :      └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
 
-***** Appendix
-The code for the circuit plots:
+# The code for the circuit plots:
 
-#+name: exercise-4.22-appendix
-#+begin_src python :exports code
+#+name: exercise-4.22-prepare
+#+begin_src python :exports none
   params = (Param('θ/2'), Param('-θ/2'), Param('-π/2'))
 
   qc1 = QuantumCircuit(2)
-  qc1.rx(params[0], 1)
+  qc1.ry(params[0], 1)
   qc1.cx(0, 1)
-  qc1.rx(params[1], 1)
+  qc1.ry(params[1], 1)
   qc1.cx(0, 1)
 
   qc2 = QuantumCircuit(2)
@@ -2196,13 +2182,13 @@ The code for the circuit plots:
   qc2.rz(params[2], 1)
 #+end_src
 
-#+name: exercise-4.22-appendix-1
-#+begin_src python :results replace :exports both
+#+name: exercise-4.22-circuit-1
+#+begin_src python :results replace :exports results
   str(qc1.draw('text'))
 #+end_src
 
-#+name: exercise-4.22-appendix-2
-#+begin_src python :results replace :exports both
+#+name: exercise-4.22-circuit-2
+#+begin_src python :results replace :exports results
   str(qc2.draw('text'))
 #+end_src
 
@@ -2277,7 +2263,7 @@ Recall that the Fredkin (controlled-swap) gate performs the transform:
 Taking the swap-gate construction from Figure 1.7 we may deduce that the following circuit might do
 what we want:
 
-#+RESULTS: exercise-4-25-appendix-1
+#+RESULTS: exercise-4-25-circuit-1
 :
 : q_0: ──■────■────■──
 :        │  ┌─┴─┐  │
@@ -2288,6 +2274,7 @@ what we want:
 
 In fact, a short calculation yields the desired result.
 
+#+name: exercise-4-25-1
 #+begin_src python
   T01 = make_CnU(3, [0, 1], 2, X)
   T02 = make_CnU(3, [0, 2], 1, X)
@@ -2295,10 +2282,20 @@ In fact, a short calculation yields the desired result.
   assert T01 * T02 * T01 == Fred, "Exercise 4.25, Solution to 1."
 #+end_src
 
+#+name: exercise-4-25-circuit-1
+#+begin_src python :results replace :exports results
+  qc1 = QuantumCircuit(3)
+  qc1.ccx(0, 1, 2)
+  qc1.ccx(0, 2, 1)
+  qc1.ccx(0, 1, 2)
+
+  qc1.draw('text')
+#+end_src
+
 ***** Solution to 2
 The following circuit equals the Fredkin Gate too:
 
-#+RESULTS: exercise-4-25-appendix-2
+#+RESULTS: exercise-4-25-circuit-2
 :
 : q_0: ───────■───────
 :           ┌─┴─┐
@@ -2315,6 +2312,16 @@ In fact:
   assert C12 * T02 * C12 == Fred, "Exercise 4.25, Solution to 2."
 #+end_src
 
+#+name: exercise-4-25-circuit-2
+#+begin_src python :results replace :exports results
+  qc2 = QuantumCircuit(3)
+  qc2.cx(1, 2)
+  qc2.ccx(0, 2, 1)
+  qc2.cx(1, 2)
+
+  qc2.draw('text')
+#+end_src
+
 ***** Solution to 3
 Apriori this new circuit uses 8 = 6 + 2 two-qubit gates. However the first two of these can be
 merged into one (together with the Hadamard in between). Observe that the a similar fact is true for
@@ -2326,33 +2333,10 @@ with $V^2=X$). With the same trick as in Solution 3 (merging adjacent gates) one
 with 6 two-qubit gates. I tried to move around gates at the right end (via commutator relations)
 hoping the find an equivalent circuit with on gate less - so far without success.
 
-***** Appendix
-This code produces the images to the solutions.
-
-#+name: exercise-4-25-appendix-1
-#+begin_src python :results replace :exports both
-  qc1 = QuantumCircuit(3)
-  qc1.ccx(0, 1, 2)
-  qc1.ccx(0, 2, 1)
-  qc1.ccx(0, 1, 2)
-
-  qc1.draw('text')
-#+end_src
-
-#+name: exercise-4-25-appendix-2
-#+begin_src python :results replace :exports both
-  qc2 = QuantumCircuit(3)
-  qc2.cx(1, 2)
-  qc2.ccx(0, 2, 1)
-  qc2.cx(1, 2)
-
-  qc2.draw('text')
-#+end_src
-
 **** Exercise 4.26
 Show that the circuit
 
-#+RESULTS: exercise-4-26-appendix
+#+RESULTS: exercise-4-26-circuit-1
 :
 : q_0: ─────────────────────────────■───────────────────────────────
 :                                   │
@@ -2362,6 +2346,21 @@ Show that the circuit
 :      └─────────┘└───┘└─────────┘└───┘└──────────┘└───┘└──────────┘
 
 differs from a Toffoli gate only by relative phases $e^{i\theta(c_1,c_2,t)}$.
+
+#+name: exercise-4-26-circuit-1
+#+begin_src python :results replace :exports results
+  qc = QuantumCircuit(3)
+  params = (Param('π/?'), Param('-π/?'))
+  qc.ry(params[0], 2)
+  qc.cx(1, 2)
+  qc.ry(params[0], 2)
+  qc.cx(0, 2)
+  qc.ry(params[1], 2)
+  qc.cx(1, 2)
+  qc.ry(params[1], 2)
+
+  qc.draw('text')
+#+end_src
 
 ***** Proof
 The following code saves us from the tedious calculations. It shows that $?=4$ (everywhere) is a
@@ -2377,7 +2376,7 @@ $$
 #+name: exercise-4-8-get-circuit
 #+begin_src python
   def get_circuit(n: int):
-      """The n is the divisor missing in the Figure of Exercise 4.26."""
+      """The n is the divisor missing in the Figure of Exercise 4.26 (the '?')."""
       R = tprod(Id, Id, Ry.subs(theta, pi / n))
       Ri = tprod(Id, Id, Ry.subs(theta, -pi / n))
 
@@ -2391,24 +2390,6 @@ $$
   Phase = tprod(Id, Id, Id) - 2*tprod(P1, P0, P0)  # Multiplies |100> by -1
 
   assert Phase * C == Toff, "Exercise 4.26: Circuit should be Toffoli up to Phase Factor"
-#+end_src
-
-***** Appendix
-This code produces the images to the problem.
-
-#+name: exercise-4-26-appendix
-#+begin_src python :results replace :exports both
-  qc = QuantumCircuit(3)
-  params = (Param('π/?'), Param('-π/?'))
-  qc.ry(params[0], 2)
-  qc.cx(1, 2)
-  qc.ry(params[0], 2)
-  qc.cx(0, 2)
-  qc.ry(params[1], 2)
-  qc.cx(1, 2)
-  qc.ry(params[1], 2)
-
-  qc.draw('text')
 #+end_src
 
 **** Exercise 4.27
@@ -2483,7 +2464,7 @@ listed in the code block below.
 
 #+name: exercise-4-27-1
 #+begin_src python
-  # cxij means control i, target j
+  # cxij means: control i, target j
   cx01 = Perm(4, 6)(5, 7)
   cx02 = Perm(4, 5)(6, 7)
   cx12 = Perm(2, 3)(6, 7)
@@ -2530,7 +2511,7 @@ t0 * cx21 * t2 * cx12 * cx02
 One benefit of the "reversed" multiplication of the permutations is that it is the same ordering
 like in typical drawings of circuits. Let us just draw the third one:
 
-#+RESULTS: exercise-4-27-appendix
+#+RESULTS: exercise-4-27-circuit
 :      ┌───┐
 : q_0: ┤ X ├────────────■────■──
 :      └─┬─┘┌───┐       │    │
@@ -2539,11 +2520,8 @@ like in typical drawings of circuits. Let us just draw the third one:
 : q_2: ──■────■──┤ X ├┤ X ├┤ X ├
 :                └───┘└───┘└───┘
 
-***** Appendix
-This code produces the circuit drawings.
-
-#+name: exercise-4-27-appendix
-#+begin_src python :results replace :exports both
+#+name: exercise-4-27-circuit
+#+begin_src python :results replace :exports results
   qc = QuantumCircuit(3)
   qc.ccx(1, 2, 0)
   qc.cx(2, 1)
