@@ -2,9 +2,6 @@
 #+author: Reinhard Stahn
 #+startup: inlineimages nolatexpreview show3levels
 
-# TODO:
-#+options: num:nil toc:3
-
 Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011].
 
 TODOs:
@@ -190,7 +187,7 @@ Very simple unit tests:
 #+end_src
 
 *** Exercises
-**** Exercise 2.71
+**** Exercise 2.71 (Criterion to decide if a state is mixed or pure)
 Let $\rho$ be a density operator. Show that $\trace{\rho^2}\leq1$, with equality if and only if
 $\rho$ is a pure state.
 
@@ -212,7 +209,7 @@ which proves the first claim. Equality can clearly only hold if for all $i$: $p_
 condition this is only possible if there is only one summand in the sum making up $\rho$. This means
 that $\rho$ is pure in that case. QED.
 
-**** Exercise 2.72
+**** Exercise 2.72 (Bloch sphere for mixed states)
 The Bloch sphere picture for pure states of a single qubit was introduced in Section 1.2. This
 description has an important generalization to mixed states as follows.
 
@@ -578,7 +575,7 @@ $(|i_{B,\varphi}\rangle)$. By the latter fact it is easy to find a unitary $U$ w
 $|i_{A,\varphi}\rangle$ to $|i_{A,\psi}\rangle$ and similarly a $V$ for the B-system. These two
 unitary operators satisfy the claim.
 
-**** Exercise 2.81
+**** Exercise 2.81 (Freedom in purifications)
 Let $|AR_1\rangle$ and $|AR_2\rangle$ be two purifications of a state $\rho^A$ to a composite system
 AR. Prove that there exists a unitary transformation $U_R$ acting on system R such that
 
@@ -1428,7 +1425,7 @@ relations between the Pauli Operators like $XY=iZ=-YX$. This shows that in the e
 $(\hat{n}\cdot\sigma)^2$ only the squares of the Pauli Operators survive. Now use $X^2=Y^2=Z^2=I$ to
 obtain the claim.
 
-**** Exercise 4.6
+**** Exercise 4.6 (Bloch sphere interpretation of rotations)
 Show that the rotation operators $R_{\hat{n}}(\theta)$ corresponds to a rotation of angle $\theta$
 around the axis given by $\hat{n}$.
 
@@ -1670,7 +1667,7 @@ Explain why any single qubit unitary operator may be written in the form (4.12).
 *Solution:* This essentially follows from the first lines of the proof of part 1 in [[#exercise-4-8-part-1][exercise 4.8]]
 (representation of $U$).
 
-**** Exercise 4.10
+**** Exercise 4.10 (=X=-=Y= decomposition of rotations)
 Give a decomposition analogous to Theorem 4.1 but using $R_x$ instead of $R_z$.
 
 ***** Solution
@@ -1774,7 +1771,7 @@ Hence:
       0 & e^{\frac{i \pi}{4}}
     \end{pmatrix}
 \end{align*}
-**** Exercise 4.13
+**** Exercise 4.13 (Circuit identities)
 It is useful to be able to simplify circuits by inspection, using well-known identities. Prove the
 following three identities:
 
@@ -1793,7 +1790,7 @@ Use the previous exercise to show that $HTH=R_x(\pi/4)$, up to a global phase.
 
 ***** Proof
 This follows from $T\equiv R_z(\pi/4)$ (up to phase factor) and $HZH=X$.
-**** Exercise 4.15
+**** Exercise 4.15 (Composition of single qubit operations)
 The Bloch representation gives a nice way to visualize the effect of composing two rotations.
 
 1. Prove that if a rotation through an angle β1 about the axis n̂1 is followed by a
@@ -1872,7 +1869,7 @@ Rearranging the result for better readability:
 
 From here we can directly read out the claim! QED.
 
-**** Exercise 4.16
+**** Exercise 4.16 (Matrix representation of multi-qubit gates)
 What is the 4×4 unitary matrix for the following circuits
 
 #+RESULTS: exercise-4.16-circuit
@@ -1926,7 +1923,7 @@ $$
   \,\end{bmatrix}
 $$
 
-**** Exercise 4.17
+**** Exercise 4.17 (Building =CNOT= from controlled-=Z= gates)
 Construct a =CNOT= (=CX=) gate from a =CZ= using two Hadamard Gates.
 
 ***** Solution
@@ -1981,7 +1978,7 @@ $$
   CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
 $$
 
-**** Exercise 4.19
+**** Exercise 4.19 (=CNOT= action on density matrices)
 The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
 the matrix. Write out this action explicitly in the computational basis.
 
@@ -1999,7 +1996,7 @@ $$
   p_{0i} \mapsto p_{0i},\quad p_{10} \mapsto p_{11},\quad p_{11} \mapsto p_{10} .
 $$
 
-**** Exercise 4.20
+**** Exercise 4.20 (=CNOT= basis transformations)
 Show that the following two circuits are equal:
 
 #+RESULTS: exercise-4.20-circuit-1
@@ -2237,7 +2234,7 @@ $$
 
 QED.
 
-**** TODO Exercise 4.25 [3/4]
+**** TODO Exercise 4.25 (Fredkin gate construction) [3/4]
 Recall that the Fredkin (controlled-swap) gate performs the transform:
 
 \begin{bmatrix}
@@ -2627,7 +2624,7 @@ qubit gates which implements a $C^n(U)$ gate (for $n>3$), using no work qubits.
 I interpret the exercise. Maybe one can find a different interpretation, state the exercise less
 vague, and give a solution.
 
-**** Exercise 4.31
+**** Exercise 4.31 (More circuit identities)
 Let subscripts denote which qubit an operator acts on, and let $C$ be a =CNOT= with qubit 1 the
 control qubit and qubit 2 the target qubit. Prove the following identities:
 
@@ -2719,7 +2716,7 @@ $$
 
 which concludes the solution of the exercise. QED.
 
-**** Exercise 4.33
+**** Exercise 4.33 (Measurement in the Bell basis)
 The measurement model we have specified for the quantum circuit model is that measurements are
 performed only in the computational basis. However, often we want to perform a measurement in some
 other basis, defined by a complete set of orthonormal states. To perform this measurement, simply
@@ -3251,7 +3248,7 @@ controlled $S^3$ next to it) of the second circuit making it dependent on succes
 one. My the principle of deferred measurement all measurements can be done at the end of the
 circuit. To improve the probability even further, just repeat the procedure.
 
-**** Exercise 4.42
+**** Exercise 4.42 (Irrationality of $\theta$)
 Suppose $\cos\theta=3/5$. We give a proof by contradiction that $\theta$ is an irrational multiple
 of $2\pi$.
 
@@ -3384,7 +3381,7 @@ $$
 where $M_1$ and $M_2$ have only complex integer coefficients and $k$ is the number of $T$ gates
 involved. QED.
 
-**** Exercise 4.46
+**** Exercise 4.46 (Exponential complexity growth of quantum systems)
 Let $\rho$ be a density matrix describing the state of $n$ qubits. Show that describing $\rho$
 requires $4n-1$ independent real numbers.
 

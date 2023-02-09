@@ -55,7 +55,7 @@
             :time-stamp-file t
             :completion-function '(copy-images copy-css)
             :with-inlinetasks nil
-            :with-toc t)))
+            :with-toc 3)))
 
 (org-publish-all t)
 
