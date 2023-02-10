@@ -11,7 +11,10 @@
 ;; Load packages but do not activate them:
 (package-initialize nil)
 
-(load-theme 'misterioso t) ; TODO: does not effect syntax highlighting in batch mode
+;; Install use-package if necessary (builtin in emacs-29)
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
 
 ;; Activate dependencies, ensure installation if necessary
 (setq use-package-verbose t)
