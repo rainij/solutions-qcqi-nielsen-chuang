@@ -10,6 +10,9 @@
 
 ;; Load packages but do not activate them:
 (package-initialize nil)
+;; This *seems* to be not needed on emacs-29:
+(unless package-archive-contents
+  (package-refresh-contents))
 
 ;; Install use-package if necessary (builtin in emacs-29)
 (unless (package-installed-p 'use-package)
