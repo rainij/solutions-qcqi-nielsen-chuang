@@ -1,0 +1,87 @@
+/* light mode */
+:root {
+  --keyword: purple;
+  --code: var(--keyword); /* e.g. =CNOT= has this color */
+  --latex: var(--text);
+  --function: #066098;
+  --builtin: #008b8b;
+  --variable: #daa520;
+  --string: #c01907;
+  --comment: #74af68;
+  --operator: black;
+  --constant: #e67128;
+}
+
+/* dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --keyword: #c586c0;
+    --code: var(--keyword);
+    --latex: var(--keyword);
+    --function: #87cefa;
+    --builtin: #23d7d7;
+    --variable: #eedd82;
+    --string: #ffa07a;
+    --comment: #74af68;
+    --operator1: #db3e00;
+    --operator: white;
+    --constant: #e67128;
+  }
+}
+
+
+/* common tags */
+body {
+  grid-template-columns: 1fr min(65rem, 90%) 1fr;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+h2 {
+  font-size: 3.4rem;
+  margin-top: 3rem;
+}
+h3 {
+  font-size: 2.5rem;
+  margin-top: 3rem;
+}
+h4 { font-size: 2.0rem; }
+h5 { font-size: 1.6rem; }
+h6 { font-size: 1.3rem; }
+h7 { font-size: 1.1rem; font-weight: bold; }
+
+
+/* classes */
+.title { text-align: center; }
+.todo { font-family: monospace; color: red; }
+.done { font-family: monospace; color: green; }
+.MathJax { color: var(--latex); }
+
+/* syntax highlighting of source blocks */
+.org-keyword { color: var(--keyword); font-weight: bold; }
+.org-function-name { color: var(--function); font-weight: bold; }
+.org-builtin { color: var(--builtin); }
+.org-string, .org-doc { color: var(--string); }
+.org-variable-name { color: var(--variable); }
+.org-comment, .org-comment-delimiter { color: var(--comment); font-style: italic; }
+.org-operator { color: var(--operator); }
+.org-constant { color: var(--constant); }
+
+/* Show the source language in src blocks on hover */
+pre.src {
+  position: relative;
+  overflow: auto;
+}
+pre.src:before {
+  display: none;
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  padding: 3px;
+  color: var(--text-light);
+}
+pre.src:hover:before { display: inline; margin-top: 14px;}
+pre.src-python:before { content: 'Python'; }

@@ -1,1 +1,5444 @@
-Test Page
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Solutions for the book `Quantum Computation and Quantum Information`</title><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><h1 class="title">Solutions for the book `Quantum Computation and Quantum Information`</h1><div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#common-notation">Common Notation</a></li>
+<li><a href="#org24901c2">Part I</a>
+<ul>
+<li><a href="#orga5ab57e">Chapter 2</a></li>
+</ul>
+</li>
+<li><a href="#org90cb7f9">Part II</a>
+<ul>
+<li><a href="#org71c8ea8">Chapter 4</a></li>
+<li><a href="#org5adca2a"><span class="todo TODO">TODO</span> Chapter 5</a></li>
+</ul>
+</li>
+<li><a href="#org0cdb546">References</a></li>
+</ul>
+</div>
+</div>
+<p>
+Solutions for the "Quantum Computation Bible" [cite: @ChuangNielsen2011] (aka "Mike and Ike").
+</p>
+
+<p>
+TODOs:
+</p>
+<ul class="org-ul">
+<li class="on"><code>[X]</code> Write Exercise x.y instead of exercise x.y in headings.</li>
+<li class="on"><code>[X]</code> Remove the numbers from (at least some) headings in the HTML output.</li>
+<li class="on"><code>[X]</code> How to tell the HTML exporter to recognize the latex macros (e.g. for \norm).</li>
+<li class="on"><code>[X]</code> Remove toplevel Heading "quantum bible", Make Parts toplevel.</li>
+<li class="on"><code>[X]</code> move latex<sub>header</sub> to separate file</li>
+<li class="on"><code>[X]</code> Use <code>qiskit.circuit.Parameter</code> (<a href="https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html">link</a>) to draw some of the circuits.</li>
+<li class="on"><code>[X]</code> Use <code>print</code> less often in code blocks to not pollute ipython when using <code>%run quantum-bible.py</code>.</li>
+<li class="on"><code>[X]</code> Don't use these "Inline" Appendices. Use <code>:exports results</code> and so on.</li>
+<li class="on"><code>[X]</code> Setup some nice CSS.</li>
+<li class="off"><code>[&#xa0;]</code> Comment out "Search for circuits" - it might be distracting?</li>
+<li class="off"><code>[&#xa0;]</code> Do not replace (most) results of code blocks. If a result is already there do not recompute if
+block was not changed (or similar criterion).</li>
+<li class="off"><code>[&#xa0;]</code> Can we have some "proof-environment"?</li>
+</ul>
+
+\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+
+<div id="outline-container-org2591455" class="outline-2">
+<h2 id="common-notation">Common Notation</h2>
+<div class="outline-text-2" id="text-common-notation">
+<p>
+For two hermitian operators we write:
+</p>
+
+<p>
+\[ A \leq B \]
+</p>
+
+<p>
+if \(\langle\psi|B - A|\psi\rangle \geq 0\) for all \(|\psi\rangle\). In the special case that one
+operator is just a multiple of the Identity, e.g. \(A=aI\), we write:
+</p>
+
+<p>
+\[ a \leq B \]
+</p>
+</div>
+</div>
+
+<div id="outline-container-org24901c2" class="outline-2">
+<h2 id="org24901c2">Part I</h2>
+<div class="outline-text-2" id="text-org24901c2">
+</div>
+<div id="outline-container-orga5ab57e" class="outline-3">
+<h3 id="orga5ab57e">Chapter 2</h3>
+<div class="outline-text-3" id="text-orga5ab57e">
+</div>
+<div id="outline-container-org701a58b" class="outline-4">
+<h4 id="org701a58b">Setup</h4>
+<div class="outline-text-4" id="text-org701a58b">
+</div>
+<div id="outline-container-orgf3648ce" class="outline-5">
+<h5 id="orgf3648ce">Python Libraries</h5>
+<div class="outline-text-5" id="text-orgf3648ce">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> product
+
+<span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> Matrix, sqrt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd99bfd6" class="outline-5">
+<h5 id="orgd99bfd6">Bra-Ket</h5>
+<div class="outline-text-5" id="text-orgd99bfd6">
+<p>
+For convenience we define two functions which map bit-strings to the corresponding bra and ket vectors.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">ket</span>(bits: <span class="org-builtin">str</span>) -&gt; Matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns |bits&gt;."""</span>
+    <span class="org-variable-name">vec</span> = [0] * 2**<span class="org-builtin">len</span>(bits)
+    <span class="org-variable-name">vec</span>[<span class="org-builtin">int</span>(bits, 2)] = 1
+    <span class="org-keyword">return</span> Matrix(vec)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">bra</span>(bits: <span class="org-builtin">str</span>) -&gt; Matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns &lt;bits|."""</span>
+    <span class="org-keyword">return</span> ket(bits).H
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0ee9405" class="outline-5">
+<h5 id="org0ee9405">The Trace and the Partial Trace</h5>
+<div class="outline-text-5" id="text-org0ee9405">
+<p>
+In the following we define the trace for arbitrary square matrices and the partial trace for square
+matrices whose dimension is a power of two. Note that the concept of the partial trace only makes
+sense if one can consider the matrix as element of some tensor product (i.e. the dimension is a
+product \(m_1\cdot m_2\cdot\ldots\)). We further restrict to \(m_i=2\) to keep the implementation and
+the interface simple and since probably nothing else is needed in the context of the book.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">trace</span>(M: Matrix):  <span class="org-comment-delimiter"># </span><span class="org-comment">TODO: what is the correct return type?</span>
+    <span class="org-doc">"""Returns the sum of the diagonal elements. Requires a square matrix."""</span>
+    <span class="org-variable-name">dim</span> = M.shape[0]
+    <span class="org-keyword">assert</span> dim == M.shape[1], <span class="org-string">"M must be square"</span>
+    <span class="org-variable-name">result</span> = 0
+    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim):
+        <span class="org-variable-name">result</span> += M[i, i]
+    <span class="org-keyword">return</span> result
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">ptrace</span>(M: Matrix, bit_positions: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>] = <span class="org-constant">None</span>) -&gt; Matrix:
+    <span class="org-doc">"""Partial Trace. The Matrix must have dimension 2^n. The bit_positions describe which bits</span>
+<span class="org-doc">    (from the right) get traced out."""</span>
+    <span class="org-variable-name">dim</span> = M.shape[0]
+    <span class="org-keyword">assert</span> dim == M.shape[1], <span class="org-string">"M must be square"</span>
+    <span class="org-keyword">assert</span> dim.bit_count() == 1, <span class="org-string">"Dim of M must be 2^n for some n &gt;= 0"</span>
+    <span class="org-variable-name">bit_size</span> = dim.bit_length() - 1
+    <span class="org-keyword">if</span> bit_positions <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+        <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(bit_positions) &gt; 0, <span class="org-string">"bit_positions must not be empty"</span>
+        <span class="org-keyword">assert</span> <span class="org-builtin">all</span>(0 &lt;= pos &lt;= bit_size <span class="org-keyword">for</span> pos <span class="org-keyword">in</span> bit_positions), <span class="org-string">"Invalid bit_positions"</span>
+
+    <span class="org-keyword">if</span> bit_positions <span class="org-keyword">is</span> <span class="org-constant">None</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">shortcut</span>
+        <span class="org-keyword">return</span> Matrix([[trace(M)]])
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(bit_positions) == 1 <span class="org-keyword">and</span> dim == 2:  <span class="org-comment-delimiter"># </span><span class="org-comment">corner case</span>
+        <span class="org-keyword">return</span> Matrix([[trace(M)]])
+    <span class="org-keyword">elif</span> <span class="org-builtin">len</span>(bit_positions) &gt; 1:
+        <span class="org-variable-name">ps</span> = bit_positions.copy()
+        ps.sort()  <span class="org-comment-delimiter"># </span><span class="org-comment">IMPORTANT!</span>
+        <span class="org-variable-name">RM</span> = M
+        <span class="org-keyword">while</span> <span class="org-builtin">len</span>(ps) &gt; 0:
+            <span class="org-variable-name">pos</span> = ps.pop()
+            <span class="org-variable-name">RM</span> = ptrace(RM, [pos])
+        <span class="org-keyword">return</span> RM
+
+    <span class="org-variable-name">rpos</span> = bit_size - 1 - bit_positions[0]
+
+    <span class="org-variable-name">mat</span> = [[0]*(dim//2) <span class="org-keyword">for</span> _ <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim//2)]
+    <span class="org-keyword">for</span> i, j <span class="org-keyword">in</span> product(<span class="org-builtin">range</span>(dim//2), <span class="org-builtin">range</span>(dim//2)):
+        <span class="org-variable-name">ibits</span> = f<span class="org-string">"{i:b}"</span>.zfill(bit_size - 1)
+        <span class="org-variable-name">jbits</span> = f<span class="org-string">"{j:b}"</span>.zfill(bit_size - 1)
+        <span class="org-variable-name">i0</span> = <span class="org-builtin">int</span>(ibits[:rpos] + <span class="org-string">"0"</span> + ibits[rpos:], 2)
+        <span class="org-variable-name">i1</span> = <span class="org-builtin">int</span>(ibits[:rpos] + <span class="org-string">"1"</span> + ibits[rpos:], 2)
+        <span class="org-variable-name">j0</span> = <span class="org-builtin">int</span>(jbits[:rpos] + <span class="org-string">"0"</span> + jbits[rpos:], 2)
+        <span class="org-variable-name">j1</span> = <span class="org-builtin">int</span>(jbits[:rpos] + <span class="org-string">"1"</span> + jbits[rpos:], 2)
+        mat[i][j] = M[i0, j0] + M[i1, j1]
+
+    <span class="org-keyword">return</span> Matrix(mat)
+</pre>
+</div>
+
+<p>
+Very simple unit tests:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">A</span> = Matrix([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
+<span class="org-variable-name">B</span> = Matrix([[8*i + j <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Results for bit_positions == [0], in this case it is easy to read out the results from the input</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">matrix. Essentially you only have to to view e.g. A as a Matrix of 2x2 matrices which you replace</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">by their traces.</span>
+<span class="org-variable-name">A0</span> = Matrix([[5, 9], [21, 25]])
+<span class="org-variable-name">B0</span> = Matrix([[9, 13, 17, 21], [41, 45, 49, 53], [73, 77, 81, 85], [105, 109, 113, 117]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">To reduce the case of e.g. bit_positions == [1] to bit_positions == [0] use the fact that</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">permuting the bit pattern like so 'xyz' -&gt; 'zyx' induces a Permutation on the basis vectors which</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">corresponds to a permutation matrix P1. After doing the partial trace we are left with 'zy' and</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">have to permute this back to 'yz' (Matrix P2). In other words we have the identity</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">P2*ptrace(P1*B*P1, [0])*P2 - ptrace(B, [i]). Use sympy.Permutation, sympy.PermutationMatrix, and</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">PermutationMatrix.as_explicit to automate most of the work.</span>
+<span class="org-variable-name">A1</span> = Matrix([[10, 12], [18, 20]])
+<span class="org-variable-name">B1</span> = Matrix([[18, 20, 26, 28], [34, 36, 42, 44], [82, 84, 90, 92], [98, 100, 106, 108]])
+<span class="org-variable-name">B2</span> = Matrix([[36, 38, 40, 42], [52, 54, 56, 58], [68, 70, 72, 74], [84, 86, 88, 90]])
+
+<span class="org-keyword">assert</span> ptrace(A, [0]) == A0, <span class="org-string">"test ptrace(A, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(A, [1]) == A1, <span class="org-string">"test ptrace(A, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0]) == B0, <span class="org-string">"test ptrace(B, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [1]) == B1, <span class="org-string">"test ptrace(B, [1])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2]) == B2, <span class="org-string">"test ptrace(B, [2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0, 2]) == ptrace(ptrace(B, [2]), [0]), <span class="org-string">"test ptrace(B, [0, 2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2, 0]) == ptrace(ptrace(B, [2]), [0]), <span class="org-string">"test ptrace(B, [2, 0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0, 1, 2]) == Matrix([[trace(B)]]), <span class="org-string">"test ptrace(B, [0, 1, 2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2, 1, 0]) == Matrix([[trace(B)]]), <span class="org-string">"test ptrace(B, [2, 1, 0])"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org88b17ab" class="outline-4">
+<h4 id="org88b17ab">Exercises</h4>
+<div class="outline-text-4" id="text-org88b17ab">
+</div>
+<div id="outline-container-org96e65e7" class="outline-5">
+<h5 id="org96e65e7">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</h5>
+<div class="outline-text-5" id="text-org96e65e7">
+<p>
+Let \(\rho\) be a density operator. Show that \(\trace{\rho^2}\leq1\), with equality if and only if
+\(\rho\) is a pure state.
+</p>
+</div>
+
+<div id="outline-container-org45466a0" class="outline-6">
+<h6 id="org45466a0">Proof</h6>
+<div class="outline-text-6" id="text-org45466a0">
+<p>
+By the characterization of density operators (Theorem 2.5) there are \(0<p_i\leq 1\) and orthonormal
+\(\{|\psi_i\rangle\}\) such that:
+</p>
+
+<p>
+\[
+  \rho = \sum_i p_i |\psi_i\rangle\langle\psi_i| .
+\]
+</p>
+
+<p>
+Hence:
+</p>
+
+<p>
+\[
+  \trace{\rho^2} = \trace{ \sum_i p_i^2 |\psi_i\rangle\langle\psi_i| } = \sum_i p_i^2 \leq \sum_i p_i = 1 ,
+\]
+</p>
+
+<p>
+which proves the first claim. Equality can clearly only hold if for all \(i\): \(p_i=1\). By the trace
+condition this is only possible if there is only one summand in the sum making up \(\rho\). This means
+that \(\rho\) is pure in that case. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org60afccd" class="outline-5">
+<h5 id="org60afccd">Exercise 2.72 (Bloch sphere for mixed states)</h5>
+<div class="outline-text-5" id="text-org60afccd">
+<p>
+The Bloch sphere picture for pure states of a single qubit was introduced in Section 1.2. This
+description has an important generalization to mixed states as follows.
+</p>
+
+<ol class="org-ol">
+<li><p>
+Show that an arbitrary density matrix for a mixed state qubit may be written as
+</p>
+
+<p>
+\[
+     \rho = \frac{I + \overrightarrow{r} \cdot \overrightarrow{\sigma} }{2}
+   \]
+</p>
+
+<p>
+where \(\overrightarrow{r}\) is a real three-dimensional vector such that
+ \(\norm{\overrightarrow{r}}\leq1\). This vector is known as the Bloch vector for the state
+ \(\rho\). Conversely any such \(\rho\) is also a density operator.
+</p></li>
+<li>What is the Bloch vector representation for the state \(\rho=I/2\)?</li>
+<li>Show that a state \(\rho\) is pure if and only if \(\norm{\overrightarrow{r}}=1\).</li>
+<li>Show that for pure states the description of the Bloch vector we have given coincides with that
+in Section 1.2.</li>
+</ol>
+</div>
+
+<div id="outline-container-org3905413" class="outline-6">
+<h6 id="org3905413">Proof of 1, 3, and 4</h6>
+<div class="outline-text-6" id="text-org3905413">
+<p>
+The matrix representation of \(\rho\) looks as follows:
+</p>
+
+<p>
+\[
+  \rho = \frac{1}{2} \begin{bmatrix} 1 + z & x - iy \\ x + iy & 1 - z \end{bmatrix}
+  = \begin{bmatrix} p & \frac{1}{2}\zeta^* \\ \frac{1}{2}\zeta & q \end{bmatrix} .
+\]
+</p>
+
+<p>
+Let \(r=\norm{\overrightarrow{r}}\). We see that the matrices \(D\) which can be represented by \(\rho\)
+are characterized by the above matrix together with the constraints:
+</p>
+
+<p>
+\[
+  p, q \geq 0,\; \zeta\in\CC \text{ with } p + q = 1 \text{ and } r = (p - q)^2 + |\zeta|^2 \leq 1 .
+\]
+</p>
+
+<p>
+Now let \(|\psi\rangle=e^{i\gamma}(c|0\rangle+e^{i\varphi}s|1\rangle)\) be a pure state (\(c=\cos(\theta/2)\) and \(s=\sin(\theta/2)\)). The
+corresponding density matrix is:
+</p>
+
+<p>
+\[
+  \,|\psi\rangle\langle\psi| = \begin{bmatrix} c^2 & e^{-i\varphi}cs \\ e^{i\varphi}cs & s^2 \end{bmatrix} .
+\]
+</p>
+
+<p>
+Recall the following trigonometric identities: \(\cos\theta=c^2-s^2\) and \(\sin\theta=2cs\). This
+implies that the above constraint is satisfied. Hence pure states are in \(D\). In particular we have
+\(r=1\) for pure states.
+</p>
+
+<p>
+On the other hand the same trigonometric identities also show that the constraint strengthened by
+\(r=1\) characterizes the pure states. Indeed, the correspondence between the two representations is
+given by \(x+iy=\zeta=e^{i\varphi}\sin\theta\) and \(z=p-q=\cos\theta\). This shows claims 3 and 4 (for
+the latter recall that the Bloch-Sphere is parameterized by
+\((x,y,z)=(\sin\theta\cos\varphi,\;\sin\theta\sin\varphi,\;\cos\theta)\)).
+</p>
+
+<p>
+Clearly \(D\) is a convex set, hence all density matrices are in \(D\). This follows from the fact that
+density operators are the (closed) convex hull of the pure states. This shows the original version
+of claim 1 (we extended it a bit).
+</p>
+
+<p>
+To show the rest of claim 1 it remains to prove that \(D\) contains only density operators.
+</p>
+
+<p>
+That \(D\) contains only hermitian operators with trace=1 is clear. By exercise 4.5 we have
+\((\overrightarrow{r} \cdot \overrightarrow{\sigma})^2=\norm{\overrightarrow{r}}^2I\). Since
+\(\overrightarrow{r} \cdot \overrightarrow{\sigma}\) is hermitian and not a multiple of \(I\) we deduce
+that it has the two eigenvalues \(\pm\norm{\overrightarrow{r}}\). Hence (see <a href="#common-notation">section on notation</a> for
+the meaning):
+</p>
+
+<p>
+\[
+  0 \leq \frac{1 - \norm{\overrightarrow{r}}}{2} \leq \rho \leq  \frac{1 + \norm{\overrightarrow{r}}}{2} \leq 1 .
+\]
+</p>
+
+<p>
+In particular, \(\rho\) is indeed a positive operator. Hence, \(\rho\) is a density matrix. This shows
+the rest of claim 1.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org43f797b" class="outline-6">
+<h6 id="org43f797b">Solution to 2</h6>
+<div class="outline-text-6" id="text-org43f797b">
+<p>
+\(I/2\) is represented by \(\overrightarrow{r}=(0,0,0)\). It corresponds to the ensemble \(\{(1/2,|0\rangle),(1/2,|1\rangle)\}\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4ffa711" class="outline-5">
+<h5 id="org4ffa711">Exercise 2.73</h5>
+<div class="outline-text-5" id="text-org4ffa711">
+<p>
+Let \(\rho\) be a density operator. A minimal ensemble for \(\rho\) is an ensemble
+\(\{(p_i, |\psi_i\rangle)\}\) containing a number of elements equal to the rank of \(\rho\). Let
+\(|\psi\rangle\) be any state in the support of \(\rho\) . (The <i>support</i> of a Hermitian operator \(A\)
+is the vector space spanned by the eigenvectors of \(A\) with non-zero eigenvalues.) Show that there
+is a minimal ensemble for \(\rho\) that contains \(|\psi\rangle\), and moreover that in any such
+ensemble \(|\psi\rangle\) must appear with probability
+</p>
+
+<p>
+\[
+  p = \frac{1}{\langle\psi|\rho^{-1}|\psi\rangle} ,
+\]
+</p>
+
+<p>
+where \(\rho^{-1}\) is defined to be the inverse of \(\rho\), when \(\rho\) is considered as an operator
+acting only on the support of \(\rho\). (This definition removes the problem that \(\rho\) may not have
+an inverse.)
+</p>
+</div>
+
+<div id="outline-container-orged8168f" class="outline-6">
+<h6 id="orged8168f">Proof</h6>
+<div class="outline-text-6" id="text-orged8168f">
+<p>
+Consider the representation of \(\rho\) by its eigenvectors (with non-zero eigenvalues):
+</p>
+
+<p>
+\[
+  \rho = \sum_{i=1}^n \lambda_i |i\rangle\langle i| .
+\]
+</p>
+
+<p>
+Since \(|\psi\rangle\) is in the support of \(\rho\) there are unique complex numbers \(v_1,\ldots,v_n\)
+with:
+</p>
+
+<p>
+\[
+  \sum_{i=1}^n v_i \sqrt{\lambda_i} |i\rangle \in \RR |\psi\rangle \text{ and } \sum_{i=1}^n |v_i|^2 = 1 .
+\]
+</p>
+
+<p>
+Now extend these numbers to a unitary matrix \(u\in\CC^{n\times n}\) such that \(u_{ij}=v_j\) (formally
+the existence follows from the Gram-Schmidt procedure). Let
+</p>
+
+<p>
+\[
+  \sqrt{p_i} |\psi_i\rangle := \sum_{i=1}^n u_{ij} \sqrt{\lambda_j} |j\rangle .
+\]
+</p>
+
+<p>
+By construction \(|\psi\rangle=|\psi_1\rangle\). By Theorem 2.6 (Unitary Freedom in the ensemble for
+density matrices) we found an ensemble containing \(|\psi\rangle\) so the existence is
+established. Conversely, the same Theorem states that any ensemble representing \(\rho\) and
+satisfying \(|\psi_1\rangle=|\psi_1\rangle\) must satisfy the above constraint for a matrix \(u\) whose
+first row is \(v\).
+</p>
+
+<p>
+By the above contraint and the spectral theorem we have:
+</p>
+
+<p>
+\[
+  \sqrt{p_i p_j} \langle\psi_i|\rho^{-1}|\psi_j\rangle
+  = \sum_{kl} u_{ik}^\dagger \sqrt{\lambda_k} \langle k| \rho^{-1} u_{jl} \sqrt{\lambda_l} |l\rangle
+  = \sum_{k} u_{jk} u_{ki}^* \lambda_k \langle k|\rho^{-1}|k\rangle
+  = \delta_{ij} .
+\]
+</p>
+
+<p>
+Setting \(i=j=1\) proves the claim. QED.
+</p>
+
+<p>
+<b>Remark:</b> The proof shows that each minimal ensemble \((\sqrt{p_i}|\psi_i\rangle)\) is an orthonormal
+basis on the support of \(\rho\) with respect to the inner product given by
+\(\langle\varphi|\rho^{-1}|\psi\rangle\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeae42f0" class="outline-5">
+<h5 id="orgeae42f0">Exercise 2.74</h5>
+<div class="outline-text-5" id="text-orgeae42f0">
+<p>
+Suppose a composite of systems A and B is in the state \(|a\rangle|b\rangle\), where \(|a\rangle\) is a
+pure state of system A, and \(|b\rangle\) is a pure state of system B. Show that the reduced density
+operator of system A alone is a pure state.
+</p>
+</div>
+
+<div id="outline-container-org1f1ba12" class="outline-6">
+<h6 id="org1f1ba12">Proof</h6>
+<div class="outline-text-6" id="text-org1f1ba12">
+<p>
+The joint state is indeed a <i>simple</i> tensor product (i.e. a product state):
+</p>
+
+<p>
+\[
+  \,|a\rangle |b\rangle = |a\rangle \otimes |b\rangle .
+\]
+</p>
+
+<p>
+The corresponding density matrix is:
+</p>
+
+<p>
+\[
+  \rho = |a\rangle\langle a| \otimes |b\rangle\langle b| .
+\]
+</p>
+
+<p>
+The reduced density operator for A is obtained by taking the partial trace with respect to B:
+</p>
+
+<p>
+\[
+  \rho_A = \ptrace{B}{\rho} = |a\rangle\langle a|.
+\]
+</p>
+
+<p>
+This is indeed the pure state \(|a\rangle\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd7bfa7c" class="outline-5">
+<h5 id="orgd7bfa7c">Exercise 2.75</h5>
+<div class="outline-text-5" id="text-orgd7bfa7c">
+<p>
+For each of the four Bell states, find the reduced density operator for each qubit.
+</p>
+</div>
+
+<div id="outline-container-orgef45c4f" class="outline-6">
+<h6 id="orgef45c4f">Solution</h6>
+<div class="outline-text-6" id="text-orgef45c4f">
+<p>
+The four Bell States are given by:
+</p>
+
+<p>
+\[
+  \,|\beta_{xy}\rangle = \frac{1}{\sqrt{2}} \left( |0y\rangle + (-1)^{x} |1\overline{y}\rangle \right) ,
+\]
+</p>
+
+<p>
+where \(\overline{y}\) denotes the negation of \(y\). Using \(\trace{|i\rangle\langle j|}=\delta_{ij}\) we deduce:
+</p>
+
+<p>
+\[
+  \ptrace{2}{|\beta_{xy}\rangle} = \frac{1}{2} (|0\rangle\langle0| + |1\rangle\langle1|) = \frac{1}{2} I .
+\]
+</p>
+
+<p>
+and in the same way:
+</p>
+
+<p>
+\[
+  \ptrace{1}{|\beta_{xy}\rangle} = \frac{1}{2} (|y\rangle\langle y|
+  \,+\, |\overline{y}\rangle\langle\overline{y}|) = \frac{1}{2} I .
+\]
+</p>
+
+<p>
+So in all 8 cases we get the same result: \(I/2\).
+</p>
+
+<p>
+<b>Remark:</b> We see that knowledge of all partial traces is not sufficient to reconstruct the original
+state.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org52c5dc0" class="outline-5">
+<h5 id="org52c5dc0">Exercise 2.76</h5>
+<div class="outline-text-5" id="text-org52c5dc0">
+<p>
+Extend the proof of the Schmidt decomposition to the case where A and B may have state spaces of
+different dimensionality.
+</p>
+</div>
+
+<div id="outline-container-org23c06ac" class="outline-6">
+<h6 id="org23c06ac">Proof</h6>
+<div class="outline-text-6" id="text-org23c06ac">
+<p>
+Of course one may reuse the proof from the book by utilizing the general form of the singular value
+decompostion for non-square matrices.
+</p>
+
+<p>
+Alternatively: Assume wlog \(\dim(H_A)\leq\dim(H_B)\). We already have a proof for the case of equal
+dimensions hence assume \(\dim(H_A)<\dim(H_B)\). Now we extend A by a direct sum with a Hilbert Space
+\(R\) such that:
+</p>
+
+<p>
+\[
+  \dim(H_A \oplus R) = \dim(H_B) .
+\]
+</p>
+
+<p>
+By the already proved special case of the theorem we get a Schmidt-Decomposition on \((H_A\oplus R)\otimes H_B\):
+</p>
+
+<p>
+\[
+  \,|\psi\rangle = \sum_i \lambda_i \, |i_A\rangle |i_B\rangle .
+\]
+</p>
+
+<p>
+We have to prove that \(|i_A\rangle\in H_A\) for all \(i\). Indeed, let \(|r\rangle\in R\) and consider:
+</p>
+
+
+<p>
+\[
+  \langle i_A|r\rangle = \langle i_A, i_B | r, i_B \rangle = \sum_j \langle j_A, j_B | r, i_B \rangle
+  = \langle \psi | r, i_B \rangle = 0 .
+\]
+This shows the claim. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org620b938" class="outline-5">
+<h5 id="org620b938">Exercise 2.77</h5>
+<div class="outline-text-5" id="text-org620b938">
+<p>
+Suppose ABC is a three component quantum system. Show by example that there are quantum states of
+such systems which can not be written in the form
+</p>
+
+<p>
+\[
+  \,|\psi\rangle = \sum_i \lambda_i |i_A, i_B, i_C\rangle
+\]
+</p>
+
+<p>
+where \(\lambda_i\) are real numbers, and \(|i_A\rangle\), \(|i_B\rangle\), \(|i_C\rangle\) are orthonormal
+vectors of the respective systems.
+</p>
+</div>
+
+<div id="outline-container-org97e89c9" class="outline-6">
+<h6 id="org97e89c9">Proof</h6>
+<div class="outline-text-6" id="text-org97e89c9">
+<p>
+Suppose a Schmidt-like decomposition is possible for a state with respect to ABC. Then the reduced
+density operators in A, B and C must have the same set of eigenvalues. Hence, to show that such a
+decomposition is not possible for a given state it suffices to show that the sets of eigenvalue are
+not all equal.
+</p>
+
+<p>
+To spare us boring calculations lets introduce a nice function which takes a state vector of a
+three-qubit system ABC as input (this is already the simplest case where we can find counter
+examples). As output it reports the eigenvalues of the density matrix of each subsystem.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org9060224"><span class="org-keyword">def</span> <span class="org-function-name">get_eigenvals_of_ABC</span>(state_vector: Matrix):
+    <span class="org-doc">"""Calculate eigenvals of subsystems of three-qubit system (for Exercise 2.77)."""</span>
+    <span class="org-variable-name">density</span> = state_vector * state_vector.H
+    <span class="org-variable-name">DA</span> = ptrace(density, [1, 2])
+    <span class="org-variable-name">DB</span> = ptrace(density, [0, 2])
+    <span class="org-variable-name">DC</span> = ptrace(density, [0, 1])
+
+    <span class="org-variable-name">result</span> = <span class="org-string">""</span>
+    <span class="org-keyword">for</span> S, D <span class="org-keyword">in</span> [(<span class="org-string">"A"</span>, DA), (<span class="org-string">"B"</span>, DB), (<span class="org-string">"C"</span>, DC)]:
+        <span class="org-variable-name">result</span> += f<span class="org-string">"Eigenvalues in {S}: {D.eigenvals()}.\n"</span>
+
+    <span class="org-keyword">return</span> result
+</pre>
+</div>
+
+<p>
+The following code-snippit shows that
+</p>
+
+<p>
+\[
+  \frac{1}{\sqrt{3}} (|000\rangle + |010\rangle + |011\rangle)
+\]
+</p>
+
+<p>
+cannot be decomposed as required:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgd0ad0ef">get_eigenvals_of_ABC((ket(<span class="org-string">'000'</span>) + ket(<span class="org-string">'010'</span>) + ket(<span class="org-string">'011'</span>)) / sqrt(3))
+</pre>
+</div>
+
+<pre class="example">
+Eigenvalues in A: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+Eigenvalues in B: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+Eigenvalues in C: {1: 1, 0: 1}.
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org14f47cb" class="outline-5">
+<h5 id="org14f47cb">Exercise 2.78</h5>
+<div class="outline-text-5" id="text-org14f47cb">
+<p>
+Prove that a state \(|\psi\rangle\) of a composite system AB is a product state if and only if it has
+Schmidt number 1. Prove that \(|\psi\rangle\) is a product state if and only if \(\rho^A\) (and thus
+\(\rho^B\)) are pure states.
+</p>
+</div>
+
+<div id="outline-container-org1ed6b44" class="outline-6">
+<h6 id="org1ed6b44">Proof</h6>
+<div class="outline-text-6" id="text-org1ed6b44">
+<p>
+A product state is a state which can be represented by a <i>simple</i> tensor product
+\(|\alpha\rangle\otimes|\beta\rangle\). But this is by definition the same as having Schmidt-Rank 1.
+</p>
+
+<p>
+For the second part consider the Schmidt-Decomposition:
+</p>
+
+<p>
+\[
+  \, |\psi\rangle = \sum_{i=1}^r \lambda_i |i_A\rangle \otimes |i_B\rangle .
+\]
+</p>
+
+<p>
+Hence the reduced state on system A is (take the partial trace on B):
+</p>
+
+<p>
+\[
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A| .
+\]
+</p>
+
+<p>
+Since \(\sum_i\lambda_i^2=1\) and \(\lambda_i>0\) this can only be a pure state (a projection operator,
+i.e. \(\rho^2=\rho\)) if \(r=1\). This is the same as \(|\psi\rangle\) being a product state. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1adca0a" class="outline-5">
+<h5 id="org1adca0a">Exercise 2.79</h5>
+<div class="outline-text-5" id="text-org1adca0a">
+<p>
+Consider a composite system consisting of two qubits. Find the Schmidt decompositions of the states
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |11\rangle}{\sqrt{2}}; \quad
+  \frac{|00\rangle + |01\rangle +  |10\rangle + |11\rangle}{2}; \quad \text{and} \quad
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} .
+\]
+</p>
+</div>
+
+<div id="outline-container-org94d82d1" class="outline-6">
+<h6 id="org94d82d1">Solution</h6>
+<div class="outline-text-6" id="text-org94d82d1">
+<p>
+The first state clearly is already represented as Schmidt-Decomposition.
+</p>
+
+<p>
+The second term has Schmidt-Decomposition \(|+\rangle\otimes|+\rangle\), where
+\(|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}\) is "the" positive eigenvector of the Pauli Operator <code>X</code>.
+</p>
+
+<p>
+For the third one we have to calculate something. The proof of the existence of the
+Schmidt-Decomposition gives a procedure to actually calculate it. First let us find the Matrix
+\(A\in\CC^{2\times2}\) such that:
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} = \sum_{ij} A_{ij} |i\rangle \otimes |j\rangle .
+\]
+</p>
+
+<p>
+Clearly the following is the only matrix satisfying the above equation:
+</p>
+
+<p>
+\[
+  A = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} .
+\]
+</p>
+
+<p>
+We need to find the singular value decomposition of \(A\). Since \(A\) is hermitian this simplifies to
+find the spectral decomposition \(A=UDU^\dagger\).
+</p>
+
+<p>
+One can use sympy to do this. The eigenvalues are:
+</p>
+
+<p>
+\[
+  \lambda_{\pm} = \frac{\sqrt{3}}{6} \left( 1 \pm \sqrt{5} \right) .
+\]
+</p>
+
+<p>
+"The" eigenvectors are:
+</p>
+
+<p>
+\[
+  \,|\pm_A\rangle = \frac{1}{\sqrt{10 \pm 2\sqrt{5}}} \left((1 \pm \sqrt{5})|0\rangle + 2|1\rangle \right) .
+\]
+</p>
+
+<p>
+With this we can write down the Schmidt-Decomposition:
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}}
+  = \lambda_+ |+_A\rangle|+_A\rangle + \lambda_- |-_A\rangle|-_A\rangle .
+\]
+</p>
+
+<p>
+Note that the fact that the eigenvectors can be chosen with real entries simplifies things.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb969850" class="outline-5">
+<h5 id="orgb969850">Exercise 2.80</h5>
+<div class="outline-text-5" id="text-orgb969850">
+<p>
+Suppose \(|\psi\rangle\) and \(|\varphi\rangle\) are two pure states of a composite quantum system with
+components A and B, with identical Schmidt coefficients. Show that there are unitary transformations
+\(U\) on system A and \(V\) on system B such that \(|\psi\rangle = (U \otimes V )|\varphi\rangle\).
+</p>
+</div>
+
+<div id="outline-container-org07eb69e" class="outline-6">
+<h6 id="org07eb69e">Proof</h6>
+<div class="outline-text-6" id="text-org07eb69e">
+<p>
+That \(|\psi\rangle\) and \(|\varphi\rangle\) have the same Schmidt coefficients means that there are
+positive numbers \(\lambda_i\) such that
+</p>
+
+\begin{align*}
+  \, |\psi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\psi}\rangle |i_{B,\psi}\rangle , \\
+  \, |\varphi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\varphi}\rangle |i_{B,\varphi}\rangle ,
+\end{align*}
+
+<p>
+for some orthonormal sets \((|i_{A,\psi}\rangle)\), \((|i_{A,\varphi}\rangle)\), \((|i_{B,\psi}\rangle)\),
+\((|i_{B,\varphi}\rangle)\). By the latter fact it is easy to find a unitary \(U\) which maps
+\(|i_{A,\varphi}\rangle\) to \(|i_{A,\psi}\rangle\) and similarly a \(V\) for the B-system. These two
+unitary operators satisfy the claim.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org646392c" class="outline-5">
+<h5 id="org646392c">Exercise 2.81 (Freedom in purifications)</h5>
+<div class="outline-text-5" id="text-org646392c">
+<p>
+Let \(|AR_1\rangle\) and \(|AR_2\rangle\) be two purifications of a state \(\rho^A\) to a composite system
+AR. Prove that there exists a unitary transformation \(U_R\) acting on system R such that
+</p>
+
+<p>
+\[
+\,|AR_1\rangle = (I_A \otimes U_R ) |AR_2\rangle .
+\]
+</p>
+</div>
+
+<div id="outline-container-org965fe6d" class="outline-6">
+<h6 id="org965fe6d">Proof</h6>
+<div class="outline-text-6" id="text-org965fe6d">
+<p>
+Let
+</p>
+
+<p>
+\[
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A|
+\]
+</p>
+
+<p>
+be a Spectral-Decomposition of \(\rho^A\) (in particular all the vectors involved form an orthonormal
+set). Without loss of generality we may assume that \(|AR_2\rangle\) adheres to the generic
+construction from the book, that is
+</p>
+
+<p>
+\[
+\, |AR_2\rangle = \sum_{i=1}^r |i_A\rangle \otimes |i_R\rangle
+\]
+</p>
+
+<p>
+with an orthonormal set \((|i_R\rangle)\). A priori the Hilbert Space of \(R\) could have dimension
+smaller then \(r\). But in that case we could simply augment \(R\) by some additional dimensions.
+</p>
+
+<p>
+Since \(|AR_1\rangle\) and \(|AR_2\rangle\) are purifications of the same state they have the same
+Schmidt Numbers (the \(\lambda_i\) from above). From Exercise 2.80 we deduce that there exist
+unitary matrices \(V_A\) and \(V_R\) such that
+</p>
+
+<p>
+\[
+\,|AR_1\rangle = (V_A \otimes V_R ) |AR_2\rangle .
+\]
+</p>
+
+<p>
+To simplify notation let us write \(V=V_A\). Slightly abusing notation, let us write
+\(\ptrace{R}{|\psi\rangle}\) when we mean \(\ptrace{R}{|\psi\rangle\langle\psi|}\). We have
+</p>
+
+<p>
+\[
+  \rho^A = \ptrace{R}{|AR_1\rangle} = \ptrace{R}{V\otimes V_R \, |AR_2\rangle} = V^\dagger \rho^A V .
+\]
+</p>
+
+<p>
+This implies that \(V\) leaves the eigenspaces of \(\rho^A\) invariant (that is, an eigenvector of some
+eigenvalue is mapped to a possibly different eigenvector of the same eigenvalue).
+</p>
+
+<p>
+For the moment let us assume that all \(\lambda_i\) are equal, that is \(\lambda_i=1/r\). Let
+\((v_{ij})\in\CC^{r\times r}\) be the matrix representation of \(V\) on the eigenspace of \(1/r\). We
+have:
+</p>
+
+<p>
+\[
+\, |AR_1\rangle = V \otimes V_R \, |AR_2\rangle = \frac{1}{r} \sum_{ij} v_{ji} |j_A\rangle \otimes V_R|i_R\rangle
+  = \frac{1}{r} \sum_{j} |j_A\rangle \otimes \left( \sum_i v_{ji} V_R|i_{R}\rangle \right) .
+\]
+</p>
+
+<p>
+Let \(|j_{R'}\rangle=\sum_{i}v_{ji}V_R|i_{R}\rangle\). These vectors form an orthonormal set
+since \((v_{ij})\) is a unitary matrix (and transposed unitary matrices are unitary too) and the
+\((|i_R\rangle)\) are orthonormal. Hence there is a unitary matrix \(U_R\) such that
+\(|j_{R'}\rangle=U|j_R\rangle\). This together with the previous equation implies the desired result:
+</p>
+
+<p>
+\[
+\, |AR_1\rangle = (I_A \otimes U_R) |AR_2\rangle .
+\]
+</p>
+
+<p>
+The general case follows by decomposing \(|AR_1\rangle\) and \(|AR_2\rangle\) into direct sums over the
+eigenspaces of \(\rho^A\) and repeating the above reasoning for each one. Note that in the above
+reasoning for the special case the particular value of the trace was unimportant! QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgce8abd8" class="outline-5">
+<h5 id="orgce8abd8">Exercise 2.82</h5>
+<div class="outline-text-5" id="text-orgce8abd8">
+<p>
+Suppose \(\{p_i , |\psi_i\rangle\}\) is an ensemble of states generating a density matrix \(\rho\)
+for a quantum system A. Introduce a system R with orthonormal basis \(|i\rangle\).
+</p>
+
+<ol class="org-ol">
+<li>Show that \(\sum_i \sqrt{p_i} |\psi_i\rangle|i\rangle\) is a purification of \(\rho\).</li>
+<li>Suppose we measure R in the basis \((|i\rangle)\), obtaining outcome i. With what probability do we
+obtain the result \(i\), and what is the corresponding state of system A?</li>
+<li>Let \(|AR\rangle\) be any purification of \(\rho\) to the system AR. Show that there exists an
+orthonormal basis \(|i\rangle\) in which R can be measured such that the corresponding
+post-measurement state for system A is \(|\psi_i\rangle\) with probability \(p_i\).</li>
+</ol>
+
+<p>
+Remark (which is missing in the book): In sub-exercise 3 one may assume that the space \(R\) is large
+enough to hold all the \(|i\rangle\) even if the purification does not need that many dimensions (two
+ensembles always have at least \(r\) (rank) members but might have more, see also Theorem 2.6).
+</p>
+</div>
+
+<div id="outline-container-org6e463b7" class="outline-6">
+<h6 id="org6e463b7">Proof of 1</h6>
+<div class="outline-text-6" id="text-org6e463b7">
+<p>
+This was <i>essentially</i> shown in the book right before Exercise 2.79! In the book it was <i>implicitly</i>
+assumed that the \(|\psi\rangle\) are orthonormal (by using the Schmidt-Decomposition of \(\rho\)). But
+the proof did not use this fact. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org71977db" class="outline-6">
+<h6 id="org71977db">Proof of 2</h6>
+<div class="outline-text-6" id="text-org71977db">
+<p>
+Recall that:
+</p>
+
+<p>
+\[
+  \,|AR\rangle = \sum_i \sqrt{p_i} |\psi_i\rangle |i\rangle .
+\]
+</p>
+
+<p>
+The measurement of \(i\) as viewed from the whole system AR is represented by
+\(I\otimes|i\rangle\langle i|\) (see Box 2.6). Hence the probability to measure \(i\) is:
+</p>
+
+<p>
+\[
+  p(i) = \langle AR|I\otimes|i\rangle\langle i| AR\rangle = p_i .
+\]
+</p>
+
+<p>
+The post-measurement state is:
+</p>
+
+<p>
+\[
+  \frac{1}{p(i)} I\otimes|i\rangle\langle i| AR\rangle = |\psi\rangle|i\rangle .
+\]
+</p>
+
+<p>
+Restricted to A this is corresponds to \(|\psi\rangle\) (note that this does not <i>directly</i> follow
+from Postulate 4 but it is easy to show that product state behave nice under decomposition into the
+corresponding subsystems). QED.
+</p>
+
+<p>
+<b>Although it is not asked for</b>, here is the state of R expressed as a density matrix (before measurement):
+</p>
+
+<p>
+\[
+  \rho^R = \ptrace{A}{|AR\rangle\langle AR|} = \sum_{ij} \sqrt{p_i p_j} \langle\psi_i|\psi_j\rangle |i\rangle\langle i| .
+\]
+</p>
+
+<p>
+It is nice to verify that the after measurement results restricted to R are consistent with the
+above:
+</p>
+
+<p>
+\[
+  p(i) = p_i = \trace{|i\rangle\langle i| \rho^R} ,
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+\,  |i\rangle = \frac{1}{p_i} |i\rangle\langle i| \rho^R |i\rangle\langle i| .
+\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4dfaf9a" class="outline-6">
+<h6 id="org4dfaf9a">Proof of 3</h6>
+<div class="outline-text-6" id="text-org4dfaf9a">
+<p>
+Unfortunately there is a notation clash here. Let us rename the orthonormal set used in part 1 to
+\((|i_0\rangle)\) and the corresponding purified vector to \(|AR_0\rangle\). By exercise 2.81 (freedom
+of purifications) there is a unitary operator \(U_R\) such that:
+</p>
+
+<p>
+\[ |AR\rangle = I\otimes U_R \; |AR_0\rangle \]
+</p>
+
+<p>
+Hence we may use the basis \((|i\rangle=U_R|i_0\rangle)\) to achieve the desired goal.
+</p>
+
+<p>
+But note a subtle issue here: A priori \(U_R\) is not necessarily defined on each individual
+\(|i_0\rangle\). The reason is, that each density operator has ensembles with arbitrary many states
+(of course they are all linearly dependent to some \(r\) dimensional set due to Theorem 2.6). This
+implies that R0 can be arbitrary large if one takes the construction in sub-exercise 1. On the
+other hand one can just "add some dimensions" to R if necessary and extend \(U_R\) unitarily. QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org90cb7f9" class="outline-2">
+<h2 id="org90cb7f9">Part II</h2>
+<div class="outline-text-2" id="text-org90cb7f9">
+</div>
+<div id="outline-container-org71c8ea8" class="outline-3">
+<h3 id="org71c8ea8">Chapter 4</h3>
+<div class="outline-text-3" id="text-org71c8ea8">
+</div>
+<div id="outline-container-org068efff" class="outline-4">
+<h4 id="org068efff">Setup</h4>
+<div class="outline-text-4" id="text-org068efff">
+</div>
+<div id="outline-container-orge178e8f" class="outline-5">
+<h5 id="orge178e8f">Setup Python Libraries</h5>
+<div class="outline-text-5" id="text-orge178e8f">
+<div class="org-src-container">
+<pre class="src src-python" id="org2e1776f"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-builtin">reduce</span>
+<span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> product
+<span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Any
+
+<span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> cos, exp, I, Matrix, pi, sin, sqrt
+<span class="org-keyword">from</span> sympy.physics.quantum <span class="org-keyword">import</span> TensorProduct
+<span class="org-keyword">from</span> sympy.combinatorics <span class="org-keyword">import</span> Permutation <span class="org-keyword">as</span> Perm
+
+<span class="org-keyword">import</span> numpy <span class="org-keyword">as</span> np
+<span class="org-keyword">import</span> numpy.typing <span class="org-keyword">as</span> npt
+
+<span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> QuantumCircuit, Parameter <span class="org-keyword">as</span> Param
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgce3a5be" class="outline-5">
+<h5 id="orgce3a5be">Pauli- and Rotation-Matrices</h5>
+<div class="outline-text-5" id="text-orgce3a5be">
+<p>
+The Pauli matrices, and some related matrices:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org02e551b"><span class="org-comment-delimiter"># </span><span class="org-comment">The Paulis:</span>
+<span class="org-variable-name">X</span> = Matrix([[0, 1], [1, 0]])
+<span class="org-variable-name">Y</span> = Matrix([[0, -I], [I, 0]])
+<span class="org-variable-name">Z</span> = Matrix([[1, 0], [0, -1]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Identity</span>
+<span class="org-variable-name">Id</span> = Matrix([[1, 0], [0, 1]])
+<span class="org-comment-delimiter"># </span><span class="org-comment">Hadamard Gate</span>
+<span class="org-variable-name">H</span> = Matrix([[1, 1], [1, -1]]) / sqrt(2)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Phase Gate (sqrt(Z))</span>
+<span class="org-variable-name">S</span> = Matrix([[1, 0], [0, I]])
+<span class="org-comment-delimiter"># </span><span class="org-comment">pi/8 Gate</span>
+<span class="org-variable-name">T</span> = Matrix([[1, 0], [0, exp(pi * I / 4)]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Rotation Operators</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">- Rz: Phase Shift</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">- Rx: "Strange" Rotation</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">- Ry: Real Rotation</span>
+<span class="org-variable-name">theta</span> = sp.symbols(<span class="org-string">'theta'</span>)
+<span class="org-variable-name">Rz</span> = Matrix([[exp(-I*theta/2), 0], [0, exp(I*theta/2)]])
+<span class="org-variable-name">Rx</span> = Matrix([[cos(theta/2), -I*sin(theta/2)], [-I*sin(theta/2), cos(theta/2)]])
+<span class="org-variable-name">Ry</span> = Matrix([[cos(theta/2), -sin(theta/2)], [sin(theta/2), cos(theta/2)]])
+</pre>
+</div>
+
+<p>
+The rotation operators correspond to a rotation of angle \(\theta\) around the respective axis in the
+<b>Bloch Sphere</b> (See Exercise 4.6).
+</p>
+
+
+<div id="org2c22859" class="figure">
+<p><object type="image/svg+xml" data="./images/bloch-sphere.svg" class="org-svg" style="width: 50%">
+Sorry, your browser does not support SVG.</object>
+</p>
+<p><span class="figure-number">Figure 1: </span>The Bloch Sphere</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5708a38" class="outline-5">
+<h5 id="org5708a38">SWAP - a two-qubit Gate</h5>
+<div class="outline-text-5" id="text-org5708a38">
+<p>
+The <code>SWAP</code> Gate takes two qubits and exchanges their state. It is a permutation on the basis vectors:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org1d1e31c"><span class="org-variable-name">SWAP</span> = Matrix([
+  [1, 0, 0, 0],
+  [0, 0, 1, 0],
+  [0, 1, 0, 0],
+  [0, 0, 0, 1]
+])
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd44c5e7" class="outline-5">
+<h5 id="orgd44c5e7">Controlled Gates</h5>
+<div class="outline-text-5" id="text-orgd44c5e7">
+<p>
+For the definition of the controlled gates we introduce the projections \(P_j\) corresponding to the
+computational basis. Moreover we generalize the Tensor Product (Kronecker Product on Matrices) to
+take more then two argumentes (sympy only allows two arguments, which is not convenient).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgc147790"><span class="org-comment-delimiter"># </span><span class="org-comment">First define the projections onto the computational basis</span>
+<span class="org-variable-name">P0</span> = Matrix([[1, 0], [0, 0]])
+<span class="org-variable-name">P1</span> = Matrix([[0, 0], [0, 1]])
+
+<span class="org-keyword">def</span> <span class="org-function-name">tprod</span>(A1, *As):
+    <span class="org-doc">"""Generalize TensorProduct to one and more then two arguments."""</span>
+    <span class="org-variable-name">P</span> = A1
+    <span class="org-keyword">for</span> A <span class="org-keyword">in</span> As:
+        <span class="org-variable-name">P</span> = TensorProduct(P, A)
+    <span class="org-keyword">return</span> P
+</pre>
+</div>
+
+<p>
+The most basic controlled gates are the controlled Pauli Gates on two qubits. The function <code>make_CU</code>
+generalizes this construction to arbitrary single-qubit gates on arbitrary many wires:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org3774ce0"><span class="org-comment-delimiter"># </span><span class="org-comment">controlled X (NOT), Y, and Z gates</span>
+<span class="org-variable-name">CX</span> = tprod(P0, Id) + tprod(P1, X)
+<span class="org-variable-name">CY</span> = tprod(P0, Id) + tprod(P1, Y)
+<span class="org-variable-name">CZ</span> = tprod(P0, Id) + tprod(P1, Z)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_CU</span>(num_wires: <span class="org-builtin">int</span>, control: <span class="org-builtin">int</span>, target: <span class="org-builtin">int</span>, U: Matrix) -&gt; Matrix:
+    <span class="org-doc">"""Returns a controlled U Gate. U must be single qubit gate. Wires are</span>
+<span class="org-doc">    numbered 0 to num_wires - 1."""</span>
+    <span class="org-keyword">assert</span> 0 &lt;= control &lt; num_wires, <span class="org-string">"control out of range"</span>
+    <span class="org-keyword">assert</span> 0 &lt;= target &lt; num_wires, <span class="org-string">"target out of range"</span>
+    <span class="org-keyword">assert</span> control != target, <span class="org-string">"target must differ from control"</span>
+    <span class="org-keyword">assert</span> U.rows == U.cols == 2, <span class="org-string">"U must be single-qubit gate"</span>
+
+    <span class="org-variable-name">t0</span> = [Id]*num_wires
+    <span class="org-variable-name">t1</span> = [Id]*num_wires
+
+    <span class="org-variable-name">t0</span>[control] = P0
+    <span class="org-variable-name">t1</span>[control] = P1
+    <span class="org-variable-name">t1</span>[target] = U
+
+    <span class="org-keyword">return</span> tprod(*t0) + tprod(*t1)
+</pre>
+</div>
+
+<p>
+There are a few straightforward ways to generalize the above defined simple controlled gates.
+</p>
+
+<ul class="org-ul">
+<li>One can allow for multiple controls (\(C^nU\) gates). One instance is the <i>Toffoli Gate</i> aka \(CCX\)
+aka \(C^2X\).</li>
+<li>Normally, e.g. \(C^3X\) is "activated" by the bit pattern <code>111</code>. One can generalize this to let a
+different bit pattern, like <code>101</code>, activate it.</li>
+<li>One can also allow for \(U\) to be a multi-qubit gate (multiple targets). In general this requires
+to specify how to wire the targets into \(U\) (in which order) but for some examples like the
+<i>Fredkin Gate</i> (aka <code>CSWAP</code>) this is an irrelevant question since the <code>SWAP</code> gate is symmetric in
+its inputs.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgb9a2f84"><span class="org-comment-delimiter"># </span><span class="org-comment">Toffoli Gate aka CCX</span>
+<span class="org-variable-name">Toff</span> = tprod(P0, P0, Id) + tprod(P0, P1, Id) + tprod(P1, P0, Id) + tprod(P1, P1, X)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Fredkin Gate aka CSWAP</span>
+<span class="org-variable-name">Fred</span> = tprod(P0, Id, Id) + tprod(P1, SWAP)
+</pre>
+</div>
+
+<p>
+Since we need them sometimes, in the following we define a factory for controlled gates with multiple controls.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgfb04101"><span class="org-keyword">def</span> <span class="org-function-name">make_CnU</span>(num_wires: <span class="org-builtin">int</span>, controls: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], target: <span class="org-builtin">int</span>, U: Matrix) -&gt; Matrix:
+    <span class="org-doc">"""Generalization of make_CU to several controls."""</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>([0 &lt;= c &lt; num_wires <span class="org-keyword">for</span> c <span class="org-keyword">in</span> controls]), <span class="org-string">"controls out of range"</span>
+    <span class="org-keyword">assert</span> 0 &lt;= target &lt; num_wires, <span class="org-string">"target out of range"</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>([c != target <span class="org-keyword">for</span> c <span class="org-keyword">in</span> controls]), <span class="org-string">"target must differ from controls"</span>
+    <span class="org-keyword">assert</span> U.rows == U.cols == 2, <span class="org-string">"U must be single-qubit gate"</span>
+
+    <span class="org-variable-name">P</span> = [P0, P1]
+
+    <span class="org-variable-name">CnU</span> = <span class="org-constant">None</span>
+    <span class="org-variable-name">ts</span> = []
+    <span class="org-keyword">for</span> bitlist <span class="org-keyword">in</span> product(*[[0, 1]]*<span class="org-builtin">len</span>(controls)):
+        <span class="org-variable-name">t</span> = [Id]*num_wires
+
+        <span class="org-keyword">for</span> i, bit <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(bitlist):
+            t[controls[i]] = P[bit]
+
+        ts.append(t)
+    ts[-1][target] = U
+
+    <span class="org-variable-name">tensors</span> = [tprod(*t) <span class="org-keyword">for</span> t <span class="org-keyword">in</span> ts]
+    <span class="org-variable-name">CnU</span> = <span class="org-constant">None</span>
+    <span class="org-keyword">for</span> tensor <span class="org-keyword">in</span> tensors:
+        <span class="org-variable-name">CnU</span> = tensor <span class="org-keyword">if</span> CnU <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> CnU + tensor
+
+    <span class="org-keyword">return</span> CnU
+</pre>
+</div>
+
+<p>
+Some very simple Unit Tests:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgcb20d36"><span class="org-keyword">assert</span> make_CU(2, 0, 1, X) == CX, <span class="org-string">"Expected CX Gate (1)"</span>
+<span class="org-keyword">assert</span> make_CU(3, 1, 2, X) == tprod(Id, CX), <span class="org-string">"Expected CX Gate (2)"</span>
+
+<span class="org-keyword">assert</span> make_CnU(3, [0, 1], 2, X) == Toff, <span class="org-string">"Expected Toffoli Gate (1)"</span>
+<span class="org-keyword">assert</span> make_CnU(4, [1, 2], 3, X) == tprod(Id, Toff), <span class="org-string">"Expected Toffoli Gate (2)"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga484c69" class="outline-5">
+<h5 id="orga484c69">Two-Level Gates</h5>
+<div class="outline-text-5" id="text-orga484c69">
+<p>
+Two-Level gates are gates which act non-trivially only on two base vectors (computational
+base). They are a direct generalization of <i>fully controlled</i> single-qubit gates, whose two base
+vectors must additionally satisfy the property that the bit-representation of their index must be
+equal up to a single bit-flip.
+</p>
+
+<p>
+In the following we provide a utility function to quickly generate a two-level matrix. It is
+designed to work well together with the procedure to decompose general matrices into two-level
+matrices outlined in chapter 4.5.1 of the book.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org82dae31"><span class="org-keyword">def</span> <span class="org-function-name">make_twolevel</span>(dim: <span class="org-builtin">int</span>, indices: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], row: <span class="org-builtin">list</span>) -&gt; Matrix:
+    <span class="org-doc">"""Make a two level unitary matrix essentially by giving an unnormalized row.</span>
+
+<span class="org-doc">    Let i,j=indices, a,b=row, n=norm((a,b)). The resulting unitary matrix U satisfies</span>
+<span class="org-doc">    (U_{ii},U_{ij}=(a,b)/n if i&lt;j, else (U_{ij},U_{ii}=(a,b)/n. The other is derived from</span>
+<span class="org-doc">    conjugation, like that (a,b) -&gt; (-b*,a*).</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(indices) == <span class="org-builtin">len</span>(row) == 2, <span class="org-string">"Expected only two indices/rows."</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>([0 &lt;= i &lt; dim <span class="org-keyword">for</span> i <span class="org-keyword">in</span> indices]), <span class="org-string">"Indices out of range."</span>
+    <span class="org-variable-name">i</span>, <span class="org-variable-name">j</span> = indices
+    <span class="org-keyword">assert</span> i != j, <span class="org-string">"Indices must not be equal."</span>
+    <span class="org-variable-name">i1</span>, <span class="org-variable-name">j1</span> = <span class="org-builtin">sorted</span>([i, j])
+
+    <span class="org-variable-name">U</span> = [[1 <span class="org-keyword">if</span> i == j <span class="org-keyword">else</span> 0 <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim)] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim)]
+
+    <span class="org-variable-name">norm</span> = sqrt(row[0]*row[0].conjugate() + row[1]*row[1].conjugate())
+    <span class="org-variable-name">r0</span>, <span class="org-variable-name">r1</span> = row[0]/norm, row[1]/norm
+
+    U[i][i1], U[i][j1] = r0, r1
+    U[j][i1], U[j][j1] = -r1.conjugate(), r0.conjugate()
+
+    <span class="org-keyword">return</span> Matrix(U)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_onelevel</span>(dim: <span class="org-builtin">int</span>, index: <span class="org-builtin">int</span>, factor) -&gt; Matrix:
+  <span class="org-doc">"""Make a diagonal matrix with `factor` at position `index`."""</span>
+  <span class="org-variable-name">U</span> = [[1 <span class="org-keyword">if</span> i == j <span class="org-keyword">else</span> 0 <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim)] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim)]
+  U[index][index] = factor
+  <span class="org-keyword">return</span> Matrix(U)
+</pre>
+</div>
+
+<p>
+The following tests also illustrate how the function works. Take the first test as an example. The
+first index, which is 1 in test 1, determines in which row we put <code>[4,3]</code>. The columns are specified
+by the <i>sorted</i> indices: 0 and 1. Then the corresponding "conjugate row" is inserted and finally we
+normalize.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org29fb223"><span class="org-keyword">assert</span> make_twolevel(4, [1,0], [3, 4]) == Matrix([
+    [-4, 3, 0, 0],
+    [ 3, 4, 0, 0],
+    [ 0, 0, 5, 0],
+    [ 0, 0, 0, 5]]) / 5, <span class="org-string">"test: make_twolevel 1"</span>
+<span class="org-keyword">assert</span> make_twolevel(4, [2,1], [3, 4*I]) == Matrix([
+    [5,   0,   0, 0],
+    [0, 4*I,   3, 0],
+    [0,   3, 4*I, 0],
+    [0,   0,   0, 5]]) / 5, <span class="org-string">"test: make_twolevel 2"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb5b2606" class="outline-5">
+<h5 id="orgb5b2606">The Search for Circuits</h5>
+<div class="outline-text-5" id="text-orgb5b2606">
+<p>
+In the following we document some <i>very basic</i> approaches to find circuits consisting of
+(relatively) simple gates to construct more complex gates.
+</p>
+
+<p>
+The simplest non-trivial test case is to find the construction of \(C^2U\) by a circuit consisting
+only of controlled \(X\), \(V\), and \(V^\dagger\), where \(V\) is unitary with \(V^2=U\). That is, we want to
+find the construction from Figure 4.8 by exhausive search.
+</p>
+
+<p>
+Possible Approaches (checkbox means that it is tried out within this document):
+</p>
+<ul class="org-ul">
+<li class="on"><code>[X]</code> via sympy directly on matrices</li>
+<li class="on"><code>[X]</code> via numpy (on matrices)</li>
+<li class="off"><code>[&#xa0;]</code> via sympy but replacing matrices by permutations (in the spirit of the solution to exercise 4.27).</li>
+<li class="off"><code>[&#xa0;]</code> outside python to avoid slow loops</li>
+</ul>
+</div>
+
+<div id="outline-container-org2a4c7b2" class="outline-6">
+<h6 id="org2a4c7b2">Approach 1: via Sympy - Don't do this!</h6>
+<div class="outline-text-6" id="text-org2a4c7b2">
+<p>
+Here I document the approach via Sympy. This is not really a feasable approach since Matrix
+Multiplication in Sympy is <b>extremely</b> slow. Of course this is not entirely unexpected since sympy
+is not meant to be used in a brute force environment.
+</p>
+
+<p>
+In fact, finding the circuit of Figure 4.8 via brute force is out of reach for this approach. It
+can't be done within "reasonable" time limits. Going through all combinations of <b>just two gates</b>
+(just 25=5*5 cases for the five admissible gates) already takes one second. For three gates the
+number raises to almost nine seconds. So several minutes are to be expected in case of five gates. I
+count this as "unreasonable" since this is still a very small problem.
+</p>
+
+<p>
+<b>Conclusion:</b> Do not use sympy to calculate lots of matrix products.
+</p>
+</div>
+
+<div id="outline-container-orge790360" class="outline-7">
+<h7 id="orge790360">The search routine</h7>
+<div class="outline-text-7" id="text-orge790360">
+<p>
+Just for completeness here is the code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org8d30546"><span class="org-keyword">def</span> <span class="org-function-name">make_all_CU</span>(num_wires: <span class="org-builtin">int</span>, U: Matrix, name: <span class="org-builtin">str</span>, pred=<span class="org-constant">None</span>) -&gt; <span class="org-builtin">list</span>[Any]:
+    <span class="org-doc">"""Generate all CU gates, whose control/target wires satisfy an optional predicate."""</span>
+    <span class="org-keyword">if</span> pred <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+        <span class="org-variable-name">pred</span> = (<span class="org-keyword">lambda</span> c, t: <span class="org-constant">True</span>)
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">All possible combinations of (control, target).</span>
+    <span class="org-variable-name">all_cts</span> = <span class="org-builtin">list</span>(product(<span class="org-builtin">range</span>(num_wires), <span class="org-builtin">range</span>(num_wires)))
+    <span class="org-variable-name">all_cts</span> = [(c, t) <span class="org-keyword">for</span> (c, t) <span class="org-keyword">in</span> all_cts <span class="org-keyword">if</span> c != t <span class="org-keyword">and</span> pred(c, t)]
+
+    <span class="org-variable-name">gates</span> = []
+    <span class="org-keyword">for</span> c, t <span class="org-keyword">in</span> all_cts:
+        <span class="org-variable-name">gate</span> = make_CU(num_wires, c, t, U)
+        gates.append(<span class="org-builtin">dict</span>(  <span class="org-comment-delimiter"># </span><span class="org-comment">The output is a list of dicts</span>
+            name=name,
+            ct=(c, t),
+            gate=gate,
+        ))
+
+    <span class="org-keyword">return</span> gates
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">sp_search_circuits</span>(n: <span class="org-builtin">int</span>, admissible_gates: <span class="org-builtin">list</span>[Matrix], Wanted_Gate: Matrix) -&gt; <span class="org-builtin">str</span>:
+    <span class="org-doc">"""Find all circuits with n gates implementing Wanted_Gate."""</span>
+    <span class="org-variable-name">solutions</span> = []
+    <span class="org-keyword">for</span> gates <span class="org-keyword">in</span> product(*([admissible_gates]*n)):
+        <span class="org-variable-name">gs</span> = [g[<span class="org-string">"gate"</span>] <span class="org-keyword">for</span> g <span class="org-keyword">in</span> gates]
+        <span class="org-variable-name">prod</span> = <span class="org-builtin">reduce</span>((<span class="org-keyword">lambda</span> x, y: x*y), gs)
+        <span class="org-keyword">if</span> sp.simplify(prod) == Wanted_Gate:  <span class="org-comment-delimiter"># </span><span class="org-comment">wanted gate should already be simplified</span>
+            solutions.append(<span class="org-string">" * "</span>.join([f<span class="org-string">"{g['name']}{g['ct']}"</span> <span class="org-keyword">for</span> g <span class="org-keyword">in</span> gates]))
+    <span class="org-keyword">return</span> solutions
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7423484" class="outline-7">
+<h7 id="org7423484">Testing the search routine</h7>
+<div class="outline-text-7" id="text-org7423484">
+<p>
+Here we try it out. You can use ipython magic function <code>%time</code> to measure how slow this approach is.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgf753f30"><span class="org-variable-name">V</span> = Matrix([[1 - I, 1 + I], [1 + I, 1 - I]]) / 2
+<span class="org-keyword">assert</span> sp.simplify(V*V) == X, <span class="org-string">"Exercise 28: V must be sqrt(X)."</span>
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_pred_CX</span>(num_wires):
+    <span class="org-keyword">def</span> <span class="org-function-name">pred_CX</span>(c, t):
+        <span class="org-keyword">return</span> c &lt; t <span class="org-keyword">and</span> t &lt; num_wires - 1
+    <span class="org-keyword">return</span> pred_CX
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_pred_CV</span>(num_wires: <span class="org-builtin">int</span>):
+    <span class="org-keyword">def</span> <span class="org-function-name">pred_CV</span>(c, t):
+        <span class="org-keyword">return</span> c &lt; t <span class="org-keyword">and</span> t == num_wires - 1
+    <span class="org-keyword">return</span> pred_CV
+
+
+<span class="org-variable-name">adm_CX</span> = make_all_CU(3, X, <span class="org-string">"CX"</span>, make_pred_CX(3))
+<span class="org-variable-name">adm_CV</span> = make_all_CU(3, V, <span class="org-string">"CV"</span>, make_pred_CV(3))
+<span class="org-variable-name">adm_CVh</span> = make_all_CU(3, V.H, <span class="org-string">"CVh"</span>, make_pred_CV(3))
+
+<span class="org-variable-name">admissible_gates</span> = adm_CX + adm_CV + adm_CVh
+
+<span class="org-variable-name">CX01</span> = make_CU(3, 0, 1, X)
+<span class="org-variable-name">CX02</span> = make_CU(3, 0, 2, X)
+<span class="org-variable-name">CV02</span> = make_CU(3, 0, 2, V)
+<span class="org-keyword">assert</span> sp_search_circuits(1, admissible_gates, CX01) == [<span class="org-string">'CX(0, 1)'</span>], <span class="org-string">"sp_search_circuits: CX01"</span>
+<span class="org-keyword">assert</span> sp_search_circuits(1, admissible_gates, CV02) == [<span class="org-string">'CV(0, 2)'</span>], <span class="org-string">"sp_search_circuits: CV02"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">We comment this out since it takes about a second:</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">assert sorted(sp_search_circuits(2, admissible_gates, CX01 * CV02)) == result, "sp_search_circuits: CX01 * CV02"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org13cd6fc" class="outline-6">
+<h6 id="org13cd6fc">Approach 2: via Numpy</h6>
+<div class="outline-text-6" id="text-org13cd6fc">
+<p>
+<b>IMPORTANT:</b> Complex numbers in numpy are always implemented via floats. To avoid the typical
+floating point arithmetic issues we assume that all numbers are either integrals or more generally
+multiples of some <code>2**(-n)</code>. In that case floating point arithmetic is exact (up to overflow).
+</p>
+</div>
+
+<div id="outline-container-orge82723c" class="outline-7">
+<h7 id="orge82723c">Reimplement some basic auxiliary functions for numpy</h7>
+<div class="outline-text-7" id="text-orge82723c">
+<p>
+First we have to reimplement some functions we already use at the sympy side:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org9d9d7b6"><span class="org-keyword">def</span> <span class="org-function-name">np_kron</span>(A1: npt.ArrayLike, *As: <span class="org-builtin">list</span>[npt.ArrayLike]) -&gt; np.ndarray:
+    <span class="org-doc">"""Generalize TensorProduct to one and more then two arguments."""</span>
+    <span class="org-variable-name">P</span> = A1
+    <span class="org-keyword">for</span> A <span class="org-keyword">in</span> As:
+        <span class="org-variable-name">P</span> = np.kron(P, A)
+    <span class="org-keyword">return</span> P
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">np_make_CU</span>(num_wires: <span class="org-builtin">int</span>, control: <span class="org-builtin">int</span>, target: <span class="org-builtin">int</span>, U: np.ndarray) -&gt; np.ndarray:
+    <span class="org-doc">"""Returns a controlled U Gate. U must be single qubit gate. Wires are</span>
+<span class="org-doc">    numbered 0 to num_wires - 1."""</span>
+    <span class="org-keyword">assert</span> 0 &lt;= control &lt; num_wires, <span class="org-string">"control out of range"</span>
+    <span class="org-keyword">assert</span> 0 &lt;= target &lt; num_wires, <span class="org-string">"target out of range"</span>
+    <span class="org-keyword">assert</span> control != target, <span class="org-string">"target must differ from control"</span>
+    <span class="org-keyword">assert</span> U.shape == (2, 2), <span class="org-string">"U must be single-qubit gate"</span>
+
+    <span class="org-variable-name">t0</span> = [np_Id]*num_wires
+    <span class="org-variable-name">t1</span> = [np_Id]*num_wires
+
+    <span class="org-variable-name">t0</span>[control] = np_P0
+    <span class="org-variable-name">t1</span>[control] = np_P1
+    <span class="org-variable-name">t1</span>[target] = U
+
+    <span class="org-keyword">return</span> np_kron(*t0) + np_kron(*t1)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">np_make_CnU</span>(num_wires: <span class="org-builtin">int</span>, controls: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], target: <span class="org-builtin">int</span>, U: np.ndarray) -&gt; np.ndarray:
+    <span class="org-doc">"""Generalization of make_CU to several controls."""</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>([0 &lt;= c &lt; num_wires <span class="org-keyword">for</span> c <span class="org-keyword">in</span> controls]), <span class="org-string">"controls out of range"</span>
+    <span class="org-keyword">assert</span> 0 &lt;= target &lt; num_wires, <span class="org-string">"target out of range"</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>([c != target <span class="org-keyword">for</span> c <span class="org-keyword">in</span> controls]), <span class="org-string">"target must differ from controls"</span>
+    <span class="org-keyword">assert</span> U.shape == (2, 2), <span class="org-string">"U must be single-qubit gate"</span>
+
+    <span class="org-variable-name">P</span> = [np_P0, np_P1]
+
+    <span class="org-variable-name">CnU</span> = <span class="org-constant">None</span>
+    <span class="org-variable-name">ts</span> = []
+    <span class="org-keyword">for</span> bitlist <span class="org-keyword">in</span> product(*[[0, 1]]*<span class="org-builtin">len</span>(controls)):
+        <span class="org-variable-name">t</span> = [np_Id]*num_wires
+
+        <span class="org-keyword">for</span> i, bit <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(bitlist):
+            t[controls[i]] = P[bit]
+
+        ts.append(t)
+    ts[-1][target] = U
+
+    <span class="org-variable-name">tensors</span> = [np_kron(*t) <span class="org-keyword">for</span> t <span class="org-keyword">in</span> ts]
+    <span class="org-variable-name">CnU</span> = <span class="org-constant">None</span>
+    <span class="org-keyword">for</span> tensor <span class="org-keyword">in</span> tensors:
+        <span class="org-variable-name">CnU</span> = tensor <span class="org-keyword">if</span> CnU <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> CnU + tensor
+
+    <span class="org-keyword">return</span> CnU
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org42c992f" class="outline-7">
+<h7 id="org42c992f">Implementation of the search routine</h7>
+<div class="outline-text-7" id="text-org42c992f">
+<p>
+Now we can implement the search routine:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">np_make_all_CU</span>(num_wires: <span class="org-builtin">int</span>, U: Matrix, name: <span class="org-builtin">str</span>, pred=<span class="org-constant">None</span>) -&gt; <span class="org-builtin">list</span>[Any]:
+    <span class="org-keyword">if</span> pred <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+        <span class="org-variable-name">pred</span> = (<span class="org-keyword">lambda</span> c, t: <span class="org-constant">True</span>)
+
+    <span class="org-variable-name">pairs</span> = <span class="org-builtin">list</span>(product(<span class="org-builtin">range</span>(num_wires), <span class="org-builtin">range</span>(num_wires)))
+    <span class="org-variable-name">pairs</span> = [(c, t) <span class="org-keyword">for</span> (c, t) <span class="org-keyword">in</span> pairs <span class="org-keyword">if</span> c != t <span class="org-keyword">and</span> pred(c, t)]
+
+    <span class="org-variable-name">gates</span> = []
+    <span class="org-keyword">for</span> c, t <span class="org-keyword">in</span> pairs:
+        <span class="org-variable-name">gate</span> = np_make_CU(num_wires, c, t, U)
+        gates.append(<span class="org-builtin">dict</span>(
+            name=name,
+            ct=(c, t),
+            gate=gate,
+        ))
+
+    <span class="org-keyword">return</span> gates
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">np_make_all_C2U</span>(num_wires: <span class="org-builtin">int</span>, U: np.ndarray, name: <span class="org-builtin">str</span>, pred=<span class="org-constant">None</span>) -&gt; <span class="org-builtin">list</span>[Any]:
+    <span class="org-keyword">if</span> pred <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+        <span class="org-variable-name">pred</span> = (<span class="org-keyword">lambda</span> c, t: <span class="org-constant">True</span>)
+
+    <span class="org-variable-name">triples</span> = <span class="org-builtin">list</span>(product(*([<span class="org-builtin">range</span>(num_wires)]*3)))
+    <span class="org-variable-name">triples</span> = [(c0, c1, t) <span class="org-keyword">for</span> (c0, c1, t) <span class="org-keyword">in</span> triples <span class="org-keyword">if</span> c0 &lt; c1 <span class="org-keyword">and</span> c0 != t <span class="org-keyword">and</span> c1 != t <span class="org-keyword">and</span> pred((c0, c1), t)]
+
+    <span class="org-variable-name">gates</span> = []
+    <span class="org-keyword">for</span> c0, c1, t <span class="org-keyword">in</span> triples:
+        <span class="org-variable-name">gate</span> = np_make_CnU(num_wires, [c0, c1], t, U)
+        gates.append(<span class="org-builtin">dict</span>(
+            name=name,
+            ct=((c0, c1), t),
+            gate=gate,
+        ))
+
+    <span class="org-keyword">return</span> gates
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">np_search_circuit</span>(n: <span class="org-builtin">int</span>, admissible_gates: <span class="org-builtin">list</span>[np.ndarray], Wanted_Gate: np.ndarray) -&gt; <span class="org-builtin">str</span>:
+    <span class="org-doc">"""Find all solutions to exercise 4.28 with n gates."""</span>
+    <span class="org-variable-name">solutions</span> = []
+    <span class="org-keyword">for</span> gates <span class="org-keyword">in</span> product(*([admissible_gates]*n)):
+        <span class="org-variable-name">gs</span> = [g[<span class="org-string">"gate"</span>] <span class="org-keyword">for</span> g <span class="org-keyword">in</span> gates]
+        <span class="org-variable-name">prod</span> = <span class="org-builtin">reduce</span>((<span class="org-keyword">lambda</span> x, y: x @ y), gs)
+        <span class="org-keyword">if</span> np.alltrue(prod == Wanted_Gate):
+            solutions.append(<span class="org-string">" @ "</span>.join([f<span class="org-string">"{g['name']}{g['ct']}"</span> <span class="org-keyword">for</span> g <span class="org-keyword">in</span> gates]))
+    <span class="org-keyword">return</span> solutions
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_pred_CX</span>(num_wires):
+    <span class="org-keyword">def</span> <span class="org-function-name">pred_CX</span>(c, t):
+        <span class="org-keyword">return</span> c &lt; t <span class="org-keyword">and</span> t &lt; num_wires - 1
+    <span class="org-keyword">return</span> pred_CX
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_pred_CV</span>(num_wires: <span class="org-builtin">int</span>):
+    <span class="org-keyword">def</span> <span class="org-function-name">pred_CV</span>(c, t):
+        <span class="org-keyword">return</span> c &lt; t <span class="org-keyword">and</span> t == num_wires - 1
+    <span class="org-keyword">return</span> pred_CV
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_pred_CCX</span>(num_wires: <span class="org-builtin">int</span>):
+    <span class="org-keyword">def</span> <span class="org-function-name">pred_CCX</span>(c, t):
+        <span class="org-keyword">return</span> c[0] &lt; t <span class="org-keyword">and</span> c[1] &lt; t <span class="org-keyword">and</span> t &lt; num_wires - 1
+    <span class="org-keyword">return</span> pred_CCX
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4270585" class="outline-7">
+<h7 id="org4270585">Pauli Matrices (and friends) for numpy</h7>
+<div class="outline-text-7" id="text-org4270585">
+<p>
+Now let us redefine the Pauli Matrices within numpy:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orge254e1f"><span class="org-variable-name">np_X</span> = np.array([[0, 1], [1, 0]])
+<span class="org-variable-name">np_Y</span> = np.array([[0, -1j], [1j, 0]])
+<span class="org-variable-name">np_Z</span> = np.array([[1, 0], [0, -1]])
+
+<span class="org-variable-name">np_Id</span> = np.eye(2)
+<span class="org-variable-name">np_P0</span> = np.array([[1, 0], [0, 0]])
+<span class="org-variable-name">np_P1</span> = np.array([[0, 0], [0, 1]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Half-integral-numbers should be OK too since floats are binary</span>
+<span class="org-variable-name">np_V</span> = np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
+<span class="org-variable-name">np_Vt</span> = np_V.conj().T
+<span class="org-keyword">assert</span> np.alltrue(np_V @ np_V == np_X), <span class="org-string">"np_V must be sqrt(np_X)."</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeb5d012" class="outline-7">
+<h7 id="orgeb5d012">Basic Unit Tests</h7>
+<div class="outline-text-7" id="text-orgeb5d012">
+<p>
+Very simple unit tests:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgcba69ef"><span class="org-variable-name">np_adm_CX</span> = np_make_all_CU(3, np_X, <span class="org-string">"CX"</span>, make_pred_CX(3))
+<span class="org-variable-name">np_adm_CV</span> = np_make_all_CU(3, np_V, <span class="org-string">"CV"</span>, make_pred_CV(3))
+<span class="org-variable-name">np_adm_CVh</span> = np_make_all_CU(3, np_Vt, <span class="org-string">"CVh"</span>, make_pred_CV(3))
+
+<span class="org-variable-name">np_admissible_gates</span> = np_adm_CX + np_adm_CV + np_adm_CVh
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">For convenience:</span>
+<span class="org-keyword">def</span> <span class="org-function-name">shorten_admissible_gates</span>(admissible_gates):
+    <span class="org-keyword">return</span> [<span class="org-builtin">dict</span>(name=ag[<span class="org-string">"name"</span>], ct=ag[<span class="org-string">"ct"</span>]) <span class="org-keyword">for</span> ag <span class="org-keyword">in</span> admissible_gates]
+
+
+<span class="org-variable-name">np_CX01</span> = np_make_CU(3, 0, 1, np_X)
+<span class="org-variable-name">np_CX02</span> = np_make_CU(3, 0, 2, np_X)
+<span class="org-variable-name">np_CV02</span> = np_make_CU(3, 0, 2, np_V)
+<span class="org-variable-name">np_CVt02</span> = np_make_CU(3, 0, 2, np_Vt)
+<span class="org-keyword">assert</span> np_search_circuit(1, np_admissible_gates, np_CX01) == [<span class="org-string">'CX(0, 1)'</span>], <span class="org-string">"np_search_circuit: CX01"</span>
+<span class="org-keyword">assert</span> <span class="org-builtin">sorted</span>(np_search_circuit(1, np_admissible_gates, np_CV02)) == [<span class="org-string">'CV(0, 2)'</span>], <span class="org-string">"np_search_circuit: CV02"</span>
+<span class="org-variable-name">result</span> = <span class="org-builtin">sorted</span>([<span class="org-string">'CX(0, 1) @ CV(0, 2)'</span>, <span class="org-string">'CV(0, 2) @ CX(0, 1)'</span>])
+<span class="org-keyword">assert</span> <span class="org-builtin">sorted</span>(np_search_circuit(2, np_admissible_gates, np_CX01 @ np_CV02)) == result, <span class="org-string">"np_search_circuit: CX01 @ CV02"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdcc6e97" class="outline-7">
+<h7 id="orgdcc6e97">Find all minimal implementations of the Toffoli Gate</h7>
+<div class="outline-text-7" id="text-orgdcc6e97">
+<p>
+Finally we can actually search for all realizations of the Toffoli Gate (<code>CCX</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgd18d444"><span class="org-variable-name">np_Toff</span> = np.array(Toff)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">we deactivate the code since it takes around 10 seconds to execute</span>
+<span class="org-keyword">if</span> <span class="org-constant">False</span>:
+    np_search_circuit(5, np_admissible_gates, np_Toff)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Produces among 19 others the solution from the book:</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">'CV(0, 2) @ CX(0, 1) @ CVt(1, 2) @ CX(0, 1) @ CV(1, 2)',</span>
+</pre>
+</div>
+
+<p>
+We obtain 20 solutions using exactly 5 gates to represent the Toffoli (with less gates it is not possible):
+</p>
+
+<pre class="example">
+CX(0, 1) @ CV(0, 2) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2)
+CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(0, 2) @ CVh(1, 2)
+CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CVh(0, 2)
+CX(0, 1) @ CV(1, 2) @ CVh(0, 2) @ CX(0, 1) @ CVh(1, 2)
+CX(0, 1) @ CVh(0, 2) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2)
+CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(0, 2) @ CV(1, 2)
+CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CV(0, 2)
+CX(0, 1) @ CVh(1, 2) @ CV(0, 2) @ CX(0, 1) @ CV(1, 2)
+CV(0, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2)
+CV(0, 2) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1)
+CV(1, 2) @ CX(0, 1) @ CV(0, 2) @ CVh(1, 2) @ CX(0, 1)
+CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1) @ CV(0, 2)
+CV(1, 2) @ CX(0, 1) @ CVh(1, 2) @ CV(0, 2) @ CX(0, 1)
+CV(1, 2) @ CV(0, 2) @ CX(0, 1) @ CVh(1, 2) @ CX(0, 1)
+CVh(0, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(1, 2)
+CVh(0, 2) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1)
+CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(0, 2)
+CVh(1, 2) @ CX(0, 1) @ CV(1, 2) @ CVh(0, 2) @ CX(0, 1)
+CVh(1, 2) @ CX(0, 1) @ CVh(0, 2) @ CV(1, 2) @ CX(0, 1)
+CVh(1, 2) @ CVh(0, 2) @ CX(0, 1) @ CV(1, 2) @ CX(0, 1)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfb1498e" class="outline-4">
+<h4 id="orgfb1498e">Exercises</h4>
+<div class="outline-text-4" id="text-orgfb1498e">
+</div>
+<div id="outline-container-org6e8d4ec" class="outline-5">
+<h5 id="org6e8d4ec">Exercise 4.1</h5>
+<div class="outline-text-5" id="text-org6e8d4ec">
+<p>
+In Exercise 2.11, which you should do now if you haven’t already done it, you computed the
+eigenvectors of the Pauli matrices. Find the points on the Bloch sphere which correspond to the
+normalized eigenvectors of the different Pauli matrices.
+</p>
+</div>
+
+<div id="outline-container-org47944e1" class="outline-6">
+<h6 id="org47944e1">Solution</h6>
+<div class="outline-text-6" id="text-org47944e1">
+<p>
+The eigenvalues are \(\pm1\) for all Pauli matrices. The eigenvectors (tip: <code>Z.eigenvects()</code>) are:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Pauli</th>
+<th scope="col" class="org-left">Eigenvector for \(+1\)</th>
+<th scope="col" class="org-left">Eigenvector for \(-1\)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Z</td>
+<td class="org-left">\(\vert0\rangle\)</td>
+<td class="org-left">\(\vert1\rangle\)</td>
+</tr>
+
+<tr>
+<td class="org-left">X</td>
+<td class="org-left">\(2^{-1/2}(\vert0\rangle+\vert1\rangle)\)</td>
+<td class="org-left">\(2^{-1/2}(\vert0\rangle-\vert1\rangle)\)</td>
+</tr>
+
+<tr>
+<td class="org-left">Y</td>
+<td class="org-left">\(2^{-1/2}(i\vert0\rangle-\vert1\rangle)\)</td>
+<td class="org-left">\(2^{-1/2}(-\vert0\rangle+i\vert1\rangle)\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Recall the correspondence between the state vector and the parameterization of the Bloch Sphere:
+</p>
+
+\begin{align*}
+  ​|\psi\rangle &= \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi}  \sin\left(\theta /2\right) |1\rangle
+  \quad \text{ for } 0 \leq \theta \leq \pi \text{ and } 0 \leq \varphi \leq 2\pi \\
+  &=: c |0\rangle + e^{i\varphi} s |1\rangle
+\end{align*}
+
+<p>
+and (using \(\sin\theta=2sc\), \(\cos\theta=c^2-s^2\))
+</p>
+
+\begin{align*}
+  (x, y, z) &= (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta) \\
+  &= (2sc\cdot\cos\varphi,\; 2sc\cdot\sin\varphi,\; c^2 - s^2) .
+\end{align*}
+
+<p>
+From this it is not hard to see that the \(+1\) eigenvectors of <code>X</code>, <code>Y</code>, <code>Z</code> correspond to \(\hat{x}\),
+\(\hat{y}\), \(\hat{z}\). The \(-1\) eigenvectors correspond to \(-\hat{x}\), \(-\hat{y}\), \(-\hat{z}\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc321909" class="outline-5">
+<h5 id="orgc321909">Exercise 4.2</h5>
+<div class="outline-text-5" id="text-orgc321909">
+<p>
+Let \(x\) be a real number and \(A\) a matrix such that \(A^2 = I\). Show that
+</p>
+
+\begin{align*}
+% \label{eq:exercise-4.2-1}
+\exp(ixA) = \cos(x)I + i\sin(x)A
+\end{align*}
+
+<p>
+Use this result to verify Equations (4.4) through (4.6).
+</p>
+</div>
+
+<div id="outline-container-org1b83438" class="outline-6">
+<h6 id="org1b83438">Solution</h6>
+<div class="outline-text-6" id="text-org1b83438">
+<p>
+The equation follows directly from the polynomial series of \(\exp\), \(\sin\), and \(\cos\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgaf3fc0e" class="outline-5">
+<h5 id="orgaf3fc0e">Exercise 4.3</h5>
+<div class="outline-text-5" id="text-orgaf3fc0e">
+<p>
+Show that, up to a global phase, the π/8 gate satisfies \(T = R_z(\pi/4)\).
+</p>
+</div>
+
+<div id="outline-container-org02b4700" class="outline-6">
+<h6 id="org02b4700">Proof</h6>
+<div class="outline-text-6" id="text-org02b4700">
+<p>
+It is easy to see that \(T = \exp(i\pi/8) \cdot R_z(\pi/4)\). We let <code>sympy</code> do the job:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org6c21580"><span class="org-variable-name">rz</span> = Rz.subs(theta, pi/4)
+exp(I*pi/8) * rz - T  <span class="org-comment-delimiter"># </span><span class="org-comment">should be zero</span>
+</pre>
+</div>
+
+<pre class="example">
+Matrix([[0, 0], [0, 0]])
+</pre>
+
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org28d1356" class="outline-5">
+<h5 id="org28d1356">Exercise 4.4</h5>
+<div class="outline-text-5" id="text-org28d1356">
+<p>
+Express the Hadamard gate \(H\) as a product of \(R_x\) and \(R_z\) rotations and \(e^{i\varphi}\) for some
+\(\varphi\).
+</p>
+</div>
+
+<div id="outline-container-org4306c39" class="outline-6">
+<h6 id="org4306c39">Solution</h6>
+<div class="outline-text-6" id="text-org4306c39">
+<p>
+Clearly a mere product of two factors can't produce the Hadamard gate. Hence we try to
+find \(\alpha,\beta,\gamma\) such that \(R_z(\alpha)\cdot R_x(\gamma) \cdot R_z(\beta)\) is the Hadamard
+up to the phase factor. Due to the sqrt of 2 factor appearing in \(H\) we deduce that \(\gamma=\pm\pi/2\)
+is a good bet. Knowing what comes we choose \(\gamma=\pi/2\).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org3f239ff"><span class="org-variable-name">a</span>, <span class="org-variable-name">b</span> = sp.symbols(<span class="org-string">'\\alpha \\beta'</span>)
+
+<span class="org-variable-name">ra</span> = Rz.subs(theta, a)
+<span class="org-variable-name">rb</span> = Rz.subs(theta, b)
+<span class="org-variable-name">rx</span> = Rx.subs(theta, pi/2)
+
+<span class="org-variable-name">h0</span> = ra * rx * rb
+<span class="org-variable-name">simp</span> = sp.simplify(sqrt(2)*h0)
+</pre>
+</div>
+
+<p>
+A short calculation leads to (use the code above to do it):
+</p>
+
+<p>
+\[
+R_z(\alpha)\cdot R_x(\pi/2) \cdot R_z(\beta) = \frac{1}{\sqrt{2}} \cdot
+\left[\begin{matrix}e^{0.5 i \left(- \alpha - \beta\right)} & - 1.0 i e^{- 0.5 i \left(\alpha - \beta\right)}\\- 1.0 i e^{0.5 i \left(\alpha - \beta\right)} & e^{0.5 i \left(\alpha + \beta\right)}\end{matrix}\right]
+\]
+</p>
+
+<p>
+Hence setting \(\alpha = \beta = \pi/2\) and \(\phi = \pi/2\) we get
+</p>
+
+<p>
+\[
+H = e^{i\pi/2} \cdot R_z(\pi/2)\cdot R_x(\pi/2) \cdot R_z(\pi/2)
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3191801" class="outline-5">
+<h5 id="org3191801">Exercise 4.5</h5>
+<div class="outline-text-5" id="text-org3191801">
+<p>
+Prove that \((\hat{n}\cdot\sigma)^2 = I\), and use this to verify Equation (4.8).
+</p>
+</div>
+
+<div id="outline-container-org5a319c2" class="outline-6">
+<h6 id="org5a319c2">Solution</h6>
+<div class="outline-text-6" id="text-org5a319c2">
+<p>
+This is easy to see from the following calculation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org17c99d0"><span class="org-variable-name">nx</span>, <span class="org-variable-name">ny</span>, <span class="org-variable-name">nz</span> = sp.symbols(<span class="org-string">'n_x n_y n_z'</span>)
+<span class="org-variable-name">r</span> = nx*X + ny*Y + nz*Z
+
+sp.simplify(r*r)
+</pre>
+</div>
+
+<pre class="example">
+Matrix([[n_x**2 + n_y**2 + n_z**2, 0], [0, n_x**2 + n_y**2 + n_z**2]])
+</pre>
+
+
+<p>
+By assumption we have \(n_x^2 + n_y^2 + n_z^2 = 1\), which implies the claim.
+</p>
+
+<p>
+Alternatively one can avoid calculating with matrices by using the well known (anti) commutator
+relations between the Pauli Operators like \(XY=iZ=-YX\). This shows that in the expanded form of
+\((\hat{n}\cdot\sigma)^2\) only the squares of the Pauli Operators survive. Now use \(X^2=Y^2=Z^2=I\) to
+obtain the claim.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc9adc96" class="outline-5">
+<h5 id="orgc9adc96">Exercise 4.6 (Bloch sphere interpretation of rotations)</h5>
+<div class="outline-text-5" id="text-orgc9adc96">
+<p>
+Show that the rotation operators \(R_{\hat{n}}(\theta)\) corresponds to a rotation of angle \(\theta\)
+around the axis given by \(\hat{n}\).
+</p>
+
+<p>
+In other words: If we identify Qubits which just differ by phase, and identify each Qubit with its
+(unique) Bloch vector, then the action of the quantum rotation is isomorphic to the ordinary
+rotation with said axis and angle within the Bloch Sphere.
+</p>
+</div>
+<div id="outline-container-orgc1ccf33" class="outline-6">
+<h6 id="orgc1ccf33">Proof</h6>
+<div class="outline-text-6" id="text-orgc1ccf33">
+<p>
+We divide the proof into several steps.
+</p>
+
+<p>
+Let \(|\psi\rangle = \cos\left(\theta /2\right) |0 \rangle \, + \, e^{i\varphi} \sin\left(\theta
+/2\right) |1\rangle\) and recall the parameterization \(p = (\sin\theta \cos\varphi,\;
+\sin\theta \sin\varphi,\; \cos\theta)\)
+of the sphere.
+</p>
+</div>
+
+<div id="outline-container-orgbb2bf0c" class="outline-7">
+<h7 id="orgbb2bf0c">(A) The claim is true for the special case \(\hat{n} = (0, 0, 1)\).</h7>
+<div class="outline-text-7" id="text-orgbb2bf0c">
+<p>
+PROOF: The standard basis \((|0\rangle, |1\rangle)\) diagonalizes <code>Z</code>. Hence, <code>Z</code> trivially acts on
+\(\varphi\) which corresponds to a rotation around the z-axis. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4973a2e" class="outline-7">
+<h7 id="org4973a2e">(B) The claim is true for the special case \(\hat{n} = (0, 1, 0)\).</h7>
+<div class="outline-text-7" id="text-org4973a2e">
+<p>
+PROOF: It is sufficient to prove this for infinitesimal small angles. More precisely, we consider
+\(\delta \to 0\) and use \(\approx\) for equality up to \(O(\delta^2)\).
+</p>
+
+<p>
+Let \(r_y(\delta)\) be the rotation of angle \(\delta\) around y-axis. Let \(\theta' = \theta + a\delta\) and \(\varphi'=\varphi+b\delta\)
+be the coordinates of \(r_y(\delta)p\). We want to calculate \(a, b\). We have:
+</p>
+
+\begin{align*}
+r_y(\delta)p &\approx (\sin(\theta)\cos(\varphi) + \delta\cos(\theta),\;
+  a \sin(\theta)\sin(\varphi),\;
+  a \cos(\theta) - \delta\sin(\theta)\cos(\varphi)) \\
+  &\approx (\sin\theta' \cos\varphi',\; \sin\theta' \sin\varphi',\; \cos\theta')
+\end{align*}
+
+<p>
+It is advisable to first calculate \(a\) from the third components and then \(b\) from the second:
+</p>
+
+<p>
+\[
+  a = \cos(\varphi),\quad b = - \frac{\cos(\theta)\sin(\varphi)}{\sin(\theta)}
+\]
+</p>
+
+<p>
+Next we abbreviate \(c=\cos(\theta/2)\), \(s=\sin(\theta/2)\) and similarly \(c', s'\) with \(\theta'\) in place of \(\theta\).
+</p>
+
+<p>
+\[
+  R_y(\delta) |\psi\rangle \approx (c - \frac{\delta}{2} e^{i\varphi} s) |0\rangle + (\frac{\delta}{2} c + e^{i\varphi}s) |1\rangle
+\]
+</p>
+
+<p>
+It is to be shown that this equals (up to \(O(\delta^2)\))
+</p>
+
+<p>
+\[
+  e^{i\delta f} (c'|0\rangle + e^{i\varphi'}s'|1\rangle)
+\]
+</p>
+
+<p>
+for some real \(x\). A calculation yields that this is indeed true for \(f=-s\sin(\varphi)/2c\). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgde4775e" class="outline-7">
+<h7 id="orgde4775e">(C) The claim is true for the special case \(\hat{n} = (1, 0, 0)\).</h7>
+<div class="outline-text-7" id="text-orgde4775e">
+<p>
+PROOF: Observe that:
+</p>
+
+<p>
+\[
+  R_x(\theta) = R_y(\pi/2) R_z(\theta) R_y(-\pi/2)
+\]
+</p>
+
+<p>
+Moreover, recall that a similar formula holds for the rotations within the Bloch Sphere:
+</p>
+
+<p>
+\[
+  r_x(\theta) = r_y(\pi/2) r_z(\theta) r_y(-\pi/2)
+\]
+</p>
+
+<p>
+This together with (A) and (B) implies the claim. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga53084f" class="outline-7">
+<h7 id="orga53084f">Intermezzo</h7>
+<div class="outline-text-7" id="text-orga53084f">
+<p>
+Let \(\hat{n} = (x, y, z)\), and \(a = x + iy\). Then
+</p>
+
+<p>
+\[
+  N := \hat{n}\cdot(X, Y, Z) = \left(\begin{matrix} z & \overline{a} \\ a & -z \end{matrix}\right)
+\]
+</p>
+
+<p>
+It remains to show the claim for \(N\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgae9306d" class="outline-7">
+<h7 id="orgae9306d">(D) There exist \(\alpha,\beta\) such that:</h7>
+<div class="outline-text-7" id="text-orgae9306d">
+<p>
+\[
+  R_{\hat{n}}(\theta) = R_x(\alpha) R_y(\beta) \cdot R_z(\theta) \cdot R_y(-\beta) R_x(-\alpha)
+\]
+</p>
+
+<p>
+PROOF: The expression on the right simplifies to
+</p>
+
+\begin{bmatrix}
+  \cos(\alpha)\cos(\beta) & \sin(\beta) + i \sin(\alpha)\cos(\beta) \\
+  \sin(\beta) - i \sin(\alpha)\cos(\beta) & -\cos(\alpha)\cos(\beta)
+\end{bmatrix}
+
+<p>
+It is not hard to see that \(\alpha,\beta\) can be chosen such that this equals \(N\). The concrete
+values would be needed to determine the axis of rotation. However, we determine it another way. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc31bce2" class="outline-7">
+<h7 id="orgc31bce2">(E) \(R_{\hat{n}}(\alpha)\) corresponds to a rotation of angle \(\alpha\) around <i>some</i> axis</h7>
+<div class="outline-text-7" id="text-orgc31bce2">
+<p>
+(which is independent of the angle).
+</p>
+
+<p>
+PROOF: This is a direct consequence of (D), together with (B) and (C). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1eb4f78" class="outline-7">
+<h7 id="org1eb4f78">(F) The angle in (E) is indeed \(\hat{n}\).</h7>
+<div class="outline-text-7" id="text-org1eb4f78">
+<p>
+PROOF: We have to show that the positive eigenvector \(v_+\) of \(R_{\hat{n}(\alpha)}\) corresponds to
+\(\hat{n}\) on the Bloch sphere. Therefore let us calculate the eigenvalues:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org1ad2de3"><span class="org-variable-name">x</span>, <span class="org-variable-name">y</span>, <span class="org-variable-name">z</span> = sp.symbols(<span class="org-string">'x y z'</span>)
+<span class="org-variable-name">N</span> = Matrix([[z, x - I*y], [x + I*y, -z]])
+<span class="org-variable-name">ev</span> = N.eigenvects()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Keep in mind that x^2 + y^2 + z^2 = 1</span>
+<span class="org-variable-name">output</span>=<span class="org-string">""</span>
+<span class="org-keyword">for</span> i <span class="org-keyword">in</span> [0, 1]:
+    <span class="org-variable-name">output</span> += f<span class="org-string">"eigenvalue = {ev[i][0]}\neigenvector = {ev[i][2]}"</span>
+    <span class="org-keyword">if</span> i==0: <span class="org-variable-name">output</span> += <span class="org-string">"\n\n"</span>
+output
+</pre>
+</div>
+
+<pre class="example">
+eigenvalue = -sqrt(x**2 + y**2 + z**2)
+eigenvector = [Matrix([
+[z/(x + I*y) - sqrt(x**2 + y**2 + z**2)/(x + I*y)],
+[                                               1]])]
+
+eigenvalue = sqrt(x**2 + y**2 + z**2)
+eigenvector = [Matrix([
+[z/(x + I*y) + sqrt(x**2 + y**2 + z**2)/(x + I*y)],
+[                                               1]])]
+</pre>
+
+
+<p>
+We see that the normalized eigenvectors for \(\pm 1\) are:
+</p>
+
+<p>
+\[
+  v_{\pm} = \frac{1}{\sqrt{2}} \left(
+    \pm \sqrt{1 \pm z}\cdot|0\rangle + \frac{x + iy}{\sqrt{1 \pm z}} \cdot |1\rangle \right)
+\]
+</p>
+
+<p>
+Let \(\theta,\varphi\) such that
+</p>
+
+<p>
+\[
+  \hat{n} =: (\sin\theta \cos\varphi,\; \sin\theta \sin\varphi,\; \cos\theta)
+\]
+</p>
+
+<p>
+Let us abbreviate \(c=\cos(\theta/2)\), \(s=\sin(\theta/2)\). By the usual trigonometric identities we have:
+</p>
+
+<p>
+\[
+  \hat{n} = (2sc\cos(\varphi), 2sc\sin(\varphi), c^2 - s^2)
+\]
+</p>
+
+<p>
+Plugging this into the above formula for \(v_+\) we see that indeed
+</p>
+
+<p>
+\[ |\psi\rangle = c |0\rangle + e^{i\varphi}s |1\rangle \]
+</p>
+
+<p>
+which proofs the claim. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8bbe243" class="outline-7">
+<h7 id="org8bbe243">Conclusion</h7>
+<div class="outline-text-7" id="text-org8bbe243">
+<p>
+(F) proves the claim QED[exercise 4.6].
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgaf20800" class="outline-5">
+<h5 id="orgaf20800">Exercise 4.7</h5>
+<div class="outline-text-5" id="text-orgaf20800">
+<p>
+Show that \(XYX = - Y\) and use this to prove that \(X R_y(\theta)X = R_y(-\theta)\).
+</p>
+
+<p>
+<b>Solution:</b> Follows from \((XY)X = iZX = i^2Y\).
+</p>
+</div>
+</div>
+<div id="outline-container-orgcbd89f5" class="outline-5">
+<h5 id="orgcbd89f5">Exercise 4.8</h5>
+<div class="outline-text-5" id="text-orgcbd89f5">
+<p>
+An arbitrary single qubit unitary operator can be written in the form
+</p>
+
+<p>
+\[ U = \exp(i\alpha) R_{\hat{n}} (\theta) \]
+</p>
+
+<p>
+for some real numbers \(\alpha\) and \(\theta\), and a real three-dimensional unit vector \(\hat{n}\).
+</p>
+
+<ol class="org-ol">
+<li>Prove this fact.</li>
+<li>Find values for the Hadamard gate \(H\).</li>
+<li>Find values for the phase gate \(S = \sqrt{Z}\).</li>
+</ol>
+</div>
+
+<div id="outline-container-orgcc013f6" class="outline-6">
+<h6 id="exercise-4-8-part-1">Proof of 1</h6>
+<div class="outline-text-6" id="text-exercise-4-8-part-1">
+<p>
+PROOF: Clearly every unitary Matrix has the form:
+</p>
+
+<p>
+\[
+  U = e^{i\gamma} \begin{pmatrix} e & -\overline{f} \\ f & \overline{e} \end{pmatrix}
+  \text{ where } |e|^2 + |f|^2 = 1,
+\]
+</p>
+
+<p>
+since the columns have to be orthogonal. In the following we show that the rotation operators are
+<b>characterized</b> as those unitary operators which look like the RHS without the phase factor.
+</p>
+
+<p>
+We have:
+</p>
+
+<p>
+\[
+R_{\hat{n}}(\theta) = e^{-i\theta N/2} = \left(\begin{matrix}
+  \cos(\theta/2) - iz \sin(\theta/2) & -i\overline{a} \sin(\theta/2) \\
+  -ia \sin(\theta/2) & \cos(\theta/2) + iz \sin(\theta/2) \end{matrix}\right)
+\]
+</p>
+
+<p>
+where \(\hat{n} = (x, y, z)\) and \(a = x + iy\). It is sufficient to show that the First column of the
+rotation opterator can be made equal to \((e, f)\), since the second column of \(U\) is fixed
+by unitarity - up to a phase factor (this is where the \(\alpha\) kicks in).
+</p>
+
+<p>
+Abbreviating \(\zeta = \cos(\theta/2) - iz \sin(\theta/2)\) and decomposing \(a = e^{i\varphi}|a|\) we
+see that the first columnt of the rotation is:
+</p>
+
+<p>
+\[ (\zeta, -i e^{i \varphi} \sqrt{1 - |\zeta|^2}) \]
+</p>
+
+<p>
+Clearly \(\zeta\) can be chosen to be any complex number with modulus at most \(1\). Once this is fixed,
+the second component can be made any number with modulus \(\sqrt{1-|\zeta|^2}\). Hence the system
+</p>
+
+\begin{align*}
+  \alpha &= \gamma \\
+  \zeta &= e \\
+  -i e^{i\varphi} &= f/|f| \text{ if } f \neq 0
+\end{align*}
+
+<p>
+has a (unique) solution, which proves the claim. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3143814" class="outline-6">
+<h6 id="org3143814">Part 2</h6>
+<div class="outline-text-6" id="text-org3143814">
+<p>
+We follow the proof of Part 1 and first represent \(H\) in this special form:
+</p>
+
+<p>
+\[
+  H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+    = \frac{i}{\sqrt{2}} \begin{pmatrix} -i & -i \\ -i & i \end{pmatrix}
+\]
+</p>
+
+<p>
+Hence \(\zeta=-i/\sqrt{2}\) and \(e^{i\varphi}=1\). This in turn leads to \(x=z=1/\sqrt{2}\), \(z=0\) and
+\(\theta=\pi\). In other words:
+</p>
+
+<p>
+\[
+  H = i R_{(\hat{x}+\hat{z})/\sqrt{2}}(\pi) = \frac{1}{\sqrt{2}} \left( X + Z \right).
+\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-org956021b" class="outline-6">
+<h6 id="org956021b">Part 3</h6>
+<div class="outline-text-6" id="text-org956021b">
+<p>
+Recall \(Z = i R_z(\pi)\), hence:
+</p>
+
+<p>
+\[ S = e^{i\pi/4} R_z(\pi/2). \]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org24e0ee6" class="outline-5">
+<h5 id="org24e0ee6">Exercise 4.9</h5>
+<div class="outline-text-5" id="text-org24e0ee6">
+<p>
+Explain why any single qubit unitary operator may be written in the form (4.12).
+</p>
+
+<p>
+<b>Solution:</b> This essentially follows from the first lines of the proof of part 1 in <a href="#exercise-4-8-part-1">exercise 4.8</a>
+(representation of \(U\)).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga4aec26" class="outline-5">
+<h5 id="orga4aec26">Exercise 4.10 (<code>X</code>-<code>Y</code> decomposition of rotations)</h5>
+<div class="outline-text-5" id="text-orga4aec26">
+<p>
+Give a decomposition analogous to Theorem 4.1 but using \(R_x\) instead of \(R_z\).
+</p>
+</div>
+
+<div id="outline-container-orga2ac8c1" class="outline-6">
+<h6 id="orga2ac8c1">Solution</h6>
+<div class="outline-text-6" id="text-orga2ac8c1">
+<p>
+By Theorem 4.1 we find the following representation of \(HUH\):
+</p>
+
+<p>
+\[
+  HUH = e^{i\alpha} R_z(\beta)\cdot R_y(\gamma)\cdot R_z(\delta)
+\]
+</p>
+
+<p>
+Conjugating this again with \(H\) we get:
+</p>
+
+<p>
+\[
+  U = e^{i\alpha} R_x(\beta)\cdot R_y(-\gamma)\cdot R_x(\delta)
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org130754b" class="outline-5">
+<h5 id="org130754b">Exercise 4.11</h5>
+<div class="outline-text-5" id="text-org130754b">
+<p>
+Suppose \(\hat{m}\) and \(\hat{n}\) are non-parallel real unit vectors in three dimensions. Use Theorem 4.1 to show that
+an arbitrary single qubit unitary \(U\) may be written
+</p>
+
+<p>
+\[
+  U = e^{i\alpha} R_{\hat{n}}(\beta) R_{\hat{m}}(\gamma) R_{\hat{n}}(\delta)
+\]
+</p>
+
+<p>
+for appropriate choices of α, β, γ and δ.
+</p>
+</div>
+
+<div id="outline-container-orgc8ec8d9" class="outline-6">
+<h6 id="orgc8ec8d9">Proof</h6>
+<div class="outline-text-6" id="text-orgc8ec8d9">
+<p>
+Since we consider only products of Gates we may identify Gates resp. Qubits which are equivalent up
+to a phase factor. That is we work on the quotient space \(\CC^2/\CC\) for the Qubits and
+\(\CC^{2\times2}/\CC\) for the Gates.
+</p>
+
+<p>
+We have to proof that:
+</p>
+
+<p>
+\[
+  U \equiv R_{\hat{n}}(\beta) R_{\hat{m}}(\gamma) R_{\hat{n}}(\delta)
+\]
+</p>
+
+<p>
+In exercise 4.8 we proved that \(U\equiv R_{\hat{k}}(\varepsilon)\) for some axis and angle. Let us
+denote by \(r\) the (ordinary) rotations in the Bloch Sphere. By exercise 4.6 we know that the quantum
+roations are isomorphic to the corresponding ordinary rotations. That is, we have to show:
+</p>
+
+<p>
+\[
+  r_{\hat{k}}(\varepsilon) = r_{\hat{n}}(\beta) r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) .
+\]
+</p>
+
+<p>
+On the other hand this is a well known fact about the group of rotations (real orthogonal matrices
+with determinant equal to 1) in three dimensions. We prove it here anyway:
+</p>
+
+<p>
+The above equation is equivalent to
+</p>
+
+<p>
+\[
+   r_{\hat{n}}(-\beta) = r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) r_{\hat{k}}(-\varepsilon) .
+\]
+</p>
+
+<p>
+Since \(\beta\) is a free parameter it suffices to show that the RHS maps \(\hat{n}\) to itself, for
+appropriate choices of \(\gamma\) and \(\delta\). Therefore let \(\hat{t} = r_{\hat{k}}(-\varepsilon)\hat{n}\) and consider:
+</p>
+
+<p>
+\[
+  \hat{n} = r_{\hat{m}}(\gamma) r_{\hat{n}}(\delta) \hat{t} .
+\]
+</p>
+
+<p>
+Consider the Meridian \(M_1\) around \(\hat{n}\) which contains \(\hat{t}\) and the Meridian \(M_2\) around
+\(\hat{m}\) which contains \(\hat{n}\). Since the two axes are not parallel the two Meridians have two
+intersection points \(a\) and \(b\) (they can be equal in the trivial case \(\hat{t}=\hat{n}\)). Clearly
+we can choose \(\delta\) in such a way that \(\hat{t}\) moves to one of the intersection points, say
+\(a\). Now, by definition of \(M_2\) we can choose \(\gamma\) in sich a way that \(a\) moves to \(\hat{n}\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2688ade" class="outline-5">
+<h5 id="org2688ade">Exercise 4.12</h5>
+<div class="outline-text-5" id="text-org2688ade">
+<p>
+Give A, B, C, and α (in Corollary 4.2) for the Hadamard gate.
+</p>
+</div>
+
+<div id="outline-container-orgf646341" class="outline-6">
+<h6 id="orgf646341">Solution</h6>
+<div class="outline-text-6" id="text-orgf646341">
+<p>
+First let us find the parameters in
+</p>
+
+<p>
+\[
+  H = e^{i\alpha} R_z(\beta) R_y(\gamma) R_z(\delta)
+\]
+</p>
+
+<p>
+The RHS is given explicitly in (4.12) from where it is immediat that \(\gamma=\pi/2\). The other three
+parameters satisfy a linear system of equations, which can be solved easily: \(\alpha=\pi/2\),
+\(\beta=0\), and \(\delta=\pi\).
+</p>
+
+<p>
+Hence:
+</p>
+
+\begin{align*}
+  A &= R_z(\beta) R_y(\gamma/2) = R_y(\pi/4) = \frac{1}{2}
+    \begin{pmatrix}
+      \sqrt{\sqrt{2} + 2} & - \sqrt{2 - \sqrt{2}} \\
+      \sqrt{2 - \sqrt{2}} & \sqrt{\sqrt{2} + 2}
+    \end{pmatrix} \\
+  B &= R_y(-\gamma/2) R_z(-(\delta + \beta)/2) = R_y(-\pi/4) R_z(-\pi/2) = \frac{1}{2}
+    \begin{pmatrix}
+      e^{\frac{i\pi}{4}} \sqrt{\sqrt{2} + 2} & e^{-\frac{i\pi}{4}} \sqrt{2 - \sqrt{2}} \\
+      - e^{\frac{i\pi}{4}} \sqrt{2 - \sqrt{2}} & e^{-\frac{i\pi}{4}} \sqrt{\sqrt{2} + 2}
+    \end{pmatrix} \\
+  C &= R_z((\delta - \beta)/2) = R_z(\pi/2) =
+    \begin{pmatrix}
+      e^{- \frac{i \pi}{4}} & 0 \\
+      0 & e^{\frac{i \pi}{4}}
+    \end{pmatrix}
+\end{align*}
+</div>
+</div>
+</div>
+<div id="outline-container-orgdaafff4" class="outline-5">
+<h5 id="orgdaafff4">Exercise 4.13 (Circuit identities)</h5>
+<div class="outline-text-5" id="text-orgdaafff4">
+<p>
+It is useful to be able to simplify circuits by inspection, using well-known identities. Prove the
+following three identities:
+</p>
+
+<p>
+\[ X = HZH,\quad Z = HXH,\quad Y = - HYH \]
+</p>
+</div>
+
+<div id="outline-container-org9f3069a" class="outline-6">
+<h6 id="org9f3069a">Proof</h6>
+<div class="outline-text-6" id="text-org9f3069a">
+<p>
+The first two identities follow from the fact that \(H\) is (unitary and) self-adjoint and contains
+eigenvectors of <code>X</code> as columns (and rows). The third identity follows from
+</p>
+
+<p>
+\[ H = \frac{1}{\sqrt{2}} \left( X + Z \right). \]
+</p>
+
+<p>
+and the commutator properties of the Paulis, e.g. \(XY=iZ\) and its cyclic variations. Of course the
+first two identities could also be proved like that.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd3efa7c" class="outline-5">
+<h5 id="orgd3efa7c">Exercise 4.14</h5>
+<div class="outline-text-5" id="text-orgd3efa7c">
+<p>
+Use the previous exercise to show that \(HTH=R_x(\pi/4)\), up to a global phase.
+</p>
+</div>
+
+<div id="outline-container-org47f58fc" class="outline-6">
+<h6 id="org47f58fc">Proof</h6>
+<div class="outline-text-6" id="text-org47f58fc">
+<p>
+This follows from \(T\equiv R_z(\pi/4)\) (up to phase factor) and \(HZH=X\).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcbbadcb" class="outline-5">
+<h5 id="orgcbbadcb">Exercise 4.15 (Composition of single qubit operations)</h5>
+<div class="outline-text-5" id="text-orgcbbadcb">
+<p>
+The Bloch representation gives a nice way to visualize the effect of composing two rotations.
+</p>
+
+<ol class="org-ol">
+<li>Prove that if a rotation through an angle β1 about the axis n̂1 is followed by a</li>
+</ol>
+<p>
+rotation through an angle β2 about an axis n̂2 , then the overall rotation is through an angle β12
+about an axis n̂12 given by
+</p>
+
+\begin{align*}
+  c_{12} &= c_1 c_2 - s_1 s_2 \; \hat{n}_1 \cdot \hat{n}_2 \\
+  s_{12} \hat{n}_{12} &= s_1 c_2 \; \hat{n}_1 + c_1 s_2 \; \hat{n}_2 + s_1 s_2 \; \hat{n}_2 \times \hat{n}_1 ,
+\end{align*}
+
+<p>
+where \(c_i=\cos(\beta_i/2)\), \(s_i=\sin(\beta_i/2)\), \(c_{12}=\cos(\beta_{12}/2)\), and \(s_{12}=\sin(\beta_{12}/2)\).
+</p>
+
+<ol class="org-ol">
+<li>Show that if β1 = β2 and n̂1 = ẑ these equations simplify to</li>
+</ol>
+
+\begin{align*}
+  c_{12} &= c_2 − s_2 \; \hat{z} \cdot \hat{n}_2 \\
+  s_{12} \hat{n}_12 &= sc \; (\hat{z} + \hat{n}_2) + s_2 \; \hat{n}_2 \times \hat{z} ,
+\end{align*}
+
+<p>
+where \(c=c_1\) and \(s=s_1\).
+</p>
+
+<p>
+<b>Remark:</b> <i>It seems</i> (if we did no mistake) that there is a typo in the original formula for
+\(s_{12}\hat{n}_{12}\). We corrected this (hopefully).
+</p>
+</div>
+
+<div id="outline-container-org37390c5" class="outline-6">
+<h6 id="org37390c5">Proof</h6>
+<div class="outline-text-6" id="text-org37390c5">
+<p>
+We only proof the first assertion since the second one follows trivially from the first.
+</p>
+
+<p>
+We use the previously established fact that the 3D-rotations are isomorphic to the Pauli rotation
+operators (exercise 4.6). Along that way we essentially establish the relation between Quaternions
+and 3D rotations (and Pauli rotations).
+</p>
+
+<p>
+For a vector \(\hat{n}\) let us define \(N_{\hat{n}}=-i(n_1X+n_2Y+n_3Z)\). The composition of the two
+rotations is given by:
+</p>
+
+<p>
+\[
+  (c_{12} + s_{12} N_{\hat{n}_{12}}) = (c_2 + s_2 N_{\hat{n}_2}) \cdot (c_1 + s_1 N_{\hat{n}_1}) .
+\]
+</p>
+
+<p>
+To spare us from the tedious work to expand the RHS by hand we use sympy for that. We are only
+interested in algebraic operations and in particular we don't want to see any cumbersome matrix
+expression. To help sympy we use the fact that the Quaterions can be modelled by the Pauli
+Matrices. Just use the Identity matrix as the unit (the real number 1) and \(-iX\), \(-iY\), \(-iZ\) as
+the three imaginary units. Keep in mind that we only use the Quaterions as a trick to tell sympy
+that we are not interested in Matrices. Essentially we still use the Pauli Rotations to prove the
+claim.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgb66a27b"><span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> Quaternion
+
+<span class="org-variable-name">x1</span>, <span class="org-variable-name">y1</span>, <span class="org-variable-name">z1</span> = sp.symbols(<span class="org-string">'x1 y1 z1'</span>)
+<span class="org-variable-name">x2</span>, <span class="org-variable-name">y2</span>, <span class="org-variable-name">z2</span> = sp.symbols(<span class="org-string">'x2 y2 z2'</span>)
+<span class="org-variable-name">c1</span>, <span class="org-variable-name">c2</span>, <span class="org-variable-name">s1</span>, <span class="org-variable-name">s2</span> = sp.symbols(<span class="org-string">'c1 c2 s1 s2'</span>)
+
+<span class="org-variable-name">N1</span> = Quaternion(0, x1, y1, z1)
+<span class="org-variable-name">N2</span> = Quaternion(0, x2, y2, z2)
+
+<span class="org-variable-name">R1</span> = c1 + s1*N1
+<span class="org-variable-name">R2</span> = c2 + s2*N2
+
+R2 * R1
+</pre>
+</div>
+
+<pre class="example">
+(c1*c2 - s1*s2*x1*x2 - s1*s2*y1*y2 - s1*s2*z1*z2) + (c1*s2*x2 + c2*s1*x1 - s1*s2*y1*z2 + s1*s2*y2*z1)*i + (c1*s2*y2 + c2*s1*y1 + s1*s2*x1*z2 - s1*s2*x2*z1)*j + (c1*s2*z2 + c2*s1*z1 - s1*s2*x1*y2 + s1*s2*x2*y1)*k
+</pre>
+
+
+<p>
+Rearranging the result for better readability:
+</p>
+
+<pre class="example">
+(c1*c2 - s1*s2*x1*x2 - s1*s2*y1*y2 - s1*s2*z1*z2)
++ (c1*s2*x2 + c2*s1*x1 - s1*s2*y1*z2 + s1*s2*y2*z1)*i
++ (c1*s2*y2 + c2*s1*y1 + s1*s2*x1*z2 - s1*s2*x2*z1)*j
++ (c1*s2*z2 + c2*s1*z1 - s1*s2*x1*y2 + s1*s2*x2*y1)*k
+</pre>
+
+<p>
+From here we can directly read out the claim! QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org06893f7" class="outline-5">
+<h5 id="org06893f7">Exercise 4.16 (Matrix representation of multi-qubit gates)</h5>
+<div class="outline-text-5" id="text-org06893f7">
+<p>
+What is the 4×4 unitary matrix for the following circuits
+</p>
+
+<pre class="example">
+
+q_0: ─────
+     ┌───┐
+q_1: ┤ H ├
+     └───┘
+
+     ┌───┐
+q_0: ┤ H ├
+     └───┘
+q_1: ─────
+
+</pre>
+</div>
+
+<div id="outline-container-orge840b35" class="outline-6">
+<h6 id="orge840b35">Solution</h6>
+<div class="outline-text-6" id="text-orge840b35">
+<p>
+According the convention of the book, these two circuits are represented by \(I\otimes H\),
+\(H\otimes I\) (in that order). We note here that Qiskit uses the reverse order. The Kronecker Product
+yields the matrices (since the basis vectors are ordered in a canonical way: 00, 01, 10, 11):
+</p>
+
+<p>
+\[
+  I\otimes H = \frac{1}{\sqrt{2}}
+  \,\begin{bmatrix}
+    1 &  1 & 0 &  0 \\
+    1 & -1 & 0 &  0 \\
+    0 &  0 & 1 &  1 \\
+    0 &  0 & 1 & -1
+  \,\end{bmatrix}
+\]
+</p>
+
+<p>
+\[
+  H\otimes I = \frac{1}{\sqrt{2}}
+  \,\begin{bmatrix}
+    1 & 0 &  1 &  0 \\
+    0 & 1 &  0 &  1 \\
+    1 & 0 & -1 &  0 \\
+    0 & 1 &  0 & -1
+  \,\end{bmatrix}
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org762c504" class="outline-5">
+<h5 id="org762c504">Exercise 4.17 (Building <code>CNOT</code> from controlled-<code>Z</code> gates)</h5>
+<div class="outline-text-5" id="text-org762c504">
+<p>
+Construct a <code>CNOT</code> (<code>CX</code>) gate from a <code>CZ</code> using two Hadamard Gates.
+</p>
+</div>
+
+<div id="outline-container-orga8779b7" class="outline-6">
+<h6 id="orga8779b7">Solution</h6>
+<div class="outline-text-6" id="text-orga8779b7">
+<p>
+The general form of a CU-gate is (\(P_j\) being projections):
+</p>
+
+<p>
+\[
+  CU = P_1 \otimes I + P_2 \otimes U
+\]
+</p>
+
+<p>
+Hence by \(HZH=X\):
+</p>
+
+<p>
+\[
+  CX = I\otimes H \cdot CZ \cdot I\otimes H
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7a7a9f6" class="outline-5">
+<h5 id="org7a7a9f6">Exercise 4.18</h5>
+<div class="outline-text-5" id="text-org7a7a9f6">
+<p>
+Show that swapping the two qubits leaves <code>CZ</code> invariant. That is, these two circuits are equal:
+</p>
+
+<pre class="example">
+q_0: ──■──
+     ┌─┴─┐
+q_1: ┤ Z ├
+     └───┘
+
+     ┌───┐
+q_0: ┤ Z ├
+     └─┬─┘
+q_1: ──■──
+</pre>
+
+<p>
+For this reason, the <code>CZ</code> is often denoted in a symmetric form:
+</p>
+
+<pre class="example">
+
+q_0: ─■─
+      │
+q_1: ─■─
+
+</pre>
+</div>
+
+<div id="outline-container-orgc970d40" class="outline-6">
+<h6 id="orgc970d40">Proof</h6>
+<div class="outline-text-6" id="text-orgc970d40">
+<p>
+This follows from
+</p>
+
+<p>
+\[
+  CZ = P_1 \otimes I + P_2 \otimes Z = I \otimes P_1 + Z \otimes P_2 .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1b979fc" class="outline-5">
+<h5 id="org1b979fc">Exercise 4.19 (<code>CNOT</code> action on density matrices)</h5>
+<div class="outline-text-5" id="text-org1b979fc">
+<p>
+The gate is a simple permutation whose action on a density matrix ρ is to rearrange the elements in
+the matrix. Write out this action explicitly in the computational basis.
+</p>
+</div>
+
+<div id="outline-container-orgc68d88b" class="outline-6">
+<h6 id="orgc68d88b">Solution</h6>
+<div class="outline-text-6" id="text-orgc68d88b">
+<p>
+The density matrix for two qubits in the computational basis looks as follows:
+</p>
+
+<p>
+\[
+  \rho = \sum_{i,j=0}^1 p_{ij} |ij\rangle .
+\]
+</p>
+
+<p>
+<code>CX</code> maps \(|0j\rangle\) to itself, and it swaps \(|10\rangle\) with \(|11\rangle\). Hence, as a mapping
+on the density matrix it acts as follows on the density matrix:
+</p>
+
+<p>
+\[
+  p_{0i} \mapsto p_{0i},\quad p_{10} \mapsto p_{11},\quad p_{11} \mapsto p_{10} .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org46cf38a" class="outline-5">
+<h5 id="org46cf38a">Exercise 4.20 (<code>CNOT</code> basis transformations)</h5>
+<div class="outline-text-5" id="text-org46cf38a">
+<p>
+Show that the following two circuits are equal:
+</p>
+
+<pre class="example">
+     ┌───┐     ┌───┐
+q_0: ┤ H ├──■──┤ H ├
+     ├───┤┌─┴─┐├───┤
+q_1: ┤ H ├┤ X ├┤ H ├
+     └───┘└───┘└───┘
+
+     ┌───┐
+q_0: ┤ X ├
+     └─┬─┘
+q_1: ──■──
+
+</pre>
+
+
+<p>
+Moreover the effect of the <code>CX</code> gate on the eigenbasis of <code>X</code> is as follows:
+</p>
+
+<p>
+\[
+  \,|\pm+\rangle \mapsto |\pm+\rangle,\quad |\pm-\rangle \mapsto |\mp-\rangle
+\]
+</p>
+
+<p>
+In other words: With respect to the eigenbasis of <code>X</code> the <code>CX</code> gate acts again like a <code>CX</code> gate but with
+the control and target qubit switched.
+</p>
+</div>
+
+<div id="outline-container-org01db974" class="outline-6">
+<h6 id="org01db974">Proof</h6>
+<div class="outline-text-6" id="text-org01db974">
+<p>
+The statement after "Moreover" is direct consequence of the first statement. Therefore we only prove
+the first one.
+</p>
+
+<p>
+We have to show that \(H\otimes H \cdot CX \cdot H\otimes H\) is the <code>CX</code> gate with the qubits reversed.
+</p>
+
+<p>
+First, let us recall the projections on the eigenbasis of <code>X</code>:
+</p>
+
+\begin{align*}
+  P_+ &= |+\rangle \otimes \langle+| = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}, \\
+  P_- &= |-\rangle \otimes \langle-| = \begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}.
+\end{align*}
+
+<p>
+Consider
+</p>
+
+<p>
+\[
+  H\otimes H \cdot CX \cdot H\otimes H = P_+ \otimes I + P_- \otimes Z .
+\]
+</p>
+
+<p>
+We have to show that, after swapping the two qubits the RHS equals <code>CX</code>. In fact:
+</p>
+
+<p>
+\[
+  I \otimes P_+ + Z \otimes P_- = \frac{1}{2}
+      \,\begin{bmatrix}
+         1 &  1 &  0 &  0 \\
+         1 &  1 &  0 &  0 \\
+         0 &  0 &  1 &  1 \\
+         0 &  0 &  1 &  1
+      \,\end{bmatrix}
+    \,+ \frac{1}{2}
+      \,\begin{bmatrix}
+         1 & -1 &  0 &  0 \\
+        -1 &  1 &  0 &  0 \\
+         0 &  0 & -1 &  1 \\
+         0 &  0 &  1 & -1
+      \,\end{bmatrix}
+    =
+      \,\begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0
+      \,\end{bmatrix} = C(X) .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org255179b" class="outline-5">
+<h5 id="org255179b">Exercise 4.21</h5>
+<div class="outline-text-5" id="text-org255179b">
+<p>
+Verify that Figure 4.8 implements the \(C^2(U)\) operation.
+</p>
+</div>
+
+<div id="outline-container-org6983090" class="outline-6">
+<h6 id="org6983090">Solution</h6>
+<div class="outline-text-6" id="text-org6983090">
+<p>
+The easiest solution might be to just try out all four possibilities to plugin the computational
+basis into the first two wires.
+</p>
+
+<p>
+Another approach is to just calculate the corresponding algebraic expression:
+</p>
+
+\begin{align*}
+        &(P_0 \otimes I \otimes I + P_1 \otimes I \otimes V) \\
+  \cdot &(P_0 \otimes I \otimes I + P_1 \otimes X \otimes I) \\
+  \cdot &(I \otimes P_0 \otimes I + I \otimes P_1 \otimes V^\dagger) \\
+  \cdot &(P_0 \otimes I \otimes I + P_1 \otimes X \otimes I) \\
+  \cdot &(I \otimes P_0 \otimes I + I \otimes P_1 \otimes V)
+\end{align*}
+
+<p>
+Using \(XP_0X=P_1\) and \(XP_1X=P_0\) we get, that this is:
+</p>
+
+<p>
+\[
+  P_0 \otimes P_0 \otimes I + P_1 \otimes P_0 \otimes I + P_0 \otimes P_1 \otimes I + P_1 \otimes P_1 \otimes V^2 .
+\]
+</p>
+
+<p>
+Which is indeed \(C^2(U)\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org48c834c" class="outline-5">
+<h5 id="org48c834c">Exercise 4.22</h5>
+<div class="outline-text-5" id="text-org48c834c">
+<p>
+Prove that a \(C^2(U)\) gate (for any single qubit unitary \(U\)) can be constructed using at most eight
+one-qubit gates, and six \(C(X)\).
+</p>
+</div>
+
+<div id="outline-container-org61713ae" class="outline-6">
+<h6 id="org61713ae">Proof</h6>
+<div class="outline-text-6" id="text-org61713ae">
+<p>
+If we combine the construction of \(C^2(U)\) from figure 4.8 (the \(U=V^2\) thing) with the construction
+of \(C(U)\) from figure 4.6 (the \(AXBXC=U\) thing), we immediately see that we can construct a circuit
+with six <code>CX</code> and ten one-qubit gates (two of the three phase gates cancel each other). However, we
+can reduce the number of one qubit gates by two, since two pairs can actually be merged into a
+single one-qubit operator.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf437cb0" class="outline-5">
+<h5 id="orgf437cb0">Exercise 4.23</h5>
+<div class="outline-text-5" id="text-orgf437cb0">
+<p>
+Construct a \(C^1(U)\) gate for \(U=R_x(\theta)\) and \(U=R_y(\theta)\), using only <code>CNOT</code> and single qubit
+gates. Can you reduce the number of single qubit gates needed in the construction from three to two?
+</p>
+</div>
+
+<div id="outline-container-org2b4922d" class="outline-6">
+<h6 id="org2b4922d">Solution</h6>
+<div class="outline-text-6" id="text-org2b4922d">
+<p>
+For the y-rotation this is easy:
+</p>
+
+<p>
+\[
+  C^1(R_y(\theta)) = C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{y,2}(\theta/2) .
+\]
+</p>
+
+<pre class="example">
+
+q_0: ─────────────■────────────────■──
+     ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
+q_1: ┤ Ry(θ/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├
+     └─────────┘└───┘└──────────┘└───┘
+</pre>
+
+
+<p>
+We get the same result if we use the proof of Corollary 4.2. For the x-rotation we first deduce from
+exercise 4.6 (interpretation as 3D rotations):
+</p>
+
+<p>
+\[
+  R_x(\theta) = R_z(-\pi/2) \cdot R_y(\theta) \cdot R_z(\pi/2) .
+\]
+</p>
+
+<p>
+Now the proof of Corollary 4.2 shows:
+</p>
+
+<p>
+\[
+  C^1(R_x(\theta)) = R_{z,2}(-\pi/2) C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
+\]
+</p>
+
+<pre class="example">
+
+q_0: ─────────────────────────■────────────────■──────────────
+     ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
+q_1: ┤ Ry(θ/2) ├┤ Rz(-π/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├┤ Rz(-π/2) ├
+     └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgda6371f" class="outline-5">
+<h5 id="orgda6371f">Exercise 4.24</h5>
+<div class="outline-text-5" id="text-orgda6371f">
+<p>
+Verify that Figure 4.9 implements the Toffoli gate.
+</p>
+</div>
+
+<div id="outline-container-org343f7b4" class="outline-6">
+<h6 id="org343f7b4">Proof</h6>
+<div class="outline-text-6" id="text-org343f7b4">
+<p>
+Preliminaries: Recall that \(T=e^{i\pi/8}R_z(\pi/4)\) and \(XZX=-Z\). It suffices to prove the claim for
+states of the form \(|ij\rangle\otimes|\psi\rangle\) (the basis states in the first two wires), by
+linearity.
+</p>
+
+<p>
+The first wire always acts as \(T\). This does nothing to \(|0\rangle\) and applies a phase shift to \(|1\rangle\).
+</p>
+
+<p>
+Now we consider the first two wires (the upper wires) states of the form \(|01\rangle\) (that is, the
+control qubit is turned off). Then, the second wire acts as \(ST^\dagger T^\dagger=I\). Hence
+\(|01\rangle\) is mapped to itself. Now consider \(|1i\rangle\). The second wire now acts as
+</p>
+
+<p>
+\[
+  SX T\dagger XT\dagger = e^{-i\pi/4} S XR_z(\pi/4)XR_z(\pi/4) = e^{-i\pi/4} S .
+\]
+</p>
+
+<p>
+Hence \(|1i\rangle\) is mapped to \(|1\rangle\otimes S|i\rangle\). We summarize: The first two wires act as:
+</p>
+
+<p>
+\[
+  \,|ij\rangle \mapsto \begin{cases}
+      i|11\rangle  & \text{if } i=j=1 \\
+      \,|ij\rangle & \text{else.}
+  \,\end{cases}
+\]
+</p>
+
+<p>
+Now consider the third wire. It is not hard to see that if one of the first two qubits is
+\(|0\rangle\), then all operators cancel each other (equalize to \(I\)) due to \(X^2=-1\) and \(T^\dagger T=I\).
+</p>
+
+<p>
+So the only interesting case is if the first to qubits are both on (equal state 1). In that case we
+have to show that the operator in the third row is equal to \(-iX\). We have:
+</p>
+
+<p>
+\[
+  T X T^\dagger X = R_z(\pi/4) X R_z(-\pi/4) X = R_z(\pi/2) .
+\]
+</p>
+
+<p>
+Hence the operator in the third row is:
+</p>
+
+<p>
+\[
+  H R_z(\pi/2) R_z(\pi/2) H = R_x(\pi) = -iX.
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0a5bc76" class="outline-5">
+<h5 id="org0a5bc76"><span class="todo TODO">TODO</span> Exercise 4.25 (Fredkin gate construction) <code>[3/4]</code></h5>
+<div class="outline-text-5" id="text-org0a5bc76">
+<p>
+Recall that the Fredkin (controlled-swap) gate performs the transform:
+</p>
+
+\begin{bmatrix}
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+
+
+<ol class="org-ol">
+<li class="on"><code>[X]</code> Give a quantum circuit which uses three Toffoli gates to construct the Fredkin gate (Hint: think
+of the swap gate construction – you can control each gate, one at a time).</li>
+<li class="on"><code>[X]</code> Show that the first and last Toffoli gates can be replaced by gates.</li>
+<li class="on"><code>[X]</code> Now replace the middle Toffoli gate with the circuit in Figure 4.8 to obtain a Fredkin gate
+construction using only six two-qubit gates.</li>
+<li class="off"><code>[&#xa0;]</code> Can you come up with an even simpler construction, with only five two-qubit gates?</li>
+</ol>
+</div>
+
+<div id="outline-container-orgee57070" class="outline-6">
+<h6 id="orgee57070">Solution to 1</h6>
+<div class="outline-text-6" id="text-orgee57070">
+<p>
+Taking the swap-gate construction from Figure 1.7 we may deduce that the following circuit might do
+what we want:
+</p>
+
+<pre class="example">
+
+q_0: ──■────■────■──
+       │  ┌─┴─┐  │
+q_1: ──■──┤ X ├──■──
+     ┌─┴─┐└─┬─┘┌─┴─┐
+q_2: ┤ X ├──■──┤ X ├
+     └───┘     └───┘
+</pre>
+
+
+<p>
+In fact, a short calculation yields the desired result.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org1fd73a5"><span class="org-variable-name">T01</span> = make_CnU(3, [0, 1], 2, X)
+<span class="org-variable-name">T02</span> = make_CnU(3, [0, 2], 1, X)
+
+<span class="org-keyword">assert</span> T01 * T02 * T01 == Fred, <span class="org-string">"Exercise 4.25, Solution to 1."</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1e46da1" class="outline-6">
+<h6 id="org1e46da1">Solution to 2</h6>
+<div class="outline-text-6" id="text-org1e46da1">
+<p>
+The following circuit equals the Fredkin Gate too:
+</p>
+
+<pre class="example">
+
+q_0: ───────■───────
+          ┌─┴─┐
+q_1: ──■──┤ X ├──■──
+     ┌─┴─┐└─┬─┘┌─┴─┐
+q_2: ┤ X ├──■──┤ X ├
+     └───┘     └───┘
+</pre>
+
+
+<p>
+In fact:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">C12</span> = make_CU(3, 1, 2, X)
+
+<span class="org-keyword">assert</span> C12 * T02 * C12 == Fred, <span class="org-string">"Exercise 4.25, Solution to 2."</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgab9608d" class="outline-6">
+<h6 id="orgab9608d">Solution to 3</h6>
+<div class="outline-text-6" id="text-orgab9608d">
+<p>
+Apriori this new circuit uses 8 = 6 + 2 two-qubit gates. However the first two of these can be
+merged into one (together with the Hadamard in between). Observe that the a similar fact is true for
+the last two two-qubit gates of the construction from Figure 4.9. Hence we only need 6 such gates.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc16cc39" class="outline-6">
+<h6 id="orgc16cc39">Solution to 4</h6>
+<div class="outline-text-6" id="text-orgc16cc39">
+<p>
+So far I have no solution. My first guess was to use the construction from Firgure 4.8 (the thing
+with \(V^2=X\)). With the same trick as in Solution 3 (merging adjacent gates) one gets a solution
+with 6 two-qubit gates. I tried to move around gates at the right end (via commutator relations)
+hoping the find an equivalent circuit with on gate less - so far without success.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org377589a" class="outline-5">
+<h5 id="org377589a">Exercise 4.26</h5>
+<div class="outline-text-5" id="text-org377589a">
+<p>
+Show that the circuit
+</p>
+
+<pre class="example">
+
+q_0: ─────────────────────────────■───────────────────────────────
+                                  │
+q_1: ─────────────■───────────────┼────────────────■──────────────
+     ┌─────────┐┌─┴─┐┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
+q_2: ┤ Ry(π/?) ├┤ X ├┤ Ry(π/?) ├┤ X ├┤ Ry(-π/?) ├┤ X ├┤ Ry(-π/?) ├
+     └─────────┘└───┘└─────────┘└───┘└──────────┘└───┘└──────────┘
+</pre>
+
+
+<p>
+differs from a Toffoli gate only by relative phases \(e^{i\theta(c_1,c_2,t)}\).
+</p>
+</div>
+
+<div id="outline-container-orgf1085de" class="outline-6">
+<h6 id="orgf1085de">Proof</h6>
+<div class="outline-text-6" id="text-orgf1085de">
+<p>
+The following code saves us from the tedious calculations. It shows that \(?=4\) (everywhere) is a
+possible choice and that
+</p>
+
+<p>
+\[
+  \theta(c_1, c_2, t) = \begin{cases}
+      \pi  & \text{if } c_1=1,  \text{ and } c_2=t=0 \\
+      0 & \text{else.}
+  \,\end{cases}
+\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org613c57b"><span class="org-keyword">def</span> <span class="org-function-name">get_circuit</span>(n: <span class="org-builtin">int</span>):
+    <span class="org-doc">"""The n is the divisor missing in the Figure of Exercise 4.26 (the '?')."""</span>
+    <span class="org-variable-name">R</span> = tprod(Id, Id, Ry.subs(theta, pi / n))
+    <span class="org-variable-name">Ri</span> = tprod(Id, Id, Ry.subs(theta, -pi / n))
+
+    <span class="org-variable-name">CX12</span> = make_CU(3, 1, 2, X)
+    <span class="org-variable-name">CX02</span> = make_CU(3, 0, 2, X)
+
+    <span class="org-keyword">return</span> sp.simplify(R * CX12 * R * CX02 * Ri * CX12 * Ri)
+
+
+<span class="org-variable-name">C</span> = get_circuit(4)
+<span class="org-variable-name">Phase</span> = tprod(Id, Id, Id) - 2*tprod(P1, P0, P0)  <span class="org-comment-delimiter"># </span><span class="org-comment">Multiplies |100&gt; by -1</span>
+
+<span class="org-keyword">assert</span> Phase * C == Toff, <span class="org-string">"Exercise 4.26: Circuit should be Toffoli up to Phase Factor"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org532290d" class="outline-5">
+<h5 id="org532290d">Exercise 4.27</h5>
+<div class="outline-text-5" id="text-org532290d">
+<p>
+Using just <code>CNOT</code> and Toffoli gates, construct a quantum circuit to perform the transformation
+</p>
+
+\begin{bmatrix}
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+\end{bmatrix}
+
+<p>
+This kind of partial cyclic permutation operation will be useful later, in Chapter 7.
+</p>
+</div>
+
+<div id="outline-container-org617948b" class="outline-6">
+<h6 id="org617948b">Solution</h6>
+<div class="outline-text-6" id="text-org617948b">
+<p>
+Since the exercise already speaks about permutations lets dive into the permutation group
+formalism. This works since all involved matrices (<code>CNOT</code>, Toffoli, and the matrix from the exercise
+text) are all <i>permutation matrices</i>. These form a group which is isomorphic to a group of
+permuations. The procedure below also works analogously if we would directly use the matrix
+representations but I think it is nice to think it throught in a different formalism.
+</p>
+
+<p>
+Keep in mind that the isomorphism reverses the order of multiplication, that is: if Matrices \(A\) and
+\(B\) correspond to permutations \(a\) and \(b\) then \(AB\) corresponds to \(ba\) (meaning apply \(b\) first
+and then \(a\)). This is not just a sympy quirk but a normal convention in the mathematics of
+permutations. Maybe the rationale is that the action of a permutation is sometimes written in
+superscript notation: \(x^{ba}=(x^b)^a\) where \(x\) is some set which gets permutated (see also
+<a href="https://en.wikipedia.org/wiki/Group_action#Right_group_action">right-group-action</a> on wikipedia, which does not use superscript notation though).
+</p>
+
+<p>
+Recall the Matrix representation for the <code>CNOT</code> gate with control at 0 and target at 1 (on three
+wires):
+</p>
+
+<p>
+\[
+  C_{01}(X) = \begin{bmatrix}
+      1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+      0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 0 & 0 & 1 & 0 & 0
+    \,\end{bmatrix}
+\]
+</p>
+
+<p>
+If we enumerate the basis vectors from \(0\) (for \(|000\rangle\)) to \(7\) (for \(|111\rangle\)), then this
+corresponds to the permuation \((4\;6)(5\;7)\) (in <a href="https://en.wikipedia.org/wiki/Permutation#Cycle_notation">cycle-notation</a>). The other variations of <code>CX</code> (with
+different control/target) can be found by noting that permuting the three wires induces a
+permutation on the basis vectors which in turn translates to an action on the permutation group
+itself. See the code block below for the results (or use <code>make_CU</code> to make life easier).
+</p>
+
+<p>
+The "standard" Toffoli Gate is the one with target at 2:
+</p>
+
+<p>
+\[
+  T_2 = \begin{bmatrix}
+      1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+      0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+      0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+  \,\end{bmatrix} ,
+\]
+</p>
+
+<p>
+which corresponds to the permuation \((6\;7)\). The other three Toffolis (with different targets) are
+listed in the code block below.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgfcef956"><span class="org-comment-delimiter"># </span><span class="org-comment">cxij means: control i, target j</span>
+<span class="org-variable-name">cx01</span> = Perm(4, 6)(5, 7)
+<span class="org-variable-name">cx02</span> = Perm(4, 5)(6, 7)
+<span class="org-variable-name">cx12</span> = Perm(2, 3)(6, 7)
+<span class="org-variable-name">cx10</span> = Perm(2, 6)(3, 7)
+<span class="org-variable-name">cx20</span> = Perm(1, 5)(3, 7)
+<span class="org-variable-name">cx21</span> = Perm(1, 3)(5, 7)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">ti means: target at qubit i</span>
+<span class="org-variable-name">t0</span> = Perm(3, 7)
+<span class="org-variable-name">t1</span> = Perm(5, 7)
+<span class="org-variable-name">t2</span> = Perm(6, 7)
+</pre>
+</div>
+
+<p>
+The following code defines an exhaustive search for solutions with a fixed number of gates.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgf0a2c80"><span class="org-variable-name">perms</span> = [cx01, cx02, cx12, cx10, cx20, cx21, t0, t1, t2]
+<span class="org-variable-name">names</span> = [<span class="org-string">"cx01"</span>, <span class="org-string">"cx02"</span>, <span class="org-string">"cx12"</span>, <span class="org-string">"cx10"</span>, <span class="org-string">"cx20"</span>, <span class="org-string">"cx21"</span>, <span class="org-string">"t0"</span>, <span class="org-string">"t1"</span>, <span class="org-string">"t2"</span>]
+<span class="org-variable-name">indices</span> = <span class="org-builtin">list</span>(<span class="org-builtin">range</span>(<span class="org-builtin">len</span>(perms)))
+
+<span class="org-keyword">def</span> <span class="org-function-name">search_ex4_27</span>(n: <span class="org-builtin">int</span>):
+    <span class="org-doc">"""Find all solutions to exercise 4.27 with n gates."""</span>
+    <span class="org-keyword">for</span> idxs <span class="org-keyword">in</span> product(*([indices]*n)):
+        <span class="org-variable-name">ps</span> = [perms[i] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> idxs]
+        <span class="org-variable-name">prod</span> = <span class="org-builtin">reduce</span>((<span class="org-keyword">lambda</span> x, y: x*y), ps)
+        <span class="org-keyword">if</span> prod == Perm(1, 2, 3, 4, 5, 6, 7):
+            <span class="org-keyword">print</span>(<span class="org-string">" * "</span>.join([names[i] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> idxs]))
+</pre>
+</div>
+
+<p>
+Trying out some values of \(n\) we see that \(n=5\) is the minimal value which yields a solution. There
+are six solutions in fact but they are similar in the sense that the last three permutations (gates)
+actually commute. The solutions are:
+</p>
+
+<pre class="example">
+t0 * cx21 * cx02 * cx12 * t2
+t0 * cx21 * cx02 * t2 * cx12
+t0 * cx21 * cx12 * cx02 * t2
+t0 * cx21 * cx12 * t2 * cx02
+t0 * cx21 * t2 * cx02 * cx12
+t0 * cx21 * t2 * cx12 * cx02
+</pre>
+
+<p>
+One benefit of the "reversed" multiplication of the permutations is that it is the same ordering
+like in typical drawings of circuits. Let us just draw the third one:
+</p>
+
+<pre class="example">
+     ┌───┐
+q_0: ┤ X ├────────────■────■──
+     └─┬─┘┌───┐       │    │
+q_1: ──■──┤ X ├──■────┼────■──
+       │  └─┬─┘┌─┴─┐┌─┴─┐┌─┴─┐
+q_2: ──■────■──┤ X ├┤ X ├┤ X ├
+               └───┘└───┘└───┘
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0b4a0ef" class="outline-5">
+<h5 id="org0b4a0ef">Exercise 4.28</h5>
+<div class="outline-text-5" id="text-org0b4a0ef">
+<p>
+<b>Original Formulation:</b> For \(U=V^2\) with \(V\) unitary, construct a \(C^5(U)\) gate analogous to that in
+Figure 4.10, but using no work qubits. You may use controlled-\(V\) and controlled-\(V^\dagger\) gates.
+</p>
+
+<p>
+<b>Remark:</b> In my opinion the formulation of the exercise is bad. The way I understand it there is
+indeed no solution. Some sources in the internet claim that some slight variation of the circuit in
+Figure 8 (for n=3 add a wire above the others, and let this wire be an additional control of the two
+<code>CX</code> and the rightmost <code>CV</code>) solves the problem (see reference in the solution). But in fact, I also
+found this solution but since it involves a \(C^{n-1}V\) gate to construct \(C^nU\) I rejected it as an
+invalid solution. To get rid of all these control qubits on \(V\) one would again take further roots
+of \(V\) which seems to be not very usefull for a real implementations. So at best it is a <b>pseudo
+solution</b> (in my opinion).
+</p>
+
+<p>
+<b>Alternate Version:</b> Let \(n\geq3\), \(V\) unitary and \(U=V^2\). Prove that it is impossible to obtain a
+construction of \(C^n(U)\) on \(n+1\) wires from \(X\), \(V\), \(V^\dagger\), \(U\), \(C(X)\), \(C(V)\),
+\(C(V^\dagger)\), and \(C(U)\) alone which works for arbitrary \(U\) (for \(n=2\) it is possible as Figure
+4.8 shows).
+</p>
+</div>
+
+<div id="outline-container-org9eb4725" class="outline-6">
+<h6 id="org9eb4725">Proof (of the alternate version)</h6>
+<div class="outline-text-6" id="text-org9eb4725">
+<p>
+The idea for the proof is surprisingly simple - watch out for the determinant of the circuit! The
+credits for the idea go to <a href="https://cs.stackexchange.com/q/138853">this stackoverflow answer</a>. The overall discussion contains also a
+reference to the pseudo-solution mentioned in the remark above.
+</p>
+
+<p>
+Consider \(n+1\) wires and recall that with all controls being on the first \(n\) wires we have:
+</p>
+
+<p>
+\[
+  C^n(U) = \mathrm{diag}(I,I,\ldots,I,U) \text{ with } 2^n - 1 \text{ copies of }
+  I=\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}.
+\]
+</p>
+
+<p>
+That is, \(C^n(U)\) is a diagonal matrix up to a tiny 2 by 2 sub-matrix \(U\) in the lower right
+corner. This follows from the ordering of the basis vectors (counting in binary, like 000, 001, 010,
+&#x2026;, 111). Hence:
+</p>
+
+<p>
+\[
+  \det(C^n(U)) = \det(U).
+\]
+</p>
+
+<p>
+Note that this formula also holds if the controls are elsewhere. This follows from the fact that the
+determinant is invariant with respect to a change of basis.
+</p>
+
+<p>
+Now consider the more general case of \(C^m(W)\) (for a unitary \(W\)) with \(m\leq n\) on \(n+1\)
+wires. Assume for the moment that \(W\) sits on the last wire and the controls being immediately
+before. Again by the ordering of the basis vectors we see that:
+</p>
+
+<p>
+\[
+  C^m(W) = \mathrm{diag}(W_m, W_m,\ldots, W_m) \text{ with } 2^{n-m} \text{ copies of } W_m,
+\]
+</p>
+
+<p>
+where \(W_m\) looks like in the special case \(m=n\) above. Since the determinant of \(W_m\) is \(\det(W)\), we deduce:
+</p>
+
+<p>
+\[
+  \det(C^m(W)) = \det(W)^{2^{n-m}} .
+\]
+</p>
+
+<p>
+Again this still holds if the controls and the target are elsewhere on the \(n\) wires.
+</p>
+
+<p>
+Now suppose the construction was possible:
+</p>
+
+<p>
+\[
+  C^n(U) = \prod_i G_i,
+\]
+</p>
+
+<p>
+where each \(G_i\) is one of the allowed gates. By well known properties of the determinant we have:
+</p>
+
+<p>
+\[
+  \det(U) = \prod_i \det(G_i) .
+\]
+</p>
+
+<p>
+The analysis above, together with \(n-m\geq 2\), shows that \(\det(G_i)=\det(W)^{4k}\) for some \(k\) and
+\(W\) one of \(V\), \(V^\dagger\), \(U\) or \(X\). Since \(\det(X)=-1\) we have:
+</p>
+
+<p>
+\[
+  \det(U) = \left(\det(V)^{k_V} \cdot \det(V^\dagger)^{k_{V^\dagger}} \cdot \det(U)^{k_U}\right)^4.
+\]
+</p>
+
+<p>
+This can't be satisfied for <i>arbitrary</i> \(U\). To be specific consider \(U=X\). In that case the LHS is
+\(-1\) and the RHS is \(+1\) because \(\det(V),\det(V^\dagger)\in\{+i,-i\}\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org46a17ea" class="outline-5">
+<h5 id="org46a17ea"><span class="todo TODO">TODO</span> Exercise 4.29</h5>
+<div class="outline-text-5" id="text-org46a17ea">
+<p>
+Find a circuit containing \(O(n^2)\) Toffoli, <code>CNOT</code> and single qubit gates which implements a
+\(C^n(X)\) gate (for \(n>3\)), using no work qubits.
+</p>
+
+<p>
+<b>TODO:</b> In the light of the discussion of Exercise 4.28 this seems to be not possible - at least how
+I interpret the exercise. Maybe one can find a different interpretation, state the exercise less
+vague, and give a solution.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org9bad025" class="outline-5">
+<h5 id="org9bad025"><span class="todo TODO">TODO</span> Exercise 4.30</h5>
+<div class="outline-text-5" id="text-org9bad025">
+<p>
+Suppose \(U\) is a single qubit unitary operation. Find a circuit containing \(O(n^2)\) Toffoli, <code>CNOT</code> and single
+qubit gates which implements a \(C^n(U)\) gate (for \(n>3\)), using no work qubits.
+</p>
+
+<p>
+<b>TODO:</b> In the light of the discussion of Exercise 4.28 this seems to be not possible - at least how
+I interpret the exercise. Maybe one can find a different interpretation, state the exercise less
+vague, and give a solution.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb0894bd" class="outline-5">
+<h5 id="orgb0894bd">Exercise 4.31 (More circuit identities)</h5>
+<div class="outline-text-5" id="text-orgb0894bd">
+<p>
+Let subscripts denote which qubit an operator acts on, and let \(C\) be a <code>CNOT</code> with qubit 1 the
+control qubit and qubit 2 the target qubit. Prove the following identities:
+</p>
+
+\begin{align}
+  C X_1 C &= X_1 X_2 \\
+  C Y_1 C &= Y_1 X_2 \\
+  C Z_1 C &= Z_1 \\
+  C X_2 C &= X_2 \\
+  C Y_2 C &= Z_1 Y_2 \\
+  C Z_2 C &= Z_1 Z_2 \\
+  R_{z,1}(\theta) C &= C R_{z,1}(\theta) \\
+  R_{x,2}(\theta) C &= C R_{x,2}(\theta)
+\end{align}
+</div>
+
+<div id="outline-container-org2849b21" class="outline-6">
+<h6 id="org2849b21">Proofs</h6>
+<div class="outline-text-6" id="text-org2849b21">
+<p>
+Preparations: Let \(N\) stand for <code>X</code>, <code>Y</code>, or <code>Z</code>. Recall that \(P_0\) and \(P_1\) are the projections
+onto the computational basis, and that:
+</p>
+
+\begin{align*}
+  C = P_0 \otimes I + P_1 \otimes X \\
+  N_1 = N \otimes I,\quad N_2 = I \otimes N
+\end{align*}
+
+<p>
+In particular: \(X_1 X_2=X\otimes X\).
+</p>
+
+<p>
+Identity (1) follows by considering only states of the form \(|0j\rangle\), \(|1j\rangle\), noting that
+\(X_1\) swaps the computational basis.
+</p>
+
+<p>
+Identitiy (2) follows similarly if one observes that \(Y_1\) acts like \(X_1\) up to different phases,
+which do not play a role here.
+</p>
+
+<p>
+Identity (3) follows from the fact that \(Z_1\) commutes with \(P_0\) and \(P_1\) (and hence with \(C\)),
+and that \(C^2=I\).
+</p>
+
+<p>
+Identity (4) follows similarly from the fact that \(X_2\) also commutes with \(C\).
+</p>
+
+<p>
+Identity (5) follows from \(YX=-iZ=-XY\), and \(P_0P_1=P_1P_0=0\), and \(X^2=I\), and \(Z=P_0-P_1\).
+</p>
+
+<p>
+Identity (6) follows the same way as (5).
+</p>
+
+<p>
+Identity (7) follows from the fact that <code>Z</code>, and hence \(R_z\), commutes with \(P_0\) and \(P_1\).
+</p>
+
+<p>
+Identitiy (8) follows from the fact <code>X</code>, and hence \(R_x\), commutes with <code>X</code>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2092a38" class="outline-5">
+<h5 id="org2092a38">Exercise 4.32</h5>
+<div class="outline-text-5" id="text-org2092a38">
+<p>
+Suppose \(\rho\) is the density matrix describing a two qubit system.
+Suppose we perform a projective measurement in the computational basis of the
+second qubit. Let \(P_0=|0\rangle\langle0|\) and \(P_1=|1\rangle\langle1|\) be the projectors onto the \(|0\rangle\) and
+\(|1\rangle\) states of the second qubit, respectively. Let \(\rho'\) be the density matrix which
+would be assigned to the system after the measurement by an observer who did
+not learn the measurement result. Show that
+</p>
+
+<p>
+\[
+  \rho' = P_0 \rho P_0 + P_1 \rho P_1 .
+\]
+</p>
+
+<p>
+Also show that the reduced density matrix for the first qubit is not affected by
+the measurement, that is, \(\ptrace{2}{\rho}=\ptrace{2}{\rho'}\).
+</p>
+</div>
+
+<div id="outline-container-org5e89278" class="outline-6">
+<h6 id="org5e89278">Proof</h6>
+<div class="outline-text-6" id="text-org5e89278">
+<p>
+First of all observe that the formulation of the exercise clearly identifies \(P_i\) with
+\(I_1\otimes P_i\). We keep this identification in the following.
+</p>
+
+<p>
+If the interpret the measurement postulate "the right way" we see that it immediately implies that
+a measurement with respect to \(P\) leaves the system in the post measurement state
+</p>
+
+<p>
+\[
+  \left\{ \left(\trace{P_0\rho}, P_0 \rho P_0\right),
+          \left(\trace{P_1\rho}, P_1 \rho P_1\right) \right\} ,
+\]
+</p>
+
+<p>
+which is an <i>ensemble</i>. I suppose it only "collapses" into one of its members if "some classical
+information flows". I suppose that "an observer who did not learn the measurement result" means that
+this flow of information did not happen, hence the state of the system is still in the ensemble. The
+corresponding density operator is:
+</p>
+
+<p>
+\[
+  P_0 \rho P_0 + P_1 \rho P_1 = \rho' .
+\]
+</p>
+
+<p>
+This proves the first claim. To prove the second claim we may assume wlog that
+\(\rho=\alpha\otimes\beta\) - by linearity of the trace. Indeed:
+</p>
+
+<p>
+\[
+  \sum_i \ptrace{2}{P_i\,\rho\,P_i}
+  = \sum_i \ptrace{2}{I\otimes P_i \, \alpha\otimes\beta \, I\otimes P_i}
+  = \alpha \sum_i \trace{P_i \beta P_i} = \alpha = \ptrace{2}{\rho} ,
+\]
+</p>
+
+<p>
+which concludes the solution of the exercise. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb5947d1" class="outline-5">
+<h5 id="orgb5947d1">Exercise 4.33 (Measurement in the Bell basis)</h5>
+<div class="outline-text-5" id="text-orgb5947d1">
+<p>
+The measurement model we have specified for the quantum circuit model is that measurements are
+performed only in the computational basis. However, often we want to perform a measurement in some
+other basis, defined by a complete set of orthonormal states. To perform this measurement, simply
+unitarily transform from the basis we wish to perform the measurement in to the computational basis,
+then measure. For example, show that the circuit
+</p>
+
+<pre class="example">
+          ┌───┐ ░ ┌─┐
+q_0: ──■──┤ H ├─░─┤M├───
+     ┌─┴─┐└───┘ ░ └╥┘┌─┐
+q_1: ┤ X ├──────░──╫─┤M├
+     └───┘      ░  ║ └╥┘
+c: 2/══════════════╩══╩═
+                   0  1
+</pre>
+
+
+
+<p>
+performs a measurement in the basis of the Bell states. More precisely, show that
+this circuit results in a measurement being performed with corresponding
+POVM elements the four projectors onto the Bell states. What are the
+corresponding measurement operators?
+</p>
+</div>
+
+<div id="outline-container-orge3ecf5f" class="outline-6">
+<h6 id="orge3ecf5f">Proof</h6>
+<div class="outline-text-6" id="text-orge3ecf5f">
+<p>
+Let \(x,y\in\{0,1\}\). Observe
+</p>
+
+<p>
+\[
+  CX \cdot H\otimes I \; |xy\rangle
+  = \frac{1}{\sqrt{2}} (|0y\rangle + (-1)^x |1\overline{y})
+  = |\beta_{xy}\rangle .
+\]
+</p>
+
+<p>
+Hence the circuit first maps \(|\beta_{xy}\rangle\) to \(|xy\rangle\) and then measures in the
+computational basis. This already shows that the circuit indeed "measures in the Bell Basis" in some
+sense.
+</p>
+
+<p>
+The measurement operators can be read directly from the circuit:
+</p>
+
+<p>
+\[
+  Q_{ij} = P_{ij} \cdot H\otimes I \cdot CX =: P_{ij} \cdot U ,
+\]
+</p>
+
+<p>
+where the \(P_{ij}\) are the standard projections (for the measurement in the computational basis
+after the barrier). Observe that these are no projections (\(U\) and hence the \(P_{ij}U\) map the Bell
+Basis to the standard basis as implied by the introductory calculations). This is in line with the
+observation that two times applying the circuit results in a potentially different outcome.
+</p>
+
+<p>
+The corresponding POVMs are indeed the projections on the Bell Basis:
+</p>
+
+<p>
+\[
+  Q_{ij}^\dagger Q_{ij} = U^\dagger P_{ij} U ,
+\]
+</p>
+
+<p>
+since \(U\) maps the Bell Basis to the standard basis. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd48326e" class="outline-5">
+<h5 id="orgd48326e">Exercise 4.34 (Measuring an operator)</h5>
+<div class="outline-text-5" id="text-orgd48326e">
+<p>
+Suppose we have a single qubit operator \(U\) with eigenvalues \(\pm1\), so that \(U\) is both Hermitian and
+unitary, so it can be regarded both as an observable and a quantum gate. Suppose we wish to measure
+the observable \(U\). That is, we desire to obtain a measurement result indicating one of the two
+eigenvalues, and leaving a post-measurement state which is the corresponding eigenvector. How can
+this be implemented by a quantum circuit?  Show that the following circuit implements a measurement
+of \(U\):
+</p>
+
+<pre class="example">
+     ┌───┐     ┌───┐ ░ ┌─┐
+|0&gt;: ┤ H ├──■──┤ H ├─░─┤M├
+     └───┘┌─┴─┐└───┘ ░ └╥┘
+|ψ&gt;: ─────┤ U ├──────░──╫─
+          └───┘      ░  ║
+c: 1/═══════════════════╩═
+                        0
+</pre>
+</div>
+
+<div id="outline-container-org93e141f" class="outline-6">
+<h6 id="org93e141f">Proof</h6>
+<div class="outline-text-6" id="text-org93e141f">
+<p>
+Observe that the projections on the eigenvalues of \(U\) are given by:
+</p>
+
+<p>
+\[
+  Q_{\pm} = \frac{1}{2} (I \pm U) .
+\]
+</p>
+
+<p>
+This and a short calculation shows that the result of the circuit at the position of the barrier
+(before measurement) is:
+</p>
+
+<p>
+\[
+  H_1 \cdot C(U) \cdot H_1 \; |0\psi\rangle
+  = |0\rangle \otimes Q_+ |\psi\rangle + |1\rangle \otimes Q_- |\psi\rangle .
+\]
+</p>
+
+<p>
+Now we see that finally applying the measurement in the first qubit "reveals" the corresponding
+projection of \(|\psi\rangle\) in the second wire. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1d647ad" class="outline-5">
+<h5 id="org1d647ad">Exercise 4.35 (Measurement commutes with controls)</h5>
+<div class="outline-text-5" id="text-org1d647ad">
+<p>
+A consequence of the principle of deferred measurement is that measurements commute with quantum
+gates when the qubit being measured is a control qubit. That is, applying \(C(U)\) first and then
+measure the first qubit is the same as first measuring (first qubit) and then applying \(U\)
+conditionally on the second qubit depending on the measurement outcome.
+</p>
+</div>
+
+<div id="outline-container-org0a3f103" class="outline-6">
+<h6 id="org0a3f103">Proof</h6>
+<div class="outline-text-6" id="text-org0a3f103">
+<p>
+Let us consider a generic state \(|\psi\rangle=\sum_{ij}\alpha_{ij}|ij\rangle\).
+</p>
+
+<p>
+<b>Case 1 (Measure first):</b> Directly after measuring, the state of the system is an ensemble (of the
+possible measurement outcomes):
+</p>
+
+<p>
+\[
+  \{ (p_0, |\psi_0\rangle), (p_1, |\psi_1\rangle) \} ,
+\]
+</p>
+
+<p>
+where
+</p>
+
+<p>
+\[
+  p_i = \sqrt{|\alpha_{i0}|^2 + |\alpha_{i1}|^2}, \quad
+  \,|\psi_i\rangle = \frac{1}{p_i} (\alpha_{i0} |i0\rangle + \alpha_{i1} |i1\rangle) .
+\]
+</p>
+
+<p>
+The conditional application of \(U\) leaves the system in state
+</p>
+
+<p>
+\[
+  \{ (p_0, |\psi_0\rangle), (p_1, I\otimes U \; |\psi_1\rangle) \} .
+\]
+</p>
+
+<p>
+<b>Case 2 (CU first):</b> After applying the controlled \(U\) the state is:
+</p>
+
+<p>
+\[
+  C(U) |\psi\rangle = \sum_j (\alpha_{0j} |0j\rangle + \alpha_{1j} |1\rangle \otimes U|j\rangle) .
+\]
+</p>
+
+<p>
+Measuring this, leaves us in the same final state as in case 1:
+</p>
+
+<p>
+\[
+  \{ (p_0, |\psi_0\rangle), (p_1, I\otimes U \; |\psi_1\rangle) \} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5e07761" class="outline-5">
+<h5 id="org5e07761">Exercise 4.36</h5>
+<div class="outline-text-5" id="text-org5e07761">
+<p>
+Construct a quantum circuit to add two two-bit numbers \(x\) and \(y\) modulo 4. That is, the circuit
+should perform the transformation \(|x,y\rangle\rightarrow|x,x+y\mod4\rangle\).
+</p>
+</div>
+
+<div id="outline-container-org40a0adb" class="outline-6">
+<h6 id="org40a0adb">Solution</h6>
+<div class="outline-text-6" id="text-org40a0adb">
+<p>
+To find a possible solution let us write the operation in a slightly more explicit bit-wise form:
+</p>
+
+<p>
+\[
+  \, |x_0,x_1,y_0,y_1\rangle \mapsto |x_0,x_1,x_0\oplus y_0, x_1\oplus c \oplus y_1\rangle ,
+\]
+</p>
+
+<p>
+where \(c=x_0\cdot y_0\) is the carry-bit. Recall that \(C(X)\) implements binary addition
+modulo 2. Hence the following circuit, which is inspired by the above equation, does what we want:
+</p>
+
+<pre class="example">
+
+q_0: ──■────■───────
+       │    │
+q_1: ──┼────┼────■──
+       │  ┌─┴─┐  │
+q_2: ──■──┤ X ├──┼──
+     ┌─┴─┐└───┘┌─┴─┐
+q_3: ┤ X ├─────┤ X ├
+     └───┘     └───┘
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org65be93d" class="outline-5">
+<h5 id="org65be93d">Exercise 4.37</h5>
+<div class="outline-text-5" id="text-org65be93d">
+<p>
+Provide a decomposition of the transform
+</p>
+
+<p>
+\[
+\frac{1}{2}
+\,\begin{bmatrix}
+  1 & 1 & 1 & 1 \\
+  1 & i & -1 & - i \\
+  1 & -1 & 1 & -1 \\
+  1 & - i & -1 & i
+\,\end{bmatrix}
+\]
+</p>
+
+<p>
+into a product of two-level unitaries. This is a special case of the quantum Fourier transform,
+which we study in more detail in the next chapter.
+</p>
+</div>
+
+<div id="outline-container-orgc1cadbd" class="outline-6">
+<h6 id="orgc1cadbd">Solution</h6>
+<div class="outline-text-6" id="text-orgc1cadbd">
+<p>
+We semi-automate the task with sympy. First we have to set up the matrix:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orge8b3d44"><span class="org-variable-name">F</span> = Matrix([[I**(x*y) <span class="org-keyword">for</span> x <span class="org-keyword">in</span> <span class="org-builtin">range</span>(4)] <span class="org-keyword">for</span> y <span class="org-keyword">in</span> <span class="org-builtin">range</span>(4)]) / 2
+</pre>
+</div>
+
+<p>
+Using the the utility function <code class="src src-python">make_twolevel</code> it is relatively easy to follow the
+procedure from the book (note that in general we also had to use <code class="src src-python">make_onelevel</code>, but here
+we don't need it)):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orge1a6831"><span class="org-variable-name">U1</span> = sp.simplify(make_twolevel(4, [1,0], [1, -1]))
+<span class="org-variable-name">U2</span> = sp.simplify(make_twolevel(4, [2,0], [1, -sqrt(2)]))
+<span class="org-variable-name">U3</span> = sp.simplify(make_twolevel(4, [3,0], [1, -sqrt(3)]))
+<span class="org-variable-name">U4</span> = sp.simplify(make_twolevel(4, [2,1], [sqrt(3) * (3 + I), -3 * (1 - I)]))
+<span class="org-variable-name">U5</span> = sp.simplify(make_twolevel(4, [3,1], [I, -sqrt(2)]))
+
+<span class="org-variable-name">F0</span> = make_CU(2, 0, 1, Matrix([[1, I], [-1, I]]) / sqrt(2))
+<span class="org-keyword">assert</span> sp.simplify(U5*U4*U3*U2*U1*F) == F0
+</pre>
+</div>
+
+<p>
+From this we can easily readout the decomposition:
+</p>
+
+<p>
+\[
+\left[\begin{matrix}\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} & 0 & 0\\\frac{\sqrt{2}}{2} & - \frac{\sqrt{2}}{2} & 0 & 0\\0 & 0 & 1 & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}\frac{\sqrt{6}}{3} & 0 & \frac{\sqrt{3}}{3} & 0\\0 & 1 & 0 & 0\\\frac{\sqrt{3}}{3} & 0 & - \frac{\sqrt{6}}{3} & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}\frac{\sqrt{3}}{2} & 0 & 0 & \frac{1}{2}\\0 & 1 & 0 & 0\\0 & 0 & 1 & 0\\\frac{1}{2} & 0 & 0 & - \frac{\sqrt{3}}{2}\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & - \frac{\sqrt{3} i \left(1 + i\right)}{4} & \frac{3}{4} - \frac{i}{4} & 0\\0 & \frac{3}{4} + \frac{i}{4} & - \frac{\sqrt{3} \cdot \left(1 + i\right)}{4} & 0\\0 & 0 & 0 & 1\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & \frac{\sqrt{6}}{3} & 0 & - \frac{\sqrt{3} i}{3}\\0 & 0 & 1 & 0\\0 & \frac{\sqrt{3} i}{3} & 0 & - \frac{\sqrt{6}}{3}\end{matrix}\right] \cdot \left[\begin{matrix}1 & 0 & 0 & 0\\0 & 1 & 0 & 0\\0 & 0 & \frac{\sqrt{2}}{2} & \frac{\sqrt{2} i}{2}\\0 & 0 & - \frac{\sqrt{2}}{2} & \frac{\sqrt{2} i}{2}\end{matrix}\right]
+\]
+</p>
+
+
+<p>
+The following code was used to produce the above latex expression:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgebabdcd"><span class="org-keyword">def</span> <span class="org-function-name">get_latex_for_exercise_4_37</span>():
+    <span class="org-variable-name">Vs</span> = [U1.H, U2.H, U3.H, U4.H, U5.H, F0]
+    <span class="org-keyword">return</span> <span class="org-string">" \\cdot "</span>.join([sp.latex(V) <span class="org-keyword">for</span> V <span class="org-keyword">in</span> Vs])
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgca4c7e9" class="outline-5">
+<h5 id="orgca4c7e9">Exercise 4.38</h5>
+<div class="outline-text-5" id="text-orgca4c7e9">
+<p>
+Prove that there exists a \(d\times d\) unitary matrix \(U\) which cannot be decomposed as a product of
+fewer than \(d-1\) two-level unitary matrices.
+</p>
+</div>
+
+<div id="outline-container-orgceff682" class="outline-6">
+<h6 id="orgceff682">Proof</h6>
+<div class="outline-text-6" id="text-orgceff682">
+<p>
+For each unitary matrix \(U\) let us define an equivalence relation \(\sim_U\) on \(\{0,\ldots,d-1\}\)
+as follows. First of all define:
+</p>
+
+<p>
+\[
+  i \sim^0_U j :\Leftrightarrow \langle i|U|j\rangle \neq 0
+\]
+</p>
+
+<p>
+Now let \(\sim_U\) be the reflexive and transitive closure \(\mathrm{closure}(\sim^0_U)\) of
+\(\sim^0_U\). We remark that we actually only care about \(i,j\) with \(i\neq j\). But it is
+convenient to have an <i>equivalence</i> relation, hence we require reflexivity.
+</p>
+
+<p>
+Let us call equivalence classes with at least two elements <i>non-trivial</i>. In a sense, the
+non-trivial equivalence classes correspond to those subspaces, spanned by base vectors, on which the
+matrix acts <i>non-trivially</i>. Note that this is a <i>slightly</i> stricter notion then in the book. Merely
+multiplying a base vector with a complex number of modulus one does not count. Instead we require
+some "interaction" <i>between</i> the basis vectors.
+</p>
+
+<p>
+Note that two-Level matrices have at most one non-trivial equivalence class \(A\), and this \(A\) has
+<i>exactly</i> two elements.
+</p>
+
+<p>
+Let us define the <i>score</i> of an equivalence relation \(\sim\) by:
+</p>
+
+<p>
+\[
+  \mathrm{score}(\sim) = \sum_A (|A| - 1),
+\]
+</p>
+
+<p>
+where \(A\) ranges over all (non-trivial) equivalence classes of \(\sim\). Observe that the score of a
+two-level matrix is at most \(1\). Let us write \(\mathrm{score}(U):=\mathrm{score}(\sim_U)\). The score
+has the following easy to prove properties (we only sketch their proofs)
+</p>
+
+<dl class="org-dl">
+<dt>monotonicity</dt><dd>\(\sim_1\;\subset\;\sim_2\quad\Rightarrow\quad\mathrm{score}(\sim_1)\leq\mathrm{score}(\sim_2)\)</dd>
+<dt>sub-additivity</dt><dd>\(\mathrm{score}(\mathrm{closure}(\sim_1\cup\sim_2))\leq\mathrm{score}(\sim_1)+\mathrm{score}(\sim_2)\).</dd>
+</dl>
+
+<p>
+The key to prove monotonicity is to observe that the equivalence classes of \(\sim_1\) are subsets of
+equivalence classes of \(\sim_2\). Note that the claim would even be true without the \(-1\)
+"punishment" for each equivalence class.
+</p>
+
+<p>
+For sub-additivity first observe that the equivalence classes of the combined relation is
+"essentially" the set of the "old" equivalence classes. In the extreme case where this is "realy"
+true equality holds. In general, there can be old equivalence classes which overlap. This means that
+we have to merge them. This "merger" of two old equivalence classes decreases the score by \(m-1\),
+where \(m\) is the number of common elements of the two old equivalence classes. Of course the merging
+has to be repeated until the equivalence classes are disjoint.
+</p>
+
+<p>
+To say something about \(\sim_{UV}\) recall:
+</p>
+
+<p>
+\[
+  \langle i|UV|j\rangle = \sum_k \langle i|U|k\rangle\langle k|V|j\rangle .
+\]
+</p>
+
+<p>
+This implies that
+</p>
+
+<p>
+\[
+  \sim^0_{UV} \; \subseteq \; \sim_U \circ \sim_V \; \subseteq \; \mathrm{closure}(\sim_U \cup \sim_V)
+  \; =: \; \sim_{U,V} .
+\]
+</p>
+
+<p>
+In particular \(\sim_{UV}\;\subseteq\;\sim_{U,V}\) (note the comma between \(U\) and \(V\) in the
+RHS). Hence, by monotonicity and sub-additivity:
+</p>
+
+<p>
+\[
+  \mathrm{score}(UV) \leq \mathrm{score}(\sim_{U,V}) \leq \mathrm{score}(U) + \mathrm{score}(V) .
+\]
+</p>
+
+<p>
+In particular the score of a matrix which can be decomposed into \(k\) two-level matrices is at most
+\(k\). On the other hand there are matrices whose score is \(d-1\) (the maximal possible value). Take
+for example the cyclic permuation which maps \(|i\rangle\) to \(|i+1\mod d\rangle\). Such a matrix
+cannot be expressend by fewer than \(d-1\) matrices. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org41895c7" class="outline-5">
+<h5 id="org41895c7">Exercise 4.39</h5>
+<div class="outline-text-5" id="text-org41895c7">
+<p>
+Find a quantum circuit using single qubit operations and <code>CNOT</code>​s to implement the transformation
+</p>
+
+\begin{bmatrix}
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & a & 0 & 0 & 0 & 0 & c \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  0 & 0 & b & 0 & 0 & 0 & 0 & d
+\end{bmatrix}
+
+<p>
+where \(\tilde{U}=\begin{bmatrix}a&c\\b&d\end{bmatrix}\) is an arbitrary \(2\times2\) unitary matrix.
+</p>
+</div>
+
+<div id="outline-container-orgfebf843" class="outline-6">
+<h6 id="orgfebf843">Solution</h6>
+<div class="outline-text-6" id="text-orgfebf843">
+<p>
+Let us call the matrix \(M\). Clearly \(M\) represents a two-level operation at \(s=010\), \(t=111\). The
+following gray code connects the two bit-patterns:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">\(g_1\)</td>
+<td class="org-right">010</td>
+</tr>
+
+<tr>
+<td class="org-left">\(g_2\)</td>
+<td class="org-right">011</td>
+</tr>
+
+<tr>
+<td class="org-left">\(g_3\)</td>
+<td class="org-right">111</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Let \(P\) be the permutation matrix corresponding to the permuation \((7)(2,3)\) in cycle notation (it
+swaps \(|g_1\rangle\) and \(|g_2\rangle\)). It can be implemented by a controlled <code>X</code>. \(PMP\) is a
+controlled \(\tilde{U}\) gate with target \(0\) and controls at all remaining wires. Hence the following
+circuit implements \(M\):
+</p>
+
+<pre class="example">
+          ┌───┐
+q_0: ──o──┤ Ũ ├──o──
+       │  └─┬─┘  │
+q_1: ──■────■────■──
+     ┌─┴─┐  │  ┌─┴─┐
+q_2: ┤ X ├──■──┤ X ├
+     └───┘     └───┘
+</pre>
+
+
+<p>
+Figure 4.9 shows how to implement the controlled <code>X</code> from fundamental gates (take also into account
+the "trick" from Figure 4.11). Use Figure 4.8 and Figure 4.6 to implement the controlled
+\(\tilde{U}\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3b4eeff" class="outline-5">
+<h5 id="org3b4eeff">Exercise 4.40</h5>
+<div class="outline-text-5" id="text-org3b4eeff">
+<p>
+For arbitrary \(\alpha\) and \(\beta\) show that
+</p>
+
+<p>
+\[
+  \norm{R_{\hat{n}}(\alpha) - R_{\hat{n}}(\alpha + \beta)} = |1 - \exp(i\beta/2)| .
+\]
+</p>
+
+<p>
+and use this to justify (4.76).
+</p>
+</div>
+
+<div id="outline-container-org725ac08" class="outline-6">
+<h6 id="org725ac08">Proof</h6>
+<div class="outline-text-6" id="text-org725ac08">
+<p>
+This directly follows from the fact that the <i>spectral radius</i> of a normal operator is equal to its
+operator norm (for non-normal operators it might be strictly smaller). For diagonal matrices this is
+easy to see. For the general case, recall that normal operators are those operators which can be
+diagonalized by unitary operators.
+</p>
+
+<p>
+Let us return to the particular exercise. By the spectral theorem, and the fact that the rotation
+operators are unitary we have:
+</p>
+
+<p>
+\[
+  \norm{R_{\hat{n}}(\alpha) - R_{\hat{n}}(\alpha + \beta)}
+  = \norm{ R_{\hat{n}}(\alpha) (I-R_{\hat{n}}(\beta)) }
+  = \norm{I-R_{\hat{n}}(\beta)} .
+\]
+</p>
+
+<p>
+Again by the spectral theorem the eigenvalues of \(I-R_{\hat{n}}(\beta)\) are \(1-\exp(\mp i\beta/2)\)
+(because the eigenvalues of \(\hat{n}\cdot(X,Y,Z)\) are \(\pm1\)). Hence the spectral radius is
+\(|1-\exp(i\beta/2)|\). Putting everything together we proved the claim.
+</p>
+
+<p>
+Formula (4.76) follows directly from this and \(R_{\hat{n}}(\theta)^n=R_{\hat{n}}(n\theta)\) (again
+spectral theorem) for an appropriate choice of \(n\) (so that \(\alpha\) and \(n\theta\) are close
+enough (as elements of the unit circle)). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org019a786" class="outline-5">
+<h5 id="org019a786">Exercise 4.41</h5>
+<div class="outline-text-5" id="text-org019a786">
+<p>
+This and the next two exercises develop a construction showing that the Hadamard, phase, controlled-
+and Toffoli gates are universal. Show that this circuit
+</p>
+
+<pre class="example">
+     ┌───┐               ┌───┐┌─┐
+|0&gt;: ┤ H ├──■─────────■──┤ H ├┤M├───
+     ├───┤  │         │  ├───┤└╥┘┌─┐
+|0&gt;: ┤ H ├──■─────────■──┤ H ├─╫─┤M├
+     └───┘┌─┴─┐┌───┐┌─┴─┐└───┘ ║ └╥┘
+|ψ&gt;: ─────┤ X ├┤ S ├┤ X ├──────╫──╫─
+          └───┘└───┘└───┘      ║  ║
+c: 2/══════════════════════════╩══╩═
+                               0  1
+</pre>
+
+
+<p>
+applies the operation \(R_z(\theta)\) to the third (target) qubit if the measurement outcomes are both
+\(0\), where \(\cos\theta=3/5\), and otherwise applies <code>Z</code> to the target qubit. Show that the
+probability of both measurement outcomes being \(0\) is \(5/8\), and explain how repeated use of this
+circuit and \(Z=S^2\) gates may be used to apply a \(R_z(\theta)\) gate with probability approaching
+\(1\).
+</p>
+</div>
+
+<div id="outline-container-org84bcf41" class="outline-6">
+<h6 id="org84bcf41">Proof</h6>
+<div class="outline-text-6" id="text-org84bcf41">
+<p>
+The initial state is \(|00\psi\rangle\), however let us consider the more general situation where the
+initial state is \(|ab\psi\rangle\) for \(a,b\in\{0,1\}\). Observe that
+</p>
+
+<p>
+\[
+  H\otimes H |ab\rangle = \frac{1}{2} \sum_{ij} (-1)^{ai+bj} |ij\rangle .
+\]
+</p>
+
+<p>
+It is easy to calculate the state <i>directly</i> after the second <code>CCX</code>. It is:
+</p>
+
+<p>
+\[
+\, |\zeta_0\rangle = \frac{1}{2} \sum_{ij} \, (-1)^{ai+bj} \, |ij\rangle \, X^{ij} S X^{ij} \, |\psi\rangle .
+\]
+</p>
+
+<p>
+Before applying the last two Hadamard gates it comes in handy to represent this in a slightly
+different way:
+</p>
+
+<p>
+\[
+\, |\zeta_0\rangle = \frac{1}{2} \sum_{ij} \, (-1)^{ai+bj} \, |ij\rangle \, S \, |\psi\rangle
+   \, + \, \frac{1}{2} \, (-1)^{a+b} \, |11\rangle \, (XSX - S) \, |\psi\rangle .
+\]
+</p>
+
+<p>
+Applying the last two Hadamards leads to
+</p>
+
+\begin{align*}
+\, |\zeta\rangle &= H\otimes H\otimes I |\zeta_0\rangle
+  = |ab\rangle |\psi\rangle + \frac{1}{4} \sum_{ij} (-1)^{i+j+a+b} |ij\rangle \, (XSX-S) \, |\psi\rangle \\
+  &= |ab\rangle \left( \frac{3}{4}S+\frac{1}{4}XSX \right)|\psi\rangle
+  \,+\, \underbrace{\left(\sum_{ij\neq ab} \frac{1}{4} (-1)^{i+j+a+b} |ij\rangle \right)}_{=:A|ab\rangle}
+  \, (XSX-S) \, |\psi\rangle .
+\end{align*}
+
+<p>
+Note that the thus defined linear operator \(A\) is <i>not</i> unitary but invertible. It has the nice
+property that \(\norm{A|ab\rangle}=\sqrt{3}/4\) (independent of \(a,b\)) and that \(A|ab\rangle\) is
+orthogonal to \(|ab\rangle\). On the other hand these properties do not generalize to arbitrary
+states.
+</p>
+
+<p>
+Clearly
+</p>
+
+<p>
+\[
+  XSX - S = (i-1) Z .
+\]
+</p>
+
+<p>
+The other operator which is applied to the first occurrence of \(|\psi\rangle\) is a bit more tricky
+to make sense of. We make use of the functional calculus for <code>Z</code> (more specifically: we use the
+Pauli-Rotation formalism). First of all recall that \(S=e^{i\pi/4}R_z(\pi/2)\) and
+\(R_z(-\pi)=iZ\). Using this, with \(XZX=-Z\) we get:
+</p>
+
+\begin{align*}
+  \frac{3}{4}S+\frac{1}{4}XSX &= \frac{1}{4} e^{i\pi/4} (3R_z(\pi/2) + R_z(-\pi/2))
+  = \frac{1}{4} e^{i\pi/4} R_z(\pi/2) \cdot (3 + R_z(-\pi)) \\
+  &= \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\pi/2) \cdot
+    \underbrace{\left(\frac{3}{\sqrt{10}} + \frac{i}{\sqrt{10}} Z \right)}_{=:R_z(\theta_0)} .
+\end{align*}
+
+<p>
+Observe that \(\sin\theta_0=2\sin(\theta_0/2)\cos(\theta_0/2)=-3/5\). Let
+\(\theta=\theta_0+\pi/2\). Hence \(\cos(\theta)=3/5\) and
+</p>
+
+<p>
+\[
+  \frac{3}{4}S+\frac{1}{4}XSX = \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\theta) .
+\]
+</p>
+
+<p>
+Let us summarize what we found out. The final state of the qubits is:
+</p>
+
+<p>
+\[
+\,  |\zeta\rangle = |ab\rangle \, \frac{\sqrt{10}}{4} e^{i\pi/4} R_z(\theta) |\psi\rangle
+      \,+\, A|ab\rangle (i-1) Z |\psi\rangle
+\]
+</p>
+
+<p>
+<b>Conclusion:</b> If the initial state is \(|ab\rangle|\psi\rangle\) then we measure \(|ab\rangle\) with
+probability \(5/8\). In that case the final state of the "payload" is \(R_z(\theta)|\psi\rangle\) (up to
+a global phase). Otherwise the payload ends up in state \(Z|\psi\rangle\) (up to a global phase). The
+angle satisfies \(\cos\theta=3/5\). This proves the first part of the exercise.
+</p>
+
+<p>
+Let us sketch a possibility to improve the probability of success. One can introduce two more
+ancillary qubits (initialized to \(|0\rangle\)) and put another such circuit on them (connected to the
+"main" qubit as the first one). To cancel the <code>Z</code> from the first circuit, in case it "fails", one
+can use three <code>CCZ</code> gates (for the three "failing" measurement outcomes). To prevent a double
+rotation (if both circuits succeed) one can put a controls on the \(S\) gate (or simpler: put a
+controlled \(S^3\) next to it) of the second circuit making it dependent on success of the first
+one. My the principle of deferred measurement all measurements can be done at the end of the
+circuit. To improve the probability even further, just repeat the procedure.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8800943" class="outline-5">
+<h5 id="org8800943">Exercise 4.42 (Irrationality of \(\theta\))</h5>
+<div class="outline-text-5" id="text-org8800943">
+<p>
+Suppose \(\cos\theta=3/5\). We give a proof by contradiction that \(\theta\) is an irrational multiple
+of \(2\pi\).
+</p>
+
+<ol class="org-ol">
+<li>Using the fact that \(e^{i\theta}=(3+4i)/5\), show that if \(\theta\) is rational, then there must
+exist a positive integer \(m\) such that \((3+4i)^m=5m\).</li>
+<li>Show that \((3 + 4i)^m=3+4i\mod5\) for all \(m>0\), and conclude that no \(m\) such that \((3+4i)^m=5^m\)
+can exist.</li>
+</ol>
+</div>
+
+<div id="outline-container-org35d9e0b" class="outline-6">
+<h6 id="org35d9e0b">Proof</h6>
+<div class="outline-text-6" id="text-org35d9e0b">
+<p>
+The exercise essentially contains the solution. If \(\theta\) was rational, then there would be
+integers \(k,m\) such that \(\theta=2k\pi/m\). Hence
+</p>
+
+<p>
+\[
+  (3 + 4i)^m = 5^m \cdot e^{2k\pi i} = 5^m .
+\]
+</p>
+
+<p>
+On the other hand
+</p>
+
+<p>
+\[
+  (3+4i)^2 = -7 + 24i \equiv 3 + 4i \mod 5 .
+\]
+</p>
+
+<p>
+Clearly the same is true for higher powers. Hence \((3+4i)^m\) cannot be real - which contradicts a
+previous statement. Hence \(\theta\) can not be rational. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org27e193c" class="outline-5">
+<h5 id="org27e193c">Exercise 4.43</h5>
+<div class="outline-text-5" id="text-org27e193c">
+<p>
+Use the results of the previous two exercises to show that the Hadamard, phase, controlled-<code>NOT</code> and
+Toffoli gates are universal for quantum computation.
+</p>
+</div>
+
+<div id="outline-container-org8fdc372" class="outline-6">
+<h6 id="org8fdc372">Proof</h6>
+<div class="outline-text-6" id="text-org8fdc372">
+<p>
+We already know that if we add the \(T\) gate then we have a universal set of gates. Hence it suffices
+to be able to approximate the \(T\) gate. Note that the \(T\) gate is \(R_z(\pi/4)\) up to a global
+phase. Exercises 4.41 and 4.42 show that <i>any</i> \(R_z(\theta)\) can be approximated arbitrarily
+well. QED.
+</p>
+
+<p>
+Of course, contrary to the construction from the main-text, <i>this</i> construction with the Toffoli
+gate needs some ancillary qubits. So we proved a <i>weaker</i> kind of universality then what is proved
+for the "original" set of universal gates!
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge6a5ad9" class="outline-5">
+<h5 id="orge6a5ad9">Exercise 4.44</h5>
+<div class="outline-text-5" id="text-orge6a5ad9">
+<p>
+Show that the three qubit gate
+</p>
+
+<p>
+\[ G = C^2(iR_x(\pi\alpha)) \]
+</p>
+
+<p>
+is universal for quantum computation whenever \(\alpha\) is irrational.
+</p>
+</div>
+
+<div id="outline-container-orgbde1588" class="outline-6">
+<h6 id="orgbde1588">Proof</h6>
+<div class="outline-text-6" id="text-orgbde1588">
+<p>
+We show universality for the situation where one has access to a reservoir of ancillary qubits in
+state \(|0\rangle\) or \(|1\rangle\).
+</p>
+
+<p>
+By irrationality of \(\alpha\) one can approximate \(C^2(R_x(\theta))\) for any angle \(\theta\) (we drop
+the factor \(i\) because we ignore the global phase here and in the following). By the use of
+ancillary qubits in state \(|1\rangle\) one can thus implement \(R_x(\theta)\) for any \(\theta\).
+</p>
+
+<p>
+Moreover the Toffoli <code>CCX</code> can be implemented. By the use of ancillary qubits in state \(|1\rangle\)
+it is easy to implement <code>CX</code> and <code>X</code> from it.
+</p>
+
+<p>
+To proof universality it suffices to implement \(R_z(\theta)\) for arbitrary \(\theta\). To see this,
+first recall that according to exercise 4.11 any single qubit gate has the form
+\(R_z(\beta)R_x(\gamma)R_z(\delta)\) (up to a global phase). On the other hand, the book shows that
+single qubit gates together with <code>CX</code> is a universal set.
+</p>
+
+<p>
+Let \(|\pm\rangle\) be eigenstates of <code>X</code> corresponding to the eigenvalues \(\pm1\). By the spectral
+theorem we have:
+</p>
+
+<p>
+\[
+  C(R_x(\theta)) |k-\rangle =
+  \,\begin{cases}
+    \, |0-\rangle & \text{for } k=0 \\
+    e^{i\theta/2} \, |1-\rangle & \text{for } k=1
+  \,\end{cases}
+  = (e^{i\theta/4} R_z(\theta/2) |k\rangle) \otimes |-\rangle .
+\]
+</p>
+
+<p>
+That is, if we had access to an ancillary qubit in state \(|-\rangle\) we could implement all
+\(R_z(\theta)\) gates. To see that, in a sense, we have access to such a qubit, consider:
+</p>
+
+<p>
+\[
+  C = R_x(\pi/2)_1 \cdot C(X) \cdot R_x(\pi/2)_1 .
+\]
+</p>
+
+<p>
+As usual the index \(1\) means that we apply the rotation gate to the first qubit. Observe that
+</p>
+
+<p>
+\[
+  C |00\rangle = \frac{1}{\sqrt{2}} (|0\rangle|-\rangle - i|1\rangle|+\rangle) .
+\]
+</p>
+
+<p>
+That is, the circuit \(C\), feeded with the initial state \(|00\rangle\) and measured at the first qubit
+produces \(|-\rangle\) with a probability of \(1/2\) (in that case \(0\) is the measurement outcome). One
+can make the probability as close to one as needed by running sufficiently many of these circuits,
+but with the same "output" qubit. Of course, we have to prevent "multiple successes". To accomplish
+this, we add additional controls to the \(C(X)\) gate making it dependent on the measurement outcomes
+of the "previous" runs of \(C\). Of course measurements can be deferred to the end.
+</p>
+
+<p>
+For the argument above it is of course sufficient to be able to generate \(|-\rangle\) with <i>merely</i>
+high probability. This proves the claim. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org78f8b10" class="outline-5">
+<h5 id="org78f8b10">Exercise 4.45</h5>
+<div class="outline-text-5" id="text-org78f8b10">
+<p>
+Suppose \(U\) is a unitary transform implemented by an n qubit quantum circuit constructed from \(H\),
+\(S\), and Toffoli gates. Show that \(U\) is of the form \(2^{-k/2}M\), for some integer \(k\), where \(M\) is
+a \(2^n\times2^n\) matrix with only complex integer entries. Repeat this exercise with the Toffoli gate
+replaced by the π/8 gate.
+</p>
+</div>
+
+<div id="outline-container-org4693a4f" class="outline-6">
+<h6 id="org4693a4f">Proof</h6>
+<div class="outline-text-6" id="text-org4693a4f">
+<p>
+Observe that except for the Hadamard gate all mentioned gates have complex integer coefficients (and
+Kronecker products of these gates with the identity obviously does not change this
+property). Moreover we have
+</p>
+
+<p>
+\[
+  H = 2^{-1/2} \tilde{H} ,
+\]
+</p>
+
+<p>
+for a matrix \(\tilde{H}\) with (real - but this does not matter) integer coefficients. Hence we can
+choose \(k\) to be the number of Hadamard gates and \(M\) to be the product of the matrices where \(H\) is
+replaced by \(\tilde{H}\).
+</p>
+
+<p>
+Now consider the \(T\) gate. Observe that
+</p>
+
+<p>
+\[
+  T = \frac{1}{\sqrt{2}} \begin{bmatrix} \sqrt{2} & 0 \\ 0 & i+1 \end{bmatrix} .
+\]
+</p>
+
+<p>
+By a similar reasoning as above (technically by mathematical induction) we can easily show that any
+gate composed of the mentioned base gates has the form
+</p>
+
+<p>
+\[
+  2^{-k/2} (M_1 + \sqrt{2} M_2) ,
+\]
+</p>
+
+<p>
+where \(M_1\) and \(M_2\) have only complex integer coefficients and \(k\) is the number of \(T\) gates
+involved. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0a44956" class="outline-5">
+<h5 id="org0a44956">Exercise 4.46 (Exponential complexity growth of quantum systems)</h5>
+<div class="outline-text-5" id="text-org0a44956">
+<p>
+Let \(\rho\) be a density matrix describing the state of \(n\) qubits. Show that describing \(\rho\)
+requires \(4n-1\) independent real numbers.
+</p>
+</div>
+
+<div id="outline-container-org8e9b58a" class="outline-6">
+<h6 id="org8e9b58a">Proof</h6>
+<div class="outline-text-6" id="text-org8e9b58a">
+<p>
+We know that \(\rho\in\CC^{2n\times2n}\). Hence, a priori we need \(2\cdot4^n\) real numbers to describe
+it. Since \(\rho\) is (positive) hermitian, the diagonal entries are real and the off-diagonal entries
+above the diagonl determine the off-diagonal entries below the diagonal completely. Hence we are
+left with \(4^n\) reals. This again reduces by one to \(4^n-1\) by the trace condition.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org34d4309" class="outline-5">
+<h5 id="org34d4309">Exercise 4.47</h5>
+<div class="outline-text-5" id="text-org34d4309">
+<p>
+For \(H=\sum_k^LH_k\), prove that \(e^{-iHt}=\prod_ke^{-iH_kt}\) for all \(t\) if \([H_j,H_k]=0\), for all
+\(j\), \(k\).
+</p>
+</div>
+
+<div id="outline-container-org2abab15" class="outline-6">
+<h6 id="org2abab15">Proof</h6>
+<div class="outline-text-6" id="text-org2abab15">
+<p>
+First of all let us observe that it is sufficient to prove the statement for the special case \(L=2\)
+since the general case directly follows from it. Let us restate a "cleaned up" version of the
+statement:
+</p>
+
+<p>
+Let \(A\), \(B\) two <i>commuting</i> bounded operators (on the same Hilbert Space). Then
+\(e^{A+B}=e^Ae^B\). We will prove this statement.
+</p>
+
+<p>
+The proof has two key ingredients. The first one is the <b>Binomial Formula</b>
+</p>
+
+<p>
+\[
+  (A + B)^k = \sum_{i=0}^k \binom{k}{i} A^{k-i} B^i .
+\]
+</p>
+
+<p>
+This formula can be easily proved by mathematical induction on \(k\). The commutativity of \(A\) and \(B\)
+is needed in the proof and in fact it allows us to take the standard proof, where \(A\) and \(B\) are
+real (or complex) numbers, as a template.
+</p>
+
+<p>
+The second ingredient is the <b>Cauchy Product Formula</b>:
+</p>
+
+<p>
+\[
+  \left( \sum_{i=0}^\infty a_i \right) \cdot \left( \sum_{i=0}^\infty b_j \right)
+  = \sum_{k=0}^\infty \sum_{i=0}^k a_{k-i} b_i .
+\]
+</p>
+
+<p>
+This formula holds under rather general conditions. One sufficient condition is that the two series
+on the left are both absolutely convergent series (in a space of bounded operators over a Hilbert
+Space). In fact, no commutativity is required and even associativity is unnecessary (the results
+holds in abstract Banach Algebras).
+</p>
+
+<p>
+Now let us come back to our problem. From the binomial formula we deduce:
+</p>
+
+<p>
+\[
+  e^{A+B} = \sum_{k=0}^\infty \frac{1}{k!} (A+B)^k
+  = \sum_{k=0}^\infty \frac{1}{k!} \sum_{i=0}^k \binom{k}{i} A^{k-i} B^i
+  = \sum_{k=0}^\infty \sum_{i=0}^k \frac{1}{(k-i)!} A^{k-i} \cdot \frac{1}{i!} B^i .
+\]
+</p>
+
+<p>
+The RHS has the form of the RHS of the Cauchy Product formula. Hence
+</p>
+
+<p>
+\[
+  e^{A+B} = e^A e^B
+\]
+</p>
+
+<p>
+as desired. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org05c7d6d" class="outline-5">
+<h5 id="org05c7d6d">Exercise 4.48</h5>
+<div class="outline-text-5" id="text-org05c7d6d">
+<p>
+Show that the restriction of \(H_k\) to involve at most \(c\) particles implies that in the sum (4.97):
+</p>
+
+<p>
+\[
+  H = \sum_{k=1}^L H_k .
+\]
+</p>
+
+<p>
+\(L\) is upper bounded by a polynomial in \(n\).
+</p>
+</div>
+
+<div id="outline-container-org98286ed" class="outline-6">
+<h6 id="org98286ed">Proof</h6>
+<div class="outline-text-6" id="text-org98286ed">
+<p>
+I suppose that \(n\) is the number of qubits. We assume that any particle is described by at most \(m\)
+qubits. This implies that each Hamiltonian involves at most \(mc\) qubits.
+</p>
+
+<p>
+Moreover we assume that there are only a finite number \(K\) of <i>types</i> of interactions. As an example
+consider a special case of the (quantum) Ising Model (aka <a href="https://en.wikipedia.org/wiki/Quantum_Heisenberg_model">Heisenberg Model</a>) with periodic boundary
+conditions:
+</p>
+
+<p>
+\[
+  H = -\frac{J}{2} \sum_{i=0}^n X_i X_{i+1} - h \sum_{j=1}^n Z_j .
+\]
+</p>
+
+<p>
+Here we have \(c=2\), \(m=1\) and \(K=2\). More generally the two particle interaction could also involve
+\(Y_iY_{i+1}\) and \(Z_iZ_{i+1}\) contributions, in which case we had \(K=4\).
+</p>
+
+<p>
+In the extreme case that each combination of \(c\) particles gets a Hamiltonian of each type we get
+the maximum value for \(L\). So we get the upper bound
+</p>
+
+<p>
+\[
+  K \binom{n/m}{c} = O(Km^{-c} n^c)
+\]
+</p>
+
+<p>
+<i>if</i> each particle needs <i>exactly</i> \(m\) qubits. In general at least some particles could need less
+qubits. So the save upper bound is:
+</p>
+
+<p>
+\[
+  L \leq K \binom{n}{c} = O(K n^c) .
+\]
+</p>
+
+<p>
+Note that not each type of Hamiltonian needs to act on all \(c\) particles. In that case the
+inequality is already strict, since then the given binomial coefficient overestimates the possible
+combinations. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org590a9e7" class="outline-5">
+<h5 id="org590a9e7">Exercise 4.49 (Baker–Campbell–Hausdorff formula)</h5>
+<div class="outline-text-5" id="text-org590a9e7">
+<p>
+Let \(A\) and \(B\) be bounded operators (on a Hilbert Space). Prove that
+</p>
+
+<p>
+\[
+  e^{(A+B)t} = e^{At} e^{Bt} e^{-\frac{1}{2} [A,B] t^2} + O(t^3)
+\]
+</p>
+
+<p>
+near \(t=0\) and also prove these equations:
+</p>
+
+\begin{align}
+  e^{(A + B)t} &= e^{At} e^{Bt} + O(t^2) , \\
+  e^{(A + B)t} &= e^{Bt/2} e^{At} e^{Bt/2} + O(t^3) .
+\end{align}
+
+<p>
+<b>Remarks:</b>
+</p>
+<ul class="org-ul">
+<li>I cleaned up the formulation a little bit, but it is essentially the same exercise.</li>
+<li>According to <a href="https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula">wikipedia</a> the above formula is a variant called the <i>Zassenhaus</i> formula. In fact,
+BCH deals with the related but slightly different problem of finding the solution \(C\) of
+\(e^{Ct}=e^{At}e^{Bt}\).</li>
+</ul>
+</div>
+
+<div id="outline-container-org964d003" class="outline-6">
+<h6 id="org964d003">Proofs</h6>
+<div class="outline-text-6" id="text-org964d003">
+<p>
+Let us first prove formula (1) - because it is the simplest. In fact, it directly follows from first
+order approximating all involved exponential series:
+</p>
+
+<p>
+\[
+  e^{(A+B)t} = I + (A+B)t + O(t^2) = e^{At} e^{Bt} + O(t^2) .
+\]
+</p>
+
+<p>
+<b>Remark:</b> From this we easily obtain the Trotter Formula (Theorem 4.3) by replacing
+\(t\,\leftarrow\,t/n\) and taking the \(n\)​-th power. We even get a uniform error estimate \(O(1/n)\) if
+\(t\) is restricted to a fixed interval \([0,t_0]\). Of course the original proof shows the same
+(including the error estimate), but it contains an error: It is not true that
+\(\binom{n}{k}/n^k=(1+O(1/n))/k!\). Set \(k=n\) to see this.
+</p>
+
+<p>
+The other two formulas are also showed by comparing power series. This rather boring task can be
+done by <code>sympy</code>. Hence let us define three symbols. Two non-commuting symbols for the operators and
+a commuting symbol for the time:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org16cd77f"><span class="org-variable-name">A</span>, <span class="org-variable-name">B</span> = sp.symbols(<span class="org-string">'A B'</span>, commutative=<span class="org-constant">False</span>)
+<span class="org-variable-name">t</span> = sp.symbols(<span class="org-string">'t'</span>, commutative=<span class="org-constant">True</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">commutes with A and B</span>
+</pre>
+</div>
+
+<p>
+For a warm up let us return to formula (1):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org9365f9d"><span class="org-variable-name">E1</span> = exp((A+B)*t) - exp(A*t)*exp(B*t)
+E1.series(t, 0, 3)
+</pre>
+</div>
+
+<pre class="example">
+t**2*(-A*B/2 + B*A/2) + O(t**3)
+</pre>
+
+
+<p>
+This of course shows the claim again. But it is slightly more precise. The \(t^2\) term as the
+coefficient \(-[A,B]/2\). In a sense this already proves the BCH formula (since the exponential's
+leading term is \(I\)). But let us check it anyway. We increase the order of the series expansion to
+\(4\) since we are curious what the first non-vanishing term looks like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org7baa5ec"><span class="org-variable-name">E2</span> = exp((A+B)*t) - exp(A*t)*exp(B*t)*exp(-(A*B-B*A)*t**2/2)
+E2.series(t, 0, 4)
+</pre>
+</div>
+
+<pre class="example">
+t**3*(-A*B*A/3 - A*B**2/3 + A**2*B/6 + 2*B*A*B/3 + B*A**2/6 - B**2*A/3) + O(t**4)
+</pre>
+
+
+<p>
+Now let us check formula (2):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org05a2fd7"><span class="org-variable-name">E3</span> = exp((A+B)*t) - exp(B*t/2)*exp(A*t)*exp(B*t/2)
+E3.series(t, 0, 4)
+</pre>
+</div>
+
+<pre class="example">
+t**3*(A*B*A/6 + A*B**2/24 - A**2*B/12 - B*A*B/12 - B*A**2/12 + B**2*A/24) + O(t**4)
+</pre>
+
+
+<p>
+Comparing this with the third order term of the BCH formula it looks like this formula has a
+slightly better error estimate (the coefficients are smaller). But this is speculation at this
+point!
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3d9d55a" class="outline-5">
+<h5 id="org3d9d55a">Exercise 4.50</h5>
+<div class="outline-text-5" id="text-org3d9d55a">
+<p>
+Let \(H=\sum_{k=1}^L H_k\), and define
+</p>
+
+<p>
+\[
+  U_{t} = \left[ e^{-iH_1 t} e^{-iH_2 t} \ldots e^{-iH_L t}  \right]
+    \left[ e^{-iH_L t} e^{-iH_{L-1} t} \ldots e^{-iH_1 t}  \right] .
+\]
+</p>
+
+<ol class="org-ol">
+<li>Prove that \(U_{t}=e^{-2iHt}+O(t^3)\) near \(t=0\).</li>
+<li>Use the results in Box 4.1 to prove that there exists an \(\alpha>0\) such that
+\[
+     \norm{U^m_t - e^{-2miHt}} \leq m\alpha |t|^3 ,
+   \]
+for all positive integers \(m\).</li>
+</ol>
+</div>
+
+<div id="outline-container-org9fc3bbb" class="outline-6">
+<h6 id="org9fc3bbb">Proof</h6>
+<div class="outline-text-6" id="text-org9fc3bbb">
+<p>
+The first part is a direct consequence of one of the formulas proved in Exercise 4.49:
+</p>
+
+<p>
+\[
+  e^{(A + B)t} = e^{Bt/2} e^{At} e^{Bt/2} + O(t^3) .
+\]
+</p>
+
+<p>
+The rest of the proof is just mathematical induction on \(L\). The base case \(L=0\) is trivial (holds
+even with a zero-error). The induction step uses the above formula.
+</p>
+
+<p>
+The case \(m=1\) of the second part is <i>essentially</i> a reformulation of the first part. In fact the
+first part shows that there is a \(t_0>0\) such that the inequality holds for all
+\(t\in[-t_0,t_0]\). But for \(t>t_0\) we can use that the LHS is bounded by \(2\). Hence the inequality
+also holds in that range after possibly adjusting \(\alpha\). The general case follows from the case
+\(m=1\) because all involved operators are unitary and hence the error estimates just add up according
+to Box 4.1. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org05dfbf4" class="outline-5">
+<h5 id="org05dfbf4">Exercise 4.51</h5>
+<div class="outline-text-5" id="text-org05dfbf4">
+<p>
+Construct a quantum circuit to simulate the Hamiltonian
+</p>
+
+<p>
+\[
+  \mathcal{H} = X_1 \otimes Y_2 \otimes Z_3 .
+\]
+</p>
+
+<p>
+performing the unitary transform \(e^{-i\Delta t\mathcal{H}}\) for any \(\Delta t\).
+</p>
+</div>
+
+<div id="outline-container-org33f3635" class="outline-6">
+<h6 id="org33f3635">Solution</h6>
+<div class="outline-text-6" id="text-org33f3635">
+<p>
+Let
+</p>
+
+<p>
+\[
+  H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}, \quad
+  K = \frac{1}{\sqrt{2}} \begin{bmatrix} i & -1 \\ -1 & i \end{bmatrix}.
+\]
+</p>
+
+<p>
+The first matrix is the Hadamard gate. Recall \(HXH=Z\). The second matrix is chosen so that
+\(K^\dagger YK=Z\). To construct it we just calculated the eigenvectors of <code>Y</code> and used them as
+columns in \(K\). Hence
+</p>
+
+<p>
+\[
+  \mathcal{H} = H\otimes K^\dagger\otimes I \cdot Z_1\otimes Z_2\otimes Z_3 \cdot H\otimes K\otimes I .
+\]
+</p>
+
+<p>
+Observe that \(K=iR_x(\pi/2)\). Note that the factor \(i\) in the rotation operator representation of
+\(K\) and \(K^\dagger\) cancels out when diagonalizing: \(R_x(\pi/2)YR_x(-\pi/2)=Z\). Hence
+</p>
+
+<p>
+\[
+  \mathcal{H} = H\otimes R_x(\pi/2)\otimes I \cdot Z_1\otimes Z_2\otimes Z_3 \cdot H\otimes R_x(-\pi/2)\otimes I ,
+\]
+</p>
+
+<p>
+and thus:
+</p>
+
+<p>
+\[
+  e^{-i\mathcal{H} \Delta t} =
+  H\otimes R_x(\pi/2)\otimes I \cdot
+  e^{-i Z_1\otimes Z_2\otimes Z_3 \Delta t}
+  \cdot H\otimes R_x(-\pi/2)\otimes I .
+\]
+</p>
+
+<p>
+From the book we already know how to construct the operator in the middle (Figure 4.19). The
+complete circuit is:
+</p>
+
+<pre class="example">
+        ┌───┐                                                ┌───┐
+q_0: ───┤ H ├──────■───────────────────────────────────■─────┤ H ├────
+     ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
+q_1: ┤ Rx(+π/2) ├──┼────■─────────────────────────■────┼──┤ Rx(-π/2) ├
+     └──────────┘  │    │                         │    │  └──────────┘
+q_2: ──────────────┼────┼────■───────────────■────┼────┼──────────────
+                 ┌─┴─┐┌─┴─┐┌─┴─┐┌─────────┐┌─┴─┐┌─┴─┐┌─┴─┐
+|0&gt;: ────────────┤ X ├┤ X ├┤ X ├┤ Rz(2Δt) ├┤ X ├┤ X ├┤ X ├────────────
+                 └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5adca2a" class="outline-3">
+<h3 id="org5adca2a"><span class="todo TODO">TODO</span> Chapter 5</h3>
+<div class="outline-text-3" id="text-org5adca2a">
+<p>
+TODO
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0cdb546" class="outline-2">
+<h2 id="org0cdb546">References</h2>
+<div class="outline-text-2" id="text-org0cdb546">
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p><p>Find the source code on <a href="https://github.com/rainij">Github</a></p></footer></body></html>
