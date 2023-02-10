@@ -24,12 +24,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: DUMMY BUILD # TODO
-        run: mkdir public && echo "Test Page" > public/index.html && tar -czf public.tar.gz public
       - name: Install Emacs
         run: sudo apt install emacs-nox --yes
       - name: Build site
         run: ./build-site.el
+      - name: Compress artifacts
+        run: tar -czf public.tar.gz public
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
