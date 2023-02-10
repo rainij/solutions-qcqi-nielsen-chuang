@@ -25,8 +25,9 @@
 
 
 (setq org-cite-global-bibliography (list (expand-file-name "./bibliography.bib"))
-      org-export-use-babel nil ; don't execute source blocks while exporting
+      ;;org-export-use-babel nil ; don't execute source blocks while exporting TODO: nil is not what we want!
       org-html-html5-fancy t
+      org-html-htmlize-output-type 'css ; use classes for syntax highlighting of code blocks
       ;; Otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4":
       python-indent-guess-indent-offset-verbose nil)
 
