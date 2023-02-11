@@ -31,7 +31,6 @@
 
 
 (setq org-cite-global-bibliography (list (expand-file-name "./bibliography.bib"))
-      ;;org-export-use-babel nil ; don't execute source blocks while exporting TODO: nil is not what we want!
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css ; use classes for syntax highlighting of code blocks
       ;; Otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4":
@@ -46,7 +45,7 @@
                 " with " (raw-string ,creator))
              (p nil
                 "Find the source code on " ;; TODO: set link, once repo is on github
-                (a ((href . "https://github.com/rainij")) "Github")))))
+                (a ((href . "https://github.com/rainij/solutions-qcqi-nielsen-chuang")) "Github")))))
 
 ;; This is our custom html template (written as s-expression):
 (defun rs/org-html-template (contents info)
