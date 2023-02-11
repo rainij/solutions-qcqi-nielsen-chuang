@@ -1,5 +1,63 @@
-#+title: Solutions to Chuang-Nielsen's Book on Quantum Computation
+#+title: Solutions for the bible of Quantum Computation and Quantum Information
 #+author: Reinhard Stahn
 
 This repository contains solutions to some exercises of the Book `Quantum Computation and Quantum
-Information` by Michael A. Nielsen & Isaac L. Chuang (Mike and Ike).
+Information` by Michael A. Nielsen & Isaac L. Chuang (Mike and Ike). The easiest way to view the
+solutions is to head over to [[https://rainij.github.io/solutions-qcqi-nielsen-chuang/][the website]] which is generated from this repo via GitHub pages. Read on
+if you want to obtain the /interactive/ notes on which the website is based.
+
+Of course there are already tons of solutions out there (the book is well known so anything else
+would be a surprise). But still, some solutions are hard to find and for others it is good to have
+several solutions.
+
+* How to use the sources
+The sources of the website are (mostly) under [[./src/]]. The entry point is the [[https://orgmode.org/][org-mode]] file
+[[./src/index.org]]. The sources contain more information than what is displayed on the website. In
+particular they contain the [[https://qiskit.org/][qiskit]] code to generate the numerous drawings of circuits.
+
+Most reasonable text editors have at least an addon to display org files (e.g. [[https://vscode-org-mode.github.io/vscode-org-mode/][vscode]]). But you
+probably need [[https://www.gnu.org/software/emacs/][Emacs]] for more sophisticated things like execution or tangling of the embedded python
+code.
+
+To use the embedded python code without modifying the org files you can do the following /as an
+Emacs and IPython user/. [[https://en.wikipedia.org/wiki/Literate_programming][Tangle]] =index.org= via ~M-x org-babel-tangle~ to generate a python file
+=index.py= which contains all the embedded code. From an IPython terminal just type ~%run index.py~
+to load it. You may wonder which functionality is available from your ipython shell after doing
+this. Have a look into the /Setup/ section of each chapter to find out. For example, chapter 4 loads
+~sympy~ and defines the matrices for various gates (e.g. Pauli Operators ~X~, ~Y~, ~Z~ some
+controlled gates like ~CX~). It also provides some useful functions like ~make_CU~ or
+~make_twolevel~. Some variables or functions from code within the exercises might have a unique name
+so that they are also available from the ipython shell.
+
+I can't guarantee that the code does not contain bugs. For the more complicated functions I
+implemented some /very basic/ unit tests in the form of a bunch of ~assert~ statements.
+
+* Contributing
+It is unclear if anybody wants to contribute anything to this project. Just in case, here is what
+you need to know ...
+
+/At the moment/ I do not accept solutions to exercises which do not already appear in my notes. The
+reason is simple: The exercises are a kind of Sudoku for me. I solve them for the joy of solving
+them. This isn't possible anymore if somebody else takes them away from me 😉.
+
+But if you find mistakes you can let me know or open a pull request.
+
+There is an exception for chapter 2: I read this chapter /solely/ in support of chapter 4 and I
+already solved the exercises which helped me understand the material in chapter 4. The remaining
+exercises mostly train some linear algebra stuff. They are mostly trivial for me since I did this
+stuff back then in university. But solutions might still be interesting for others since not
+everybody interested in quantum computation has a background in mathematics - at least this is what
+I read out there in the internet.
+
+In any case, contributors must be fine dedicating their work to the public domain (see the [[#unlicense][section
+on unlicense]]).
+
+* Unlicense
+:PROPERTIES:
+:CUSTOM_ID: unlicense
+:END:
+This work has been dedicated to the [[https://en.wikipedia.org/wiki/Public_domain][public domain]] via the [[file:UNLICENSE][UNLICENSE]]:
+
+https://unlicense.org/
+
+Attribution is appreciated, but not required.

@@ -103,7 +103,7 @@
        :section-numbers nil
        :time-stamp-file t
        :with-inlinetasks nil
-       :with-toc 2)
+       :with-toc nil) ; `nil' enables us to place the toc where we want it to be
       ("static"
        ,@rs/default-publish-params
        :base-extension "css\\|js\\|svg"
