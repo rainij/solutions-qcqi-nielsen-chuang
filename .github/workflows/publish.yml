@@ -1,0 +1,40 @@
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches: ["master"] # TODO
+    # Allows you to run this workflow manually from the Actions tab:
+    workflow_dispatch:
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build Website and upload Artifact
+        uses: ./.github/actions/build-site-and-upload-artifacts
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: build
+    steps:
+      - name: Download artifacts from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: public
+      - run: tar -xf public.tar.gz
+      - name: Deploy public
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          # For this to work the GITHUB_TOKEN needs read/write permissions. See
+          # the action-settings in github!
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public

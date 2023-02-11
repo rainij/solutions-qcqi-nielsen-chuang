@@ -10,8 +10,14 @@
 
 ;; Load packages but do not activate them:
 (package-initialize nil)
+;; This *seems* to be not needed on emacs-29:
+(unless package-archive-contents
+  (package-refresh-contents))
 
-(load-theme 'misterioso t) ; TODO: does not effect syntax highlighting in batch mode
+;; Install use-package if necessary (builtin in emacs-29)
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
 
 ;; Activate dependencies, ensure installation if necessary
 (setq use-package-verbose t)
@@ -25,7 +31,6 @@
 
 
 (setq org-cite-global-bibliography (list (expand-file-name "./bibliography.bib"))
-      ;;org-export-use-babel nil ; don't execute source blocks while exporting TODO: nil is not what we want!
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css ; use classes for syntax highlighting of code blocks
       ;; Otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4":
@@ -40,7 +45,7 @@
                 " with " (raw-string ,creator))
              (p nil
                 "Find the source code on " ;; TODO: set link, once repo is on github
-                (a ((href . "https://github.com/rainij")) "Github")))))
+                (a ((href . "https://github.com/rainij/solutions-qcqi-nielsen-chuang")) "Github")))))
 
 ;; This is our custom html template (written as s-expression):
 (defun rs/org-html-template (contents info)
@@ -97,7 +102,7 @@
        :section-numbers nil
        :time-stamp-file t
        :with-inlinetasks nil
-       :with-toc 2)
+       :with-toc nil) ; `nil' enables us to place the toc where we want it to be
       ("static"
        ,@rs/default-publish-params
        :base-extension "css\\|js\\|svg"
