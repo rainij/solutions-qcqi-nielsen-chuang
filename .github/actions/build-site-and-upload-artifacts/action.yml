@@ -1,0 +1,17 @@
+name: 'Build Site and upload Artifact'
+
+description: 'Build the Website as public.tar.gz and upload this artifact'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Build Website
+      uses: ./.github/actions/build-site
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: public
+        path: './public.tar.gz'
+        retention-days: 1
