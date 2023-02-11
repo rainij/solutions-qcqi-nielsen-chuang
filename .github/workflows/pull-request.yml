@@ -1,0 +1,20 @@
+name: Build Website, upload artifact
+
+on:
+  pull_request:
+    brances: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build Website
+        uses: ./.github/actions/build-site
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: public
+          path: './public.tar.gz'
+          retention-days: 1
