@@ -60,6 +60,7 @@
                    (meta ((name . "viewport") (content . "width=device-width, initial-scale=1.0")))
                    (meta ((name . "author") (content . "Reinhard Stahn")))
                    (title nil ,title)
+                   (raw-string "<!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css -->")
                    (link ((rel . "stylesheet") (href . "./css/simple.css")))
                    (link ((rel . "stylesheet") (href . "./css/style.css")))
                    (script ((src . "./js/perf.js")) "")
