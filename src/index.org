@@ -3738,7 +3738,7 @@ These are the operators $R_k$ appearing in the implementation of the Fourier Tra
 
 #+name: chapter-5-Rk
 #+begin_src python
-  k = sp.symbol('k', integer=True)
+  k = sp.symbols('k', integer=True)
   Rk = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
 #+end_src
 
@@ -4102,6 +4102,32 @@ eigenstate.
 
 In hindsight we see that in exercise 4.34 we already used this special case of the phase estimation
 circuit. We also note that the Hadamard gate is the Fourier transform on a single qubit.
+
+**** Exercise 5.10
+Show that the order of $x=5$ modulo $N=21$ is $6$.
+
+***** Proof
+It is probably easiest to just make a table:
+
+| $i$           | 1 | 2 |  3 |  4 |  5 | 6 |
+| $5^i \mod 21$ | 5 | 4 | 20 | 16 | 17 | 1 |
+
+The powers of $x=5$ can be calculated sequentially by repeatedly multiplying by $5$ and taking the
+rest after deviding by $21$. QED.
+
+**** Exercise 5.11
+Show that the order of $x$ satisfies $r\leq N$.
+
+***** Proof
+By the pigeonhole principle there are $a,b\in\{1,2,\ldots,N+1\}$ with $a < b$ such that
+$x^a=x^b$. Since $x$ and $N$ are coprime we can divide this by $x^a$ (see also Exercise A4.12) and
+obtain
+
+$$
+  x^{b-a} = 1 \mod N .
+$$
+
+Hence $r\leq b-a\leq N$. QED.
 
 * COMMENT References
 # TODO: once the deployment uses org v9.5 or higher org-cite is properly supported and we can
