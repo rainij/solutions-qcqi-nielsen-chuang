@@ -772,7 +772,8 @@ other hand one can just "add some dimensions" to R if necessary and extend $U_R$
 **** Python Libraries
 #+name: chapter-3-setup
 #+begin_src python
-  from typing import NewType, Literal
+  from typing import Literal, NewType, Optional
+  from collections.abc import Callable
 
   # Terminal colors. TODO: Move somwhere else.
   # Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")
@@ -783,31 +784,100 @@ other hand one can just "add some dimensions" to R if necessary and extend $U_R$
 
 **** TODO Turing Machines
 TODOs:
-- [ ] parse program from string
-- [ ] write a short explanation
+- [X] parse program from string
+- [ ] write some text around the code, a little more inline doc (maybe)
 - [ ] function to print the program with line numbers
+- [ ] note on special symbols =#=, =,=, =(=, =)=.
+- [ ] In TuringMachine: make start_state and halt_state optional
 
-#+name: chapter-3-turing-machine
+First some type definitions
+
+#+name: chapter-3-turing-machine-typing
 #+begin_src python
   Char = NewType("Char", str)  # better than nothing
   Move = Literal[-1, 0, +1]
   TuringProgLine = tuple[str, Char, str, Char, Move]  # (s,c,s',c',m)
   TuringProgram = list[TuringProgLine]
 
+  SourceMap = list[tuple[int, str]]
+  TuringParser = Callable[[str], [tuple[TuringProgram, SourceMap | None]]]
+#+end_src
+
+Next, a parser for a Turing program:
+
+#+name: chapter-3-turing-parser
+#+begin_src python
+  def parse_turing_program_line(line: str) -> TuringProgLine | None:
+      # Remove comments and leading/trailing whitespace
+      line = line[:line.find('#')].strip()
+      if len(line) == 0:
+          return None  # line comment or empty line
+
+      line = line.strip().lstrip("(").rstrip(")")
+      s0, c0, s1, c1, m = line.split(",")
+      m = +1 if m == "+" else m  # for convinience ...
+      m = -1 if m == "-" else m  # ... allow shortcuts for +1, -1
+      m = int(m)
+      assert len(c0) == 1, f"Expected character got '{c0}'."
+      assert len(c1) == 1, f"Expected character got '{c1}'."
+      assert m in [-1, 0, +1], f"Forbidden head movement: {m}."
+
+      return s0, c0, s1, c1, m
+
+
+  def parse_turing_program(source: str) -> tuple[TuringProgram, SourceMap]:
+      """TODO"""
+      program: TuringProgram = []
+      source_map: list[int] = []
+
+      lines = source.split("\n")
+      for line_no, line in enumerate(lines):
+          parsed_line = parse_turing_program_line(line)
+
+          if parsed_line is not None:
+              program.append(parsed_line)
+              source_map.append((line_no, line))
+
+      return program, source_map
+#+end_src
+
+Implementation of the Turing machine:
+
+#+name: chapter-3-turing-machine
+#+begin_src python
   class TuringMachine:
       BLANK: Char = "■"
       MAX_STEPS = 1000000  # abort after running this many steps
       LOG_LEVEL = 0  # Set greater 0 for a chatty execution
+      SOURCE_LINE_OFFSET = 0
 
-      def __init__(self, start_state: str, halt_state: str, program: TuringProgram):
+      def __init__(self, start_state: str, halt_state: str, program: TuringProgram,
+                   source_map: Optional[SourceMap] = None):
           self._start_state = start_state
           self._halt_state = halt_state
           self._program = program
+          self._source_map = source_map
+
+          assert source_map is None or len(source_map) == len(program), "Invalid source_map"
 
           self._state = None
           self._head_position: int = None
           self._tape: list[Char] = []  # gets input during execution
           self._step_count = None
+
+          # Only relevant for logging:
+          self._index_width = len(str(len(self._program)-1))
+
+      @property
+      def _line_no_width(self):  # only relevant for logging
+          return None if self._source_map is None \
+              else len(str(self._source_map[-1][0] + self.SOURCE_LINE_OFFSET - 1))
+
+      @classmethod
+      def fromSource(cls, start_state: str, halt_state: str, source: str,
+                     parser: TuringParser = parse_turing_program) -> "TuringMachine":
+          program, source_map = parse_turing_program(source)
+          return TuringMachine(start_state, halt_state, program, source_map)
 
       def run(self, tape_input: str) -> str:
           """Run the TM and return what is on the tape after it halts."""
@@ -836,12 +906,17 @@ TODOs:
           current_line = self._current_program_line
 
           if current_line is None:
-              self._log(2, "No matching program line - halting")
+              self._log(2, f"{TermColor.RED}No matching program line - halting{TermColor.ENDC}")
               self._state = self._halt_state
               return
 
           index, current_line = current_line
-          self._log(2, f"program line = {index:{len(str(len(self._program)-1))}}: {current_line}")
+          self._log(4, f"program line = {index:{self._index_width}}: {current_line}")
+
+          if self._source_map is not None:
+              line_no, source_line = self._source_map[index]
+              self._log(3, f"source line = {line_no:{self._line_no_width}}: {source_line}")
+
           s1, c1, m = current_line[2:]
 
           self._state = s1
@@ -891,13 +966,13 @@ TODOs:
 
 Some very basic tests that the above implementation of ~TuringMachine~ is not complete garbage:
 
-#+name: chapter-3-turing-machine-tests
+#+name: chapter-3-turing-machine-tests-1
 #+begin_src python
   # If the tape initially is blank, this prints "XYZ"
   prog_print_XYZ = [
       ("S", "■", "2", "X", +1),
       ("2", "■", "3", "Y", +1),
-      ("3", "■", "H", "Z", +1),
+      ("3", "■", "H", "Z",  0),
   ]
 
   tm1 = TuringMachine("S", "H", prog_print_XYZ)
@@ -924,6 +999,63 @@ Some very basic tests that the above implementation of ~TuringMachine~ is not co
   assert tm2.run("▶1011") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 1"
   assert tm2.run("▶0") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 2"
 #+end_src
+
+Some basic tests on parsing of Turing programs
+
+#+name: chapter-3-turing-machine-tests-2
+#+begin_src python
+  prog_print_XYZ_str = \
+  """# Anything behind '#' is a comment. Empty lines are ignored.
+
+  (S,■,2,X,+)  # We use "+" and "-" as shortcuts for +1 and -1.
+    (2,■,3,Y,+)  # Indentation is irrelevant.
+  (3,■,H1,Z,-)  # We go to the left before halting - just for fun
+  (H1,Y,H,Y,0)
+  # whitespace inside (...) is (mostly) important. We could not replace the last line by this:
+  # (H1,Y,H ,Y,0)
+  """
+
+  # ["".join(list(map(str,l))) for l in src]
+  parsed_prog, source_map = parse_turing_program(prog_print_XYZ_str)
+  # Python seems to compare these structs recursively by value 👍:
+  assert source_map == [
+      (2, "(S,■,2,X,+)  # We use \"+\" and \"-\" as shortcuts for +1 and -1."),
+      (3, "  (2,■,3,Y,+)  # Indentation is irrelevant."),
+      (4, "(3,■,H1,Z,-)  # We go to the left before halting - just for fun"),
+      (5, "(H1,Y,H,Y,0)"),
+  ], "test parse_turing_program - 1"
+  assert parsed_prog == [
+      ('S', '■', '2', 'X', +1),
+      ('2', '■', '3', 'Y', +1),
+      ('3', '■', 'H1', 'Z', -1),
+      ('H1', 'Y', 'H', 'Y', 0)
+  ], "test parse_turing_program - 2"
+#+end_src
+
+Basic tests on ~TuringMachine.fromSource~:
+
+#+name: tprog-constant-one
+#+begin_example
+# This evaluates the function f(n)=1
+# Example: input="▶1001", output="▶1".
+(S,▶,1,▶,+)
+(1,0,1,■,+)
+(1,1,1,■,+)
+(1,■,2,■,-)
+(2,■,2,■,-)
+(2,▶,3,▶,+)
+(3,■,H,1,0)
+#+end_example
+
+#+name: chapter-3-turing-machine-tests-3
+#+begin_src python :var source=tprog-constant-one
+  tm = TuringMachine.fromSource("S", "H", source)
+
+  assert tm.run("▶1001") == "▶1", "test TuringMachine.fromSource"
+#+end_src
+
+#+RESULTS: chapter-3-turing-machine-tests-3
+: ▶1
 
 *** Exercises
 * Part II
