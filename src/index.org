@@ -59,7 +59,7 @@ information.
 
 #+TOC: headlines 2
 
-* COMMENT TODOs [9/15]
+* COMMENT TODOs [9/16]
 - [X] Write Exercise x.y instead of exercise x.y in headings.
 - [X] Remove the numbers from (at least some) headings in the HTML output.
 - [X] How to tell the HTML exporter to recognize the latex macros (e.g. for \norm).
@@ -82,6 +82,8 @@ information.
   - Properly support citations via =org-cite= (fortunately we only cite one thing at the moment 😄).
   - Older org modes do not put (svg) images into an =img= HTML-container - this makes them look "different".
 - [ ] Should we have some "proof-environment"?
+- [ ] I use type annotations only due to its in-IDE benefits. Might make sense to actually set up
+  type checking - somehow.
 - [ ] We would like to have chapter wise session. On the other hand we also need to share some stuff
   between chapters. Currently I made chapter 4 and chapter but this may be a problem since I
   potentially want to divide the file into several files (not sure though).
@@ -785,18 +787,97 @@ other hand one can just "add some dimensions" to R if necessary and extend $U_R$
       ENDC = '\033[0m'
 #+end_src
 
-**** TODO Turing Machines
-TODOs:
-- [X] parse program from string
-- [ ] write some text around the code, a little more inline doc (maybe)
-- [ ] note on special symbols =#=, =,=, =(=, =)=.
-- [X] In TuringMachine: make start_state and halt_state optional
+**** Turing Machines
+***** Introduction
+#+name: chapter-3-gather-turing-machine-sources
+#+begin_src python :exports none :noweb yes
+  <<chapter-3-turing-machine-typing>>
+  <<chapter-3-turing-parser>>
+  <<chapter-3-turing-machine>>
+#+end_src
 
-First some type definitions
+In this section we define a class ~TuringMachine~ which empowers us to execute a turing program like
+this one:
+
+#+name: tprog-constant-one
+#+begin_example
+# This program computes the function f(n)=1.
+# Example: input="▶1001", output="▶1".
+(S,▶,1,▶,+) # S is the start state
+(1,0,1,■,+)
+(1,1,1,■,+)
+(1,■,2,■,-)
+(2,■,2,■,-)
+(2,▶,3,▶,+)
+(3,■,H,1,0) # H is the halt state
+#+end_example
+
+Below we initialize a turing machine ~my_tm~ from the above source code:
+
+#+name: chapter-3-turing-machine-demo
+#+begin_src python :var source=tprog-constant-one :tangle no :results output replace
+  my_tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
+  my_tm.LOG_LEVEL = 3
+  my_tm.COLORED_LOG = False  # set to false since listing below does not support colors
+
+  result = my_tm.run("▶0")
+  print(f"\nresult = '{result}'")
+#+end_src
+
+Setting ~LOG_LEVEL=3~ makes the Turing machine print certain informations for each step of
+execution. The result can be seen in the following listing (with ~COLORED_LOG=True~ this would be
+even more informative). Note that in theory the tape is infinite. We realize this by dynamically
+allocating new blank cells whenever we want to access a cell not already allocated (we roughly
+double the tape size in that case).
+
+#+RESULTS: chapter-3-turing-machine-demo
+#+begin_example
+
+Executing step 1
+tape = '▶0'
+state='S', symbol='▶', head_position=0
+source line = 2: (S,▶,1,▶,+) # S is the start state
+
+Executing step 2
+tape = '▶0'
+state='1', symbol='0', head_position=1
+source line = 3: (1,0,1,■,+)
+
+Executing step 3
+tape = '▶■■■■'
+state='1', symbol='■', head_position=2
+source line = 5: (1,■,2,■,-)
+
+Executing step 4
+tape = '▶■■■■'
+state='2', symbol='■', head_position=1
+source line = 6: (2,■,2,■,-)
+
+Executing step 5
+tape = '▶■■■■'
+state='2', symbol='▶', head_position=0
+source line = 7: (2,▶,3,▶,+)
+
+Executing step 6
+tape = '▶■■■■'
+state='3', symbol='■', head_position=1
+source line = 8: (3,■,H,1,0) # H is the halt state
+
+Execution took 6 steps.
+
+result = '▶1'
+#+end_example
+
+***** Implementation
+First we introduce some useful types. We represent the state by strings since this /allows/ for
+readable or at least mnemonic state names. This would not be possible had we used integers. The
+~SourceMap~ is responsible for connecting each parsed line of the turing program with its original
+from the source-string/file. It is the reason why in the [[chapter-3-turing-machine-demo][listing above]] the ~TuringMachine~ instance
+can refer to its source (see the line starting with =source line ==).
 
 #+name: chapter-3-turing-machine-typing
-#+begin_src python
-  Char = NewType("Char", str)  # better than nothing
+#+begin_src python :tangle no :eval no
+  Char = NewType("Char", str)  # better than nothing, represents a letter from the alphabet
   State = NewType("State", str)
   Move = Literal[-1, 0, +1]
   TuringProgLine = tuple[State, Char, State, Char, Move]  # (s,c,s',c',m)
@@ -806,57 +887,45 @@ First some type definitions
   TuringParser = Callable[[str], [tuple[TuringProgram, SourceMap | None]]]
 #+end_src
 
-Next, a parser for a Turing program:
+[[chapter-3-turing-machine][Below]] follows the implementation of the ~TuringMachine~. The logging functionality bloats the
+implementation a bit. But it you ignore this the implementation is very simple and straightforward
+to understand (IMHO).
 
-#+name: chapter-3-turing-parser
-#+begin_src python
-  def parse_turing_program_line(line: str) -> TuringProgLine | None:
-      # Remove comments and leading/trailing whitespace
-      line = line[:line.find('#')].strip()
-      if len(line) == 0:
-          return None  # line comment or empty line
+Note that the ~__init__~ method takes the program as an already parsed list of tuples
+(~TuringProgram~). The canonical way to create a ~TuringMachine~ is to use the ~fromSource~ factory
+method. Among other things you can optionally provide a custom parser. This might be beneficial to
+introduce syntactic sugar. For example the code snippit
 
-      line = line.strip().lstrip("(").rstrip(")")
-      s0, c0, s1, c1, m = line.split(",")
-      m = +1 if m == "+" else m  # for convinience ...
-      m = -1 if m == "-" else m  # ... allow shortcuts for +1, -1
-      m = int(m)
-      assert len(c0) == 1, f"Expected character got '{c0}'."
-      assert len(c1) == 1, f"Expected character got '{c1}'."
-      assert m in [-1, 0, +1], f"Forbidden head movement: {m}."
+#+begin_example
+(a,0,a,0,+)
+(a,1,a,1,+)
+(a,2,a,2,+)
+(a,3,a,3,+)
+(a,4,a,4,+)
+(a,5,a,5,+)
+#+end_example
 
-      return s0, c0, s1, c1, m
+might seem somewhat verbose. Probably this would be nicer syntax:
 
+#+begin_example
+(a,0|1|2|3|4|5,a,$,+)  # "$" meaning: take the original
+# or even (if this is the intended meaning)
+(a,*,a,$,+)  # "*" meaning: match all
+#+end_example
 
-  def parse_turing_program(source: str) -> tuple[TuringProgram, SourceMap]:
-      """TODO"""
-      program: TuringProgram = []
-      source_map: list[int] = []
-
-      lines = source.split("\n")
-      for line_no, line in enumerate(lines):
-          try:
-              parsed_line = parse_turing_program_line(line)
-          except Exception:
-              # Probably good enough for such a simple language:
-              raise Exception(f"Could not parse line {line_no}: '{line}'")
-
-          if parsed_line is not None:
-              program.append(parsed_line)
-              source_map.append((line_no, line))
-
-      return program, source_map
-#+end_src
-
-Implementation of the Turing machine:
+Another reason to use a custom parser would be to circumvent some restrictions of the default
+parser. For example the default parser treats the symbols =#=, =,=, =(=, =)= in a special way. In
+particular, those cannot be used as characters on the tape.
 
 #+name: chapter-3-turing-machine
-#+begin_src python
+#+begin_src python :tangle no :eval no
   class TuringMachine:
-      BLANK: Char = "■"
-      MAX_STEPS = 1000000  # abort after running this many steps
+      """Given a turing program produces the corresponding turing machine."""
+      BLANK: Char = "■"  # Special symbol for the blank cell. Is used when tape dynamically grows.
+      MAX_STEPS = 1000000  # Abort after running this many steps
       LOG_LEVEL = 0  # Set greater 0 for a chatty execution
-      SOURCE_LINE_OFFSET = 0
+      COLORED_LOG = True  # Turn of if environment does not support colors
+      SOURCE_LINE_OFFSET = 0  # SourceMap assumes that source file start with line 0. Adjust this here.
 
       def __init__(self, program: TuringProgram,
                    start_state: State = "START", halt_state: State = "HALT",
@@ -880,6 +949,7 @@ Implementation of the Turing machine:
       def fromSource(cls, source: str,
                      start_state: State = "START", halt_state: State = "HALT",
                      parser: TuringParser = parse_turing_program) -> "TuringMachine":
+          """Create a turing machine from a source string. You can provide a custom parser."""
           program, source_map = parser(source)
           return TuringMachine(program,
                                start_state=start_state, halt_state=halt_state,
@@ -917,7 +987,8 @@ Implementation of the Turing machine:
           current_line = self._current_program_line
 
           if current_line is None:
-              self._log(2, f"{TermColor.RED}No matching program line - halting{TermColor.ENDC}")
+              RED, ENDC = (TermColor.RED, TermColor.ENDC) if self.COLORED_LOG else ("", "")
+              self._log(2, f"{RED}No matching program line - halting{ENDC}")
               self._state = self._halt_state
               return
 
@@ -945,7 +1016,8 @@ Implementation of the Turing machine:
           self._enlarge_tape_if_necessary()
           text = self._tape_content
           pos = self._head_position
-          return text[:pos] + TermColor.GREEN + text[pos] + TermColor.ENDC + text[pos+1:]
+          GREEN, ENDC = (TermColor.GREEN, TermColor.ENDC) if self.COLORED_LOG else ("", "")
+          return text[:pos] + GREEN + text[pos] + ENDC + text[pos+1:]
 
       @property
       def _current_program_line(self) -> tuple[int, TuringProgLine]:
@@ -976,7 +1048,53 @@ Implementation of the Turing machine:
               self._tape += some_blanks  # double tape size
 #+end_src
 
-Some very basic tests that the above implementation of ~TuringMachine~ is not complete garbage:
+Finally, the default parser:
+
+#+name: chapter-3-turing-parser
+#+begin_src python :tangle no :eval no
+  def parse_turing_program_line(line: str) -> TuringProgLine | None:
+      """Parse a single line of the form `(s,c,s',c',m)` (up to comments).
+
+      Empty or comment lines are ignored by returning `None`."""
+      # Remove comments and leading/trailing whitespace
+      line = line[:line.find('#')].strip()
+      if len(line) == 0:
+          return None  # line comment or empty line
+
+      line = line.strip().lstrip("(").rstrip(")")
+      s0, c0, s1, c1, m = line.split(",")
+      m = +1 if m == "+" else m  # for convinience ...
+      m = -1 if m == "-" else m  # ... allow shortcuts for +1, -1
+      m = int(m)
+      assert len(c0) == 1, f"Expected character got '{c0}'."
+      assert len(c1) == 1, f"Expected character got '{c1}'."
+      assert m in [-1, 0, +1], f"Forbidden head movement: {m}."
+
+      return s0, c0, s1, c1, m
+
+
+  def parse_turing_program(source: str) -> tuple[TuringProgram, SourceMap]:
+      """Parses the source of a turing program line by line."""
+      program: TuringProgram = []
+      source_map: list[int] = []
+
+      lines = source.split("\n")
+      for line_no, line in enumerate(lines):
+          try:
+              parsed_line = parse_turing_program_line(line)
+          except Exception:
+              # Probably good enough for such a simple language:
+              raise Exception(f"Could not parse line {line_no}: '{line}'")
+
+          if parsed_line is not None:
+              program.append(parsed_line)
+              source_map.append((line_no, line))
+
+      return program, source_map
+#+end_src
+
+***** Very basic unit tests
+Tests for ~TuringMachine~:
 
 #+name: chapter-3-turing-machine-tests-1
 #+begin_src python
@@ -1012,7 +1130,8 @@ Some very basic tests that the above implementation of ~TuringMachine~ is not co
   assert tm2.run("▶0") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 2"
 #+end_src
 
-Some basic tests on parsing of Turing programs
+
+Tests for the default parser:
 
 #+name: chapter-3-turing-machine-tests-2
 #+begin_src python
@@ -1027,7 +1146,6 @@ Some basic tests on parsing of Turing programs
   # (H1,Y,H ,Y,0)
   """
 
-  # ["".join(list(map(str,l))) for l in src]
   parsed_prog, source_map = parse_turing_program(prog_print_XYZ_str)
   # Python seems to compare these structs recursively by value 👍:
   assert source_map == [
@@ -1044,20 +1162,8 @@ Some basic tests on parsing of Turing programs
   ], "test parse_turing_program - 2"
 #+end_src
 
-Basic tests on ~TuringMachine.fromSource~:
-
-#+name: tprog-constant-one
-#+begin_example
-# This evaluates the function f(n)=1
-# Example: input="▶1001", output="▶1".
-(S,▶,1,▶,+)
-(1,0,1,■,+)
-(1,1,1,■,+)
-(1,■,2,■,-)
-(2,■,2,■,-)
-(2,▶,3,▶,+)
-(3,■,H,1,0)
-#+end_example
+Tests for ~TuringMachine.fromSource~. The ~source~ is taken from the [[tprog-constant-one][listing]] on the Turing machine
+computing $f(n)=1$.
 
 #+name: chapter-3-turing-machine-tests-3
 #+begin_src python :var source=tprog-constant-one
@@ -3024,6 +3130,7 @@ The following circuit equals the Fredkin Gate too:
 
 In fact:
 
+#+name: exercise-4.25-2
 #+begin_src python
   C12 = make_CU(3, 1, 2, X)
 
