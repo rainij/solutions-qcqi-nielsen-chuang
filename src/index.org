@@ -22,6 +22,7 @@
 # forget to execute the source block of org-dblock-write:insert-latex-macros before!
 #+BEGIN: insert-latex-macros :file "latex-macros.tex"
 #+latex_header: \newcommand{\CC}{\mathbb{C}}
+#+latex_header: \newcommand{\NN}{\mathbb{N}}
 #+latex_header: \newcommand{\RR}{\mathbb{R}}
 #+latex_header: \newcommand{\ii}{\mathrm{i}}
 #+latex_header: \newcommand{\FT}{\mathcal{F}} % Fourier Transform
@@ -31,6 +32,7 @@
 #+begin_export html
 \[
 \newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\ii}{\mathrm{i}}
 \newcommand{\FT}{\mathcal{F}} % Fourier Transform
@@ -778,6 +780,7 @@ other hand one can just "add some dimensions" to R if necessary and extend $U_R$
   # Terminal colors. TODO: Move somwhere else.
   # Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")
   class TermColor:
+      GREEN = '\033[32m'
       RED = '\033[31m'
       ENDC = '\033[0m'
 #+end_src
@@ -786,17 +789,17 @@ other hand one can just "add some dimensions" to R if necessary and extend $U_R$
 TODOs:
 - [X] parse program from string
 - [ ] write some text around the code, a little more inline doc (maybe)
-- [ ] function to print the program with line numbers
 - [ ] note on special symbols =#=, =,=, =(=, =)=.
-- [ ] In TuringMachine: make start_state and halt_state optional
+- [X] In TuringMachine: make start_state and halt_state optional
 
 First some type definitions
 
 #+name: chapter-3-turing-machine-typing
 #+begin_src python
   Char = NewType("Char", str)  # better than nothing
+  State = NewType("State", str)
   Move = Literal[-1, 0, +1]
-  TuringProgLine = tuple[str, Char, str, Char, Move]  # (s,c,s',c',m)
+  TuringProgLine = tuple[State, Char, State, Char, Move]  # (s,c,s',c',m)
   TuringProgram = list[TuringProgLine]
 
   SourceMap = list[tuple[int, str]]
@@ -832,7 +835,11 @@ Next, a parser for a Turing program:
 
       lines = source.split("\n")
       for line_no, line in enumerate(lines):
-          parsed_line = parse_turing_program_line(line)
+          try:
+              parsed_line = parse_turing_program_line(line)
+          except Exception:
+              # Probably good enough for such a simple language:
+              raise Exception(f"Could not parse line {line_no}: '{line}'")
 
           if parsed_line is not None:
               program.append(parsed_line)
@@ -851,7 +858,8 @@ Implementation of the Turing machine:
       LOG_LEVEL = 0  # Set greater 0 for a chatty execution
       SOURCE_LINE_OFFSET = 0
 
-      def __init__(self, start_state: str, halt_state: str, program: TuringProgram,
+      def __init__(self, program: TuringProgram,
+                   start_state: State = "START", halt_state: State = "HALT",
                    source_map: Optional[SourceMap] = None):
           self._start_state = start_state
           self._halt_state = halt_state
@@ -868,16 +876,14 @@ Implementation of the Turing machine:
           # Only relevant for logging:
           self._index_width = len(str(len(self._program)-1))
 
-      @property
-      def _line_no_width(self):  # only relevant for logging
-          return None if self._source_map is None \
-              else len(str(self._source_map[-1][0] + self.SOURCE_LINE_OFFSET - 1))
-
       @classmethod
-      def fromSource(cls, start_state: str, halt_state: str, source: str,
+      def fromSource(cls, source: str,
+                     start_state: State = "START", halt_state: State = "HALT",
                      parser: TuringParser = parse_turing_program) -> "TuringMachine":
-          program, source_map = parse_turing_program(source)
-          return TuringMachine(start_state, halt_state, program, source_map)
+          program, source_map = parser(source)
+          return TuringMachine(program,
+                               start_state=start_state, halt_state=halt_state,
+                               source_map=source_map)
 
       def run(self, tape_input: str) -> str:
           """Run the TM and return what is on the tape after it halts."""
@@ -897,6 +903,11 @@ Implementation of the Turing machine:
 
           return self._tape_content.strip(self.BLANK)
 
+      @property
+      def _line_no_width(self):  # only relevant for logging
+          return None if self._source_map is None \
+              else len(str(self._source_map[-1][0] + self.SOURCE_LINE_OFFSET - 1))
+
       def _log(self, level, *args, **kwargs):
           if self.LOG_LEVEL >= level:
               print(*args, **kwargs)
@@ -915,6 +926,7 @@ Implementation of the Turing machine:
 
           if self._source_map is not None:
               line_no, source_line = self._source_map[index]
+              line_no += self.SOURCE_LINE_OFFSET
               self._log(3, f"source line = {line_no:{self._line_no_width}}: {source_line}")
 
           s1, c1, m = current_line[2:]
@@ -933,7 +945,7 @@ Implementation of the Turing machine:
           self._enlarge_tape_if_necessary()
           text = self._tape_content
           pos = self._head_position
-          return text[:pos] + TermColor.RED + text[pos] + TermColor.ENDC + text[pos+1:]
+          return text[:pos] + TermColor.GREEN + text[pos] + TermColor.ENDC + text[pos+1:]
 
       @property
       def _current_program_line(self) -> tuple[int, TuringProgLine]:
@@ -975,7 +987,7 @@ Some very basic tests that the above implementation of ~TuringMachine~ is not co
       ("3", "■", "H", "Z",  0),
   ]
 
-  tm1 = TuringMachine("S", "H", prog_print_XYZ)
+  tm1 = TuringMachine(prog_print_XYZ, start_state="S", halt_state="H")
 
   assert tm1.run("") == "XYZ", "test TuringMachine vs prog_print_XYZ - 1"
   assert tm1.run("a") == "a", "test TuringMachine vs prog_print_XYZ - 1"
@@ -994,7 +1006,7 @@ Some very basic tests that the above implementation of ~TuringMachine~ is not co
     ("3", "■", "H", "1",  0),
   ]
 
-  tm2 = TuringMachine("S", "H", prog_compute_constant_1)
+  tm2 = TuringMachine(prog_compute_constant_1, start_state="S", halt_state="H")
 
   assert tm2.run("▶1011") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 1"
   assert tm2.run("▶0") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 2"
@@ -1049,13 +1061,10 @@ Basic tests on ~TuringMachine.fromSource~:
 
 #+name: chapter-3-turing-machine-tests-3
 #+begin_src python :var source=tprog-constant-one
-  tm = TuringMachine.fromSource("S", "H", source)
+  tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
 
   assert tm.run("▶1001") == "▶1", "test TuringMachine.fromSource"
 #+end_src
-
-#+RESULTS: chapter-3-turing-machine-tests-3
-: ▶1
 
 *** Exercises
 * Part II
