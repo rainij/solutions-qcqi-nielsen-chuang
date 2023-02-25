@@ -1067,6 +1067,376 @@ Basic tests on ~TuringMachine.fromSource~:
 #+end_src
 
 *** Exercises
+**** TODO Exercise 3.1 (Non-computable processes in Nature)
+How might we recognize that a process in Nature computes a function not computable by a Turing
+machine?
+
+**** Exercise 3.2 (Turing numbers)
+Show that single-tape Turing machines can each be given a number from the list $1,2,3,\ldots$ in
+such a way that the number uniquely specifies the corresponding machine. We call this number the
+Turing number of the corresponding Turing machine. (/Hint/: Every positive integer has a unique
+prime factorization $p_1^{a_1}p_2^{a_2}\cdots p_k^{a_k}$, where $p_i$ are distinct prime numbers,
+and $a_1,a_2,\ldots,a_k$ are non-negative integers.)
+
+***** Proof
+For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
+consider (one could easily relax this constraint without complicating the encoding). Hence we need
+to encode the start state, the halt state and the program into a single number. This is sufficient
+to describe the Turing Machine. We follow the proposal to use prime numbers for that. Therefore let
+us enumerate the prime numbers starting by $2$: $p_1=2$, $p_2=3$, ..., $p_5=11$, ... .
+
+This procedure is certainly not the most efficient one but it serves the purpose to show that all
+Turing machines (satsifying a specific definition/architecture) can be /effectively/
+enumerated. That is, there is an /algorithm/ (which could potentially run on a Turing machine),
+which assigns numbers to each Turing machine. Moreover this assignment is invertible and the inverse
+mapping (numbers to Turing machines) can be computed by an /algorithm/ too.
+
+Let us identify the states $S$ and the elements of the alphabet $\Gamma$ with integers:
+
+$$
+  S = \{0, 1, 2, \ldots\} ; \quad \Gamma = \{0, 1, 2, \ldots\} .
+$$
+
+Moreover, we encode the possible movements by $\{0,1,2\}$, meaning /left/, /stay/, /right/ in that
+order. We encode the start state $s\in\NN$ and the halt state $h\in\NN$ by
+
+$$
+  p_1^s \text{ and } p_2^h .
+$$
+
+The $i$​-th program line
+
+$$
+  (q_i,c_i,q'_i,c'_i,m_i) \in \NN^4\times\{0,1,2\}
+$$
+
+can be encoded by
+
+$$
+  l_i = p_{5i+3}^{q_i} \, p_{5i+4}^{c_i} \, p_{5i+5}^{q'_i} \, p_{5i+6}^{c'_i} \, p_{5i+7}^{m_i} .
+$$
+
+The whole program is then encoded by the product $\Pi_il_i$ and the Turing machine itself by
+$p_1^s\,p_2^h\,\Pi_il_i$. Since prime factorization of integers is unique, this encoding is
+invertible and hence the Turing machine can be recovered from this (potentially large) number. QED.
+
+**** Exercise 3.3 (Turing machine to reverse a bit string)
+Describe a Turing machine which takes a binary number $x$ as input, and outputs the bits of $x$ in
+reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
+and/or symbols other than ▶, 0, 1, and the blank.)
+
+***** Solution
+We use a single tape together with and additional symbol "□", which we call /white blank/ in the
+following.
+
+Assume that the input tape starts with the left-end-marker "▶" followed by the number $x$ in
+binary. All other cells should be blank. As an example, for $x=13$ the input tape should look like
+that:
+
+#+name: exercise-3.3-input-tape
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+Note that the empty tape is not allowed - there should always be at least one digit. The Turing
+machine should halt with only the reversed bitstring at the beginning of the tape. In the example
+above:
+
+#+name: exercise-3.3-output-tape
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+The idea of the algorithm is as follows (the white blanks =□= simplify the implementation):
+
+- 1. Reverse the string, but shifted :: =▶1011■■■■■= → =▶□□□□1101■=
+- 2. Shift the reversed string to the correct position :: =▶□□□□1101■= → =▶1101□□□□■=
+- 3. Remove trailing white blanks :: =▶1101□□□□■= → =▶1101■■■■■=
+
+Step-by-step the first part does the following. What we call /step/ is actually several steps for
+the Turing machine (since the head can only move by one position at a time). We remark already here
+that the last displayed cell, containing a blank (always), is very important as an end-marker for
+the second step of the algorithm.
+
+#+name: exercise-3.3-how-algorithm-works-1
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ □ │ 1 │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ □ │ □ │ 1 │ 0 │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ 1 │ 0 │ 1 │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+The second part of the algorithm does this:
+
+#+name: exercise-3.3-how-algorithm-works-2
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ □ │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ □ │ □ │ □ │ □ │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ □ │ □ │ □ │ □ │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+Finally the third part acts like this:
+
+#+name: exercise-3.3-how-algorithm-works-3
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+In the following we present a [[exercise-3.3-solution-source][Turing program]] which does exactly this. Don't worry, most of the
+program is just comments - explaining how it works, and at the same time giving a kind of
+/inline-proof/ that the program is correct in the sense that it "does what we want".
+
+To best understand the inline-proof read the following explanations:
+- The program consists of set of source /blocks/ - kind of subroutines of the program.
+- Each block is a sequence of program lines without any intermediate /empty lines/ (line comments
+  are OK).
+- Each block has one or more /entry/ lines (marked by a comment =# entry=). If a block is entered we
+  require that we start at one of these lines - everything else is considered an error (does not
+  happen if the program as a whole is correct).
+- Each block has one ore more /exit/ lines (marked by a comment =# exit=). Each block must guarantee
+  that upon entering another block (or halting) we do this via one of these lines.
+- Each block has /pre-conditions/. These are sets of statements that we require to hold immediately
+  before the first line of the block is executed (each time a block is "called"). If we enter a
+  block but the pre-conditions do not hold we call this /undefined behavior/. We require that our
+  program never runs into undefined behavior.
+- Each block has /post-conditions/. These are sets of statements that we require to hold immediately
+  after we "return" from the block. The block must ensure that these statements hold.
+- Each block has zero or more /successor blocks/. Upon exiting the block it is guaranteed that we
+  must enter one if these successor blocks. This info helps navigating the code, since there are
+  usually only very few succesor blocks for each block.
+
+#+caption: Turing program to reverse a string bits (0s and 1s)
+#+name: exercise-3.3-solution-source
+#+begin_example
+# Turing program to reverse a string of bits (0s and 1s):
+#   - input  : "▶a...z■..." where a...z is a string of 0s and 1s
+#     followed by at least length-of(a..z)+1 blanks (this is important).
+#   - output : "▶z...a■..." where z...a is the reversed string.
+# The head starts and finishes at "▶".
+
+#
+##
+### Part 1: Map ▶a...z■...■ to ▶□...□z...a
+##
+#
+
+# In part 1 the tape always contains "▶" followed by a bitstring A, followed
+# by a series W of *white* blanks (special markers), followed by a bitstring B.
+# Initially B and W are empty and A is the input string. At the end A is empty,
+# W is at its place, and B contains the reversed string.
+
+# B1: At the beginning we just step into A
+# Pre-Conditions:
+#   - tape content is "▶" followed by A, followed by blanks
+#   - A is non-empty, W and B are empty
+#   - Head is at "▶"
+# Post-Conditions:
+#   - Head is at the beginning of A
+#   - tape content is unchanged (by the action of this block)
+# Successor Blocks: B1.
+(START,▶,a,▶,+) # entry and exit
+
+# B2: Move the head to the end of A
+# Pre-Conditions:
+#   - Head is inside A,
+#   - A is followed by at least one blank.
+# Post-Conditions:
+#   - Head is at last bit of A (points at 0 or 1)
+#   - tape content is unchanged
+# Successor Blocks: B3
+(a,0,a,0,+) # entry
+(a,1,a,1,+) # entry
+(a,■,b,■,-) # exit
+
+# B3: Special case if B still empty: Move the last bit of A one step to the right.
+# Pre-Conditions:
+#   - Head is at last bit of A
+#   - B is empty, A is followed by blanks
+# Post-Conditions:
+#   - Last bit of A replaced by *white* blank and moved one step to right;
+#   - B consists of one bit;
+#   - Head is inside W
+# Successor Blocks: B4
+(b,0,b0,□,+) # entry
+(b,1,b1,□,+) # entry
+(b0,■,c,0,-) # exit
+(b1,■,c,1,-) # exit
+
+# B4: Traverse to the left over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+#   - B is non-empty (but A might be empty)
+# Post-Conditions:
+#   - Head is at the last bit of A or at "▶" if A is empty
+# Successor Blocks: B5, B7
+(c,□,c,□,-) # entry and exit
+
+# B5: Move the right-most bit of A to the end of B.
+# Pre-Conditions:
+#   - A and B are non-empty
+#   - Head is at the last bit of A
+# Post-Conditions:
+#   - Head is inside B
+# Successor Blocks: B6
+(c,0,c0,□,+) # entry
+(c,1,c1,□,+) # entry
+# Move over the white blanks and then past the end of B:
+(c0,□,c0,□,+)
+(c0,0,c0,0,+)
+(c0,1,c0,1,+)
+(c1,□,c1,□,+)
+(c1,0,c1,0,+)
+(c1,1,c1,1,+)
+# Append the remembered bit to the end of B
+(c0,■,d,0,-) # exit
+(c1,■,d,1,-) # exit
+
+# B6: Go from B (back) to the white blanks
+# Pre-Conditions:
+#   - Head is inside B
+# Post-Condition:
+#   - Head is inside W
+# Successor Blocks: B4
+(d,0,d,0,-) # entry
+(d,1,d,1,-) # entry
+(d,□,c,□,-) # exit
+
+#
+##
+### Part 2: Map ▶□...□z...a to ▶z...a□...□
+##
+#
+
+# In part 2 the tape always contains "▶" followed by a bitstring C, followed
+# by a series W of *white* blanks, followed by a bitstring B.
+# Initially C is empty and B is the reversed input string. At the end B is empty,
+# W is at its place, and C contains the left-shifted version of B.
+
+# B7: Entrypoint for part 2 of the algorithm. Move into W.
+# Pre-Conditions:
+#   - Every bit of A was replaced by white blanks - now W
+#   - B is reversed version of the initial value of A (and non-empty)
+#   - Head is at ▶
+# Post-Conditions:
+#   - Head is at first white blank - in W
+#   - tape content is unchanged
+# Successor Blocks: B8
+(c,▶,e,▶,+) # entry and exit
+
+# B8: Traverse to the right over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+# Post-Conditions:
+#   - Head is at the end of B or at the first blank (after B)
+# Successor Blocks: B9, B10
+(e,□,e,□,+) # entry and exit
+
+# B9: Erase the first bit of B and append it to C
+# Pre-Conditions:
+#   - Head is at first bit of B (which is non-empty)
+# Post-Conditions:
+#   - Bit was replaced by white blank and appended to end of C
+#     or put directly after "▶" if C is empty
+#   - Head is past the end of C, points to a white blank (inside W)
+# Successor Blocks: B8
+(e,0,f0,□,-) # entry
+(e,1,f1,□,-) # entry
+(f0,□,f0,□,-)
+(f1,□,f1,□,-)
+# Reaching end of C or ▶ if C is empty
+(f0,▶,g0,▶,+)
+(f0,0,g0,0,+)
+(f0,1,g0,1,+)
+(f1,▶,g1,▶,+)
+(f1,0,g1,0,+)
+(f1,1,g1,1,+)
+# Append the remembered bit
+(g0,□,e,0,+) # exit
+(g1,□,e,1,+) # exit
+
+#
+##
+### Part 3: Map ▶z...a□...□ to ▶z...a
+##
+#
+
+# This just removes the trailing *white* blanks.
+
+# B10: Remove the trailing white blanks
+# Pre-Conditions:
+#   - The tape contains the desired result (C) but followed by some white blanks
+#   - Head is at the last of the white blanks
+# Post-Conditions:
+#   - The white blanks are all removed (replaced by blanks)
+#   - Head is at "▶"
+#   - Turing Machine is in halting state
+# Successor Blocks: None (halts upon exit)
+(e,■,h,■,-) # entry
+(h,□,h,■,-)
+(h,0,h,0,-)
+(h,1,h,1,-)
+(h,▶,HALT,▶,0) # exit
+#+end_example
+
+Let the theory behind and plug this program into our python implementation of a (universal)
+~TuringMachine~. The variable ~source~ contains the contents of the [[exercise-3.3-solution-source][above listing]].
+
+#+name: exercise-3.3-turing-machine
+#+begin_src python :var source=exercise-3.3-solution-source
+  tm_ex3_3 = TuringMachine.fromSource(source)
+
+  assert tm_ex3_3.run("▶011") == "▶110", "test exercise-3.3-1"
+  assert tm_ex3_3.run("▶101011") == "▶110101", "test exercise-3.3-2"
+  # If something else is on the tape, then we need at least n+1 blanks (n=length-of-string) after the
+  # string. Trying the following with less blanks would fail:
+  assert tm_ex3_3.run("▶001■■■■xyz") == "▶100■■■■xyz", "test exercise-3.3-3"
+  assert tm_ex3_3.run("▶1") == "▶1", "test exercise-3.3-4"
+#+end_src
+
+These basic tests yield an alternative root of trust into the program. You are invited to try out
+~tm_ex3_3~ yourself. If configured appropirately it can also print each step it does.
+
 * Part II
 ** Chapter 4
 :PROPERTIES:
