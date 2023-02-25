@@ -4802,6 +4802,76 @@ $$
 
 Hence $r\leq b-a\leq N$. QED.
 
+**** Exercise 5.12
+Show that $U$ (see (5.36)) is unitary (Hint: $x$ is co-prime to $N$, and therefore has an inverse
+modulo $N$).
+
+***** Proof
+Recall that $U$ only acts non-trivially on basis states $|i\rangle$ with $i < N$. In that case
+
+$$
+  U|i\rangle = |xi\mod N\rangle .
+$$
+
+It is sufficient to prove that the restriction of $U$ to the non-trivial sub-space is unitary. Note
+that the mapping
+
+$$
+  \pi: i \mapsto xi \mod N
+$$
+
+is a permutation on $\{0,1,\ldots,N-1\}$ since $x$ has a multiplicative inverse modulo $N$. Observe that
+
+$$
+  \langle i| U^\dagger U|j\rangle = \langle\pi(i)|\pi(j)\rangle = \delta_{ij}
+$$
+
+since $\pi$ is a permutation. This implies that $U$ is unitary. QED.
+
+- Remark :: We have actually shown that $U$ is a permutation on the computational basis.
+
+**** Exercise 5.13
+Prove (5.44). (Hint: $\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}$.) In fact, prove that
+
+$$
+  \frac{1}{\sqrt{r}} \sum_{s=0}^{r-1} e^{2\pi\ii sk/r} |u_s\rangle = |x^k \mod N\rangle .
+$$
+
+***** Proof
+Let us write $x^k$ instead of $x^k\mod N$ for short.
+
+$$
+  \frac{1}{\sqrt{r}} \sum_{s=0}^{r-1} e^{2\pi\ii sk/r} |u_s\rangle
+  = \frac{1}{r} \sum_{s,l=0}^{r-1} e^{2\pi\ii s(k-l)/r} |x^l\rangle
+  = \sum_{l=0}^{r-1} \delta_{kl} |x^l\rangle
+  = |x^k\rangle .
+$$
+
+The second equality uses the hint given in the formulation of the exercise. QED.
+
+**** TODO Exercise 5.14
+The quantum state produced in the order-finding algorithm, before the inverse Fourier transform, is
+
+$$
+\, |\psi\rangle = \frac{1}{2^{t/2}} \sum_{j=0}^{2^t-1} |j\rangle U^j |1\rangle
+  = \frac{1}{2^{t/2}} \sum_{j=0}^{2^t-1} |j\rangle |x^j \mod N \rangle ,
+$$
+
+if we initialize the second register as $|1\rangle$. Show that the same state is obtained if we
+replace $U^j$ with a /different/ unitary transform $V$, which computes
+
+$$
+  V |j\rangle |k\rangle = |j\rangle |k + x^j \mod N\rangle ,
+$$
+
+and start the second register in the state $|0\rangle$. Also show how to construct $V$ using
+$O(L^3)$ gates.
+
+***** Proof
+The first part of the claim, that we can replace the controlled $U^j$ by $V$ and $|1\rangle$ by
+$|0\rangle$ without changing the output of the algorithm is obvious. It remains to show the $V$ can
+be implemented by $O(L^3)$ gates.
+
 * COMMENT References
 # TODO: once the deployment uses org v9.5 or higher org-cite is properly supported and we can
 # uncomment this section.
