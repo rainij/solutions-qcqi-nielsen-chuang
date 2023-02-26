@@ -1,0 +1,473 @@
+#+title:  Chapter 5
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session *chapter-5*
+
+#+toc: headlines 2
+
+* Setup
+These are the operators $R_k$ appearing in the implementation of the Fourier Transform:
+
+#+name: chapter-5-Rk
+#+begin_src python
+  k = sp.symbols('k', integer=True)
+  Rk = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
+#+end_src
+
+* WIP Exercises
+** Exercise 5.1
+Give a direct proof that the linear transformation defined by Equation (5.2):
+
+$$
+  y_k = \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} x_j e^{\frac{2\pi\ii}{N}jk}
+$$
+
+is unitary.
+
+*** Proof
+An operator is unitary iff it maps one (arbitrarily chosen) orthonormal basis to an orthonormal
+basis. In other words, it suffices to show that
+
+$$
+  \langle m| \FT^\dagger \FT |n\rangle = \delta_{mn} .
+$$
+
+Let us abbreviate $a=e^{2\pi\ii/N}$. For $n\neq m$, using the formula for /geometric series/, we have:
+
+$$
+  \langle m| \FT^\dagger \FT |n\rangle = \frac{1}{N} \sum_{kj} a^{nj-mk} \langle k|j\rangle
+  = \frac{1}{N} \sum_{k} a^{(n-m)k}
+  = \frac{a^{(n-m)N}-1}{a^{n-m}-1}
+  = 0 .
+$$
+
+On the other hand, for $n=m$ the summation over $k$ in the above equality chain clearly equals
+$1$. QED.
+
+** Exercise 5.2
+Explicitly compute the Fourier transform of the $n$ qubit state $|00\ldots0\rangle$.
+
+*** Solution
+We have
+
+$$
+  \FT |00\ldots0\rangle = \frac{1}{2 ^{n/2}} \sum_{k=0}^{2^n-1} e^{\frac{2\pi\ii}{2^n}k} |k\rangle ,
+$$
+
+where we identify the (non-negative) integers $k$ with their (standard) binary representation (as
+usual).
+
+** Exercise 5.3 (Classical fast Fourier transform)
+Suppose we wish to perform a Fourier transform of a vector containing $2^n$ complex numbers on a
+classical computer. Verify that the straightforward method for performing the Fourier transform,
+based upon direct evaluation of Equation (5.1) requires $\Theta(2^{2n})$ elementary arithmetic
+operations. Find a method for reducing this to $\Theta(n2^n)$ operations, based upon Equation
+(5.4) (the product formula for the Quantum Fourier Transform).
+
+*** Proof
+First we consider the standard formula:
+
+$$
+  y_k = \frac{1}{2^{n/2}} \sum_{j=0}^{2^n-1} x_j e^{\frac{2\pi\ii}{2^n}jk}
+$$
+
+The following five "rather" elementary operations on real ($x$), complex ($z_{i}$), and integers
+($n$) arguments are sufficient to compute the above expression:
+
+$$
+  (z_1,z_2)\mapsto z_1 + z_2 ;\quad (z_1,z_2)\mapsto z_1\cdot z_2;
+  \quad x\mapsto \sqrt{x} ;\quad x\mapsto e^{2\pi\ii x} ;\quad
+  n\mapsto 2^{-n} .
+$$
+
+The exercise does not specify what an "elementary" operation is. But I think it is necessary to have
+at least an informal characterization of what we mean by "elementary". We call an operation
+/elementary/ if it can be implemented with the help of constantly many instructions from the
+instruction set of a modern computer processor (take a normal laptop as example).
+
+To be a little bit more specific, we model a "modern computer" by the instruction set of [[https://webassembly.github.io/spec/core/syntax/instructions.html][webassembly]]
+(WASM). This makes sense since webassembly aims to be compatible with a wide range of concrete
+architectures.
+
+Note that an operation consisting of constantly many elementary operations is itself
+elementary. In the following we give a /justification/ why the above functions are elementary.
+
+The first three operations are usually "elementary enough" to be directly available on (classical)
+hardware - at least for (real) single or double precision floating point numbers. The corresponding
+/instructions/ are called =add=, =mul= and =sqrt= in WASM. What exactly these instructions do
+(adding two numbers and returning the result, or replacing one number by its sum with another one)
+is not relevant for us. What matters, is that this shows that the first three operations are indeed
+easy to compute on modern hardware.
+
+The fourth operation can be implemented by the cosine and sine function, exploiting the well known
+formula $e^{i\theta}=\cos\theta+\ii\sin\theta$. Some architectures have =sin= and =cos= as
+instructions. This is not the case for WASM. Instead a WASM programmer has to use a library. But
+since cosine and sine are just unavoidable here and ubiquitous anyway, let us cheat here a bit and
+declare those functions to be elementary.
+
+The fifth operation is a /little bit/ tricky too. A simple implementation would require $n-1$
+multiplications. A well-known trick, utilizing $a^{2k}=(a^k)^2$ and $a^{2k+1}=a\cdot(a^k)^2$,
+reduces this to $\Theta(\log(n))$ multiplications. Quite fast but an elementary operation should
+need a constant number of instructions. Fortunately there is an even simpler way. First calculate
+$2^n$ by taking $1$ and applying a left shift with $n$ (=shl= in WASM). In many programming
+languages this is written ~1<<n~ and it is typically crucial to work with /integer/ types instead of
+floats (since bit-shifts have no meaningful semantics on floats). Then convert to a float
+(=f64.reinterpret.i64=) and obtain $2^{-n}=1/2^n$ (=div=).
+
+Actually counting the number of operations is rather trivial. Clearly
+
+$$
+  y_k = \frac{1}{2^{n/2}} \sum_{j=0}^{2^n-1} x_j e^{\frac{2\pi\ii}{2^n}jk}
+$$
+
+needs $\Theta(2^n)$ of the above basic operations. We have to do this for $k\in\{0,1,\ldots,2^n-1\}$
+resulting in a total of $\Theta(2^{2n})$ operations.
+
+Now let us turn to the fast Fourier transform. The product formula involves the following function
+
+$$
+  (k,j)\mapsto e_k(j) := e^{2\pi\ii \cdot 0.j_{n-k+1}\ldots j_n} .
+$$
+
+Note
+
+$$
+  0.j_{n-k+1}\ldots j_n = j 2^{-k} \mod 1 = \mathrm{trunc}(j 2^{-k}).
+$$
+
+Since the truncation operation (=trunc=) is a valid WASM instruction, we see that $e_k(j)$ is
+comprised of constantly many elementary operations and thus is elementary itself.
+
+Given a vector of complex numbers $x$, let us write $|x\rangle=\sum_jx_j|j\rangle$. In the
+following, the basic idea is to reduce a /call/ to the Fourier transform $\FT_n$ on $n$ bits to two
+calls of the Fourier transform $\FT_{n-1}$ on $n-1$ bits - recursively. By the product formula,
+writing $j=2j'+j_n$, we have
+
+\begin{align*}
+  \, |y\rangle &:= \FT_n |x\rangle
+  = 2^{-n/2} \sum_{j=0}^{2^n-1} x_j \bigotimes_{k=1}^n (|0\rangle + e_k(j)|1\rangle) \\
+  &= 2^{-n/2} \sum_{j=0}^{2^n-1} x_j (|0\rangle + (-1)^{j_n}|1\rangle)
+     \bigotimes_{k=1}^{n-1} (|0\rangle + e^{2\pi\ii j_n 2^{-k-1}} e_k(j')|1\rangle) \\
+  &= \frac{1}{\sqrt{2}} \sum_{j_n=0}^1 (|0\rangle + (-1)^{j_n}|1\rangle)
+     \underbrace{
+       2^{-(n-1)/2} \sum_{j'=0}^{2^{n-1}-1} x_{2j'+j_n} (|0\rangle + e^{2\pi\ii j_n 2^{-k-1}} e_k(j')|1\rangle)
+     }_{=:|z^{(j_n)}\rangle} .
+\end{align*}
+
+Let us denote the $2^{n-1}$ dimensional vectors $(x_{2j'+j_n})_{j'}$ by $x^{(j_n)}$. Let
+$|y^{(j_n)}\rangle=\FT_{n-1}|x^{(j_n)}\rangle$. Then we have
+
+$$
+  \,|z^{(0)}\rangle = |y^{(0)}\rangle = \sum_{j'=0}^{2^{n-1}-1} y^{(0)}_{j'}|j'\rangle
+  \text{ and } |z^{(1)}\rangle = \sum_{j'=0}^{2^{n-1}-1} e^{2\pi\ii j'2^{-n}} y^{(0)}_{j'} |j'\rangle .
+$$
+
+The first equality follows directly from the product formula. The second one also follows from the
+product formula - note that the bit pattern of $|j'\rangle$ dictates which of the factors
+$e^{2\pi\ii\,j_n2^{-k-1}}$ appear in the coefficients. Lets go on with the calculation:
+
+\begin{align*}
+  \,|y\rangle &= \frac{1}{\sqrt{2}} \sum_{j_n=0}^1 (|0\rangle + (-1)^{j_n}|1\rangle) |z^{(j_n)}\rangle \\
+  &= \frac{1}{\sqrt{2}} \sum_{j=0}^{2^n-1} (|0\rangle + (-1)^{j_n}|1\rangle) z^{(j_n)}_{j'} |j'\rangle \\
+  &= \sum_{j'=0}^{2^{n-1}-1} \underbrace{\frac{1}{\sqrt{2}}(z^{(0)}_{j'} + z^{(1)}_{j'})}_{y_{j'}} |0j'\rangle +
+     \sum_{j'=0}^{2^{n-1}-1} \underbrace{\frac{1}{\sqrt{2}}(z^{(0)}_{j'} - z^{(1)}_{j'})}_{y_{2^{n-1}+j'}} |1j'\rangle .
+\end{align*}
+
+
+Let us briefly summarize the algorithm for calculating the coefficients of $|y\rangle$ which can be
+extracted from the above calculations:
+
+1. Calculate $|y^{(j_n)}\rangle=\FT_{n-1}|x^{(j_n)}\rangle$ - recursively as long as $n>1$,
+2. Calculate $|z^{(j_n)}\rangle$ from $|y^{(j_n)}\rangle$ as above,
+3. Calculate $|y\rangle$ from $|z^{(j_n)}\rangle$ as above,
+
+where $j_n\in\{0,1\}$. Let $c_n$ be the number of elementary operations required by this
+algorithm. Clearly step one needs $2c_{n-1}$ operations. Step two needs at most $c2^n$ operations
+for some constant $c$. The same is true for step three - possibly enlarging $c$. Hence
+
+$$
+  c_{n} \leq 2c_{n-1} + 2c2^n .
+$$
+
+It is not hard to see that this implies
+
+$$
+  c_{n} \leq 2(n-1)c2^n + 2^{n-1} c_1 = O(n2^n) .
+$$
+
+It is also not hard to see that $n2^n$ is also a lower bound (up to a constant factor) for the
+number of operations. QED.
+
+** Exercise 5.4
+Give a decomposition of the controlled-$R_k$ gate into single qubit and =CNOT= gates.
+
+*** Solution
+Let us abbreviat $\theta_k=2\pi2^{-k}$. Note that $R_k=e^{\ii\theta_{k+1}}R_z(\theta_k)$. It is easy
+to find a solution based on the ABC-construction from Figure 4.6 and the proof of Corollary 4.2.
+
+In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{k+1}$) implements $C(R_k)$:
+
+#+RESULTS: exercise-5.4-circuit
+:                                          ┌─────────┐
+: q_0: ───────────────■─────────────────■──┤ R_{k+1} ├
+:      ┌───────────┐┌─┴─┐┌───────────┐┌─┴─┐└─┬─────┬─┘
+: q_1: ┤ R_{k+1}^† ├┤ X ├┤ R_{k+1}^† ├┤ X ├──┤ R_k ├──
+:      └───────────┘└───┘└───────────┘└───┘  └─────┘
+
+#+name: exercise-5.4-circuit
+#+begin_src python :results replace :exports results
+  from qiskit.circuit import Gate
+
+  qc = QuantumCircuit(2)
+  C=Gate("R_{k+1}^†", 1, [])
+  qc.append(C, [1])
+  qc.cx(0, 1)
+  B=Gate("R_{k+1}^†", 1, [])
+  qc.append(B, [1])
+  qc.cx(0, 1)
+  A=Gate("R_k", 1, [])
+  qc.append(A, [1])
+  R=Gate("R_{k+1}", 1, [])
+  qc.append(R, [0])
+
+  str(qc.draw('text'))
+#+end_src
+
+To see this recall that $XZX=-Z$. Hence by the functional calculus
+
+$$
+  XR_{k+1}^\dagger X = e^{-\ii\theta_{k+2}} XR_z(-2\pi2^{-k-1})X
+  = e^{-\ii\theta_{k+2}} R_z(2\pi2^{-k-1}) = e^{-\ii\theta_{k+1}} R_{k+1} .
+$$
+
+The factor $e^{\ii\theta_{k+1}}$ gets compensated by the $R_{k+1}$ on the upper qubit. The claim
+follows from this together with $R_k=R_{k+1}^2$. QED.
+
+** Exercise 5.5
+Give a quantum circuit to perform the inverse quantum Fourier transform.
+
+*** Solution
+The standard way to get the invere of some circuit is to just write down all the gates in revers
+order and conjugate them (replace $R_k$ by $R_k^\dagger$ in our case since =SWAP= and $H$ are
+self-inverse).
+
+Actually it is sufficient to /just/ replace all $R_k$ by $R_k^\dagger$ (and not reverse the gate
+order). To see this, recall that the inverse Fourier transform is given by
+
+$$
+  x_k = \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} y_j e^{-\frac{2\pi\ii}{N}jk} .
+$$
+
+The difference to the Fourier transform itself is just the minus sign - which could be put into $j$
+when deriving the product formula for the /inverse/ Fourier transform:
+
+$$
+  \FT^\dagger :
+\, |j\rangle \mapsto
+   \frac{\left(|0\rangle + e^{-2\pi\ii0.j_n}\right) \left(|0\rangle + e^{-2\pi\ii0.j_{n-1}j_n}\right)
+   \cdots \left(|0\rangle + e^{-2\pi\ii0.j_1j_2\ldots j_n}\right)}{2^{n/2}} .
+$$
+
+** Exercise 5.6 (Approximate quantum Fourier transform)
+The quantum circuit construction of the quantum Fourier transform apparently requires gates of
+exponential precision in the number of qubits used. However, such precision is never required in any
+quantum circuit of polynomial size. For example, let $U$ be the ideal quantum Fourier transform on
+$n$ qubits, and $V$ be the transform which results if the controlled-$R_k$ gates are performed to a
+precision $\Delta=1/p(n)$ for some polynomial $p(n)$. Show that the error
+$\norm{U-V}=\max_{|\psi\rangle}\norm{(U-V)|\psi\rangle$ scales as $\Theta(n^2/p(n))$, and thus
+polynomial precision in each gate is sufficient to guarantee polynomial accuracy in the output
+state.
+
+*** Proof
+This is actually a direct consequence of Box 4.1 and the fact that the implementation of the Fourier
+transform has $m=\Theta(n^2)$ gates. In fact, writing $U=\prod_{i=1}^mU_i$ as the product of its
+implementing gates, and similarly $V$ we see that
+
+$$
+  \norm{U-V} = \norm{\prod_{i=1}^mU_i - \prod_{i=1}^mV_i}
+  \leq \sum_{i=1}^m \norm{U_i - V_i}
+  \leq m \Delta = \Theta(n^2 / p(n)) .
+$$
+
+The first inequality is the second statement in Box 4.1 (errors of products of unitary operators
+/at worst/ add up). QED.
+
+** Exercise 5.7
+Additional insight into the circuit in Figure 5.2 may be obtained by showing, as you should now do,
+that the effect of the sequence of controlled-$U$ operations like that in Figure 5.2 is to take the
+state $|j\rangle|u\rangle$ to $|j\rangle\,U^j|u\rangle$ (Note that this does not depend on
+$|u\rangle$ being an eigenstate of $U$.)
+
+*** Proof
+This is more or less obvious but let us go at least a little bit into detail.
+
+Let $G_k$ for $k=0,\ldots,t-1$ be the $k$​-th of the controlled powers of $U$ (from the left as
+viewed in the circuit, that is, in application order).
+
+By definition we have
+
+$$
+  G_k |j\rangle |u\rangle = \begin{cases} |j\rangle |u\rangle & \text{if } j_k=0 \\ |j\rangle U^{2^k} |u\rangle & \text{if } j_k=1 \end{cases}
+  = |j\rangle U^{j_k2^k} |u\rangle .
+$$
+
+Thus
+
+$$
+  \prod_{k=0}^{t-1} G_k |j\rangle |u\rangle = |j\rangle \prod_{k=0}^{t-1} U^{j_k2^k} |u\rangle
+  = |j\rangle U^{\sum_{k=0}^{t-1} j_k 2^k} |u\rangle
+  = |j\rangle U^j |u\rangle .
+$$
+
+QED.
+
+** Exercise 5.8
+Suppose the phase estimation algorithm takes the state $|0\rangle|u\rangle$ to the state
+$|\tilde{\varphi}_u\rangle|u\rangle$, so that given the input $|0\rangle(\sum_uc_u|u\rangle)$, the
+algorithm outputs $\sum_uc_u|\tilde{\varphi}_u\rangle|u\rangle$. Show that if $t$ is chosen
+according to (5.35), then the probability for measuring $\varphi_u$ accurate to $n$ bits at the
+conclusion of the phase estimation algorithm is at least $|c_u|^2(1-\varepsilon)$.
+
+*** Proof
+The action of the phase estimation circuit is
+
+$$
+\,|0\rangle(\sum_uc_u|u\rangle) \mapsto \sum_uc_u|\tilde{\varphi}_u\rangle|u\rangle
+$$
+
+by linearity of the circuit - as claimed by the exercise statement. Tracing out the $u$​-register (in
+the RHS) yields the following mixed state in the first register:
+
+$$
+  \rho = \sum_u |c_u|^2 |\tilde{\varphi}_u\rangle \langle\tilde{\varphi}_u| .
+$$
+
+Let us now consider /any/ of the eigenstates $|u\rangle$ - call it $|v\rangle$ to give it distinct
+name. Let $b<2^t$ be any non-negative integer with $|\varphi_v-b|\,\leq\,e$, where $e$ is as in the
+book, guaranteeing that $b$ approximates $\varphi_v$ by at least $n$ bits. The probability to
+measure $b$ is given by:
+
+$$
+  p(b) = \trace{|b\rangle\langle b|\rho} = \trace{|b\rangle\langle b| \rho |b\rangle\langle b|}
+  \geq \trace{|b\rangle\langle b| |c_v|^2|\tilde{\varphi}_v\rangle\langle\tilde{\varphi}_v| |b\rangle\langle b|}
+  = |c_v|^2 |\langle b|\varphi_v\rangle|^2 .
+$$
+
+The inequality above follows from the fact that each summand in $\rho$, even when conjugated with
+some projection, yields a non-negative contribution to the trace. Hence the probability to measure
+one of the $b$ which approximate $\varphi_v$ by at least $n$ bits is at least
+$|c_v|^2(1-\varepsilon)$ (by the choice of $t$ and what was shown in the book for the special case
+$c_v=1$). QED.
+
+** Exercise 5.9
+Let $U$ be a unitary transform with eigenvalues $\pm1$, which acts on a state $|\psi\rangle$. Using
+the phase estimation procedure, construct a quantum circuit to collapse $|\psi\rangle$ into one or
+the other of the two eigenspaces of $U$, giving also a classical indicator as to which space the
+final state is in. Compare your result with Exercise 4.34.
+
+*** Solution
+In this case the two phases are $\varphi_+=0$ and $\varphi_-=1/2$. Since these two numbers can be
+expressed /exactly/, utilizing just a single bit, it is sufficient to take the phase estimation
+circuit with $t=1$ (any larger value would work too of course). Measuring $1$ (or more generally
+$2^{t-1}$) means a collapse onto the $-1$ eigenstate. Measuring $0$ means a collapse onto the $+1$
+eigenstate.
+
+In hindsight we see that in exercise 4.34 we already used this special case of the phase estimation
+circuit. We also note that the Hadamard gate is the Fourier transform on a single qubit.
+
+** Exercise 5.10
+Show that the order of $x=5$ modulo $N=21$ is $6$.
+
+*** Proof
+It is probably easiest to just make a table:
+
+| $i$           | 1 | 2 |  3 |  4 |  5 | 6 |
+| $5^i \mod 21$ | 5 | 4 | 20 | 16 | 17 | 1 |
+
+The powers of $x=5$ can be calculated sequentially by repeatedly multiplying by $5$ and taking the
+rest after deviding by $21$. QED.
+
+** Exercise 5.11
+Show that the order of $x$ satisfies $r\leq N$.
+
+*** Proof
+By the pigeonhole principle there are $a,b\in\{1,2,\ldots,N+1\}$ with $a < b$ such that
+$x^a=x^b$. Since $x$ and $N$ are coprime we can divide this by $x^a$ (see also Exercise A4.12) and
+obtain
+
+$$
+  x^{b-a} = 1 \mod N .
+$$
+
+Hence $r\leq b-a\leq N$. QED.
+
+** Exercise 5.12
+Show that $U$ (see (5.36)) is unitary (Hint: $x$ is co-prime to $N$, and therefore has an inverse
+modulo $N$).
+
+*** Proof
+Recall that $U$ only acts non-trivially on basis states $|i\rangle$ with $i < N$. In that case
+
+$$
+  U|i\rangle = |xi\mod N\rangle .
+$$
+
+It is sufficient to prove that the restriction of $U$ to the non-trivial sub-space is unitary. Note
+that the mapping
+
+$$
+  \pi: i \mapsto xi \mod N
+$$
+
+is a permutation on $\{0,1,\ldots,N-1\}$ since $x$ has a multiplicative inverse modulo $N$. Observe that
+
+$$
+  \langle i| U^\dagger U|j\rangle = \langle\pi(i)|\pi(j)\rangle = \delta_{ij}
+$$
+
+since $\pi$ is a permutation. This implies that $U$ is unitary. QED.
+
+- Remark :: We have actually shown that $U$ is a permutation on the computational basis.
+
+** Exercise 5.13
+Prove (5.44). (Hint: $\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}$.) In fact, prove that
+
+$$
+  \frac{1}{\sqrt{r}} \sum_{s=0}^{r-1} e^{2\pi\ii sk/r} |u_s\rangle = |x^k \mod N\rangle .
+$$
+
+*** Proof
+Let us write $x^k$ instead of $x^k\mod N$ for short.
+
+$$
+  \frac{1}{\sqrt{r}} \sum_{s=0}^{r-1} e^{2\pi\ii sk/r} |u_s\rangle
+  = \frac{1}{r} \sum_{s,l=0}^{r-1} e^{2\pi\ii s(k-l)/r} |x^l\rangle
+  = \sum_{l=0}^{r-1} \delta_{kl} |x^l\rangle
+  = |x^k\rangle .
+$$
+
+The second equality uses the hint given in the formulation of the exercise. QED.
+
+** TODO Exercise 5.14
+The quantum state produced in the order-finding algorithm, before the inverse Fourier transform, is
+
+$$
+\, |\psi\rangle = \frac{1}{2^{t/2}} \sum_{j=0}^{2^t-1} |j\rangle U^j |1\rangle
+  = \frac{1}{2^{t/2}} \sum_{j=0}^{2^t-1} |j\rangle |x^j \mod N \rangle ,
+$$
+
+if we initialize the second register as $|1\rangle$. Show that the same state is obtained if we
+replace $U^j$ with a /different/ unitary transform $V$, which computes
+
+$$
+  V |j\rangle |k\rangle = |j\rangle |k + x^j \mod N\rangle ,
+$$
+
+and start the second register in the state $|0\rangle$. Also show how to construct $V$ using
+$O(L^3)$ gates.
+
+*** Proof
+The first part of the claim, that we can replace the controlled $U^j$ by $V$ and $|1\rangle$ by
+$|0\rangle$ without changing the output of the algorithm is obvious. It remains to show the $V$ can
+be implemented by $O(L^3)$ gates.
