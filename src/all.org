@@ -5,62 +5,6 @@
 
 #+toc: headlines 2
 
-* COMMENT TODOs [9/16]
-- [X] Write Exercise x.y instead of exercise x.y in headings.
-- [X] Remove the numbers from (at least some) headings in the HTML output.
-- [X] How to tell the HTML exporter to recognize the latex macros (e.g. for \norm).
-- [X] Remove toplevel Heading "quantum bible", Make Parts toplevel.
-- [X] move latex_header to separate file
-- [X] Use ~qiskit.circuit.Parameter~ ([[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.assign_parameters.html][link]]) to draw some of the circuits.
-- [X] Use ~print~ less often in code blocks to not pollute ipython when using ~%run quantum-bible.py~.
-- [X] Don't use these "Inline" Appendices. Use ~:exports results~ and so on.
-- [X] Setup some nice CSS.
-- [ ] Already with just 60 exercises the mathjax on the website takes alot of time. Find a solution
-  to this problem.
-  - Possible solution: One might split this org file into several org files, e.g. by chapter.
-  - Possible solution: Do as here [[http://sporadic.stanford.edu/bump/group/gr2_2.html][fold proofs]].
-- [ ] Comment out "Search for circuits" - it might be distracting?
-- [ ] Do not replace (most) results of code blocks. If a result is already there do not recompute if
-  block was not changed (or similar criterion).
-- [ ] Github pages build should use modern emacs (via docker) and not the one which coincidentally
-  ships with =ubuntu-latest=. As of writing this, Ubuntu uses Emacs 27.1 (org-mode 9.3). I
-  personally use a custom build of Emacs 29. This solves the following problems:
-  - Properly support citations via =org-cite= (fortunately we only cite one thing at the moment 😄).
-  - Older org modes do not put (svg) images into an =img= HTML-container - this makes them look "different".
-- [ ] Should we have some "proof-environment"?
-- [ ] I use type annotations only due to its in-IDE benefits. Might make sense to actually set up
-  type checking - somehow.
-- [ ] We would like to have chapter wise session. On the other hand we also need to share some stuff
-  between chapters. Currently I made chapter 4 and chapter but this may be a problem since I
-  potentially want to divide the file into several files (not sure though).
-
-* Notation
-:PROPERTIES:
-:CUSTOM_ID: common-notation
-:END:
-For two hermitian operators we write:
-
-$$ A \leq B $$
-
-if $\langle\psi|B - A|\psi\rangle \geq 0$ for all $|\psi\rangle$. In the special case that one
-operator is just a multiple of the Identity, e.g. $A=aI$, we write:
-
-$$ a \leq B $$
-
-We define the [[https://en.wikipedia.org/wiki/Kronecker_delta][Kronecker delta]] to be
-
-$$
-\delta_{ij} = \begin{cases}
-  0 & \text{if } i \neq j, \\
-  1 & \text{if } i = j. \end{cases}
-$$
-
-The /Fourier transform/ is denoted like that:
-
-$$
-  \FT \sum_{k=0}^{N-1} x_k |k\rangle = \frac{1}{\sqrt{N}} \sum_{k,j=0}^{N-1} x_k e^{\frac{2\pi\ii}{N}kj} |j\rangle .
-$$
-
 * Part I
 ** Chapter 2
 :PROPERTIES:
@@ -263,7 +207,7 @@ To show the rest of claim 1 it remains to prove that $D$ contains only density o
 That $D$ contains only hermitian operators with trace=1 is clear. By exercise 4.5 we have
 $(\overrightarrow{r} \cdot \overrightarrow{\sigma})^2=\norm{\overrightarrow{r}}^2I$. Since
 $\overrightarrow{r} \cdot \overrightarrow{\sigma}$ is hermitian and not a multiple of $I$ we deduce
-that it has the two eigenvalues $\pm\norm{\overrightarrow{r}}$. Hence (see [[#common-notation][section on notation]] for
+that it has the two eigenvalues $\pm\norm{\overrightarrow{r}}$. Hence (see [[file:notation.org][section on notation]] for
 the meaning):
 
 $$
