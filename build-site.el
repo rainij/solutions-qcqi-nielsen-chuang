@@ -98,6 +98,7 @@
                      :url "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"
                      :integrity "sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei")
        :base-extension "org"
+       :exclude "inc/.*\.org$"  ; org files to be included in other org files
        :publishing-function org-html-publish-to-html
        :headline-levels 6
        :section-numbers nil

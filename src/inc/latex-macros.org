@@ -1,0 +1,39 @@
+#+name: insert-latex-macros-function-for-dynamic-block
+#+begin_src emacs-lisp :results silent :exports none
+  (defun org-dblock-write:insert-latex-macros (params)
+    "Function of the dynamic block for latex macros."
+    (let ((lines nil) (file (plist-get params :file)))
+        (with-temp-buffer
+            (insert-file-contents file)
+            (setq lines (split-string (buffer-string) "\n" t)))
+        (insert (mapconcat (lambda (str) (concat "#+latex_header: " str)) lines "\n"))
+        (insert "\n#+begin_export html\n\\[\n")
+        (insert (mapconcat 'identity lines "\n"))
+        (insert "\n\\]\n#+end_export")))
+#+end_src
+
+# This dynamic block defines the relevant latex macros so that org mode catches them up. Define new
+# macros in ./latex-macros.tex. Execute org-dblock-update to sync with latex-macros.tex. Don't
+# forget to execute the source block of org-dblock-write:insert-latex-macros before!
+#+BEGIN: insert-latex-macros :file "../latex-macros.tex"
+#+latex_header: \newcommand{\CC}{\mathbb{C}}
+#+latex_header: \newcommand{\NN}{\mathbb{N}}
+#+latex_header: \newcommand{\RR}{\mathbb{R}}
+#+latex_header: \newcommand{\ii}{\mathrm{i}}
+#+latex_header: \newcommand{\FT}{\mathcal{F}} % Fourier Transform
+#+latex_header: \newcommand{\norm}[1]{\|#1\|}
+#+latex_header: \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+#+latex_header: \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+#+begin_export html
+\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+#+end_export
+#+END:
