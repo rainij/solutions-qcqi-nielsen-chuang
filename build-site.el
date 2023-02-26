@@ -47,6 +47,9 @@
                 "Find the source code on " ;; TODO: set link, once repo is on github
                 (a ((href . "https://github.com/rainij/solutions-qcqi-nielsen-chuang")) "Github")))))
 
+(defun rs/nav (info)
+  `(nav nil (a ((href . "/")) "HOME")))
+
 ;; This is our custom html template (written as s-expression):
 (defun rs/org-html-template (contents info)
   (let ((title (org-export-data (and (plist-get info :with-title) (plist-get info :title)) info))
@@ -71,6 +74,7 @@
                             (crossorigin . "anonymous"))
                            ""))
              (body nil
+                   ,(rs/nav info)
                    (h1 ((class . "title")) ,title)
                    (raw-string ,contents)
                    ,(rs/site-footer info)))))))
