@@ -1,0 +1,1100 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 2</title><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="/">HOME</a></nav><h1 class="title">Chapter 2</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0c31cec">Setup</a>
+<ul>
+<li><a href="#org39cb547">Python Libraries</a></li>
+<li><a href="#org6707070">Bra-Ket</a></li>
+<li><a href="#org8b2d110">The Trace and the Partial Trace</a></li>
+</ul>
+</li>
+<li><a href="#org9dbed84">Exercises</a>
+<ul>
+<li><a href="#org99fcc70">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</a></li>
+<li><a href="#orge8f9f1f">Exercise 2.72 (Bloch sphere for mixed states)</a></li>
+<li><a href="#org7493179">Exercise 2.73</a></li>
+<li><a href="#org37317ed">Exercise 2.74</a></li>
+<li><a href="#orgf090a9e">Exercise 2.75</a></li>
+<li><a href="#org5037cca">Exercise 2.76</a></li>
+<li><a href="#org2de78a6">Exercise 2.77</a></li>
+<li><a href="#org57c8e73">Exercise 2.78</a></li>
+<li><a href="#org56f02f6">Exercise 2.79</a></li>
+<li><a href="#org3648ad2">Exercise 2.80</a></li>
+<li><a href="#org45dbf7c">Exercise 2.81 (Freedom in purifications)</a></li>
+<li><a href="#org0bfba72">Exercise 2.82</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0c31cec" class="outline-2">
+<h2 id="org0c31cec">Setup</h2>
+<div class="outline-text-2" id="text-org0c31cec">
+</div>
+<div id="outline-container-org39cb547" class="outline-3">
+<h3 id="org39cb547">Python Libraries</h3>
+<div class="outline-text-3" id="text-org39cb547">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> product
+
+<span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> Matrix, sqrt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6707070" class="outline-3">
+<h3 id="org6707070">Bra-Ket</h3>
+<div class="outline-text-3" id="text-org6707070">
+<p>
+For convenience we define two functions which map bit-strings to the corresponding bra and ket vectors.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">ket</span>(bits: <span class="org-builtin">str</span>) -&gt; Matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns |bits&gt;."""</span>
+    <span class="org-variable-name">vec</span> = [0] * 2**<span class="org-builtin">len</span>(bits)
+    <span class="org-variable-name">vec</span>[<span class="org-builtin">int</span>(bits, 2)] = 1
+    <span class="org-keyword">return</span> Matrix(vec)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">bra</span>(bits: <span class="org-builtin">str</span>) -&gt; Matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns &lt;bits|."""</span>
+    <span class="org-keyword">return</span> ket(bits).H
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8b2d110" class="outline-3">
+<h3 id="org8b2d110">The Trace and the Partial Trace</h3>
+<div class="outline-text-3" id="text-org8b2d110">
+<p>
+In the following we define the trace for arbitrary square matrices and the partial trace for square
+matrices whose dimension is a power of two. Note that the concept of the partial trace only makes
+sense if one can consider the matrix as element of some tensor product (i.e. the dimension is a
+product \(m_1\cdot m_2\cdot\ldots\)). We further restrict to \(m_i=2\) to keep the implementation and
+the interface simple and since probably nothing else is needed in the context of the book.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">trace</span>(M: Matrix):  <span class="org-comment-delimiter"># </span><span class="org-comment">TODO: what is the correct return type?</span>
+    <span class="org-doc">"""Returns the sum of the diagonal elements. Requires a square matrix."""</span>
+    <span class="org-variable-name">dim</span> = M.shape[0]
+    <span class="org-keyword">assert</span> dim == M.shape[1], <span class="org-string">"M must be square"</span>
+    <span class="org-variable-name">result</span> = 0
+    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim):
+        <span class="org-variable-name">result</span> += M[i, i]
+    <span class="org-keyword">return</span> result
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">ptrace</span>(M: Matrix, bit_positions: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>] = <span class="org-constant">None</span>) -&gt; Matrix:
+    <span class="org-doc">"""Partial Trace. The Matrix must have dimension 2^n. The bit_positions describe which bits</span>
+<span class="org-doc">    (from the right) get traced out."""</span>
+    <span class="org-variable-name">dim</span> = M.shape[0]
+    <span class="org-keyword">assert</span> dim == M.shape[1], <span class="org-string">"M must be square"</span>
+    <span class="org-keyword">assert</span> dim.bit_count() == 1, <span class="org-string">"Dim of M must be 2^n for some n &gt;= 0"</span>
+    <span class="org-variable-name">bit_size</span> = dim.bit_length() - 1
+    <span class="org-keyword">if</span> bit_positions <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+        <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(bit_positions) &gt; 0, <span class="org-string">"bit_positions must not be empty"</span>
+        <span class="org-keyword">assert</span> <span class="org-builtin">all</span>(0 &lt;= pos &lt;= bit_size <span class="org-keyword">for</span> pos <span class="org-keyword">in</span> bit_positions), <span class="org-string">"Invalid bit_positions"</span>
+
+    <span class="org-keyword">if</span> bit_positions <span class="org-keyword">is</span> <span class="org-constant">None</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">shortcut</span>
+        <span class="org-keyword">return</span> Matrix([[trace(M)]])
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(bit_positions) == 1 <span class="org-keyword">and</span> dim == 2:  <span class="org-comment-delimiter"># </span><span class="org-comment">corner case</span>
+        <span class="org-keyword">return</span> Matrix([[trace(M)]])
+    <span class="org-keyword">elif</span> <span class="org-builtin">len</span>(bit_positions) &gt; 1:
+        <span class="org-variable-name">ps</span> = bit_positions.copy()
+        ps.sort()  <span class="org-comment-delimiter"># </span><span class="org-comment">IMPORTANT!</span>
+        <span class="org-variable-name">RM</span> = M
+        <span class="org-keyword">while</span> <span class="org-builtin">len</span>(ps) &gt; 0:
+            <span class="org-variable-name">pos</span> = ps.pop()
+            <span class="org-variable-name">RM</span> = ptrace(RM, [pos])
+        <span class="org-keyword">return</span> RM
+
+    <span class="org-variable-name">rpos</span> = bit_size - 1 - bit_positions[0]
+
+    <span class="org-variable-name">mat</span> = [[0]*(dim//2) <span class="org-keyword">for</span> _ <span class="org-keyword">in</span> <span class="org-builtin">range</span>(dim//2)]
+    <span class="org-keyword">for</span> i, j <span class="org-keyword">in</span> product(<span class="org-builtin">range</span>(dim//2), <span class="org-builtin">range</span>(dim//2)):
+        <span class="org-variable-name">ibits</span> = f<span class="org-string">"{i:b}"</span>.zfill(bit_size - 1)
+        <span class="org-variable-name">jbits</span> = f<span class="org-string">"{j:b}"</span>.zfill(bit_size - 1)
+        <span class="org-variable-name">i0</span> = <span class="org-builtin">int</span>(ibits[:rpos] + <span class="org-string">"0"</span> + ibits[rpos:], 2)
+        <span class="org-variable-name">i1</span> = <span class="org-builtin">int</span>(ibits[:rpos] + <span class="org-string">"1"</span> + ibits[rpos:], 2)
+        <span class="org-variable-name">j0</span> = <span class="org-builtin">int</span>(jbits[:rpos] + <span class="org-string">"0"</span> + jbits[rpos:], 2)
+        <span class="org-variable-name">j1</span> = <span class="org-builtin">int</span>(jbits[:rpos] + <span class="org-string">"1"</span> + jbits[rpos:], 2)
+        mat[i][j] = M[i0, j0] + M[i1, j1]
+
+    <span class="org-keyword">return</span> Matrix(mat)
+</pre>
+</div>
+
+<p>
+Very simple unit tests:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">A</span> = Matrix([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
+<span class="org-variable-name">B</span> = Matrix([[8*i + j <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Results for bit_positions == [0], in this case it is easy to read out the results from the input</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">matrix. Essentially you only have to to view e.g. A as a Matrix of 2x2 matrices which you replace</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">by their traces.</span>
+<span class="org-variable-name">A0</span> = Matrix([[5, 9], [21, 25]])
+<span class="org-variable-name">B0</span> = Matrix([[9, 13, 17, 21], [41, 45, 49, 53], [73, 77, 81, 85], [105, 109, 113, 117]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">To reduce the case of e.g. bit_positions == [1] to bit_positions == [0] use the fact that</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">permuting the bit pattern like so 'xyz' -&gt; 'zyx' induces a Permutation on the basis vectors which</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">corresponds to a permutation matrix P1. After doing the partial trace we are left with 'zy' and</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">have to permute this back to 'yz' (Matrix P2). In other words we have the identity</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">P2*ptrace(P1*B*P1, [0])*P2 - ptrace(B, [i]). Use sympy.Permutation, sympy.PermutationMatrix, and</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">PermutationMatrix.as_explicit to automate most of the work.</span>
+<span class="org-variable-name">A1</span> = Matrix([[10, 12], [18, 20]])
+<span class="org-variable-name">B1</span> = Matrix([[18, 20, 26, 28], [34, 36, 42, 44], [82, 84, 90, 92], [98, 100, 106, 108]])
+<span class="org-variable-name">B2</span> = Matrix([[36, 38, 40, 42], [52, 54, 56, 58], [68, 70, 72, 74], [84, 86, 88, 90]])
+
+<span class="org-keyword">assert</span> ptrace(A, [0]) == A0, <span class="org-string">"test ptrace(A, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(A, [1]) == A1, <span class="org-string">"test ptrace(A, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0]) == B0, <span class="org-string">"test ptrace(B, [0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [1]) == B1, <span class="org-string">"test ptrace(B, [1])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2]) == B2, <span class="org-string">"test ptrace(B, [2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0, 2]) == ptrace(ptrace(B, [2]), [0]), <span class="org-string">"test ptrace(B, [0, 2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2, 0]) == ptrace(ptrace(B, [2]), [0]), <span class="org-string">"test ptrace(B, [2, 0])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [0, 1, 2]) == Matrix([[trace(B)]]), <span class="org-string">"test ptrace(B, [0, 1, 2])"</span>
+<span class="org-keyword">assert</span> ptrace(B, [2, 1, 0]) == Matrix([[trace(B)]]), <span class="org-string">"test ptrace(B, [2, 1, 0])"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9dbed84" class="outline-2">
+<h2 id="org9dbed84">Exercises</h2>
+<div class="outline-text-2" id="text-org9dbed84">
+</div>
+<div id="outline-container-org99fcc70" class="outline-3">
+<h3 id="org99fcc70">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</h3>
+<div class="outline-text-3" id="text-org99fcc70">
+<p>
+Let \(\rho\) be a density operator. Show that \(\trace{\rho^2}\leq1\), with equality if and only if
+\(\rho\) is a pure state.
+</p>
+</div>
+
+<div id="outline-container-org1c97286" class="outline-4">
+<h4 id="org1c97286">Proof</h4>
+<div class="outline-text-4" id="text-org1c97286">
+<p>
+By the characterization of density operators (Theorem 2.5) there are \(0<p_i\leq 1\) and orthonormal
+\(\{|\psi_i\rangle\}\) such that:
+</p>
+
+<p>
+\[
+  \rho = \sum_i p_i |\psi_i\rangle\langle\psi_i| .
+\]
+</p>
+
+<p>
+Hence:
+</p>
+
+<p>
+\[
+  \trace{\rho^2} = \trace{ \sum_i p_i^2 |\psi_i\rangle\langle\psi_i| } = \sum_i p_i^2 \leq \sum_i p_i = 1 ,
+\]
+</p>
+
+<p>
+which proves the first claim. Equality can clearly only hold if for all \(i\): \(p_i=1\). By the trace
+condition this is only possible if there is only one summand in the sum making up \(\rho\). This means
+that \(\rho\) is pure in that case. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge8f9f1f" class="outline-3">
+<h3 id="orge8f9f1f">Exercise 2.72 (Bloch sphere for mixed states)</h3>
+<div class="outline-text-3" id="text-orge8f9f1f">
+<p>
+The Bloch sphere picture for pure states of a single qubit was introduced in Section 1.2. This
+description has an important generalization to mixed states as follows.
+</p>
+
+<ol class="org-ol">
+<li><p>
+Show that an arbitrary density matrix for a mixed state qubit may be written as
+</p>
+
+<p>
+\[
+     \rho = \frac{I + \overrightarrow{r} \cdot \overrightarrow{\sigma} }{2}
+   \]
+</p>
+
+<p>
+where \(\overrightarrow{r}\) is a real three-dimensional vector such that
+ \(\norm{\overrightarrow{r}}\leq1\). This vector is known as the Bloch vector for the state
+ \(\rho\). Conversely any such \(\rho\) is also a density operator.
+</p></li>
+<li>What is the Bloch vector representation for the state \(\rho=I/2\)?</li>
+<li>Show that a state \(\rho\) is pure if and only if \(\norm{\overrightarrow{r}}=1\).</li>
+<li>Show that for pure states the description of the Bloch vector we have given coincides with that
+in Section 1.2.</li>
+</ol>
+</div>
+
+<div id="outline-container-org6e220ae" class="outline-4">
+<h4 id="org6e220ae">Proof of 1, 3, and 4</h4>
+<div class="outline-text-4" id="text-org6e220ae">
+<p>
+The matrix representation of \(\rho\) looks as follows:
+</p>
+
+<p>
+\[
+  \rho = \frac{1}{2} \begin{bmatrix} 1 + z & x - iy \\ x + iy & 1 - z \end{bmatrix}
+  = \begin{bmatrix} p & \frac{1}{2}\zeta^* \\ \frac{1}{2}\zeta & q \end{bmatrix} .
+\]
+</p>
+
+<p>
+Let \(r=\norm{\overrightarrow{r}}\). We see that the matrices \(D\) which can be represented by \(\rho\)
+are characterized by the above matrix together with the constraints:
+</p>
+
+<p>
+\[
+  p, q \geq 0,\; \zeta\in\CC \text{ with } p + q = 1 \text{ and } r = (p - q)^2 + |\zeta|^2 \leq 1 .
+\]
+</p>
+
+<p>
+Now let \(|\psi\rangle=e^{i\gamma}(c|0\rangle+e^{i\varphi}s|1\rangle)\) be a pure state (\(c=\cos(\theta/2)\) and \(s=\sin(\theta/2)\)). The
+corresponding density matrix is:
+</p>
+
+<p>
+\[
+  \,|\psi\rangle\langle\psi| = \begin{bmatrix} c^2 & e^{-i\varphi}cs \\ e^{i\varphi}cs & s^2 \end{bmatrix} .
+\]
+</p>
+
+<p>
+Recall the following trigonometric identities: \(\cos\theta=c^2-s^2\) and \(\sin\theta=2cs\). This
+implies that the above constraint is satisfied. Hence pure states are in \(D\). In particular we have
+\(r=1\) for pure states.
+</p>
+
+<p>
+On the other hand the same trigonometric identities also show that the constraint strengthened by
+\(r=1\) characterizes the pure states. Indeed, the correspondence between the two representations is
+given by \(x+iy=\zeta=e^{i\varphi}\sin\theta\) and \(z=p-q=\cos\theta\). This shows claims 3 and 4 (for
+the latter recall that the Bloch-Sphere is parameterized by
+\((x,y,z)=(\sin\theta\cos\varphi,\;\sin\theta\sin\varphi,\;\cos\theta)\)).
+</p>
+
+<p>
+Clearly \(D\) is a convex set, hence all density matrices are in \(D\). This follows from the fact that
+density operators are the (closed) convex hull of the pure states. This shows the original version
+of claim 1 (we extended it a bit).
+</p>
+
+<p>
+To show the rest of claim 1 it remains to prove that \(D\) contains only density operators.
+</p>
+
+<p>
+That \(D\) contains only hermitian operators with trace=1 is clear. By exercise 4.5 we have
+\((\overrightarrow{r} \cdot \overrightarrow{\sigma})^2=\norm{\overrightarrow{r}}^2I\). Since
+\(\overrightarrow{r} \cdot \overrightarrow{\sigma}\) is hermitian and not a multiple of \(I\) we deduce
+that it has the two eigenvalues \(\pm\norm{\overrightarrow{r}}\). Hence (see <a href="notation.html">section on notation</a> for
+the meaning):
+</p>
+
+<p>
+\[
+  0 \leq \frac{1 - \norm{\overrightarrow{r}}}{2} \leq \rho \leq  \frac{1 + \norm{\overrightarrow{r}}}{2} \leq 1 .
+\]
+</p>
+
+<p>
+In particular, \(\rho\) is indeed a positive operator. Hence, \(\rho\) is a density matrix. This shows
+the rest of claim 1.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgad512c2" class="outline-4">
+<h4 id="orgad512c2">Solution to 2</h4>
+<div class="outline-text-4" id="text-orgad512c2">
+<p>
+\(I/2\) is represented by \(\overrightarrow{r}=(0,0,0)\). It corresponds to the ensemble \(\{(1/2,|0\rangle),(1/2,|1\rangle)\}\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7493179" class="outline-3">
+<h3 id="org7493179">Exercise 2.73</h3>
+<div class="outline-text-3" id="text-org7493179">
+<p>
+Let \(\rho\) be a density operator. A minimal ensemble for \(\rho\) is an ensemble
+\(\{(p_i, |\psi_i\rangle)\}\) containing a number of elements equal to the rank of \(\rho\). Let
+\(|\psi\rangle\) be any state in the support of \(\rho\) . (The <i>support</i> of a Hermitian operator \(A\)
+is the vector space spanned by the eigenvectors of \(A\) with non-zero eigenvalues.) Show that there
+is a minimal ensemble for \(\rho\) that contains \(|\psi\rangle\), and moreover that in any such
+ensemble \(|\psi\rangle\) must appear with probability
+</p>
+
+<p>
+\[
+  p = \frac{1}{\langle\psi|\rho^{-1}|\psi\rangle} ,
+\]
+</p>
+
+<p>
+where \(\rho^{-1}\) is defined to be the inverse of \(\rho\), when \(\rho\) is considered as an operator
+acting only on the support of \(\rho\). (This definition removes the problem that \(\rho\) may not have
+an inverse.)
+</p>
+</div>
+
+<div id="outline-container-org6bbee50" class="outline-4">
+<h4 id="org6bbee50">Proof</h4>
+<div class="outline-text-4" id="text-org6bbee50">
+<p>
+Consider the representation of \(\rho\) by its eigenvectors (with non-zero eigenvalues):
+</p>
+
+<p>
+\[
+  \rho = \sum_{i=1}^n \lambda_i |i\rangle\langle i| .
+\]
+</p>
+
+<p>
+Since \(|\psi\rangle\) is in the support of \(\rho\) there are unique complex numbers \(v_1,\ldots,v_n\)
+with:
+</p>
+
+<p>
+\[
+  \sum_{i=1}^n v_i \sqrt{\lambda_i} |i\rangle \in \RR |\psi\rangle \text{ and } \sum_{i=1}^n |v_i|^2 = 1 .
+\]
+</p>
+
+<p>
+Now extend these numbers to a unitary matrix \(u\in\CC^{n\times n}\) such that \(u_{ij}=v_j\) (formally
+the existence follows from the Gram-Schmidt procedure). Let
+</p>
+
+<p>
+\[
+  \sqrt{p_i} |\psi_i\rangle := \sum_{i=1}^n u_{ij} \sqrt{\lambda_j} |j\rangle .
+\]
+</p>
+
+<p>
+By construction \(|\psi\rangle=|\psi_1\rangle\). By Theorem 2.6 (Unitary Freedom in the ensemble for
+density matrices) we found an ensemble containing \(|\psi\rangle\) so the existence is
+established. Conversely, the same Theorem states that any ensemble representing \(\rho\) and
+satisfying \(|\psi_1\rangle=|\psi_1\rangle\) must satisfy the above constraint for a matrix \(u\) whose
+first row is \(v\).
+</p>
+
+<p>
+By the above contraint and the spectral theorem we have:
+</p>
+
+<p>
+\[
+  \sqrt{p_i p_j} \langle\psi_i|\rho^{-1}|\psi_j\rangle
+  = \sum_{kl} u_{ik}^\dagger \sqrt{\lambda_k} \langle k| \rho^{-1} u_{jl} \sqrt{\lambda_l} |l\rangle
+  = \sum_{k} u_{jk} u_{ki}^* \lambda_k \langle k|\rho^{-1}|k\rangle
+  = \delta_{ij} .
+\]
+</p>
+
+<p>
+Setting \(i=j=1\) proves the claim. QED.
+</p>
+
+<p>
+<b>Remark:</b> The proof shows that each minimal ensemble \((\sqrt{p_i}|\psi_i\rangle)\) is an orthonormal
+basis on the support of \(\rho\) with respect to the inner product given by
+\(\langle\varphi|\rho^{-1}|\psi\rangle\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org37317ed" class="outline-3">
+<h3 id="org37317ed">Exercise 2.74</h3>
+<div class="outline-text-3" id="text-org37317ed">
+<p>
+Suppose a composite of systems A and B is in the state \(|a\rangle|b\rangle\), where \(|a\rangle\) is a
+pure state of system A, and \(|b\rangle\) is a pure state of system B. Show that the reduced density
+operator of system A alone is a pure state.
+</p>
+</div>
+
+<div id="outline-container-org75ca4f5" class="outline-4">
+<h4 id="org75ca4f5">Proof</h4>
+<div class="outline-text-4" id="text-org75ca4f5">
+<p>
+The joint state is indeed a <i>simple</i> tensor product (i.e. a product state):
+</p>
+
+<p>
+\[
+  \,|a\rangle |b\rangle = |a\rangle \otimes |b\rangle .
+\]
+</p>
+
+<p>
+The corresponding density matrix is:
+</p>
+
+<p>
+\[
+  \rho = |a\rangle\langle a| \otimes |b\rangle\langle b| .
+\]
+</p>
+
+<p>
+The reduced density operator for A is obtained by taking the partial trace with respect to B:
+</p>
+
+<p>
+\[
+  \rho_A = \ptrace{B}{\rho} = |a\rangle\langle a|.
+\]
+</p>
+
+<p>
+This is indeed the pure state \(|a\rangle\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf090a9e" class="outline-3">
+<h3 id="orgf090a9e">Exercise 2.75</h3>
+<div class="outline-text-3" id="text-orgf090a9e">
+<p>
+For each of the four Bell states, find the reduced density operator for each qubit.
+</p>
+</div>
+
+<div id="outline-container-orgc7d5a17" class="outline-4">
+<h4 id="orgc7d5a17">Solution</h4>
+<div class="outline-text-4" id="text-orgc7d5a17">
+<p>
+The four Bell States are given by:
+</p>
+
+<p>
+\[
+  \,|\beta_{xy}\rangle = \frac{1}{\sqrt{2}} \left( |0y\rangle + (-1)^{x} |1\overline{y}\rangle \right) ,
+\]
+</p>
+
+<p>
+where \(\overline{y}\) denotes the negation of \(y\). Using \(\trace{|i\rangle\langle j|}=\delta_{ij}\) we deduce:
+</p>
+
+<p>
+\[
+  \ptrace{2}{|\beta_{xy}\rangle} = \frac{1}{2} (|0\rangle\langle0| + |1\rangle\langle1|) = \frac{1}{2} I .
+\]
+</p>
+
+<p>
+and in the same way:
+</p>
+
+<p>
+\[
+  \ptrace{1}{|\beta_{xy}\rangle} = \frac{1}{2} (|y\rangle\langle y|
+  \,+\, |\overline{y}\rangle\langle\overline{y}|) = \frac{1}{2} I .
+\]
+</p>
+
+<p>
+So in all 8 cases we get the same result: \(I/2\).
+</p>
+
+<p>
+<b>Remark:</b> We see that knowledge of all partial traces is not sufficient to reconstruct the original
+state.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5037cca" class="outline-3">
+<h3 id="org5037cca">Exercise 2.76</h3>
+<div class="outline-text-3" id="text-org5037cca">
+<p>
+Extend the proof of the Schmidt decomposition to the case where A and B may have state spaces of
+different dimensionality.
+</p>
+</div>
+
+<div id="outline-container-org0b08557" class="outline-4">
+<h4 id="org0b08557">Proof</h4>
+<div class="outline-text-4" id="text-org0b08557">
+<p>
+Of course one may reuse the proof from the book by utilizing the general form of the singular value
+decompostion for non-square matrices.
+</p>
+
+<p>
+Alternatively: Assume wlog \(\dim(H_A)\leq\dim(H_B)\). We already have a proof for the case of equal
+dimensions hence assume \(\dim(H_A)<\dim(H_B)\). Now we extend A by a direct sum with a Hilbert Space
+\(R\) such that:
+</p>
+
+<p>
+\[
+  \dim(H_A \oplus R) = \dim(H_B) .
+\]
+</p>
+
+<p>
+By the already proved special case of the theorem we get a Schmidt-Decomposition on \((H_A\oplus R)\otimes H_B\):
+</p>
+
+<p>
+\[
+  \,|\psi\rangle = \sum_i \lambda_i \, |i_A\rangle |i_B\rangle .
+\]
+</p>
+
+<p>
+We have to prove that \(|i_A\rangle\in H_A\) for all \(i\). Indeed, let \(|r\rangle\in R\) and consider:
+</p>
+
+
+<p>
+\[
+  \langle i_A|r\rangle = \langle i_A, i_B | r, i_B \rangle = \sum_j \langle j_A, j_B | r, i_B \rangle
+  = \langle \psi | r, i_B \rangle = 0 .
+\]
+This shows the claim. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2de78a6" class="outline-3">
+<h3 id="org2de78a6">Exercise 2.77</h3>
+<div class="outline-text-3" id="text-org2de78a6">
+<p>
+Suppose ABC is a three component quantum system. Show by example that there are quantum states of
+such systems which can not be written in the form
+</p>
+
+<p>
+\[
+  \,|\psi\rangle = \sum_i \lambda_i |i_A, i_B, i_C\rangle
+\]
+</p>
+
+<p>
+where \(\lambda_i\) are real numbers, and \(|i_A\rangle\), \(|i_B\rangle\), \(|i_C\rangle\) are orthonormal
+vectors of the respective systems.
+</p>
+</div>
+
+<div id="outline-container-org8492659" class="outline-4">
+<h4 id="org8492659">Proof</h4>
+<div class="outline-text-4" id="text-org8492659">
+<p>
+Suppose a Schmidt-like decomposition is possible for a state with respect to ABC. Then the reduced
+density operators in A, B and C must have the same set of eigenvalues. Hence, to show that such a
+decomposition is not possible for a given state it suffices to show that the sets of eigenvalue are
+not all equal.
+</p>
+
+<p>
+To spare us boring calculations lets introduce a nice function which takes a state vector of a
+three-qubit system ABC as input (this is already the simplest case where we can find counter
+examples). As output it reports the eigenvalues of the density matrix of each subsystem.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org33e7b9c"><span class="org-keyword">def</span> <span class="org-function-name">get_eigenvals_of_ABC</span>(state_vector: Matrix):
+    <span class="org-doc">"""Calculate eigenvals of subsystems of three-qubit system (for Exercise 2.77)."""</span>
+    <span class="org-variable-name">density</span> = state_vector * state_vector.H
+    <span class="org-variable-name">DA</span> = ptrace(density, [1, 2])
+    <span class="org-variable-name">DB</span> = ptrace(density, [0, 2])
+    <span class="org-variable-name">DC</span> = ptrace(density, [0, 1])
+
+    <span class="org-variable-name">result</span> = <span class="org-string">""</span>
+    <span class="org-keyword">for</span> S, D <span class="org-keyword">in</span> [(<span class="org-string">"A"</span>, DA), (<span class="org-string">"B"</span>, DB), (<span class="org-string">"C"</span>, DC)]:
+        <span class="org-variable-name">result</span> += f<span class="org-string">"Eigenvalues in {S}: {D.eigenvals()}.\n"</span>
+
+    <span class="org-keyword">return</span> result
+</pre>
+</div>
+
+<p>
+The following code-snippit shows that
+</p>
+
+<p>
+\[
+  \frac{1}{\sqrt{3}} (|000\rangle + |010\rangle + |011\rangle)
+\]
+</p>
+
+<p>
+cannot be decomposed as required:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org533143f">get_eigenvals_of_ABC((ket(<span class="org-string">'000'</span>) + ket(<span class="org-string">'010'</span>) + ket(<span class="org-string">'011'</span>)) / sqrt(3))
+</pre>
+</div>
+
+<pre class="example">
+Eigenvalues in A: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+Eigenvalues in B: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+Eigenvalues in C: {1: 1, 0: 1}.
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org57c8e73" class="outline-3">
+<h3 id="org57c8e73">Exercise 2.78</h3>
+<div class="outline-text-3" id="text-org57c8e73">
+<p>
+Prove that a state \(|\psi\rangle\) of a composite system AB is a product state if and only if it has
+Schmidt number 1. Prove that \(|\psi\rangle\) is a product state if and only if \(\rho^A\) (and thus
+\(\rho^B\)) are pure states.
+</p>
+</div>
+
+<div id="outline-container-orge880a21" class="outline-4">
+<h4 id="orge880a21">Proof</h4>
+<div class="outline-text-4" id="text-orge880a21">
+<p>
+A product state is a state which can be represented by a <i>simple</i> tensor product
+\(|\alpha\rangle\otimes|\beta\rangle\). But this is by definition the same as having Schmidt-Rank 1.
+</p>
+
+<p>
+For the second part consider the Schmidt-Decomposition:
+</p>
+
+<p>
+\[
+  \, |\psi\rangle = \sum_{i=1}^r \lambda_i |i_A\rangle \otimes |i_B\rangle .
+\]
+</p>
+
+<p>
+Hence the reduced state on system A is (take the partial trace on B):
+</p>
+
+<p>
+\[
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A| .
+\]
+</p>
+
+<p>
+Since \(\sum_i\lambda_i^2=1\) and \(\lambda_i>0\) this can only be a pure state (a projection operator,
+i.e. \(\rho^2=\rho\)) if \(r=1\). This is the same as \(|\psi\rangle\) being a product state. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org56f02f6" class="outline-3">
+<h3 id="org56f02f6">Exercise 2.79</h3>
+<div class="outline-text-3" id="text-org56f02f6">
+<p>
+Consider a composite system consisting of two qubits. Find the Schmidt decompositions of the states
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |11\rangle}{\sqrt{2}}; \quad
+  \frac{|00\rangle + |01\rangle +  |10\rangle + |11\rangle}{2}; \quad \text{and} \quad
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} .
+\]
+</p>
+</div>
+
+<div id="outline-container-orgc76bfb9" class="outline-4">
+<h4 id="orgc76bfb9">Solution</h4>
+<div class="outline-text-4" id="text-orgc76bfb9">
+<p>
+The first state clearly is already represented as Schmidt-Decomposition.
+</p>
+
+<p>
+The second term has Schmidt-Decomposition \(|+\rangle\otimes|+\rangle\), where
+\(|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}\) is "the" positive eigenvector of the Pauli Operator <code>X</code>.
+</p>
+
+<p>
+For the third one we have to calculate something. The proof of the existence of the
+Schmidt-Decomposition gives a procedure to actually calculate it. First let us find the Matrix
+\(A\in\CC^{2\times2}\) such that:
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} = \sum_{ij} A_{ij} |i\rangle \otimes |j\rangle .
+\]
+</p>
+
+<p>
+Clearly the following is the only matrix satisfying the above equation:
+</p>
+
+<p>
+\[
+  A = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} .
+\]
+</p>
+
+<p>
+We need to find the singular value decomposition of \(A\). Since \(A\) is hermitian this simplifies to
+find the spectral decomposition \(A=UDU^\dagger\).
+</p>
+
+<p>
+One can use sympy to do this. The eigenvalues are:
+</p>
+
+<p>
+\[
+  \lambda_{\pm} = \frac{\sqrt{3}}{6} \left( 1 \pm \sqrt{5} \right) .
+\]
+</p>
+
+<p>
+"The" eigenvectors are:
+</p>
+
+<p>
+\[
+  \,|\pm_A\rangle = \frac{1}{\sqrt{10 \pm 2\sqrt{5}}} \left((1 \pm \sqrt{5})|0\rangle + 2|1\rangle \right) .
+\]
+</p>
+
+<p>
+With this we can write down the Schmidt-Decomposition:
+</p>
+
+<p>
+\[
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}}
+  = \lambda_+ |+_A\rangle|+_A\rangle + \lambda_- |-_A\rangle|-_A\rangle .
+\]
+</p>
+
+<p>
+Note that the fact that the eigenvectors can be chosen with real entries simplifies things.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3648ad2" class="outline-3">
+<h3 id="org3648ad2">Exercise 2.80</h3>
+<div class="outline-text-3" id="text-org3648ad2">
+<p>
+Suppose \(|\psi\rangle\) and \(|\varphi\rangle\) are two pure states of a composite quantum system with
+components A and B, with identical Schmidt coefficients. Show that there are unitary transformations
+\(U\) on system A and \(V\) on system B such that \(|\psi\rangle = (U \otimes V )|\varphi\rangle\).
+</p>
+</div>
+
+<div id="outline-container-org946015f" class="outline-4">
+<h4 id="org946015f">Proof</h4>
+<div class="outline-text-4" id="text-org946015f">
+<p>
+That \(|\psi\rangle\) and \(|\varphi\rangle\) have the same Schmidt coefficients means that there are
+positive numbers \(\lambda_i\) such that
+</p>
+
+\begin{align*}
+  \, |\psi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\psi}\rangle |i_{B,\psi}\rangle , \\
+  \, |\varphi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\varphi}\rangle |i_{B,\varphi}\rangle ,
+\end{align*}
+
+<p>
+for some orthonormal sets \((|i_{A,\psi}\rangle)\), \((|i_{A,\varphi}\rangle)\), \((|i_{B,\psi}\rangle)\),
+\((|i_{B,\varphi}\rangle)\). By the latter fact it is easy to find a unitary \(U\) which maps
+\(|i_{A,\varphi}\rangle\) to \(|i_{A,\psi}\rangle\) and similarly a \(V\) for the B-system. These two
+unitary operators satisfy the claim.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org45dbf7c" class="outline-3">
+<h3 id="org45dbf7c">Exercise 2.81 (Freedom in purifications)</h3>
+<div class="outline-text-3" id="text-org45dbf7c">
+<p>
+Let \(|AR_1\rangle\) and \(|AR_2\rangle\) be two purifications of a state \(\rho^A\) to a composite system
+AR. Prove that there exists a unitary transformation \(U_R\) acting on system R such that
+</p>
+
+<p>
+\[
+\,|AR_1\rangle = (I_A \otimes U_R ) |AR_2\rangle .
+\]
+</p>
+</div>
+
+<div id="outline-container-org776459c" class="outline-4">
+<h4 id="org776459c">Proof</h4>
+<div class="outline-text-4" id="text-org776459c">
+<p>
+Let
+</p>
+
+<p>
+\[
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A|
+\]
+</p>
+
+<p>
+be a Spectral-Decomposition of \(\rho^A\) (in particular all the vectors involved form an orthonormal
+set). Without loss of generality we may assume that \(|AR_2\rangle\) adheres to the generic
+construction from the book, that is
+</p>
+
+<p>
+\[
+\, |AR_2\rangle = \sum_{i=1}^r |i_A\rangle \otimes |i_R\rangle
+\]
+</p>
+
+<p>
+with an orthonormal set \((|i_R\rangle)\). A priori the Hilbert Space of \(R\) could have dimension
+smaller then \(r\). But in that case we could simply augment \(R\) by some additional dimensions.
+</p>
+
+<p>
+Since \(|AR_1\rangle\) and \(|AR_2\rangle\) are purifications of the same state they have the same
+Schmidt Numbers (the \(\lambda_i\) from above). From Exercise 2.80 we deduce that there exist
+unitary matrices \(V_A\) and \(V_R\) such that
+</p>
+
+<p>
+\[
+\,|AR_1\rangle = (V_A \otimes V_R ) |AR_2\rangle .
+\]
+</p>
+
+<p>
+To simplify notation let us write \(V=V_A\). Slightly abusing notation, let us write
+\(\ptrace{R}{|\psi\rangle}\) when we mean \(\ptrace{R}{|\psi\rangle\langle\psi|}\). We have
+</p>
+
+<p>
+\[
+  \rho^A = \ptrace{R}{|AR_1\rangle} = \ptrace{R}{V\otimes V_R \, |AR_2\rangle} = V^\dagger \rho^A V .
+\]
+</p>
+
+<p>
+This implies that \(V\) leaves the eigenspaces of \(\rho^A\) invariant (that is, an eigenvector of some
+eigenvalue is mapped to a possibly different eigenvector of the same eigenvalue).
+</p>
+
+<p>
+For the moment let us assume that all \(\lambda_i\) are equal, that is \(\lambda_i=1/r\). Let
+\((v_{ij})\in\CC^{r\times r}\) be the matrix representation of \(V\) on the eigenspace of \(1/r\). We
+have:
+</p>
+
+<p>
+\[
+\, |AR_1\rangle = V \otimes V_R \, |AR_2\rangle = \frac{1}{r} \sum_{ij} v_{ji} |j_A\rangle \otimes V_R|i_R\rangle
+  = \frac{1}{r} \sum_{j} |j_A\rangle \otimes \left( \sum_i v_{ji} V_R|i_{R}\rangle \right) .
+\]
+</p>
+
+<p>
+Let \(|j_{R'}\rangle=\sum_{i}v_{ji}V_R|i_{R}\rangle\). These vectors form an orthonormal set
+since \((v_{ij})\) is a unitary matrix (and transposed unitary matrices are unitary too) and the
+\((|i_R\rangle)\) are orthonormal. Hence there is a unitary matrix \(U_R\) such that
+\(|j_{R'}\rangle=U|j_R\rangle\). This together with the previous equation implies the desired result:
+</p>
+
+<p>
+\[
+\, |AR_1\rangle = (I_A \otimes U_R) |AR_2\rangle .
+\]
+</p>
+
+<p>
+The general case follows by decomposing \(|AR_1\rangle\) and \(|AR_2\rangle\) into direct sums over the
+eigenspaces of \(\rho^A\) and repeating the above reasoning for each one. Note that in the above
+reasoning for the special case the particular value of the trace was unimportant! QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0bfba72" class="outline-3">
+<h3 id="org0bfba72">Exercise 2.82</h3>
+<div class="outline-text-3" id="text-org0bfba72">
+<p>
+Suppose \(\{p_i , |\psi_i\rangle\}\) is an ensemble of states generating a density matrix \(\rho\)
+for a quantum system A. Introduce a system R with orthonormal basis \(|i\rangle\).
+</p>
+
+<ol class="org-ol">
+<li>Show that \(\sum_i \sqrt{p_i} |\psi_i\rangle|i\rangle\) is a purification of \(\rho\).</li>
+<li>Suppose we measure R in the basis \((|i\rangle)\), obtaining outcome i. With what probability do we
+obtain the result \(i\), and what is the corresponding state of system A?</li>
+<li>Let \(|AR\rangle\) be any purification of \(\rho\) to the system AR. Show that there exists an
+orthonormal basis \(|i\rangle\) in which R can be measured such that the corresponding
+post-measurement state for system A is \(|\psi_i\rangle\) with probability \(p_i\).</li>
+</ol>
+
+<p>
+Remark (which is missing in the book): In sub-exercise 3 one may assume that the space \(R\) is large
+enough to hold all the \(|i\rangle\) even if the purification does not need that many dimensions (two
+ensembles always have at least \(r\) (rank) members but might have more, see also Theorem 2.6).
+</p>
+</div>
+
+<div id="outline-container-org668a073" class="outline-4">
+<h4 id="org668a073">Proof of 1</h4>
+<div class="outline-text-4" id="text-org668a073">
+<p>
+This was <i>essentially</i> shown in the book right before Exercise 2.79! In the book it was <i>implicitly</i>
+assumed that the \(|\psi\rangle\) are orthonormal (by using the Schmidt-Decomposition of \(\rho\)). But
+the proof did not use this fact. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org161e2f4" class="outline-4">
+<h4 id="org161e2f4">Proof of 2</h4>
+<div class="outline-text-4" id="text-org161e2f4">
+<p>
+Recall that:
+</p>
+
+<p>
+\[
+  \,|AR\rangle = \sum_i \sqrt{p_i} |\psi_i\rangle |i\rangle .
+\]
+</p>
+
+<p>
+The measurement of \(i\) as viewed from the whole system AR is represented by
+\(I\otimes|i\rangle\langle i|\) (see Box 2.6). Hence the probability to measure \(i\) is:
+</p>
+
+<p>
+\[
+  p(i) = \langle AR|I\otimes|i\rangle\langle i| AR\rangle = p_i .
+\]
+</p>
+
+<p>
+The post-measurement state is:
+</p>
+
+<p>
+\[
+  \frac{1}{p(i)} I\otimes|i\rangle\langle i| AR\rangle = |\psi\rangle|i\rangle .
+\]
+</p>
+
+<p>
+Restricted to A this is corresponds to \(|\psi\rangle\) (note that this does not <i>directly</i> follow
+from Postulate 4 but it is easy to show that product state behave nice under decomposition into the
+corresponding subsystems). QED.
+</p>
+
+<p>
+<b>Although it is not asked for</b>, here is the state of R expressed as a density matrix (before measurement):
+</p>
+
+<p>
+\[
+  \rho^R = \ptrace{A}{|AR\rangle\langle AR|} = \sum_{ij} \sqrt{p_i p_j} \langle\psi_i|\psi_j\rangle |i\rangle\langle i| .
+\]
+</p>
+
+<p>
+It is nice to verify that the after measurement results restricted to R are consistent with the
+above:
+</p>
+
+<p>
+\[
+  p(i) = p_i = \trace{|i\rangle\langle i| \rho^R} ,
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+\,  |i\rangle = \frac{1}{p_i} |i\rangle\langle i| \rho^R |i\rangle\langle i| .
+\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge630bea" class="outline-4">
+<h4 id="orge630bea">Proof of 3</h4>
+<div class="outline-text-4" id="text-orge630bea">
+<p>
+Unfortunately there is a notation clash here. Let us rename the orthonormal set used in part 1 to
+\((|i_0\rangle)\) and the corresponding purified vector to \(|AR_0\rangle\). By exercise 2.81 (freedom
+of purifications) there is a unitary operator \(U_R\) such that:
+</p>
+
+<p>
+\[ |AR\rangle = I\otimes U_R \; |AR_0\rangle \]
+</p>
+
+<p>
+Hence we may use the basis \((|i\rangle=U_R|i_0\rangle)\) to achieve the desired goal.
+</p>
+
+<p>
+But note a subtle issue here: A priori \(U_R\) is not necessarily defined on each individual
+\(|i_0\rangle\). The reason is, that each density operator has ensembles with arbitrary many states
+(of course they are all linearly dependent to some \(r\) dimensional set due to Theorem 2.6). This
+implies that R0 can be arbitrary large if one takes the construction in sub-exercise 1. On the
+other hand one can just "add some dimensions" to R if necessary and extend \(U_R\) unitarily. QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Notation</title><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="/">HOME</a></nav><h1 class="title">Notation</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+
+<p>
+For two hermitian operators we write:
+</p>
+
+<p>
+\[ A \leq B \]
+</p>
+
+<p>
+if \(\langle\psi|B - A|\psi\rangle \geq 0\) for all \(|\psi\rangle\). In the special case that one
+operator is just a multiple of the Identity, e.g. \(A=aI\), we write:
+</p>
+
+<p>
+\[ a \leq B \]
+</p>
+
+<p>
+We define the <a href="https://en.wikipedia.org/wiki/Kronecker_delta">Kronecker delta</a> to be
+</p>
+
+<p>
+\[
+\delta_{ij} = \begin{cases}
+  0 & \text{if } i \neq j, \\
+  1 & \text{if } i = j. \end{cases}
+\]
+</p>
+
+<p>
+The <i>Fourier transform</i> is denoted like that:
+</p>
+
+<p>
+\[
+  \FT \sum_{k=0}^{N-1} x_k |k\rangle = \frac{1}{\sqrt{N}} \sum_{k,j=0}^{N-1} x_k e^{\frac{2\pi\ii}{N}kj} |j\rangle .
+\]
+</p>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>

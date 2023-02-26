@@ -1,0 +1,912 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 3</title><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="/">HOME</a></nav><h1 class="title">Chapter 3</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\]
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0e3b9ee">Setup</a>
+<ul>
+<li><a href="#org272dee8">Python Libraries</a></li>
+<li><a href="#org02634e7">Turing Machines</a></li>
+</ul>
+</li>
+<li><a href="#org6076b1f"><span class="todo WIP">WIP</span> Exercises</a>
+<ul>
+<li><a href="#org72a9511"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#orge20cae2">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#org48d15cb">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0e3b9ee" class="outline-2">
+<h2 id="org0e3b9ee">Setup</h2>
+<div class="outline-text-2" id="text-org0e3b9ee">
+</div>
+<div id="outline-container-org272dee8" class="outline-3">
+<h3 id="org272dee8">Python Libraries</h3>
+<div class="outline-text-3" id="text-org272dee8">
+<div class="org-src-container">
+<pre class="src src-python" id="org0206012"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
+<span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Terminal colors. TODO: Move somwhere else.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")</span>
+<span class="org-keyword">class</span> <span class="org-type">TermColor</span>:
+    <span class="org-variable-name">GREEN</span> = <span class="org-string">'\033[32m'</span>
+    <span class="org-variable-name">RED</span> = <span class="org-string">'\033[31m'</span>
+    <span class="org-variable-name">ENDC</span> = <span class="org-string">'\033[0m'</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org02634e7" class="outline-3">
+<h3 id="org02634e7">Turing Machines</h3>
+<div class="outline-text-3" id="text-org02634e7">
+</div>
+<div id="outline-container-org715cd82" class="outline-4">
+<h4 id="org715cd82">Introduction</h4>
+<div class="outline-text-4" id="text-org715cd82">
+<p>
+In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
+this one:
+</p>
+
+<pre class="example" id="tprog-constant-one">
+# This program computes the function f(n)=1.
+# Example: input="▶1001", output="▶1".
+(S,▶,1,▶,+) # S is the start state
+(1,0,1,■,+)
+(1,1,1,■,+)
+(1,■,2,■,-)
+(2,■,2,■,-)
+(2,▶,3,▶,+)
+(3,■,H,1,0) # H is the halt state
+</pre>
+
+<p>
+Below we initialize a turing machine <code>my_tm</code> from the above source code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org948430e"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
+<span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
+
+<span class="org-variable-name">result</span> = my_tm.run(<span class="org-string">"&#9654;0"</span>)
+<span class="org-keyword">print</span>(f<span class="org-string">"\nresult = '{result}'"</span>)
+</pre>
+</div>
+
+<p>
+Setting <code>LOG_LEVEL=3</code> makes the Turing machine print certain informations for each step of
+execution. The result can be seen in the following listing (with <code>COLORED_LOG=True</code> this would be
+even more informative). Note that in theory the tape is infinite. We realize this by dynamically
+allocating new blank cells whenever we want to access a cell not already allocated (we roughly
+double the tape size in that case).
+</p>
+
+<pre class="example">
+
+Executing step 1
+tape = '▶0'
+state='S', symbol='▶', head_position=0
+source line = 2: (S,▶,1,▶,+) # S is the start state
+
+Executing step 2
+tape = '▶0'
+state='1', symbol='0', head_position=1
+source line = 3: (1,0,1,■,+)
+
+Executing step 3
+tape = '▶■■■■'
+state='1', symbol='■', head_position=2
+source line = 5: (1,■,2,■,-)
+
+Executing step 4
+tape = '▶■■■■'
+state='2', symbol='■', head_position=1
+source line = 6: (2,■,2,■,-)
+
+Executing step 5
+tape = '▶■■■■'
+state='2', symbol='▶', head_position=0
+source line = 7: (2,▶,3,▶,+)
+
+Executing step 6
+tape = '▶■■■■'
+state='3', symbol='■', head_position=1
+source line = 8: (3,■,H,1,0) # H is the halt state
+
+Execution took 6 steps.
+
+result = '▶1'
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgec9f2fc" class="outline-4">
+<h4 id="orgec9f2fc">Implementation</h4>
+<div class="outline-text-4" id="text-orgec9f2fc">
+<p>
+First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
+readable or at least mnemonic state names. This would not be possible had we used integers. The
+<code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
+from the source-string/file. It is the reason why in the <a href="#org948430e">listing above</a> the <code>TuringMachine</code> instance
+can refer to its source (see the line starting with <code>source line =</code>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org7739a52"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
+<span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
+<span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
+<span class="org-variable-name">TuringProgram</span> = <span class="org-builtin">list</span>[TuringProgLine]
+
+<span class="org-variable-name">SourceMap</span> = <span class="org-builtin">list</span>[<span class="org-builtin">tuple</span>[<span class="org-builtin">int</span>, <span class="org-builtin">str</span>]]
+<span class="org-variable-name">TuringParser</span> = Callable[[<span class="org-builtin">str</span>], [<span class="org-builtin">tuple</span>[TuringProgram, SourceMap | <span class="org-constant">None</span>]]]
+</pre>
+</div>
+
+<p>
+<a href="#org61cee20">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+implementation a bit. But it you ignore this the implementation is very simple and straightforward
+to understand (IMHO).
+</p>
+
+<p>
+Note that the <code>__init__</code> method takes the program as an already parsed list of tuples
+(<code>TuringProgram</code>). The canonical way to create a <code>TuringMachine</code> is to use the <code>fromSource</code> factory
+method. Among other things you can optionally provide a custom parser. This might be beneficial to
+introduce syntactic sugar. For example the code snippit
+</p>
+
+<pre class="example">
+(a,0,a,0,+)
+(a,1,a,1,+)
+(a,2,a,2,+)
+(a,3,a,3,+)
+(a,4,a,4,+)
+(a,5,a,5,+)
+</pre>
+
+<p>
+might seem somewhat verbose. Probably this would be nicer syntax:
+</p>
+
+<pre class="example">
+(a,0|1|2|3|4|5,a,$,+)  # "$" meaning: take the original
+# or even (if this is the intended meaning)
+(a,*,a,$,+)  # "*" meaning: match all
+</pre>
+
+<p>
+Another reason to use a custom parser would be to circumvent some restrictions of the default
+parser. For example the default parser treats the symbols <code>#</code>, <code>,</code>, <code>(</code>, <code>)</code> in a special way. In
+particular, those cannot be used as characters on the tape.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org61cee20"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+    <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
+    BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
+    <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
+    <span class="org-variable-name">LOG_LEVEL</span> = 0  <span class="org-comment-delimiter"># </span><span class="org-comment">Set greater 0 for a chatty execution</span>
+    <span class="org-variable-name">COLORED_LOG</span> = <span class="org-constant">True</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Turn of if environment does not support colors</span>
+    <span class="org-variable-name">SOURCE_LINE_OFFSET</span> = 0  <span class="org-comment-delimiter"># </span><span class="org-comment">SourceMap assumes that source file start with line 0. Adjust this here.</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, program: TuringProgram,
+                 start_state: State = <span class="org-string">"START"</span>, halt_state: State = <span class="org-string">"HALT"</span>,
+                 source_map: Optional[SourceMap] = <span class="org-constant">None</span>):
+        <span class="org-keyword">self</span>._start_state = start_state
+        <span class="org-keyword">self</span>._halt_state = halt_state
+        <span class="org-keyword">self</span>._program = program
+        <span class="org-keyword">self</span>._source_map = source_map
+
+        <span class="org-keyword">assert</span> source_map <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">or</span> <span class="org-builtin">len</span>(source_map) == <span class="org-builtin">len</span>(program), <span class="org-string">"Invalid source_map"</span>
+
+        <span class="org-keyword">self</span>._state = <span class="org-constant">None</span>
+        <span class="org-keyword">self</span>._head_position: <span class="org-builtin">int</span> = <span class="org-constant">None</span>
+        <span class="org-keyword">self</span>._tape: <span class="org-builtin">list</span>[Char] = []  <span class="org-comment-delimiter"># </span><span class="org-comment">gets input during execution</span>
+        <span class="org-keyword">self</span>._step_count = <span class="org-constant">None</span>
+
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Only relevant for logging:</span>
+        <span class="org-keyword">self</span>._index_width = <span class="org-builtin">len</span>(<span class="org-builtin">str</span>(<span class="org-builtin">len</span>(<span class="org-keyword">self</span>._program)-1))
+
+    @<span class="org-builtin">classmethod</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">fromSource</span>(cls, source: <span class="org-builtin">str</span>,
+                   start_state: State = <span class="org-string">"START"</span>, halt_state: State = <span class="org-string">"HALT"</span>,
+                   parser: TuringParser = parse_turing_program) -&gt; <span class="org-string">"TuringMachine"</span>:
+        <span class="org-doc">"""Create a turing machine from a source string. You can provide a custom parser."""</span>
+        <span class="org-variable-name">program</span>, <span class="org-variable-name">source_map</span> = parser(source)
+        <span class="org-keyword">return</span> TuringMachine(program,
+                             start_state=start_state, halt_state=halt_state,
+                             source_map=source_map)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">run</span>(<span class="org-keyword">self</span>, tape_input: <span class="org-builtin">str</span>) -&gt; <span class="org-builtin">str</span>:
+        <span class="org-doc">"""Run the TM and return what is on the tape after it halts."""</span>
+        <span class="org-keyword">self</span>._state = <span class="org-keyword">self</span>._start_state
+        <span class="org-keyword">self</span>._head_position = 0
+        <span class="org-keyword">self</span>._tape = <span class="org-builtin">list</span>(tape_input)
+        <span class="org-keyword">self</span>._step_count = 0
+
+        <span class="org-keyword">while</span> <span class="org-keyword">self</span>._state != <span class="org-keyword">self</span>._halt_state:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>._step_count &gt; <span class="org-keyword">self</span>.MAX_STEPS:
+                <span class="org-keyword">raise</span> <span class="org-type">Exception</span>(<span class="org-string">"Turing machine takes too long. Aborting."</span>)
+            <span class="org-keyword">self</span>._step_count += 1
+            <span class="org-keyword">self</span>._log(2, f<span class="org-string">"\nExecuting step {self._step_count}"</span>)
+            <span class="org-keyword">self</span>._run_one_step()
+
+        <span class="org-keyword">self</span>._log(1, f<span class="org-string">"\nExecution took {self._step_count} steps."</span>)
+
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>._tape_content.strip(<span class="org-keyword">self</span>.BLANK)
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_line_no_width</span>(<span class="org-keyword">self</span>):  <span class="org-comment-delimiter"># </span><span class="org-comment">only relevant for logging</span>
+        <span class="org-keyword">return</span> <span class="org-constant">None</span> <span class="org-keyword">if</span> <span class="org-keyword">self</span>._source_map <span class="org-keyword">is</span> <span class="org-constant">None</span> \
+            <span class="org-keyword">else</span> <span class="org-builtin">len</span>(<span class="org-builtin">str</span>(<span class="org-keyword">self</span>._source_map[-1][0] + <span class="org-keyword">self</span>.SOURCE_LINE_OFFSET - 1))
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_log</span>(<span class="org-keyword">self</span>, level, *args, **kwargs):
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.LOG_LEVEL &gt;= level:
+            <span class="org-keyword">print</span>(*args, **kwargs)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_run_one_step</span>(<span class="org-keyword">self</span>) -&gt; <span class="org-constant">None</span>:
+        <span class="org-keyword">self</span>._log(3, f<span class="org-string">"tape = '{self._colored_tape_content}'"</span>)
+        <span class="org-variable-name">current_line</span> = <span class="org-keyword">self</span>._current_program_line
+
+        <span class="org-keyword">if</span> current_line <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+            <span class="org-variable-name">RED</span>, <span class="org-variable-name">ENDC</span> = (TermColor.RED, TermColor.ENDC) <span class="org-keyword">if</span> <span class="org-keyword">self</span>.COLORED_LOG <span class="org-keyword">else</span> (<span class="org-string">""</span>, <span class="org-string">""</span>)
+            <span class="org-keyword">self</span>._log(2, f<span class="org-string">"{RED}No matching program line - halting{ENDC}"</span>)
+            <span class="org-keyword">self</span>._state = <span class="org-keyword">self</span>._halt_state
+            <span class="org-keyword">return</span>
+
+        <span class="org-variable-name">index</span>, <span class="org-variable-name">current_line</span> = current_line
+        <span class="org-keyword">self</span>._log(4, f<span class="org-string">"program line = {index:{self._index_width}}: {current_line}"</span>)
+
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>._source_map <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            <span class="org-variable-name">line_no</span>, <span class="org-variable-name">source_line</span> = <span class="org-keyword">self</span>._source_map[index]
+            <span class="org-variable-name">line_no</span> += <span class="org-keyword">self</span>.SOURCE_LINE_OFFSET
+            <span class="org-keyword">self</span>._log(3, f<span class="org-string">"source line = {line_no:{self._line_no_width}}: {source_line}"</span>)
+
+        <span class="org-variable-name">s1</span>, <span class="org-variable-name">c1</span>, <span class="org-variable-name">m</span> = current_line[2:]
+
+        <span class="org-keyword">self</span>._state = s1
+        <span class="org-keyword">self</span>._head_symbol = c1
+        <span class="org-comment-delimiter"># </span><span class="org-comment">avoid negative positions:</span>
+        <span class="org-keyword">self</span>._head_position = <span class="org-builtin">max</span>(<span class="org-keyword">self</span>._head_position + m, 0)
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_tape_content</span>(<span class="org-keyword">self</span>) -&gt; <span class="org-builtin">str</span>:
+        <span class="org-keyword">return</span> <span class="org-string">""</span>.join(<span class="org-keyword">self</span>._tape)
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_colored_tape_content</span>(<span class="org-keyword">self</span>) -&gt; <span class="org-builtin">str</span>:
+        <span class="org-keyword">self</span>._enlarge_tape_if_necessary()
+        <span class="org-variable-name">text</span> = <span class="org-keyword">self</span>._tape_content
+        <span class="org-variable-name">pos</span> = <span class="org-keyword">self</span>._head_position
+        <span class="org-variable-name">GREEN</span>, <span class="org-variable-name">ENDC</span> = (TermColor.GREEN, TermColor.ENDC) <span class="org-keyword">if</span> <span class="org-keyword">self</span>.COLORED_LOG <span class="org-keyword">else</span> (<span class="org-string">""</span>, <span class="org-string">""</span>)
+        <span class="org-keyword">return</span> text[:pos] + GREEN + text[pos] + ENDC + text[pos+1:]
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_current_program_line</span>(<span class="org-keyword">self</span>) -&gt; <span class="org-builtin">tuple</span>[<span class="org-builtin">int</span>, TuringProgLine]:
+        <span class="org-variable-name">s0</span>, <span class="org-variable-name">c0</span> = <span class="org-keyword">self</span>._state, <span class="org-keyword">self</span>._head_symbol
+        <span class="org-keyword">self</span>._log(2, f<span class="org-string">"state='{s0}', symbol='{c0}', head_position={self._head_position}"</span>)
+        <span class="org-keyword">for</span> i, line <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(<span class="org-keyword">self</span>._program):
+            <span class="org-variable-name">s</span>, <span class="org-variable-name">c</span> = line[:2]
+            <span class="org-keyword">if</span> s0 == s <span class="org-keyword">and</span> c0 == c:
+                <span class="org-keyword">return</span> i, line
+
+        <span class="org-keyword">return</span> <span class="org-constant">None</span>
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_head_symbol</span>(<span class="org-keyword">self</span>) -&gt; Char:
+        <span class="org-keyword">self</span>._enlarge_tape_if_necessary()
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>._tape[<span class="org-keyword">self</span>._head_position]
+
+    <span class="org-type">@_head_symbol.setter</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_head_symbol</span>(<span class="org-keyword">self</span>, new_symbol) -&gt; Char:
+        <span class="org-keyword">self</span>._enlarge_tape_if_necessary()  <span class="org-comment-delimiter"># </span><span class="org-comment">just being paranoid</span>
+        <span class="org-keyword">self</span>._tape[<span class="org-keyword">self</span>._head_position] = new_symbol
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_enlarge_tape_if_necessary</span>(<span class="org-keyword">self</span>) -&gt; <span class="org-constant">None</span>:
+        <span class="org-doc">"""Call this to ensure that our finite tape can actually be accessed at head position."""</span>
+        <span class="org-variable-name">pos</span> = <span class="org-keyword">self</span>._head_position
+        <span class="org-keyword">while</span> pos &gt;= <span class="org-builtin">len</span>(<span class="org-keyword">self</span>._tape):  <span class="org-comment-delimiter"># </span><span class="org-comment">only one loop usually suffices</span>
+            <span class="org-variable-name">some_blanks</span> = [<span class="org-keyword">self</span>.BLANK] * (1 + <span class="org-builtin">len</span>(<span class="org-keyword">self</span>._tape))
+            <span class="org-keyword">self</span>._tape += some_blanks  <span class="org-comment-delimiter"># </span><span class="org-comment">double tape size</span>
+</pre>
+</div>
+
+<p>
+Finally, the default parser:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgebad00a"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+    <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
+
+<span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Remove comments and leading/trailing whitespace</span>
+    <span class="org-variable-name">line</span> = line[:line.find(<span class="org-string">'#'</span>)].strip()
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(line) == 0:
+        <span class="org-keyword">return</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">line comment or empty line</span>
+
+    <span class="org-variable-name">line</span> = line.strip().lstrip(<span class="org-string">"("</span>).rstrip(<span class="org-string">")"</span>)
+    <span class="org-variable-name">s0</span>, <span class="org-variable-name">c0</span>, <span class="org-variable-name">s1</span>, <span class="org-variable-name">c1</span>, <span class="org-variable-name">m</span> = line.split(<span class="org-string">","</span>)
+    <span class="org-variable-name">m</span> = +1 <span class="org-keyword">if</span> m == <span class="org-string">"+"</span> <span class="org-keyword">else</span> m  <span class="org-comment-delimiter"># </span><span class="org-comment">for convinience ...</span>
+    <span class="org-variable-name">m</span> = -1 <span class="org-keyword">if</span> m == <span class="org-string">"-"</span> <span class="org-keyword">else</span> m  <span class="org-comment-delimiter"># </span><span class="org-comment">... allow shortcuts for +1, -1</span>
+    <span class="org-variable-name">m</span> = <span class="org-builtin">int</span>(m)
+    <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(c0) == 1, f<span class="org-string">"Expected character got '{c0}'."</span>
+    <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(c1) == 1, f<span class="org-string">"Expected character got '{c1}'."</span>
+    <span class="org-keyword">assert</span> m <span class="org-keyword">in</span> [-1, 0, +1], f<span class="org-string">"Forbidden head movement: {m}."</span>
+
+    <span class="org-keyword">return</span> s0, c0, s1, c1, m
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program</span>(source: <span class="org-builtin">str</span>) -&gt; <span class="org-builtin">tuple</span>[TuringProgram, SourceMap]:
+    <span class="org-doc">"""Parses the source of a turing program line by line."""</span>
+    program: <span class="org-variable-name">TuringProgram</span> = []
+    source_map: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>] = []
+
+    <span class="org-variable-name">lines</span> = source.split(<span class="org-string">"\n"</span>)
+    <span class="org-keyword">for</span> line_no, line <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(lines):
+        <span class="org-keyword">try</span>:
+            <span class="org-variable-name">parsed_line</span> = parse_turing_program_line(line)
+        <span class="org-keyword">except</span> <span class="org-type">Exception</span>:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Probably good enough for such a simple language:</span>
+            <span class="org-keyword">raise</span> <span class="org-type">Exception</span>(f<span class="org-string">"Could not parse line {line_no}: '{line}'"</span>)
+
+        <span class="org-keyword">if</span> parsed_line <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            program.append(parsed_line)
+            source_map.append((line_no, line))
+
+    <span class="org-keyword">return</span> program, source_map
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8dd4e80" class="outline-4">
+<h4 id="org8dd4e80">Very basic unit tests</h4>
+<div class="outline-text-4" id="text-org8dd4e80">
+<p>
+Tests for <code>TuringMachine</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org6fc13e2"><span class="org-comment-delimiter"># </span><span class="org-comment">If the tape initially is blank, this prints "XYZ"</span>
+<span class="org-variable-name">prog_print_XYZ</span> = [
+    (<span class="org-string">"S"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"X"</span>, +1),
+    (<span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"3"</span>, <span class="org-string">"Y"</span>, +1),
+    (<span class="org-string">"3"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"H"</span>, <span class="org-string">"Z"</span>,  0),
+]
+
+<span class="org-variable-name">tm1</span> = TuringMachine(prog_print_XYZ, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+
+<span class="org-keyword">assert</span> tm1.run(<span class="org-string">""</span>) == <span class="org-string">"XYZ"</span>, <span class="org-string">"test TuringMachine vs prog_print_XYZ - 1"</span>
+<span class="org-keyword">assert</span> tm1.run(<span class="org-string">"a"</span>) == <span class="org-string">"a"</span>, <span class="org-string">"test TuringMachine vs prog_print_XYZ - 1"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The example from the book. Assume the input tape starts with "&#9654;" followed by an integer n in</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">binary followed by blanks. Then the turing machine outputs f(n)=1 (in the same format as the</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">input). Any other input tape leads to undefined behavior (C++ speak), that is, we guarantee</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">nothing in that case.</span>
+<span class="org-variable-name">prog_compute_constant_1</span> = [
+  (<span class="org-string">"S"</span>, <span class="org-string">"&#9654;"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9654;"</span>, +1),
+  (<span class="org-string">"1"</span>, <span class="org-string">"0"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, +1),
+  (<span class="org-string">"1"</span>, <span class="org-string">"1"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, +1),
+  (<span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, -1),
+  (<span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, -1),
+  (<span class="org-string">"2"</span>, <span class="org-string">"&#9654;"</span>, <span class="org-string">"3"</span>, <span class="org-string">"&#9654;"</span>, +1),
+  (<span class="org-string">"3"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"H"</span>, <span class="org-string">"1"</span>,  0),
+]
+
+<span class="org-variable-name">tm2</span> = TuringMachine(prog_compute_constant_1, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+
+<span class="org-keyword">assert</span> tm2.run(<span class="org-string">"&#9654;1011"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine vs prog_compute_constant_1 - 1"</span>
+<span class="org-keyword">assert</span> tm2.run(<span class="org-string">"&#9654;0"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine vs prog_compute_constant_1 - 2"</span>
+</pre>
+</div>
+
+
+<p>
+Tests for the default parser:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org3c1841f"><span class="org-variable-name">prog_print_XYZ_str</span> = \
+<span class="org-string">"""# Anything behind '#' is a comment. Empty lines are ignored.</span>
+
+<span class="org-string">(S,&#9632;,2,X,+)  # We use "+" and "-" as shortcuts for +1 and -1.</span>
+<span class="org-string">  (2,&#9632;,3,Y,+)  # Indentation is irrelevant.</span>
+<span class="org-string">(3,&#9632;,H1,Z,-)  # We go to the left before halting - just for fun</span>
+<span class="org-string">(H1,Y,H,Y,0)</span>
+<span class="org-string"># whitespace inside (...) is (mostly) important. We could not replace the last line by this:</span>
+<span class="org-string"># (H1,Y,H ,Y,0)</span>
+<span class="org-string">"""</span>
+
+<span class="org-variable-name">parsed_prog</span>, <span class="org-variable-name">source_map</span> = parse_turing_program(prog_print_XYZ_str)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Python seems to compare these structs recursively by value &#128077;:</span>
+<span class="org-keyword">assert</span> source_map == [
+    (2, <span class="org-string">"(S,&#9632;,2,X,+)  # We use \"+\" and \"-\" as shortcuts for +1 and -1."</span>),
+    (3, <span class="org-string">"  (2,&#9632;,3,Y,+)  # Indentation is irrelevant."</span>),
+    (4, <span class="org-string">"(3,&#9632;,H1,Z,-)  # We go to the left before halting - just for fun"</span>),
+    (5, <span class="org-string">"(H1,Y,H,Y,0)"</span>),
+], <span class="org-string">"test parse_turing_program - 1"</span>
+<span class="org-keyword">assert</span> parsed_prog == [
+    (<span class="org-string">'S'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'2'</span>, <span class="org-string">'X'</span>, +1),
+    (<span class="org-string">'2'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'3'</span>, <span class="org-string">'Y'</span>, +1),
+    (<span class="org-string">'3'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'H1'</span>, <span class="org-string">'Z'</span>, -1),
+    (<span class="org-string">'H1'</span>, <span class="org-string">'Y'</span>, <span class="org-string">'H'</span>, <span class="org-string">'Y'</span>, 0)
+], <span class="org-string">"test parse_turing_program - 2"</span>
+</pre>
+</div>
+
+<p>
+Tests for <code>TuringMachine.fromSource</code>. The <code>source</code> is taken from the <a href="#org5b8af8a">listing</a> on the Turing machine
+computing \(f(n)=1\).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="org9ba422a"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;1001"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine.fromSource"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6076b1f" class="outline-2">
+<h2 id="org6076b1f"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-org6076b1f">
+</div>
+<div id="outline-container-org72a9511" class="outline-3">
+<h3 id="org72a9511"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-org72a9511">
+<p>
+How might we recognize that a process in Nature computes a function not computable by a Turing
+machine?
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge20cae2" class="outline-3">
+<h3 id="orge20cae2">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-orge20cae2">
+<p>
+Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
+such a way that the number uniquely specifies the corresponding machine. We call this number the
+Turing number of the corresponding Turing machine. (<i>Hint</i>: Every positive integer has a unique
+prime factorization \(p_1^{a_1}p_2^{a_2}\cdots p_k^{a_k}\), where \(p_i\) are distinct prime numbers,
+and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
+</p>
+</div>
+
+<div id="outline-container-orgaba8838" class="outline-4">
+<h4 id="orgaba8838">Proof</h4>
+<div class="outline-text-4" id="text-orgaba8838">
+<p>
+For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
+consider (one could easily relax this constraint without complicating the encoding). Hence we need
+to encode the start state, the halt state and the program into a single number. This is sufficient
+to describe the Turing Machine. We follow the proposal to use prime numbers for that. Therefore let
+us enumerate the prime numbers starting by \(2\): \(p_1=2\), \(p_2=3\), &#x2026;, \(p_5=11\), &#x2026; .
+</p>
+
+<p>
+This procedure is certainly not the most efficient one but it serves the purpose to show that all
+Turing machines (satsifying a specific definition/architecture) can be <i>effectively</i>
+enumerated. That is, there is an <i>algorithm</i> (which could potentially run on a Turing machine),
+which assigns numbers to each Turing machine. Moreover this assignment is invertible and the inverse
+mapping (numbers to Turing machines) can be computed by an <i>algorithm</i> too.
+</p>
+
+<p>
+Let us identify the states \(S\) and the elements of the alphabet \(\Gamma\) with integers:
+</p>
+
+<p>
+\[
+  S = \{0, 1, 2, \ldots\} ; \quad \Gamma = \{0, 1, 2, \ldots\} .
+\]
+</p>
+
+<p>
+Moreover, we encode the possible movements by \(\{0,1,2\}\), meaning <i>left</i>, <i>stay</i>, <i>right</i> in that
+order. We encode the start state \(s\in\NN\) and the halt state \(h\in\NN\) by
+</p>
+
+<p>
+\[
+  p_1^s \text{ and } p_2^h .
+\]
+</p>
+
+<p>
+The \(i\)​-th program line
+</p>
+
+<p>
+\[
+  (q_i,c_i,q'_i,c'_i,m_i) \in \NN^4\times\{0,1,2\}
+\]
+</p>
+
+<p>
+can be encoded by
+</p>
+
+<p>
+\[
+  l_i = p_{5i+3}^{q_i} \, p_{5i+4}^{c_i} \, p_{5i+5}^{q'_i} \, p_{5i+6}^{c'_i} \, p_{5i+7}^{m_i} .
+\]
+</p>
+
+<p>
+The whole program is then encoded by the product \(\Pi_il_i\) and the Turing machine itself by
+\(p_1^s\,p_2^h\,\Pi_il_i\). Since prime factorization of integers is unique, this encoding is
+invertible and hence the Turing machine can be recovered from this (potentially large) number. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org48d15cb" class="outline-3">
+<h3 id="org48d15cb">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-org48d15cb">
+<p>
+Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
+reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
+and/or symbols other than ▶, 0, 1, and the blank.)
+</p>
+</div>
+
+<div id="outline-container-orgb60452e" class="outline-4">
+<h4 id="orgb60452e">Solution</h4>
+<div class="outline-text-4" id="text-orgb60452e">
+<p>
+We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
+following.
+</p>
+
+<p>
+Assume that the input tape starts with the left-end-marker "▶" followed by the number \(x\) in
+binary. All other cells should be blank. As an example, for \(x=13\) the input tape should look like
+that:
+</p>
+
+<pre class="example" id="exercise-3.3-input-tape">
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+</pre>
+
+<p>
+Note that the empty tape is not allowed - there should always be at least one digit. The Turing
+machine should halt with only the reversed bitstring at the beginning of the tape. In the example
+above:
+</p>
+
+<pre class="example" id="exercise-3.3-output-tape">
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+</pre>
+
+<p>
+The idea of the algorithm is as follows (the white blanks <code>□</code> simplify the implementation):
+</p>
+
+<dl class="org-dl">
+<dt>1. Reverse the string, but shifted</dt><dd><code>▶1011■■■■■</code> → <code>▶□□□□1101■</code></dd>
+<dt>2. Shift the reversed string to the correct position</dt><dd><code>▶□□□□1101■</code> → <code>▶1101□□□□■</code></dd>
+<dt>3. Remove trailing white blanks</dt><dd><code>▶1101□□□□■</code> → <code>▶1101■■■■■</code></dd>
+</dl>
+
+<p>
+Step-by-step the first part does the following. What we call <i>step</i> is actually several steps for
+the Turing machine (since the head can only move by one position at a time). We remark already here
+that the last displayed cell, containing a blank (always), is very important as an end-marker for
+the second step of the algorithm.
+</p>
+
+<pre class="example" id="exercise-3.3-how-algorithm-works-1">
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ □ │ 1 │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ □ │ □ │ 1 │ 0 │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ 1 │ 0 │ 1 │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+</pre>
+
+<p>
+The second part of the algorithm does this:
+</p>
+
+<pre class="example" id="exercise-3.3-how-algorithm-works-2">
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ □ │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ □ │ □ │ □ │ □ │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ □ │ □ │ □ │ □ │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+</pre>
+
+<p>
+Finally the third part acts like this:
+</p>
+
+<pre class="example" id="exercise-3.3-how-algorithm-works-3">
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+</pre>
+
+<p>
+In the following we present a <a href="#org9ba9588">Turing program</a> which does exactly this. Don't worry, most of the
+program is just comments - explaining how it works, and at the same time giving a kind of
+<i>inline-proof</i> that the program is correct in the sense that it "does what we want".
+</p>
+
+<p>
+To best understand the inline-proof read the following explanations:
+</p>
+<ul class="org-ul">
+<li>The program consists of set of source <i>blocks</i> - kind of subroutines of the program.</li>
+<li>Each block is a sequence of program lines without any intermediate <i>empty lines</i> (line comments
+are OK).</li>
+<li>Each block has one or more <i>entry</i> lines (marked by a comment <code># entry</code>). If a block is entered we
+require that we start at one of these lines - everything else is considered an error (does not
+happen if the program as a whole is correct).</li>
+<li>Each block has one ore more <i>exit</i> lines (marked by a comment <code># exit</code>). Each block must guarantee
+that upon entering another block (or halting) we do this via one of these lines.</li>
+<li>Each block has <i>pre-conditions</i>. These are sets of statements that we require to hold immediately
+before the first line of the block is executed (each time a block is "called"). If we enter a
+block but the pre-conditions do not hold we call this <i>undefined behavior</i>. We require that our
+program never runs into undefined behavior.</li>
+<li>Each block has <i>post-conditions</i>. These are sets of statements that we require to hold immediately
+after we "return" from the block. The block must ensure that these statements hold.</li>
+<li>Each block has zero or more <i>successor blocks</i>. Upon exiting the block it is guaranteed that we
+must enter one if these successor blocks. This info helps navigating the code, since there are
+usually only very few succesor blocks for each block.</li>
+</ul>
+
+<pre class="example" id="exercise-3.3-solution-source">
+# Turing program to reverse a string of bits (0s and 1s):
+#   - input  : "▶a...z■..." where a...z is a string of 0s and 1s
+#     followed by at least length-of(a..z)+1 blanks (this is important).
+#   - output : "▶z...a■..." where z...a is the reversed string.
+# The head starts and finishes at "▶".
+
+#
+##
+### Part 1: Map ▶a...z■...■ to ▶□...□z...a
+##
+#
+
+# In part 1 the tape always contains "▶" followed by a bitstring A, followed
+# by a series W of *white* blanks (special markers), followed by a bitstring B.
+# Initially B and W are empty and A is the input string. At the end A is empty,
+# W is at its place, and B contains the reversed string.
+
+# B1: At the beginning we just step into A
+# Pre-Conditions:
+#   - tape content is "▶" followed by A, followed by blanks
+#   - A is non-empty, W and B are empty
+#   - Head is at "▶"
+# Post-Conditions:
+#   - Head is at the beginning of A
+#   - tape content is unchanged (by the action of this block)
+# Successor Blocks: B1.
+(START,▶,a,▶,+) # entry and exit
+
+# B2: Move the head to the end of A
+# Pre-Conditions:
+#   - Head is inside A,
+#   - A is followed by at least one blank.
+# Post-Conditions:
+#   - Head is at last bit of A (points at 0 or 1)
+#   - tape content is unchanged
+# Successor Blocks: B3
+(a,0,a,0,+) # entry
+(a,1,a,1,+) # entry
+(a,■,b,■,-) # exit
+
+# B3: Special case if B still empty: Move the last bit of A one step to the right.
+# Pre-Conditions:
+#   - Head is at last bit of A
+#   - B is empty, A is followed by blanks
+# Post-Conditions:
+#   - Last bit of A replaced by *white* blank and moved one step to right;
+#   - B consists of one bit;
+#   - Head is inside W
+# Successor Blocks: B4
+(b,0,b0,□,+) # entry
+(b,1,b1,□,+) # entry
+(b0,■,c,0,-) # exit
+(b1,■,c,1,-) # exit
+
+# B4: Traverse to the left over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+#   - B is non-empty (but A might be empty)
+# Post-Conditions:
+#   - Head is at the last bit of A or at "▶" if A is empty
+# Successor Blocks: B5, B7
+(c,□,c,□,-) # entry and exit
+
+# B5: Move the right-most bit of A to the end of B.
+# Pre-Conditions:
+#   - A and B are non-empty
+#   - Head is at the last bit of A
+# Post-Conditions:
+#   - Head is inside B
+# Successor Blocks: B6
+(c,0,c0,□,+) # entry
+(c,1,c1,□,+) # entry
+# Move over the white blanks and then past the end of B:
+(c0,□,c0,□,+)
+(c0,0,c0,0,+)
+(c0,1,c0,1,+)
+(c1,□,c1,□,+)
+(c1,0,c1,0,+)
+(c1,1,c1,1,+)
+# Append the remembered bit to the end of B
+(c0,■,d,0,-) # exit
+(c1,■,d,1,-) # exit
+
+# B6: Go from B (back) to the white blanks
+# Pre-Conditions:
+#   - Head is inside B
+# Post-Condition:
+#   - Head is inside W
+# Successor Blocks: B4
+(d,0,d,0,-) # entry
+(d,1,d,1,-) # entry
+(d,□,c,□,-) # exit
+
+#
+##
+### Part 2: Map ▶□...□z...a to ▶z...a□...□
+##
+#
+
+# In part 2 the tape always contains "▶" followed by a bitstring C, followed
+# by a series W of *white* blanks, followed by a bitstring B.
+# Initially C is empty and B is the reversed input string. At the end B is empty,
+# W is at its place, and C contains the left-shifted version of B.
+
+# B7: Entrypoint for part 2 of the algorithm. Move into W.
+# Pre-Conditions:
+#   - Every bit of A was replaced by white blanks - now W
+#   - B is reversed version of the initial value of A (and non-empty)
+#   - Head is at ▶
+# Post-Conditions:
+#   - Head is at first white blank - in W
+#   - tape content is unchanged
+# Successor Blocks: B8
+(c,▶,e,▶,+) # entry and exit
+
+# B8: Traverse to the right over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+# Post-Conditions:
+#   - Head is at the end of B or at the first blank (after B)
+# Successor Blocks: B9, B10
+(e,□,e,□,+) # entry and exit
+
+# B9: Erase the first bit of B and append it to C
+# Pre-Conditions:
+#   - Head is at first bit of B (which is non-empty)
+# Post-Conditions:
+#   - Bit was replaced by white blank and appended to end of C
+#     or put directly after "▶" if C is empty
+#   - Head is past the end of C, points to a white blank (inside W)
+# Successor Blocks: B8
+(e,0,f0,□,-) # entry
+(e,1,f1,□,-) # entry
+(f0,□,f0,□,-)
+(f1,□,f1,□,-)
+# Reaching end of C or ▶ if C is empty
+(f0,▶,g0,▶,+)
+(f0,0,g0,0,+)
+(f0,1,g0,1,+)
+(f1,▶,g1,▶,+)
+(f1,0,g1,0,+)
+(f1,1,g1,1,+)
+# Append the remembered bit
+(g0,□,e,0,+) # exit
+(g1,□,e,1,+) # exit
+
+#
+##
+### Part 3: Map ▶z...a□...□ to ▶z...a
+##
+#
+
+# This just removes the trailing *white* blanks.
+
+# B10: Remove the trailing white blanks
+# Pre-Conditions:
+#   - The tape contains the desired result (C) but followed by some white blanks
+#   - Head is at the last of the white blanks
+# Post-Conditions:
+#   - The white blanks are all removed (replaced by blanks)
+#   - Head is at "▶"
+#   - Turing Machine is in halting state
+# Successor Blocks: None (halts upon exit)
+(e,■,h,■,-) # entry
+(h,□,h,■,-)
+(h,0,h,0,-)
+(h,1,h,1,-)
+(h,▶,HALT,▶,0) # exit
+</pre>
+
+<p>
+Let the theory behind and plug this program into our python implementation of a (universal)
+<code>TuringMachine</code>. The variable <code>source</code> contains the contents of the <a href="#org9ba9588">above listing</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgb9118a4"><span class="org-variable-name">tm_ex3_3</span> = TuringMachine.fromSource(source)
+
+<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
+<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">If something else is on the tape, then we need at least n+1 blanks (n=length-of-string) after the</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">string. Trying the following with less blanks would fail:</span>
+<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;001&#9632;&#9632;&#9632;&#9632;xyz"</span>) == <span class="org-string">"&#9654;100&#9632;&#9632;&#9632;&#9632;xyz"</span>, <span class="org-string">"test exercise-3.3-3"</span>
+<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;1"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test exercise-3.3-4"</span>
+</pre>
+</div>
+
+<p>
+These basic tests yield an alternative root of trust into the program. You are invited to try out
+<code>tm_ex3_3</code> yourself. If configured appropirately it can also print each step it does.
+</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
