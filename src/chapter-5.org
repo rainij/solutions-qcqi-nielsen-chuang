@@ -6,7 +6,24 @@
 
 #+toc: headlines 2
 
+#+setupfile: ./inc/python-imports.org
+
 * Setup
+** TODO Setup Python Libaries
+#+name: chapter-5-python-imports
+#+begin_src python
+  import sympy as sp
+  from sympy import exp, I
+
+  from qiskit.circuit import QuantumCircuit, Gate
+#+end_src
+
+** Code from earlier Chapters
+#+begin_src python
+  # TODO
+#+end_src
+
+** Fourier Transform
 These are the operators $R_k$ appearing in the implementation of the Fourier Transform:
 
 #+name: chapter-5-Rk
@@ -217,18 +234,16 @@ In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{
 
 #+name: exercise-5.4-circuit
 #+begin_src python :results replace :exports results
-  from qiskit.circuit import Gate
-
   qc = QuantumCircuit(2)
-  C=Gate("R_{k+1}^†", 1, [])
+  C = Gate("R_{k+1}^†", 1, [])
   qc.append(C, [1])
   qc.cx(0, 1)
-  B=Gate("R_{k+1}^†", 1, [])
+  B = Gate("R_{k+1}^†", 1, [])
   qc.append(B, [1])
   qc.cx(0, 1)
-  A=Gate("R_k", 1, [])
+  A = Gate("R_k", 1, [])
   qc.append(A, [1])
-  R=Gate("R_{k+1}", 1, [])
+  R = Gate("R_{k+1}", 1, [])
   qc.append(R, [0])
 
   str(qc.draw('text'))
