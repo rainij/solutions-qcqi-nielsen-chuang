@@ -37,13 +37,13 @@ this one:
 #+begin_example
 # This program computes the function f(n)=1.
 # Example: input="▶1001", output="▶1".
-(S,▶,1,▶,+) # S is the start state
-(1,0,1,■,+)
-(1,1,1,■,+)
-(1,■,2,■,-)
-(2,■,2,■,-)
-(2,▶,3,▶,+)
-(3,■,H,1,0) # H is the halt state
+(S,▶,A,▶,+) # S is the start state
+(A,0,A,■,+)
+(A,1,A,■,+)
+(A,■,B,■,-)
+(B,■,B,■,-)
+(B,▶,C,▶,+)
+(C,■,H,1,0) # H is the halt state
 #+end_example
 
 Below we initialize a turing machine ~my_tm~ from the above source code:
@@ -70,32 +70,32 @@ double the tape size in that case).
 Executing step 1
 tape = '▶0'
 state='S', symbol='▶', head_position=0
-source line = 2: (S,▶,1,▶,+) # S is the start state
+source line = 2: (S,▶,A,▶,+) # S is the start state
 
 Executing step 2
 tape = '▶0'
-state='1', symbol='0', head_position=1
-source line = 3: (1,0,1,■,+)
+state='A', symbol='0', head_position=1
+source line = 3: (A,0,A,■,+)
 
 Executing step 3
 tape = '▶■■■■'
-state='1', symbol='■', head_position=2
-source line = 5: (1,■,2,■,-)
+state='A', symbol='■', head_position=2
+source line = 5: (A,■,B,■,-)
 
 Executing step 4
 tape = '▶■■■■'
-state='2', symbol='■', head_position=1
-source line = 6: (2,■,2,■,-)
+state='B', symbol='■', head_position=1
+source line = 6: (B,■,B,■,-)
 
 Executing step 5
 tape = '▶■■■■'
-state='2', symbol='▶', head_position=0
-source line = 7: (2,▶,3,▶,+)
+state='B', symbol='▶', head_position=0
+source line = 7: (B,▶,C,▶,+)
 
 Executing step 6
 tape = '▶■■■■'
-state='3', symbol='■', head_position=1
-source line = 8: (3,■,H,1,0) # H is the halt state
+state='C', symbol='■', head_position=1
+source line = 8: (C,■,H,1,0) # H is the halt state
 
 Execution took 6 steps.
 
