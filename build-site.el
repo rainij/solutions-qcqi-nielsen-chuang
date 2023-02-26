@@ -48,7 +48,7 @@
                 (a ((href . "https://github.com/rainij/solutions-qcqi-nielsen-chuang")) "Github")))))
 
 (defun rs/nav (info)
-  `(nav nil (a ((href . "/")) "HOME")))
+  `(nav nil (a ((href . "index.html")) "HOME")))
 
 ;; This is our custom html template (written as s-expression):
 (defun rs/org-html-template (contents info)
