@@ -1,0 +1,778 @@
+#+title:  Chapter 3
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session *chapter-3*
+
+#+toc: headlines 2
+
+* Setup
+** Python Libraries
+#+name: chapter-3-setup
+#+begin_src python
+  from typing import Literal, NewType, Optional
+  from collections.abc import Callable
+
+  # Terminal colors. TODO: Move somwhere else.
+  # Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")
+  class TermColor:
+      GREEN = '\033[32m'
+      RED = '\033[31m'
+      ENDC = '\033[0m'
+#+end_src
+
+** Turing Machines
+*** Introduction
+#+name: chapter-3-gather-turing-machine-sources
+#+begin_src python :exports none :noweb yes
+  <<chapter-3-turing-machine-typing>>
+  <<chapter-3-turing-parser>>
+  <<chapter-3-turing-machine>>
+#+end_src
+
+In this section we define a class ~TuringMachine~ which empowers us to execute a turing program like
+this one:
+
+#+name: tprog-constant-one
+#+begin_example
+# This program computes the function f(n)=1.
+# Example: input="▶1001", output="▶1".
+(S,▶,1,▶,+) # S is the start state
+(1,0,1,■,+)
+(1,1,1,■,+)
+(1,■,2,■,-)
+(2,■,2,■,-)
+(2,▶,3,▶,+)
+(3,■,H,1,0) # H is the halt state
+#+end_example
+
+Below we initialize a turing machine ~my_tm~ from the above source code:
+
+#+name: chapter-3-turing-machine-demo
+#+begin_src python :var source=tprog-constant-one :tangle no :results output replace
+  my_tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
+  my_tm.LOG_LEVEL = 3
+  my_tm.COLORED_LOG = False  # set to false since listing below does not support colors
+
+  result = my_tm.run("▶0")
+  print(f"\nresult = '{result}'")
+#+end_src
+
+Setting ~LOG_LEVEL=3~ makes the Turing machine print certain informations for each step of
+execution. The result can be seen in the following listing (with ~COLORED_LOG=True~ this would be
+even more informative). Note that in theory the tape is infinite. We realize this by dynamically
+allocating new blank cells whenever we want to access a cell not already allocated (we roughly
+double the tape size in that case).
+
+#+RESULTS: chapter-3-turing-machine-demo
+#+begin_example
+
+Executing step 1
+tape = '▶0'
+state='S', symbol='▶', head_position=0
+source line = 2: (S,▶,1,▶,+) # S is the start state
+
+Executing step 2
+tape = '▶0'
+state='1', symbol='0', head_position=1
+source line = 3: (1,0,1,■,+)
+
+Executing step 3
+tape = '▶■■■■'
+state='1', symbol='■', head_position=2
+source line = 5: (1,■,2,■,-)
+
+Executing step 4
+tape = '▶■■■■'
+state='2', symbol='■', head_position=1
+source line = 6: (2,■,2,■,-)
+
+Executing step 5
+tape = '▶■■■■'
+state='2', symbol='▶', head_position=0
+source line = 7: (2,▶,3,▶,+)
+
+Executing step 6
+tape = '▶■■■■'
+state='3', symbol='■', head_position=1
+source line = 8: (3,■,H,1,0) # H is the halt state
+
+Execution took 6 steps.
+
+result = '▶1'
+#+end_example
+
+*** Implementation
+First we introduce some useful types. We represent the state by strings since this /allows/ for
+readable or at least mnemonic state names. This would not be possible had we used integers. The
+~SourceMap~ is responsible for connecting each parsed line of the turing program with its original
+from the source-string/file. It is the reason why in the [[chapter-3-turing-machine-demo][listing above]] the ~TuringMachine~ instance
+can refer to its source (see the line starting with =source line ==).
+
+#+name: chapter-3-turing-machine-typing
+#+begin_src python :tangle no :eval no
+  Char = NewType("Char", str)  # better than nothing, represents a letter from the alphabet
+  State = NewType("State", str)
+  Move = Literal[-1, 0, +1]
+  TuringProgLine = tuple[State, Char, State, Char, Move]  # (s,c,s',c',m)
+  TuringProgram = list[TuringProgLine]
+
+  SourceMap = list[tuple[int, str]]
+  TuringParser = Callable[[str], [tuple[TuringProgram, SourceMap | None]]]
+#+end_src
+
+[[chapter-3-turing-machine][Below]] follows the implementation of the ~TuringMachine~. The logging functionality bloats the
+implementation a bit. But it you ignore this the implementation is very simple and straightforward
+to understand (IMHO).
+
+Note that the ~__init__~ method takes the program as an already parsed list of tuples
+(~TuringProgram~). The canonical way to create a ~TuringMachine~ is to use the ~fromSource~ factory
+method. Among other things you can optionally provide a custom parser. This might be beneficial to
+introduce syntactic sugar. For example the code snippit
+
+#+begin_example
+(a,0,a,0,+)
+(a,1,a,1,+)
+(a,2,a,2,+)
+(a,3,a,3,+)
+(a,4,a,4,+)
+(a,5,a,5,+)
+#+end_example
+
+might seem somewhat verbose. Probably this would be nicer syntax:
+
+#+begin_example
+(a,0|1|2|3|4|5,a,$,+)  # "$" meaning: take the original
+# or even (if this is the intended meaning)
+(a,*,a,$,+)  # "*" meaning: match all
+#+end_example
+
+Another reason to use a custom parser would be to circumvent some restrictions of the default
+parser. For example the default parser treats the symbols =#=, =,=, =(=, =)= in a special way. In
+particular, those cannot be used as characters on the tape.
+
+#+name: chapter-3-turing-machine
+#+begin_src python :tangle no :eval no
+  class TuringMachine:
+      """Given a turing program produces the corresponding turing machine."""
+      BLANK: Char = "■"  # Special symbol for the blank cell. Is used when tape dynamically grows.
+      MAX_STEPS = 1000000  # Abort after running this many steps
+      LOG_LEVEL = 0  # Set greater 0 for a chatty execution
+      COLORED_LOG = True  # Turn of if environment does not support colors
+      SOURCE_LINE_OFFSET = 0  # SourceMap assumes that source file start with line 0. Adjust this here.
+
+      def __init__(self, program: TuringProgram,
+                   start_state: State = "START", halt_state: State = "HALT",
+                   source_map: Optional[SourceMap] = None):
+          self._start_state = start_state
+          self._halt_state = halt_state
+          self._program = program
+          self._source_map = source_map
+
+          assert source_map is None or len(source_map) == len(program), "Invalid source_map"
+
+          self._state = None
+          self._head_position: int = None
+          self._tape: list[Char] = []  # gets input during execution
+          self._step_count = None
+
+          # Only relevant for logging:
+          self._index_width = len(str(len(self._program)-1))
+
+      @classmethod
+      def fromSource(cls, source: str,
+                     start_state: State = "START", halt_state: State = "HALT",
+                     parser: TuringParser = parse_turing_program) -> "TuringMachine":
+          """Create a turing machine from a source string. You can provide a custom parser."""
+          program, source_map = parser(source)
+          return TuringMachine(program,
+                               start_state=start_state, halt_state=halt_state,
+                               source_map=source_map)
+
+      def run(self, tape_input: str) -> str:
+          """Run the TM and return what is on the tape after it halts."""
+          self._state = self._start_state
+          self._head_position = 0
+          self._tape = list(tape_input)
+          self._step_count = 0
+
+          while self._state != self._halt_state:
+              if self._step_count > self.MAX_STEPS:
+                  raise Exception("Turing machine takes too long. Aborting.")
+              self._step_count += 1
+              self._log(2, f"\nExecuting step {self._step_count}")
+              self._run_one_step()
+
+          self._log(1, f"\nExecution took {self._step_count} steps.")
+
+          return self._tape_content.strip(self.BLANK)
+
+      @property
+      def _line_no_width(self):  # only relevant for logging
+          return None if self._source_map is None \
+              else len(str(self._source_map[-1][0] + self.SOURCE_LINE_OFFSET - 1))
+
+      def _log(self, level, *args, **kwargs):
+          if self.LOG_LEVEL >= level:
+              print(*args, **kwargs)
+
+      def _run_one_step(self) -> None:
+          self._log(3, f"tape = '{self._colored_tape_content}'")
+          current_line = self._current_program_line
+
+          if current_line is None:
+              RED, ENDC = (TermColor.RED, TermColor.ENDC) if self.COLORED_LOG else ("", "")
+              self._log(2, f"{RED}No matching program line - halting{ENDC}")
+              self._state = self._halt_state
+              return
+
+          index, current_line = current_line
+          self._log(4, f"program line = {index:{self._index_width}}: {current_line}")
+
+          if self._source_map is not None:
+              line_no, source_line = self._source_map[index]
+              line_no += self.SOURCE_LINE_OFFSET
+              self._log(3, f"source line = {line_no:{self._line_no_width}}: {source_line}")
+
+          s1, c1, m = current_line[2:]
+
+          self._state = s1
+          self._head_symbol = c1
+          # avoid negative positions:
+          self._head_position = max(self._head_position + m, 0)
+
+      @property
+      def _tape_content(self) -> str:
+          return "".join(self._tape)
+
+      @property
+      def _colored_tape_content(self) -> str:
+          self._enlarge_tape_if_necessary()
+          text = self._tape_content
+          pos = self._head_position
+          GREEN, ENDC = (TermColor.GREEN, TermColor.ENDC) if self.COLORED_LOG else ("", "")
+          return text[:pos] + GREEN + text[pos] + ENDC + text[pos+1:]
+
+      @property
+      def _current_program_line(self) -> tuple[int, TuringProgLine]:
+          s0, c0 = self._state, self._head_symbol
+          self._log(2, f"state='{s0}', symbol='{c0}', head_position={self._head_position}")
+          for i, line in enumerate(self._program):
+              s, c = line[:2]
+              if s0 == s and c0 == c:
+                  return i, line
+
+          return None
+
+      @property
+      def _head_symbol(self) -> Char:
+          self._enlarge_tape_if_necessary()
+          return self._tape[self._head_position]
+
+      @_head_symbol.setter
+      def _head_symbol(self, new_symbol) -> Char:
+          self._enlarge_tape_if_necessary()  # just being paranoid
+          self._tape[self._head_position] = new_symbol
+
+      def _enlarge_tape_if_necessary(self) -> None:
+          """Call this to ensure that our finite tape can actually be accessed at head position."""
+          pos = self._head_position
+          while pos >= len(self._tape):  # only one loop usually suffices
+              some_blanks = [self.BLANK] * (1 + len(self._tape))
+              self._tape += some_blanks  # double tape size
+#+end_src
+
+Finally, the default parser:
+
+#+name: chapter-3-turing-parser
+#+begin_src python :tangle no :eval no
+  def parse_turing_program_line(line: str) -> TuringProgLine | None:
+      """Parse a single line of the form `(s,c,s',c',m)` (up to comments).
+
+      Empty or comment lines are ignored by returning `None`."""
+      # Remove comments and leading/trailing whitespace
+      line = line[:line.find('#')].strip()
+      if len(line) == 0:
+          return None  # line comment or empty line
+
+      line = line.strip().lstrip("(").rstrip(")")
+      s0, c0, s1, c1, m = line.split(",")
+      m = +1 if m == "+" else m  # for convinience ...
+      m = -1 if m == "-" else m  # ... allow shortcuts for +1, -1
+      m = int(m)
+      assert len(c0) == 1, f"Expected character got '{c0}'."
+      assert len(c1) == 1, f"Expected character got '{c1}'."
+      assert m in [-1, 0, +1], f"Forbidden head movement: {m}."
+
+      return s0, c0, s1, c1, m
+
+
+  def parse_turing_program(source: str) -> tuple[TuringProgram, SourceMap]:
+      """Parses the source of a turing program line by line."""
+      program: TuringProgram = []
+      source_map: list[int] = []
+
+      lines = source.split("\n")
+      for line_no, line in enumerate(lines):
+          try:
+              parsed_line = parse_turing_program_line(line)
+          except Exception:
+              # Probably good enough for such a simple language:
+              raise Exception(f"Could not parse line {line_no}: '{line}'")
+
+          if parsed_line is not None:
+              program.append(parsed_line)
+              source_map.append((line_no, line))
+
+      return program, source_map
+#+end_src
+
+*** Very basic unit tests
+Tests for ~TuringMachine~:
+
+#+name: chapter-3-turing-machine-tests-1
+#+begin_src python
+  # If the tape initially is blank, this prints "XYZ"
+  prog_print_XYZ = [
+      ("S", "■", "2", "X", +1),
+      ("2", "■", "3", "Y", +1),
+      ("3", "■", "H", "Z",  0),
+  ]
+
+  tm1 = TuringMachine(prog_print_XYZ, start_state="S", halt_state="H")
+
+  assert tm1.run("") == "XYZ", "test TuringMachine vs prog_print_XYZ - 1"
+  assert tm1.run("a") == "a", "test TuringMachine vs prog_print_XYZ - 1"
+
+  # The example from the book. Assume the input tape starts with "▶" followed by an integer n in
+  # binary followed by blanks. Then the turing machine outputs f(n)=1 (in the same format as the
+  # input). Any other input tape leads to undefined behavior (C++ speak), that is, we guarantee
+  # nothing in that case.
+  prog_compute_constant_1 = [
+    ("S", "▶", "1", "▶", +1),
+    ("1", "0", "1", "■", +1),
+    ("1", "1", "1", "■", +1),
+    ("1", "■", "2", "■", -1),
+    ("2", "■", "2", "■", -1),
+    ("2", "▶", "3", "▶", +1),
+    ("3", "■", "H", "1",  0),
+  ]
+
+  tm2 = TuringMachine(prog_compute_constant_1, start_state="S", halt_state="H")
+
+  assert tm2.run("▶1011") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 1"
+  assert tm2.run("▶0") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 2"
+#+end_src
+
+
+Tests for the default parser:
+
+#+name: chapter-3-turing-machine-tests-2
+#+begin_src python
+  prog_print_XYZ_str = \
+  """# Anything behind '#' is a comment. Empty lines are ignored.
+
+  (S,■,2,X,+)  # We use "+" and "-" as shortcuts for +1 and -1.
+    (2,■,3,Y,+)  # Indentation is irrelevant.
+  (3,■,H1,Z,-)  # We go to the left before halting - just for fun
+  (H1,Y,H,Y,0)
+  # whitespace inside (...) is (mostly) important. We could not replace the last line by this:
+  # (H1,Y,H ,Y,0)
+  """
+
+  parsed_prog, source_map = parse_turing_program(prog_print_XYZ_str)
+  # Python seems to compare these structs recursively by value 👍:
+  assert source_map == [
+      (2, "(S,■,2,X,+)  # We use \"+\" and \"-\" as shortcuts for +1 and -1."),
+      (3, "  (2,■,3,Y,+)  # Indentation is irrelevant."),
+      (4, "(3,■,H1,Z,-)  # We go to the left before halting - just for fun"),
+      (5, "(H1,Y,H,Y,0)"),
+  ], "test parse_turing_program - 1"
+  assert parsed_prog == [
+      ('S', '■', '2', 'X', +1),
+      ('2', '■', '3', 'Y', +1),
+      ('3', '■', 'H1', 'Z', -1),
+      ('H1', 'Y', 'H', 'Y', 0)
+  ], "test parse_turing_program - 2"
+#+end_src
+
+Tests for ~TuringMachine.fromSource~. The ~source~ is taken from the [[tprog-constant-one][listing]] on the Turing machine
+computing $f(n)=1$.
+
+#+name: chapter-3-turing-machine-tests-3
+#+begin_src python :var source=tprog-constant-one
+  tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
+
+  assert tm.run("▶1001") == "▶1", "test TuringMachine.fromSource"
+#+end_src
+
+* WIP Exercises
+** TODO Exercise 3.1 (Non-computable processes in Nature)
+How might we recognize that a process in Nature computes a function not computable by a Turing
+machine?
+
+** Exercise 3.2 (Turing numbers)
+Show that single-tape Turing machines can each be given a number from the list $1,2,3,\ldots$ in
+such a way that the number uniquely specifies the corresponding machine. We call this number the
+Turing number of the corresponding Turing machine. (/Hint/: Every positive integer has a unique
+prime factorization $p_1^{a_1}p_2^{a_2}\cdots p_k^{a_k}$, where $p_i$ are distinct prime numbers,
+and $a_1,a_2,\ldots,a_k$ are non-negative integers.)
+
+*** Proof
+For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
+consider (one could easily relax this constraint without complicating the encoding). Hence we need
+to encode the start state, the halt state and the program into a single number. This is sufficient
+to describe the Turing Machine. We follow the proposal to use prime numbers for that. Therefore let
+us enumerate the prime numbers starting by $2$: $p_1=2$, $p_2=3$, ..., $p_5=11$, ... .
+
+This procedure is certainly not the most efficient one but it serves the purpose to show that all
+Turing machines (satsifying a specific definition/architecture) can be /effectively/
+enumerated. That is, there is an /algorithm/ (which could potentially run on a Turing machine),
+which assigns numbers to each Turing machine. Moreover this assignment is invertible and the inverse
+mapping (numbers to Turing machines) can be computed by an /algorithm/ too.
+
+Let us identify the states $S$ and the elements of the alphabet $\Gamma$ with integers:
+
+$$
+  S = \{0, 1, 2, \ldots\} ; \quad \Gamma = \{0, 1, 2, \ldots\} .
+$$
+
+Moreover, we encode the possible movements by $\{0,1,2\}$, meaning /left/, /stay/, /right/ in that
+order. We encode the start state $s\in\NN$ and the halt state $h\in\NN$ by
+
+$$
+  p_1^s \text{ and } p_2^h .
+$$
+
+The $i$​-th program line
+
+$$
+  (q_i,c_i,q'_i,c'_i,m_i) \in \NN^4\times\{0,1,2\}
+$$
+
+can be encoded by
+
+$$
+  l_i = p_{5i+3}^{q_i} \, p_{5i+4}^{c_i} \, p_{5i+5}^{q'_i} \, p_{5i+6}^{c'_i} \, p_{5i+7}^{m_i} .
+$$
+
+The whole program is then encoded by the product $\Pi_il_i$ and the Turing machine itself by
+$p_1^s\,p_2^h\,\Pi_il_i$. Since prime factorization of integers is unique, this encoding is
+invertible and hence the Turing machine can be recovered from this (potentially large) number. QED.
+
+** Exercise 3.3 (Turing machine to reverse a bit string)
+Describe a Turing machine which takes a binary number $x$ as input, and outputs the bits of $x$ in
+reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
+and/or symbols other than ▶, 0, 1, and the blank.)
+
+*** Solution
+We use a single tape together with and additional symbol "□", which we call /white blank/ in the
+following.
+
+Assume that the input tape starts with the left-end-marker "▶" followed by the number $x$ in
+binary. All other cells should be blank. As an example, for $x=13$ the input tape should look like
+that:
+
+#+name: exercise-3.3-input-tape
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+Note that the empty tape is not allowed - there should always be at least one digit. The Turing
+machine should halt with only the reversed bitstring at the beginning of the tape. In the example
+above:
+
+#+name: exercise-3.3-output-tape
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+The idea of the algorithm is as follows (the white blanks =□= simplify the implementation):
+
+- 1. Reverse the string, but shifted :: =▶1011■■■■■= → =▶□□□□1101■=
+- 2. Shift the reversed string to the correct position :: =▶□□□□1101■= → =▶1101□□□□■=
+- 3. Remove trailing white blanks :: =▶1101□□□□■= → =▶1101■■■■■=
+
+Step-by-step the first part does the following. What we call /step/ is actually several steps for
+the Turing machine (since the head can only move by one position at a time). We remark already here
+that the last displayed cell, containing a blank (always), is very important as an end-marker for
+the second step of the algorithm.
+
+#+name: exercise-3.3-how-algorithm-works-1
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ 0 │ □ │ 1 │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 1 │ □ │ □ │ 1 │ 0 │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ 1 │ 0 │ 1 │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+The second part of the algorithm does this:
+
+#+name: exercise-3.3-how-algorithm-works-2
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ □ │ □ │ □ │ □ │ 1 │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ □ │ □ │ □ │ □ │ 0 │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ □ │ □ │ □ │ □ │ 1 │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ □ │ □ │ □ │ □ │ 1 │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+Finally the third part acts like this:
+
+#+name: exercise-3.3-how-algorithm-works-3
+#+begin_example
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │ □ │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │ □ │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │ □ │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │ □ │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬
+│ ▶ │ 1 │ 0 │ 1 │ 1 │   │   │   │   │   │ ...
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴
+#+end_example
+
+In the following we present a [[exercise-3.3-solution-source][Turing program]] which does exactly this. Don't worry, most of the
+program is just comments - explaining how it works, and at the same time giving a kind of
+/inline-proof/ that the program is correct in the sense that it "does what we want".
+
+To best understand the inline-proof read the following explanations:
+- The program consists of set of source /blocks/ - kind of subroutines of the program.
+- Each block is a sequence of program lines without any intermediate /empty lines/ (line comments
+  are OK).
+- Each block has one or more /entry/ lines (marked by a comment =# entry=). If a block is entered we
+  require that we start at one of these lines - everything else is considered an error (does not
+  happen if the program as a whole is correct).
+- Each block has one ore more /exit/ lines (marked by a comment =# exit=). Each block must guarantee
+  that upon entering another block (or halting) we do this via one of these lines.
+- Each block has /pre-conditions/. These are sets of statements that we require to hold immediately
+  before the first line of the block is executed (each time a block is "called"). If we enter a
+  block but the pre-conditions do not hold we call this /undefined behavior/. We require that our
+  program never runs into undefined behavior.
+- Each block has /post-conditions/. These are sets of statements that we require to hold immediately
+  after we "return" from the block. The block must ensure that these statements hold.
+- Each block has zero or more /successor blocks/. Upon exiting the block it is guaranteed that we
+  must enter one if these successor blocks. This info helps navigating the code, since there are
+  usually only very few succesor blocks for each block.
+
+#+caption: Turing program to reverse a string bits (0s and 1s)
+#+name: exercise-3.3-solution-source
+#+begin_example
+# Turing program to reverse a string of bits (0s and 1s):
+#   - input  : "▶a...z■..." where a...z is a string of 0s and 1s
+#     followed by at least length-of(a..z)+1 blanks (this is important).
+#   - output : "▶z...a■..." where z...a is the reversed string.
+# The head starts and finishes at "▶".
+
+#
+##
+### Part 1: Map ▶a...z■...■ to ▶□...□z...a
+##
+#
+
+# In part 1 the tape always contains "▶" followed by a bitstring A, followed
+# by a series W of *white* blanks (special markers), followed by a bitstring B.
+# Initially B and W are empty and A is the input string. At the end A is empty,
+# W is at its place, and B contains the reversed string.
+
+# B1: At the beginning we just step into A
+# Pre-Conditions:
+#   - tape content is "▶" followed by A, followed by blanks
+#   - A is non-empty, W and B are empty
+#   - Head is at "▶"
+# Post-Conditions:
+#   - Head is at the beginning of A
+#   - tape content is unchanged (by the action of this block)
+# Successor Blocks: B1.
+(START,▶,a,▶,+) # entry and exit
+
+# B2: Move the head to the end of A
+# Pre-Conditions:
+#   - Head is inside A,
+#   - A is followed by at least one blank.
+# Post-Conditions:
+#   - Head is at last bit of A (points at 0 or 1)
+#   - tape content is unchanged
+# Successor Blocks: B3
+(a,0,a,0,+) # entry
+(a,1,a,1,+) # entry
+(a,■,b,■,-) # exit
+
+# B3: Special case if B still empty: Move the last bit of A one step to the right.
+# Pre-Conditions:
+#   - Head is at last bit of A
+#   - B is empty, A is followed by blanks
+# Post-Conditions:
+#   - Last bit of A replaced by *white* blank and moved one step to right;
+#   - B consists of one bit;
+#   - Head is inside W
+# Successor Blocks: B4
+(b,0,b0,□,+) # entry
+(b,1,b1,□,+) # entry
+(b0,■,c,0,-) # exit
+(b1,■,c,1,-) # exit
+
+# B4: Traverse to the left over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+#   - B is non-empty (but A might be empty)
+# Post-Conditions:
+#   - Head is at the last bit of A or at "▶" if A is empty
+# Successor Blocks: B5, B7
+(c,□,c,□,-) # entry and exit
+
+# B5: Move the right-most bit of A to the end of B.
+# Pre-Conditions:
+#   - A and B are non-empty
+#   - Head is at the last bit of A
+# Post-Conditions:
+#   - Head is inside B
+# Successor Blocks: B6
+(c,0,c0,□,+) # entry
+(c,1,c1,□,+) # entry
+# Move over the white blanks and then past the end of B:
+(c0,□,c0,□,+)
+(c0,0,c0,0,+)
+(c0,1,c0,1,+)
+(c1,□,c1,□,+)
+(c1,0,c1,0,+)
+(c1,1,c1,1,+)
+# Append the remembered bit to the end of B
+(c0,■,d,0,-) # exit
+(c1,■,d,1,-) # exit
+
+# B6: Go from B (back) to the white blanks
+# Pre-Conditions:
+#   - Head is inside B
+# Post-Condition:
+#   - Head is inside W
+# Successor Blocks: B4
+(d,0,d,0,-) # entry
+(d,1,d,1,-) # entry
+(d,□,c,□,-) # exit
+
+#
+##
+### Part 2: Map ▶□...□z...a to ▶z...a□...□
+##
+#
+
+# In part 2 the tape always contains "▶" followed by a bitstring C, followed
+# by a series W of *white* blanks, followed by a bitstring B.
+# Initially C is empty and B is the reversed input string. At the end B is empty,
+# W is at its place, and C contains the left-shifted version of B.
+
+# B7: Entrypoint for part 2 of the algorithm. Move into W.
+# Pre-Conditions:
+#   - Every bit of A was replaced by white blanks - now W
+#   - B is reversed version of the initial value of A (and non-empty)
+#   - Head is at ▶
+# Post-Conditions:
+#   - Head is at first white blank - in W
+#   - tape content is unchanged
+# Successor Blocks: B8
+(c,▶,e,▶,+) # entry and exit
+
+# B8: Traverse to the right over a series of white blanks
+# Pre-Conditions:
+#   - Head is inside W
+# Post-Conditions:
+#   - Head is at the end of B or at the first blank (after B)
+# Successor Blocks: B9, B10
+(e,□,e,□,+) # entry and exit
+
+# B9: Erase the first bit of B and append it to C
+# Pre-Conditions:
+#   - Head is at first bit of B (which is non-empty)
+# Post-Conditions:
+#   - Bit was replaced by white blank and appended to end of C
+#     or put directly after "▶" if C is empty
+#   - Head is past the end of C, points to a white blank (inside W)
+# Successor Blocks: B8
+(e,0,f0,□,-) # entry
+(e,1,f1,□,-) # entry
+(f0,□,f0,□,-)
+(f1,□,f1,□,-)
+# Reaching end of C or ▶ if C is empty
+(f0,▶,g0,▶,+)
+(f0,0,g0,0,+)
+(f0,1,g0,1,+)
+(f1,▶,g1,▶,+)
+(f1,0,g1,0,+)
+(f1,1,g1,1,+)
+# Append the remembered bit
+(g0,□,e,0,+) # exit
+(g1,□,e,1,+) # exit
+
+#
+##
+### Part 3: Map ▶z...a□...□ to ▶z...a
+##
+#
+
+# This just removes the trailing *white* blanks.
+
+# B10: Remove the trailing white blanks
+# Pre-Conditions:
+#   - The tape contains the desired result (C) but followed by some white blanks
+#   - Head is at the last of the white blanks
+# Post-Conditions:
+#   - The white blanks are all removed (replaced by blanks)
+#   - Head is at "▶"
+#   - Turing Machine is in halting state
+# Successor Blocks: None (halts upon exit)
+(e,■,h,■,-) # entry
+(h,□,h,■,-)
+(h,0,h,0,-)
+(h,1,h,1,-)
+(h,▶,HALT,▶,0) # exit
+#+end_example
+
+Let the theory behind and plug this program into our python implementation of a (universal)
+~TuringMachine~. The variable ~source~ contains the contents of the [[exercise-3.3-solution-source][above listing]].
+
+#+name: exercise-3.3-turing-machine
+#+begin_src python :var source=exercise-3.3-solution-source
+  tm_ex3_3 = TuringMachine.fromSource(source)
+
+  assert tm_ex3_3.run("▶011") == "▶110", "test exercise-3.3-1"
+  assert tm_ex3_3.run("▶101011") == "▶110101", "test exercise-3.3-2"
+  # If something else is on the tape, then we need at least n+1 blanks (n=length-of-string) after the
+  # string. Trying the following with less blanks would fail:
+  assert tm_ex3_3.run("▶001■■■■xyz") == "▶100■■■■xyz", "test exercise-3.3-3"
+  assert tm_ex3_3.run("▶1") == "▶1", "test exercise-3.3-4"
+#+end_src
+
+These basic tests yield an alternative root of trust into the program. You are invited to try out
+~tm_ex3_3~ yourself. If configured appropirately it can also print each step it does.

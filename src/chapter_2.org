@@ -1,0 +1,655 @@
+#+title:  Chapter 2
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session *chapter-2*
+
+#+toc: headlines 2
+
+* Setup
+** Python Libraries
+#+begin_src python
+  from itertools import product
+
+  import sympy as sp
+  from sympy import Matrix, sqrt
+#+end_src
+
+** Bra-Ket
+For convenience we define two functions which map bit-strings to the corresponding bra and ket vectors.
+
+#+begin_src python
+  def ket(bits: str) -> Matrix:
+      """If bits is a string of '0' and '1' this returns |bits>."""
+      vec = [0] * 2**len(bits)
+      vec[int(bits, 2)] = 1
+      return Matrix(vec)
+
+
+  def bra(bits: str) -> Matrix:
+      """If bits is a string of '0' and '1' this returns <bits|."""
+      return ket(bits).H
+#+end_src
+
+** The Trace and the Partial Trace
+In the following we define the trace for arbitrary square matrices and the partial trace for square
+matrices whose dimension is a power of two. Note that the concept of the partial trace only makes
+sense if one can consider the matrix as element of some tensor product (i.e. the dimension is a
+product $m_1\cdot m_2\cdot\ldots$). We further restrict to $m_i=2$ to keep the implementation and
+the interface simple and since probably nothing else is needed in the context of the book.
+
+#+begin_src python
+  def trace(M: Matrix):  # TODO: what is the correct return type?
+      """Returns the sum of the diagonal elements. Requires a square matrix."""
+      dim = M.shape[0]
+      assert dim == M.shape[1], "M must be square"
+      result = 0
+      for i in range(dim):
+          result += M[i, i]
+      return result
+
+
+  def ptrace(M: Matrix, bit_positions: list[int] = None) -> Matrix:
+      """Partial Trace. The Matrix must have dimension 2^n. The bit_positions describe which bits
+      (from the right) get traced out."""
+      dim = M.shape[0]
+      assert dim == M.shape[1], "M must be square"
+      assert dim.bit_count() == 1, "Dim of M must be 2^n for some n >= 0"
+      bit_size = dim.bit_length() - 1
+      if bit_positions is not None:
+          assert len(bit_positions) > 0, "bit_positions must not be empty"
+          assert all(0 <= pos <= bit_size for pos in bit_positions), "Invalid bit_positions"
+
+      if bit_positions is None:  # shortcut
+          return Matrix([[trace(M)]])
+      if len(bit_positions) == 1 and dim == 2:  # corner case
+          return Matrix([[trace(M)]])
+      elif len(bit_positions) > 1:
+          ps = bit_positions.copy()
+          ps.sort()  # IMPORTANT!
+          RM = M
+          while len(ps) > 0:
+              pos = ps.pop()
+              RM = ptrace(RM, [pos])
+          return RM
+
+      rpos = bit_size - 1 - bit_positions[0]
+
+      mat = [[0]*(dim//2) for _ in range(dim//2)]
+      for i, j in product(range(dim//2), range(dim//2)):
+          ibits = f"{i:b}".zfill(bit_size - 1)
+          jbits = f"{j:b}".zfill(bit_size - 1)
+          i0 = int(ibits[:rpos] + "0" + ibits[rpos:], 2)
+          i1 = int(ibits[:rpos] + "1" + ibits[rpos:], 2)
+          j0 = int(jbits[:rpos] + "0" + jbits[rpos:], 2)
+          j1 = int(jbits[:rpos] + "1" + jbits[rpos:], 2)
+          mat[i][j] = M[i0, j0] + M[i1, j1]
+
+      return Matrix(mat)
+#+end_src
+
+Very simple unit tests:
+
+#+begin_src python
+  A = Matrix([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
+  B = Matrix([[8*i + j for j in range(8)] for i in range(8)])
+
+  # Results for bit_positions == [0], in this case it is easy to read out the results from the input
+  # matrix. Essentially you only have to to view e.g. A as a Matrix of 2x2 matrices which you replace
+  # by their traces.
+  A0 = Matrix([[5, 9], [21, 25]])
+  B0 = Matrix([[9, 13, 17, 21], [41, 45, 49, 53], [73, 77, 81, 85], [105, 109, 113, 117]])
+
+  # To reduce the case of e.g. bit_positions == [1] to bit_positions == [0] use the fact that
+  # permuting the bit pattern like so 'xyz' -> 'zyx' induces a Permutation on the basis vectors which
+  # corresponds to a permutation matrix P1. After doing the partial trace we are left with 'zy' and
+  # have to permute this back to 'yz' (Matrix P2). In other words we have the identity
+  # P2*ptrace(P1*B*P1, [0])*P2 - ptrace(B, [i]). Use sympy.Permutation, sympy.PermutationMatrix, and
+  # PermutationMatrix.as_explicit to automate most of the work.
+  A1 = Matrix([[10, 12], [18, 20]])
+  B1 = Matrix([[18, 20, 26, 28], [34, 36, 42, 44], [82, 84, 90, 92], [98, 100, 106, 108]])
+  B2 = Matrix([[36, 38, 40, 42], [52, 54, 56, 58], [68, 70, 72, 74], [84, 86, 88, 90]])
+
+  assert ptrace(A, [0]) == A0, "test ptrace(A, [0])"
+  assert ptrace(A, [1]) == A1, "test ptrace(A, [0])"
+  assert ptrace(B, [0]) == B0, "test ptrace(B, [0])"
+  assert ptrace(B, [1]) == B1, "test ptrace(B, [1])"
+  assert ptrace(B, [2]) == B2, "test ptrace(B, [2])"
+  assert ptrace(B, [0, 2]) == ptrace(ptrace(B, [2]), [0]), "test ptrace(B, [0, 2])"
+  assert ptrace(B, [2, 0]) == ptrace(ptrace(B, [2]), [0]), "test ptrace(B, [2, 0])"
+  assert ptrace(B, [0, 1, 2]) == Matrix([[trace(B)]]), "test ptrace(B, [0, 1, 2])"
+  assert ptrace(B, [2, 1, 0]) == Matrix([[trace(B)]]), "test ptrace(B, [2, 1, 0])"
+#+end_src
+
+* Exercises
+** Exercise 2.71 (Criterion to decide if a state is mixed or pure)
+Let $\rho$ be a density operator. Show that $\trace{\rho^2}\leq1$, with equality if and only if
+$\rho$ is a pure state.
+
+*** Proof
+By the characterization of density operators (Theorem 2.5) there are $0<p_i\leq 1$ and orthonormal
+$\{|\psi_i\rangle\}$ such that:
+
+$$
+  \rho = \sum_i p_i |\psi_i\rangle\langle\psi_i| .
+$$
+
+Hence:
+
+$$
+  \trace{\rho^2} = \trace{ \sum_i p_i^2 |\psi_i\rangle\langle\psi_i| } = \sum_i p_i^2 \leq \sum_i p_i = 1 ,
+$$
+
+which proves the first claim. Equality can clearly only hold if for all $i$: $p_i=1$. By the trace
+condition this is only possible if there is only one summand in the sum making up $\rho$. This means
+that $\rho$ is pure in that case. QED.
+
+** Exercise 2.72 (Bloch sphere for mixed states)
+The Bloch sphere picture for pure states of a single qubit was introduced in Section 1.2. This
+description has an important generalization to mixed states as follows.
+
+1. Show that an arbitrary density matrix for a mixed state qubit may be written as
+
+   $$
+     \rho = \frac{I + \overrightarrow{r} \cdot \overrightarrow{\sigma} }{2}
+   $$
+
+  where $\overrightarrow{r}$ is a real three-dimensional vector such that
+   $\norm{\overrightarrow{r}}\leq1$. This vector is known as the Bloch vector for the state
+   $\rho$. Conversely any such $\rho$ is also a density operator.
+2. What is the Bloch vector representation for the state $\rho=I/2$?
+3. Show that a state $\rho$ is pure if and only if $\norm{\overrightarrow{r}}=1$.
+4. Show that for pure states the description of the Bloch vector we have given coincides with that
+   in Section 1.2.
+
+*** Proof of 1, 3, and 4
+The matrix representation of $\rho$ looks as follows:
+
+$$
+  \rho = \frac{1}{2} \begin{bmatrix} 1 + z & x - iy \\ x + iy & 1 - z \end{bmatrix}
+  = \begin{bmatrix} p & \frac{1}{2}\zeta^* \\ \frac{1}{2}\zeta & q \end{bmatrix} .
+$$
+
+Let $r=\norm{\overrightarrow{r}}$. We see that the matrices $D$ which can be represented by $\rho$
+are characterized by the above matrix together with the constraints:
+
+$$
+  p, q \geq 0,\; \zeta\in\CC \text{ with } p + q = 1 \text{ and } r = (p - q)^2 + |\zeta|^2 \leq 1 .
+$$
+
+Now let $|\psi\rangle=e^{i\gamma}(c|0\rangle+e^{i\varphi}s|1\rangle)$ be a pure state ($c=\cos(\theta/2)$ and $s=\sin(\theta/2)$). The
+corresponding density matrix is:
+
+$$
+  \,|\psi\rangle\langle\psi| = \begin{bmatrix} c^2 & e^{-i\varphi}cs \\ e^{i\varphi}cs & s^2 \end{bmatrix} .
+$$
+
+Recall the following trigonometric identities: $\cos\theta=c^2-s^2$ and $\sin\theta=2cs$. This
+implies that the above constraint is satisfied. Hence pure states are in $D$. In particular we have
+$r=1$ for pure states.
+
+On the other hand the same trigonometric identities also show that the constraint strengthened by
+$r=1$ characterizes the pure states. Indeed, the correspondence between the two representations is
+given by $x+iy=\zeta=e^{i\varphi}\sin\theta$ and $z=p-q=\cos\theta$. This shows claims 3 and 4 (for
+the latter recall that the Bloch-Sphere is parameterized by
+$(x,y,z)=(\sin\theta\cos\varphi,\;\sin\theta\sin\varphi,\;\cos\theta)$).
+
+Clearly $D$ is a convex set, hence all density matrices are in $D$. This follows from the fact that
+density operators are the (closed) convex hull of the pure states. This shows the original version
+of claim 1 (we extended it a bit).
+
+To show the rest of claim 1 it remains to prove that $D$ contains only density operators.
+
+That $D$ contains only hermitian operators with trace=1 is clear. By exercise 4.5 we have
+$(\overrightarrow{r} \cdot \overrightarrow{\sigma})^2=\norm{\overrightarrow{r}}^2I$. Since
+$\overrightarrow{r} \cdot \overrightarrow{\sigma}$ is hermitian and not a multiple of $I$ we deduce
+that it has the two eigenvalues $\pm\norm{\overrightarrow{r}}$. Hence (see [[file:notation.org][section on notation]] for
+the meaning):
+
+$$
+  0 \leq \frac{1 - \norm{\overrightarrow{r}}}{2} \leq \rho \leq  \frac{1 + \norm{\overrightarrow{r}}}{2} \leq 1 .
+$$
+
+In particular, $\rho$ is indeed a positive operator. Hence, $\rho$ is a density matrix. This shows
+the rest of claim 1.
+
+*** Solution to 2
+$I/2$ is represented by $\overrightarrow{r}=(0,0,0)$. It corresponds to the ensemble $\{(1/2,|0\rangle),(1/2,|1\rangle)\}$.
+
+** Exercise 2.73
+Let $\rho$ be a density operator. A minimal ensemble for $\rho$ is an ensemble
+$\{(p_i, |\psi_i\rangle)\}$ containing a number of elements equal to the rank of $\rho$. Let
+$|\psi\rangle$ be any state in the support of $\rho$ . (The /support/ of a Hermitian operator $A$
+is the vector space spanned by the eigenvectors of $A$ with non-zero eigenvalues.) Show that there
+is a minimal ensemble for $\rho$ that contains $|\psi\rangle$, and moreover that in any such
+ensemble $|\psi\rangle$ must appear with probability
+
+$$
+  p = \frac{1}{\langle\psi|\rho^{-1}|\psi\rangle} ,
+$$
+
+where $\rho^{-1}$ is defined to be the inverse of $\rho$, when $\rho$ is considered as an operator
+acting only on the support of $\rho$. (This definition removes the problem that $\rho$ may not have
+an inverse.)
+
+*** Proof
+Consider the representation of $\rho$ by its eigenvectors (with non-zero eigenvalues):
+
+$$
+  \rho = \sum_{i=1}^n \lambda_i |i\rangle\langle i| .
+$$
+
+Since $|\psi\rangle$ is in the support of $\rho$ there are unique complex numbers $v_1,\ldots,v_n$
+with:
+
+$$
+  \sum_{i=1}^n v_i \sqrt{\lambda_i} |i\rangle \in \RR |\psi\rangle \text{ and } \sum_{i=1}^n |v_i|^2 = 1 .
+$$
+
+Now extend these numbers to a unitary matrix $u\in\CC^{n\times n}$ such that $u_{ij}=v_j$ (formally
+the existence follows from the Gram-Schmidt procedure). Let
+
+$$
+  \sqrt{p_i} |\psi_i\rangle := \sum_{i=1}^n u_{ij} \sqrt{\lambda_j} |j\rangle .
+$$
+
+By construction $|\psi\rangle=|\psi_1\rangle$. By Theorem 2.6 (Unitary Freedom in the ensemble for
+density matrices) we found an ensemble containing $|\psi\rangle$ so the existence is
+established. Conversely, the same Theorem states that any ensemble representing $\rho$ and
+satisfying $|\psi_1\rangle=|\psi_1\rangle$ must satisfy the above constraint for a matrix $u$ whose
+first row is $v$.
+
+By the above contraint and the spectral theorem we have:
+
+$$
+  \sqrt{p_i p_j} \langle\psi_i|\rho^{-1}|\psi_j\rangle
+  = \sum_{kl} u_{ik}^\dagger \sqrt{\lambda_k} \langle k| \rho^{-1} u_{jl} \sqrt{\lambda_l} |l\rangle
+  = \sum_{k} u_{jk} u_{ki}^* \lambda_k \langle k|\rho^{-1}|k\rangle
+  = \delta_{ij} .
+$$
+
+Setting $i=j=1$ proves the claim. QED.
+
+*Remark:* The proof shows that each minimal ensemble $(\sqrt{p_i}|\psi_i\rangle)$ is an orthonormal
+basis on the support of $\rho$ with respect to the inner product given by
+$\langle\varphi|\rho^{-1}|\psi\rangle$.
+
+** Exercise 2.74
+Suppose a composite of systems A and B is in the state $|a\rangle|b\rangle$, where $|a\rangle$ is a
+pure state of system A, and $|b\rangle$ is a pure state of system B. Show that the reduced density
+operator of system A alone is a pure state.
+
+*** Proof
+The joint state is indeed a /simple/ tensor product (i.e. a product state):
+
+$$
+  \,|a\rangle |b\rangle = |a\rangle \otimes |b\rangle .
+$$
+
+The corresponding density matrix is:
+
+$$
+  \rho = |a\rangle\langle a| \otimes |b\rangle\langle b| .
+$$
+
+The reduced density operator for A is obtained by taking the partial trace with respect to B:
+
+$$
+  \rho_A = \ptrace{B}{\rho} = |a\rangle\langle a|.
+$$
+
+This is indeed the pure state $|a\rangle$. QED.
+
+** Exercise 2.75
+For each of the four Bell states, find the reduced density operator for each qubit.
+
+*** Solution
+The four Bell States are given by:
+
+$$
+  \,|\beta_{xy}\rangle = \frac{1}{\sqrt{2}} \left( |0y\rangle + (-1)^{x} |1\overline{y}\rangle \right) ,
+$$
+
+where $\overline{y}$ denotes the negation of $y$. Using $\trace{|i\rangle\langle j|}=\delta_{ij}$ we deduce:
+
+$$
+  \ptrace{2}{|\beta_{xy}\rangle} = \frac{1}{2} (|0\rangle\langle0| + |1\rangle\langle1|) = \frac{1}{2} I .
+$$
+
+and in the same way:
+
+$$
+  \ptrace{1}{|\beta_{xy}\rangle} = \frac{1}{2} (|y\rangle\langle y|
+  \,+\, |\overline{y}\rangle\langle\overline{y}|) = \frac{1}{2} I .
+$$
+
+So in all 8 cases we get the same result: $I/2$.
+
+*Remark:* We see that knowledge of all partial traces is not sufficient to reconstruct the original
+state.
+
+** Exercise 2.76
+Extend the proof of the Schmidt decomposition to the case where A and B may have state spaces of
+different dimensionality.
+
+*** Proof
+Of course one may reuse the proof from the book by utilizing the general form of the singular value
+decompostion for non-square matrices.
+
+Alternatively: Assume wlog $\dim(H_A)\leq\dim(H_B)$. We already have a proof for the case of equal
+dimensions hence assume $\dim(H_A)<\dim(H_B)$. Now we extend A by a direct sum with a Hilbert Space
+$R$ such that:
+
+$$
+  \dim(H_A \oplus R) = \dim(H_B) .
+$$
+
+By the already proved special case of the theorem we get a Schmidt-Decomposition on $(H_A\oplus R)\otimes H_B$:
+
+$$
+  \,|\psi\rangle = \sum_i \lambda_i \, |i_A\rangle |i_B\rangle .
+$$
+
+We have to prove that $|i_A\rangle\in H_A$ for all $i$. Indeed, let $|r\rangle\in R$ and consider:
+
+
+$$
+  \langle i_A|r\rangle = \langle i_A, i_B | r, i_B \rangle = \sum_j \langle j_A, j_B | r, i_B \rangle
+  = \langle \psi | r, i_B \rangle = 0 .
+$$
+This shows the claim. QED.
+
+** Exercise 2.77
+Suppose ABC is a three component quantum system. Show by example that there are quantum states of
+such systems which can not be written in the form
+
+$$
+  \,|\psi\rangle = \sum_i \lambda_i |i_A, i_B, i_C\rangle
+$$
+
+where $\lambda_i$ are real numbers, and $|i_A\rangle$, $|i_B\rangle$, $|i_C\rangle$ are orthonormal
+vectors of the respective systems.
+
+*** Proof
+Suppose a Schmidt-like decomposition is possible for a state with respect to ABC. Then the reduced
+density operators in A, B and C must have the same set of eigenvalues. Hence, to show that such a
+decomposition is not possible for a given state it suffices to show that the sets of eigenvalue are
+not all equal.
+
+To spare us boring calculations lets introduce a nice function which takes a state vector of a
+three-qubit system ABC as input (this is already the simplest case where we can find counter
+examples). As output it reports the eigenvalues of the density matrix of each subsystem.
+
+#+name: exercise-2-77-1
+#+begin_src python
+  def get_eigenvals_of_ABC(state_vector: Matrix):
+      """Calculate eigenvals of subsystems of three-qubit system (for Exercise 2.77)."""
+      density = state_vector * state_vector.H
+      DA = ptrace(density, [1, 2])
+      DB = ptrace(density, [0, 2])
+      DC = ptrace(density, [0, 1])
+
+      result = ""
+      for S, D in [("A", DA), ("B", DB), ("C", DC)]:
+          result += f"Eigenvalues in {S}: {D.eigenvals()}.\n"
+
+      return result
+#+end_src
+
+The following code-snippit shows that
+
+$$
+  \frac{1}{\sqrt{3}} (|000\rangle + |010\rangle + |011\rangle)
+$$
+
+cannot be decomposed as required:
+
+#+name: exercise-2-77-2
+#+begin_src python :results replace
+  get_eigenvals_of_ABC((ket('000') + ket('010') + ket('011')) / sqrt(3))
+#+end_src
+
+#+RESULTS: exercise-2-77-2
+: Eigenvalues in A: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+: Eigenvalues in B: {1/2 - sqrt(5)/6: 1, sqrt(5)/6 + 1/2: 1}.
+: Eigenvalues in C: {1: 1, 0: 1}.
+
+** Exercise 2.78
+Prove that a state $|\psi\rangle$ of a composite system AB is a product state if and only if it has
+Schmidt number 1. Prove that $|\psi\rangle$ is a product state if and only if $\rho^A$ (and thus
+$\rho^B$) are pure states.
+
+*** Proof
+A product state is a state which can be represented by a /simple/ tensor product
+$|\alpha\rangle\otimes|\beta\rangle$. But this is by definition the same as having Schmidt-Rank 1.
+
+For the second part consider the Schmidt-Decomposition:
+
+$$
+  \, |\psi\rangle = \sum_{i=1}^r \lambda_i |i_A\rangle \otimes |i_B\rangle .
+$$
+
+Hence the reduced state on system A is (take the partial trace on B):
+
+$$
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A| .
+$$
+
+Since $\sum_i\lambda_i^2=1$ and $\lambda_i>0$ this can only be a pure state (a projection operator,
+i.e. $\rho^2=\rho$) if $r=1$. This is the same as $|\psi\rangle$ being a product state. QED.
+
+** Exercise 2.79
+Consider a composite system consisting of two qubits. Find the Schmidt decompositions of the states
+
+$$
+  \frac{|00\rangle + |11\rangle}{\sqrt{2}}; \quad
+  \frac{|00\rangle + |01\rangle +  |10\rangle + |11\rangle}{2}; \quad \text{and} \quad
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} .
+$$
+
+*** Solution
+The first state clearly is already represented as Schmidt-Decomposition.
+
+The second term has Schmidt-Decomposition $|+\rangle\otimes|+\rangle$, where
+$|+\rangle=(|0\rangle+|1\rangle)/\sqrt{2}$ is "the" positive eigenvector of the Pauli Operator =X=.
+
+For the third one we have to calculate something. The proof of the existence of the
+Schmidt-Decomposition gives a procedure to actually calculate it. First let us find the Matrix
+$A\in\CC^{2\times2}$ such that:
+
+$$
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}} = \sum_{ij} A_{ij} |i\rangle \otimes |j\rangle .
+$$
+
+Clearly the following is the only matrix satisfying the above equation:
+
+$$
+  A = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 & 1 \\ 1 & 0 \end{bmatrix} .
+$$
+
+We need to find the singular value decomposition of $A$. Since $A$ is hermitian this simplifies to
+find the spectral decomposition $A=UDU^\dagger$.
+
+One can use sympy to do this. The eigenvalues are:
+
+$$
+  \lambda_{\pm} = \frac{\sqrt{3}}{6} \left( 1 \pm \sqrt{5} \right) .
+$$
+
+"The" eigenvectors are:
+
+$$
+  \,|\pm_A\rangle = \frac{1}{\sqrt{10 \pm 2\sqrt{5}}} \left((1 \pm \sqrt{5})|0\rangle + 2|1\rangle \right) .
+$$
+
+With this we can write down the Schmidt-Decomposition:
+
+$$
+  \frac{|00\rangle + |01\rangle + |10\rangle}{\sqrt{3}}
+  = \lambda_+ |+_A\rangle|+_A\rangle + \lambda_- |-_A\rangle|-_A\rangle .
+$$
+
+Note that the fact that the eigenvectors can be chosen with real entries simplifies things.
+
+** Exercise 2.80
+Suppose $|\psi\rangle$ and $|\varphi\rangle$ are two pure states of a composite quantum system with
+components A and B, with identical Schmidt coefficients. Show that there are unitary transformations
+$U$ on system A and $V$ on system B such that $|\psi\rangle = (U \otimes V )|\varphi\rangle$.
+
+*** Proof
+That $|\psi\rangle$ and $|\varphi\rangle$ have the same Schmidt coefficients means that there are
+positive numbers $\lambda_i$ such that
+
+\begin{align*}
+  \, |\psi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\psi}\rangle |i_{B,\psi}\rangle , \\
+  \, |\varphi\rangle &= \sum_{i=1}^r \lambda_i |i_{A,\varphi}\rangle |i_{B,\varphi}\rangle ,
+\end{align*}
+
+for some orthonormal sets $(|i_{A,\psi}\rangle)$, $(|i_{A,\varphi}\rangle)$, $(|i_{B,\psi}\rangle)$,
+$(|i_{B,\varphi}\rangle)$. By the latter fact it is easy to find a unitary $U$ which maps
+$|i_{A,\varphi}\rangle$ to $|i_{A,\psi}\rangle$ and similarly a $V$ for the B-system. These two
+unitary operators satisfy the claim.
+
+** Exercise 2.81 (Freedom in purifications)
+Let $|AR_1\rangle$ and $|AR_2\rangle$ be two purifications of a state $\rho^A$ to a composite system
+AR. Prove that there exists a unitary transformation $U_R$ acting on system R such that
+
+$$
+\,|AR_1\rangle = (I_A \otimes U_R ) |AR_2\rangle .
+$$
+
+*** Proof
+Let
+
+$$
+  \rho^A = \sum_{i=1}^r \lambda_i^2 |i_A\rangle\langle i_A|
+$$
+
+be a Spectral-Decomposition of $\rho^A$ (in particular all the vectors involved form an orthonormal
+set). Without loss of generality we may assume that $|AR_2\rangle$ adheres to the generic
+construction from the book, that is
+
+$$
+\, |AR_2\rangle = \sum_{i=1}^r |i_A\rangle \otimes |i_R\rangle
+$$
+
+with an orthonormal set $(|i_R\rangle)$. A priori the Hilbert Space of $R$ could have dimension
+smaller then $r$. But in that case we could simply augment $R$ by some additional dimensions.
+
+Since $|AR_1\rangle$ and $|AR_2\rangle$ are purifications of the same state they have the same
+Schmidt Numbers (the $\lambda_i$ from above). From Exercise 2.80 we deduce that there exist
+unitary matrices $V_A$ and $V_R$ such that
+
+$$
+\,|AR_1\rangle = (V_A \otimes V_R ) |AR_2\rangle .
+$$
+
+To simplify notation let us write $V=V_A$. Slightly abusing notation, let us write
+$\ptrace{R}{|\psi\rangle}$ when we mean $\ptrace{R}{|\psi\rangle\langle\psi|}$. We have
+
+$$
+  \rho^A = \ptrace{R}{|AR_1\rangle} = \ptrace{R}{V\otimes V_R \, |AR_2\rangle} = V^\dagger \rho^A V .
+$$
+
+This implies that $V$ leaves the eigenspaces of $\rho^A$ invariant (that is, an eigenvector of some
+eigenvalue is mapped to a possibly different eigenvector of the same eigenvalue).
+
+For the moment let us assume that all $\lambda_i$ are equal, that is $\lambda_i=1/r$. Let
+$(v_{ij})\in\CC^{r\times r}$ be the matrix representation of $V$ on the eigenspace of $1/r$. We
+have:
+
+$$
+\, |AR_1\rangle = V \otimes V_R \, |AR_2\rangle = \frac{1}{r} \sum_{ij} v_{ji} |j_A\rangle \otimes V_R|i_R\rangle
+  = \frac{1}{r} \sum_{j} |j_A\rangle \otimes \left( \sum_i v_{ji} V_R|i_{R}\rangle \right) .
+$$
+
+Let $|j_{R'}\rangle=\sum_{i}v_{ji}V_R|i_{R}\rangle$. These vectors form an orthonormal set
+since $(v_{ij})$ is a unitary matrix (and transposed unitary matrices are unitary too) and the
+$(|i_R\rangle)$ are orthonormal. Hence there is a unitary matrix $U_R$ such that
+$|j_{R'}\rangle=U|j_R\rangle$. This together with the previous equation implies the desired result:
+
+$$
+\, |AR_1\rangle = (I_A \otimes U_R) |AR_2\rangle .
+$$
+
+The general case follows by decomposing $|AR_1\rangle$ and $|AR_2\rangle$ into direct sums over the
+eigenspaces of $\rho^A$ and repeating the above reasoning for each one. Note that in the above
+reasoning for the special case the particular value of the trace was unimportant! QED.
+
+** Exercise 2.82
+Suppose $\{p_i , |\psi_i\rangle\}$ is an ensemble of states generating a density matrix $\rho$
+for a quantum system A. Introduce a system R with orthonormal basis $|i\rangle$.
+
+1. Show that $\sum_i \sqrt{p_i} |\psi_i\rangle|i\rangle$ is a purification of $\rho$.
+2. Suppose we measure R in the basis $(|i\rangle)$, obtaining outcome i. With what probability do we
+   obtain the result $i$, and what is the corresponding state of system A?
+3. Let $|AR\rangle$ be any purification of $\rho$ to the system AR. Show that there exists an
+   orthonormal basis $|i\rangle$ in which R can be measured such that the corresponding
+   post-measurement state for system A is $|\psi_i\rangle$ with probability $p_i$.
+
+Remark (which is missing in the book): In sub-exercise 3 one may assume that the space $R$ is large
+enough to hold all the $|i\rangle$ even if the purification does not need that many dimensions (two
+ensembles always have at least $r$ (rank) members but might have more, see also Theorem 2.6).
+
+*** Proof of 1
+This was /essentially/ shown in the book right before Exercise 2.79! In the book it was /implicitly/
+assumed that the $|\psi\rangle$ are orthonormal (by using the Schmidt-Decomposition of $\rho$). But
+the proof did not use this fact. QED.
+
+*** Proof of 2
+Recall that:
+
+$$
+  \,|AR\rangle = \sum_i \sqrt{p_i} |\psi_i\rangle |i\rangle .
+$$
+
+The measurement of $i$ as viewed from the whole system AR is represented by
+$I\otimes|i\rangle\langle i|$ (see Box 2.6). Hence the probability to measure $i$ is:
+
+$$
+  p(i) = \langle AR|I\otimes|i\rangle\langle i| AR\rangle = p_i .
+$$
+
+The post-measurement state is:
+
+$$
+  \frac{1}{p(i)} I\otimes|i\rangle\langle i| AR\rangle = |\psi\rangle|i\rangle .
+$$
+
+Restricted to A this is corresponds to $|\psi\rangle$ (note that this does not /directly/ follow
+from Postulate 4 but it is easy to show that product state behave nice under decomposition into the
+corresponding subsystems). QED.
+
+*Although it is not asked for*, here is the state of R expressed as a density matrix (before measurement):
+
+$$
+  \rho^R = \ptrace{A}{|AR\rangle\langle AR|} = \sum_{ij} \sqrt{p_i p_j} \langle\psi_i|\psi_j\rangle |i\rangle\langle i| .
+$$
+
+It is nice to verify that the after measurement results restricted to R are consistent with the
+above:
+
+$$
+  p(i) = p_i = \trace{|i\rangle\langle i| \rho^R} ,
+$$
+
+and
+
+$$
+\,  |i\rangle = \frac{1}{p_i} |i\rangle\langle i| \rho^R |i\rangle\langle i| .
+$$
+
+*** Proof of 3
+Unfortunately there is a notation clash here. Let us rename the orthonormal set used in part 1 to
+$(|i_0\rangle)$ and the corresponding purified vector to $|AR_0\rangle$. By exercise 2.81 (freedom
+of purifications) there is a unitary operator $U_R$ such that:
+
+$$ |AR\rangle = I\otimes U_R \; |AR_0\rangle $$
+
+Hence we may use the basis $(|i\rangle=U_R|i_0\rangle)$ to achieve the desired goal.
+
+But note a subtle issue here: A priori $U_R$ is not necessarily defined on each individual
+$|i_0\rangle$. The reason is, that each density operator has ensembles with arbitrary many states
+(of course they are all linearly dependent to some $r$ dimensional set due to Theorem 2.6). This
+implies that R0 can be arbitrary large if one takes the construction in sub-exercise 1. On the
+other hand one can just "add some dimensions" to R if necessary and extend $U_R$ unitarily. QED.

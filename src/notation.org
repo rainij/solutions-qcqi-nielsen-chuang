@@ -1,0 +1,27 @@
+#+title:  Notation
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+
+For two hermitian operators we write:
+
+$$ A \leq B $$
+
+if $\langle\psi|B - A|\psi\rangle \geq 0$ for all $|\psi\rangle$. In the special case that one
+operator is just a multiple of the Identity, e.g. $A=aI$, we write:
+
+$$ a \leq B $$
+
+We define the [[https://en.wikipedia.org/wiki/Kronecker_delta][Kronecker delta]] to be
+
+$$
+\delta_{ij} = \begin{cases}
+  0 & \text{if } i \neq j, \\
+  1 & \text{if } i = j. \end{cases}
+$$
+
+The /Fourier transform/ is denoted like that:
+
+$$
+  \FT \sum_{k=0}^{N-1} x_k |k\rangle = \frac{1}{\sqrt{N}} \sum_{k,j=0}^{N-1} x_k e^{\frac{2\pi\ii}{N}kj} |j\rangle .
+$$
