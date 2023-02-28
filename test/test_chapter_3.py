@@ -38,7 +38,7 @@ def test_TuringMachine_fromSource(source, start, halt, inp, out):
     (prog_compute_constant_1, "S", "H", "▶0", "▶1"),
     (prog_compute_constant_1, "S", "H", "▶1", "▶1"),
     (prog_compute_constant_1, "S", "H", "▶1011", "▶1"),
-    # print XYZ on an empty tape, leave tape untouched if first cell contains something▶ contains some
+    # print XYZ on an empty tape, leave tape untouched if first cell contains something
     (prog_print_XYZ, "S", "H", "", "XYZ"),
     (prog_print_XYZ, "S", "H", "a", "a"),
     (prog_print_XYZ, "S", "H", "X", "X"),
