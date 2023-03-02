@@ -12,32 +12,32 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org8562c64">Setup</a>
+<li><a href="#org1ea3f8f">Setup</a>
 <ul>
-<li><a href="#orgb849e08">Python Libraries</a></li>
-<li><a href="#org5f5c0f5">Turing Machines</a></li>
+<li><a href="#org6ca92af">Python Libraries</a></li>
+<li><a href="#org8852b41">Turing Machines</a></li>
 </ul>
 </li>
-<li><a href="#orga425444"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#orgcbaaf4e"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#orgc2cebf8"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
-<li><a href="#org4d1d74c">Exercise 3.2 (Turing numbers)</a></li>
-<li><a href="#org45e649c">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+<li><a href="#org197a851"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#org7ae6ad7">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#orgc3c31e9">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8562c64" class="outline-2">
-<h2 id="org8562c64">Setup</h2>
-<div class="outline-text-2" id="text-org8562c64">
+<div id="outline-container-org1ea3f8f" class="outline-2">
+<h2 id="org1ea3f8f">Setup</h2>
+<div class="outline-text-2" id="text-org1ea3f8f">
 </div>
-<div id="outline-container-orgb849e08" class="outline-3">
-<h3 id="orgb849e08">Python Libraries</h3>
-<div class="outline-text-3" id="text-orgb849e08">
+<div id="outline-container-org6ca92af" class="outline-3">
+<h3 id="org6ca92af">Python Libraries</h3>
+<div class="outline-text-3" id="text-org6ca92af">
 <div class="org-src-container">
-<pre class="src src-python" id="orgc98a20a"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
+<pre class="src src-python" id="orgfeeac90"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
 <span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
 
 <span class="org-comment-delimiter"># </span><span class="org-comment">Terminal colors. TODO: Move somewhere else.</span>
@@ -51,13 +51,13 @@
 </div>
 </div>
 
-<div id="outline-container-org5f5c0f5" class="outline-3">
-<h3 id="org5f5c0f5">Turing Machines</h3>
-<div class="outline-text-3" id="text-org5f5c0f5">
+<div id="outline-container-org8852b41" class="outline-3">
+<h3 id="org8852b41">Turing Machines</h3>
+<div class="outline-text-3" id="text-org8852b41">
 </div>
-<div id="outline-container-orgdf17fcf" class="outline-4">
-<h4 id="orgdf17fcf">Introduction</h4>
-<div class="outline-text-4" id="text-orgdf17fcf">
+<div id="outline-container-orgd1e4cd0" class="outline-4">
+<h4 id="orgd1e4cd0">Introduction</h4>
+<div class="outline-text-4" id="text-orgd1e4cd0">
 <p>
 In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
 this one:
@@ -80,7 +80,7 @@ Below we initialize a turing machine <code>my_tm</code> from the above source co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgcfa870f"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<pre class="src src-python" id="orgb70bea8"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
 <span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
 <span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
 
@@ -136,19 +136,19 @@ result = '▶1'
 </div>
 </div>
 
-<div id="outline-container-org5510a44" class="outline-4">
-<h4 id="org5510a44">Implementation</h4>
-<div class="outline-text-4" id="text-org5510a44">
+<div id="outline-container-org85b319a" class="outline-4">
+<h4 id="org85b319a">Implementation</h4>
+<div class="outline-text-4" id="text-org85b319a">
 <p>
 First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
 readable or at least mnemonic state names. This would not be possible had we used integers. The
 <code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
-from the source-string/file. It is the reason why in the <a href="#orgcfa870f">listing above</a> the <code>TuringMachine</code> instance
+from the source-string/file. It is the reason why in the <a href="#orgb70bea8">listing above</a> the <code>TuringMachine</code> instance
 can refer to its source (see the line starting with <code>source line =</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org465808d"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<pre class="src src-python" id="org9435861"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
 <span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
 <span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
 <span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
@@ -160,7 +160,7 @@ can refer to its source (see the line starting with <code>source line =</code>).
 </div>
 
 <p>
-<a href="#org90ca421">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+<a href="#orgd321fd1">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
 implementation a bit. But it you ignore this the implementation is very simple and straightforward
 to understand (IMHO).
 </p>
@@ -198,7 +198,7 @@ particular, those cannot be used as characters on the tape.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org90ca421"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+<pre class="src src-python" id="orgd321fd1"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
     <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
     BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
     <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
@@ -333,7 +333,7 @@ Finally, the default parser:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org00ad953"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+<pre class="src src-python" id="org5671d2f"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
     <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
 
 <span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
@@ -379,13 +379,13 @@ Finally, the default parser:
 </div>
 </div>
 
-<div id="outline-container-orga425444" class="outline-2">
-<h2 id="orga425444"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-orga425444">
+<div id="outline-container-orgcbaaf4e" class="outline-2">
+<h2 id="orgcbaaf4e"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-orgcbaaf4e">
 </div>
-<div id="outline-container-orgc2cebf8" class="outline-3">
-<h3 id="orgc2cebf8"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
-<div class="outline-text-3" id="text-orgc2cebf8">
+<div id="outline-container-org197a851" class="outline-3">
+<h3 id="org197a851"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-org197a851">
 <p>
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -393,9 +393,9 @@ machine?
 </div>
 </div>
 
-<div id="outline-container-org4d1d74c" class="outline-3">
-<h3 id="org4d1d74c">Exercise 3.2 (Turing numbers)</h3>
-<div class="outline-text-3" id="text-org4d1d74c">
+<div id="outline-container-org7ae6ad7" class="outline-3">
+<h3 id="org7ae6ad7">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-org7ae6ad7">
 <p>
 Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
 such a way that the number uniquely specifies the corresponding machine. We call this number the
@@ -405,9 +405,9 @@ and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
 </p>
 </div>
 
-<div id="outline-container-org608319b" class="outline-4">
-<h4 id="org608319b">Proof</h4>
-<div class="outline-text-4" id="text-org608319b">
+<div id="outline-container-orgfda207d" class="outline-4">
+<h4 id="orgfda207d">Proof</h4>
+<div class="outline-text-4" id="text-orgfda207d">
 <p>
 For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
 consider (one could easily relax this constraint without complicating the encoding). Hence we need
@@ -474,9 +474,9 @@ invertible and hence the Turing machine can be recovered from this (potentially 
 </div>
 </div>
 
-<div id="outline-container-org45e649c" class="outline-3">
-<h3 id="org45e649c">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
-<div class="outline-text-3" id="text-org45e649c">
+<div id="outline-container-orgc3c31e9" class="outline-3">
+<h3 id="orgc3c31e9">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-orgc3c31e9">
 <p>
 Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
 reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
@@ -484,9 +484,9 @@ and/or symbols other than ▶, 0, 1, and the blank.)
 </p>
 </div>
 
-<div id="outline-container-org0d8a4c7" class="outline-4">
-<h4 id="org0d8a4c7">Solution</h4>
-<div class="outline-text-4" id="text-org0d8a4c7">
+<div id="outline-container-org50628cf" class="outline-4">
+<h4 id="org50628cf">Solution</h4>
+<div class="outline-text-4" id="text-org50628cf">
 <p>
 We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
 following.
@@ -596,7 +596,7 @@ Finally the third part acts like this:
 </pre>
 
 <p>
-In the following we present a <a href="#org1ba7e08">Turing program</a> which does exactly this. Don't worry, most of the
+In the following we present a <a href="#orgbe88f92">Turing program</a> which does exactly this. Don't worry, most of the
 program is just comments - explaining how it works, and at the same time giving a kind of
 <i>inline-proof</i> that the program is correct in the sense that it "does what we want".
 </p>
@@ -803,11 +803,11 @@ usually only very few succesor blocks for each block.</li>
 
 <p>
 Let the theory behind and plug this program into our python implementation of a (universal)
-<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org1ba7e08">above listing</a>.
+<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#orgbe88f92">above listing</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org972d301"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
+<pre class="src src-python" id="org429e231"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
