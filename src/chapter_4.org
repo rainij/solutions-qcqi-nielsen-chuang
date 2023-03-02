@@ -192,7 +192,7 @@ Let us conclude with a simple demo:
   "PASSED"
 #+end_src
 
-#+RESULTS[cb62df069c117adec47d689df74c790e4ec1a930]: unit-tests-for-controlled-gates
+#+RESULTS[6b9542b5f3a1ef133cdda6813313dbe2c7ef8371]: unit-tests-for-controlled-gates
 : PASSED
 
 ** Two-Level Gates
@@ -701,7 +701,7 @@ A short calculation leads to (use the code above to do it):
   latex_formula
 #+end_src
 
-#+RESULTS[15dded64562f365bc3966cbf26ce608c2a148d27]: exercise-4.4-2
+#+RESULTS[4cc17962fa3ae28f5b520b6994b68c6032369202]: exercise-4.4-2
 #+begin_export latex
 \left[\begin{matrix}e^{\frac{i \left(- \alpha - \beta\right)}{2}} & - i e^{- \frac{i \left(\alpha - \beta\right)}{2}}\\- i e^{\frac{i \left(\alpha - \beta\right)}{2}} & e^{\frac{i \left(\alpha + \beta\right)}{2}}\end{matrix}\right]
 #+end_export
@@ -2053,7 +2053,7 @@ unitarily transform from the basis we wish to perform the measurement in to the 
 then measure. For example, show that the circuit
 
 #+name: exercise-4.33-bell-measurement
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2, 2)
   qc.cx(0, 1)
   qc.h(0)
@@ -2063,7 +2063,7 @@ then measure. For example, show that the circuit
   str(qc.draw('text'))
 #+end_src
 
-#+RESULTS: exercise-4.33-bell-measurement
+#+RESULTS[a438cd464dc1a5d6749e2849f6949438131c2717]: exercise-4.33-bell-measurement
 :           ┌───┐ ░ ┌─┐
 : q_0: ──■──┤ H ├─░─┤M├───
 :      ┌─┴─┐└───┘ ░ └╥┘┌─┐
@@ -2071,7 +2071,6 @@ then measure. For example, show that the circuit
 :      └───┘      ░  ║ └╥┘
 : c: 2/══════════════╩══╩═
 :                    0  1
-
 
 performs a measurement in the basis of the Bell states. More precisely, show that
 this circuit results in a measurement being performed with corresponding
@@ -2119,7 +2118,7 @@ this be implemented by a quantum circuit?  Show that the following circuit imple
 of $U$:
 
 #+name: exercise-4.34-measure-observable
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2, 1)
   qc.h(0)
   qc.cx(0, 1)  # this is CX but we hack it to CU below
@@ -2133,7 +2132,7 @@ of $U$:
       .replace('q_1', '|ψ>')
 #+end_src
 
-#+RESULTS: exercise-4.34-measure-observable
+#+RESULTS[b77f646a5b3bb23e25b9ddd0996c791d747c5882]: exercise-4.34-measure-observable
 :      ┌───┐     ┌───┐ ░ ┌─┐
 : |0>: ┤ H ├──■──┤ H ├─░─┤M├
 :      └───┘┌─┴─┐└───┘ ░ └╥┘
@@ -2217,7 +2216,7 @@ $$
 where $c=x_0\cdot y_0$ is the carry-bit. Recall that $C(X)$ implements binary addition
 modulo 2. Hence the following circuit, which is inspired by the above equation, does what we want:
 
-#+RESULTS: exercise-4.36-solution
+#+RESULTS[248a411dd90d3165066a3c34fb1744571c3e4ccb]: exercise-4.36-solution
 :
 : q_0: ──■────■───────
 :        │    │
@@ -2229,7 +2228,7 @@ modulo 2. Hence the following circuit, which is inspired by the above equation, 
 :      └───┘     └───┘
 
 #+name: exercise-4.36-solution
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(4)
   qc.ccx(0, 2, 3)
   qc.cx(0, 2)
@@ -2258,7 +2257,7 @@ which we study in more detail in the next chapter.
 We semi-automate the task with sympy. First we have to set up the matrix:
 
 #+name: exercise-4.37-1
-#+begin_src python
+#+begin_src python :tangle no
   F = Matrix([[I**(x*y) for x in range(4)] for y in range(4)]) / 2
 #+end_src
 
@@ -2267,7 +2266,7 @@ procedure from the book (note that in general we also had to use src_python{make
 we don't need it)):
 
 #+name: exercise-4.37-2
-#+begin_src python
+#+begin_src python :results replace :tangle no :cache yes
   U1 = sp.simplify(make_twolevel(4, [1,0], [1, -1]))
   U2 = sp.simplify(make_twolevel(4, [2,0], [1, -sqrt(2)]))
   U3 = sp.simplify(make_twolevel(4, [3,0], [1, -sqrt(3)]))
@@ -2276,7 +2275,11 @@ we don't need it)):
 
   F0 = make_CU(2, 0, 1, Matrix([[1, I], [-1, I]]) / sqrt(2))
   assert sp.simplify(U5*U4*U3*U2*U1*F) == F0
+  "PASSED"
 #+end_src
+
+#+RESULTS[8d550adbce9382e6f28d9eac8c192b9f0eefe472]: exercise-4.37-2
+: PASSED
 
 From this we can easily readout the decomposition:
 
@@ -2288,7 +2291,7 @@ $$
 The following code was used to produce the above latex expression:
 
 #+name: exercise-4.37-3
-#+begin_src python
+#+begin_src python :tangle no :eval no
   def get_latex_for_exercise_4_37():
       Vs = [U1.H, U2.H, U3.H, U4.H, U5.H, F0]
       return " \\cdot ".join([sp.latex(V) for V in Vs])
@@ -2398,7 +2401,7 @@ controlled $\tilde{U}$ gate with target $0$ and controls at all remaining wires.
 circuit implements $M$:
 
 #+name: exercise-4.39-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qcU = QuantumCircuit(1, name="Ũ")
   ccu = qcU.to_gate().control(2)
 
@@ -2410,7 +2413,7 @@ circuit implements $M$:
   str(qc.draw('text'))
 #+end_src
 
-#+RESULTS: exercise-4.39-1
+#+RESULTS[f5070d4f963f4c5a5ea25e38d03c8782ff05c70c]: exercise-4.39-1
 :           ┌───┐
 : q_0: ──o──┤ Ũ ├──o──
 :        │  └─┬─┘  │
@@ -2459,7 +2462,7 @@ enough (as elements of the unit circle)). QED.
 This and the next two exercises develop a construction showing that the Hadamard, phase, controlled-
 and Toffoli gates are universal. Show that this circuit
 
-#+RESULTS: exercise-4.41
+#+RESULTS[c388984801ef3ce4fa6274dfc69257cdfb6d3a54]: exercise-4.41
 :      ┌───┐               ┌───┐┌─┐
 : |0>: ┤ H ├──■─────────■──┤ H ├┤M├───
 :      ├───┤  │         │  ├───┤└╥┘┌─┐
@@ -2477,7 +2480,7 @@ circuit and $Z=S^2$ gates may be used to apply a $R_z(\theta)$ gate with probabi
 $1$.
 
 #+name: exercise-4.41
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(3, 2)
   qc.h(0)
   qc.h(1)
@@ -2851,7 +2854,7 @@ done by =sympy=. Hence let us define three symbols. Two non-commuting symbols fo
 a commuting symbol for the time:
 
 #+name: exercise-4.49-1
-#+begin_src python
+#+begin_src python :tangle no
   A, B = sp.symbols('A B', commutative=False)
   t = sp.symbols('t', commutative=True)  # commutes with A and B
 #+end_src
@@ -2859,12 +2862,12 @@ a commuting symbol for the time:
 For a warm up let us return to formula (1):
 
 #+name: exercise-4.49-2
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E1 = exp((A+B)*t) - exp(A*t)*exp(B*t)
   E1.series(t, 0, 3)
 #+end_src
 
-#+RESULTS: exercise-4.49-2
+#+RESULTS[85f5c2f185c70bdc5250c320376de27fd6a9a142]: exercise-4.49-2
 : t**2*(-A*B/2 + B*A/2) + O(t**3)
 
 This of course shows the claim again. But it is slightly more precise. The $t^2$ term as the
@@ -2873,23 +2876,23 @@ leading term is $I$). But let us check it anyway. We increase the order of the s
 $4$ since we are curious what the first non-vanishing term looks like:
 
 #+name: exercise-4.49-3
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E2 = exp((A+B)*t) - exp(A*t)*exp(B*t)*exp(-(A*B-B*A)*t**2/2)
   E2.series(t, 0, 4)
 #+end_src
 
-#+RESULTS: exercise-4.49-3
+#+RESULTS[1a4fc04ca84f4667100669ebfe9fb1a6c5f06b41]: exercise-4.49-3
 : t**3*(-A*B*A/3 - A*B**2/3 + A**2*B/6 + 2*B*A*B/3 + B*A**2/6 - B**2*A/3) + O(t**4)
 
 Now let us check formula (2):
 
 #+name: exercise-4.49-4
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E3 = exp((A+B)*t) - exp(B*t/2)*exp(A*t)*exp(B*t/2)
   E3.series(t, 0, 4)
 #+end_src
 
-#+RESULTS: exercise-4.49-4
+#+RESULTS[2eab52cd65ebe6327b2d8dcbdd8e2beb97fec2ed]: exercise-4.49-4
 : t**3*(A*B*A/6 + A*B**2/24 - A**2*B/12 - B*A*B/12 - B*A**2/12 + B**2*A/24) + O(t**4)
 
 Comparing this with the third order term of the BCH formula it looks like this formula has a
@@ -2974,7 +2977,7 @@ $$
 From the book we already know how to construct the operator in the middle (Figure 4.19). The
 complete circuit is:
 
-#+RESULTS: exercise-4.51
+#+RESULTS[2abd53fe40693a3d5284212cccb411ed43077f21]: exercise-4.51
 :         ┌───┐                                                ┌───┐
 : q_0: ───┤ H ├──────■───────────────────────────────────■─────┤ H ├────
 :      ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
@@ -2986,7 +2989,7 @@ complete circuit is:
 :                  └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
 
 #+name: exercise-4.51
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   params = (Param('+π/2'), Param('-π/2'), Param('2Δt'))
 
   qc = QuantumCircuit(4)
