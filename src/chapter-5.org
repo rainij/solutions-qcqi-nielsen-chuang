@@ -2,17 +2,23 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
-#+property: header-args:python :session *chapter-5*
+#+property: header-args:python :session *chapter-5* :tangle chapter_5.py
 
 #+toc: headlines 2
 
 * Setup
 ** Setup Python Libaries
+Tangled:
+
 #+name: chapter-5-python-imports
 #+begin_src python
   import sympy as sp
   from sympy import exp, I, pi
+#+end_src
 
+Not tangled:
+
+#+begin_src python :tangle no
   from qiskit.circuit import QuantumCircuit, Gate
 #+end_src
 
@@ -223,7 +229,7 @@ to find a solution based on the ABC-construction from Figure 4.6 and the proof o
 
 In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{k+1}$) implements $C(R_k)$:
 
-#+RESULTS: exercise-5.4-circuit
+#+RESULTS[e39481c771c8a0a5950038dc7d4a524569469525]: exercise-5.4-circuit
 :                                          ┌─────────┐
 : q_0: ───────────────■─────────────────■──┤ R_{k+1} ├
 :      ┌───────────┐┌─┴─┐┌───────────┐┌─┴─┐└─┬─────┬─┘
@@ -231,7 +237,7 @@ In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{
 :      └───────────┘└───┘└───────────┘└───┘  └─────┘
 
 #+name: exercise-5.4-circuit
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2)
   C = Gate("R_{k+1}^†", 1, [])
   qc.append(C, [1])

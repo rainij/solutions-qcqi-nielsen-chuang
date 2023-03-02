@@ -1,7 +1,10 @@
-.PHONY: clean default pull-latest-simple-css
+.PHONY: clean default pull-latest-simple-css test
 
 default:
 	./build-site.el
+
+test:
+	python -m pytest -v test/
 
 clean:
 	rm -rf public

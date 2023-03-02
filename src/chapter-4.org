@@ -2,18 +2,21 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
-#+property: header-args:python :session *chapter-4*
+#+property: header-args:python :session *chapter-4* :tangle chapter_4.py
 
 #+toc: headlines 2
 
 * Setup
 ** Setup Python Libraries
-#+name: setup-chapter-4
+Tangled:
+
+#+name: setup-chapter-4-1
 #+begin_src python
   from functools import reduce
   from itertools import product
   from typing import Any
 
+  # Importing sympy takes a few houndred milliseconds
   import sympy as sp
   from sympy import cos, exp, I, Matrix, pi, sin, sqrt
   from sympy.physics.quantum import TensorProduct
@@ -21,7 +24,13 @@
 
   import numpy as np
   import numpy.typing as npt
+#+end_src
 
+Not tangled:
+
+#+name: setup-chapter-4-2
+#+begin_src python :tangle no
+  from sympy import Quaterion
   from qiskit.circuit import QuantumCircuit, Parameter as Param
 #+end_src
 
@@ -179,16 +188,21 @@ Since we need them sometimes, in the following we define a factory for controlle
       return CnU
 #+end_src
 
-Some very simple Unit Tests:
+Let us conclude with a simple demo:
 
 #+name: unit-tests-for-controlled-gates
-#+begin_src python
+#+begin_src python :tangle no :results replace :cache yes
   assert make_CU(2, 0, 1, X) == CX, "Expected CX Gate (1)"
   assert make_CU(3, 1, 2, X) == tprod(Id, CX), "Expected CX Gate (2)"
 
   assert make_CnU(3, [0, 1], 2, X) == Toff, "Expected Toffoli Gate (1)"
   assert make_CnU(4, [1, 2], 3, X) == tprod(Id, Toff), "Expected Toffoli Gate (2)"
+
+  "PASSED"
 #+end_src
+
+#+RESULTS[6b9542b5f3a1ef133cdda6813313dbe2c7ef8371]: unit-tests-for-controlled-gates
+: PASSED
 
 ** Two-Level Gates
 Two-Level gates are gates which act non-trivially only on two base vectors (computational
@@ -233,24 +247,30 @@ matrices outlined in chapter 4.5.1 of the book.
     return Matrix(U)
 #+end_src
 
-The following tests also illustrate how the function works. Take the first test as an example. The
-first index, which is 1 in test 1, determines in which row we put ~[4,3]~. The columns are specified
-by the /sorted/ indices: 0 and 1. Then the corresponding "conjugate row" is inserted and finally we
-normalize.
+The following tests illustrate how to use ~make_twolevel~ and what the function does. Take
+the first test as an example. The first index, which is 1 in test 1, determines in which
+row we put ~[3,4]~. The columns are specified by the /sorted/ indices: 0 and 1. Then the
+corresponding "conjugate row" is inserted and finally we normalize.
 
 #+name: test-two-level-gates
-#+begin_src python
+#+begin_src python :tangle no :results replace :cache yes
   assert make_twolevel(4, [1,0], [3, 4]) == Matrix([
       [-4, 3, 0, 0],
       [ 3, 4, 0, 0],
       [ 0, 0, 5, 0],
       [ 0, 0, 0, 5]]) / 5, "test: make_twolevel 1"
+
   assert make_twolevel(4, [2,1], [3, 4*I]) == Matrix([
       [5,   0,   0, 0],
       [0, 4*I,   3, 0],
       [0,   3, 4*I, 0],
       [0,   0,   0, 5]]) / 5, "test: make_twolevel 2"
+
+  "PASSED"
 #+end_src
+
+#+RESULTS[44e779d3b0358352cf7cddbe4bbe76a7a8838b6e]: test-two-level-gates
+: PASSED
 
 ** The Search for Circuits
 In the following we document some /very basic/ approaches to find circuits consisting of
@@ -320,7 +340,7 @@ Just for completeness here is the code:
 Here we try it out. You can use ipython magic function ~%time~ to measure how slow this approach is.
 
 #+name: search-for-circuits-approach-via-sympy-tests
-#+begin_src python
+#+begin_src python :tangle no :results replace :cache yes
   V = Matrix([[1 - I, 1 + I], [1 + I, 1 - I]]) / 2
   assert sp.simplify(V*V) == X, "Exercise 28: V must be sqrt(X)."
 
@@ -346,12 +366,19 @@ Here we try it out. You can use ipython magic function ~%time~ to measure how sl
   CX01 = make_CU(3, 0, 1, X)
   CX02 = make_CU(3, 0, 2, X)
   CV02 = make_CU(3, 0, 2, V)
+
   assert sp_search_circuits(1, admissible_gates, CX01) == ['CX(0, 1)'], "sp_search_circuits: CX01"
   assert sp_search_circuits(1, admissible_gates, CV02) == ['CV(0, 2)'], "sp_search_circuits: CV02"
-  # We comment this out since it takes about a second:
-  # result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])
-  # assert sorted(sp_search_circuits(2, admissible_gates, CX01 * CV02)) == result, "sp_search_circuits: CX01 * CV02"
+
+  # This takes around a second:
+  result = sorted(['CX(0, 1) * CV(0, 2)', 'CV(0, 2) * CX(0, 1)'])
+  assert sorted(sp_search_circuits(2, admissible_gates, CX01 * CV02)) == result, "sp_search_circuits: CX01 * CV02"
+
+  "PASSED"
 #+end_src
+
+#+RESULTS[5386c87bddf7c0dd355cb66bee6039ba6982fe3f]: search-for-circuits-approach-via-sympy-tests
+: PASSED
 
 *** Approach 2: via Numpy
 *IMPORTANT:* Complex numbers in numpy are always implemented via floats. To avoid the typical
@@ -504,14 +531,20 @@ Now let us redefine the Pauli Matrices within numpy:
   # Half-integral-numbers should be OK too since floats are binary
   np_V = np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]]) / 2
   np_Vt = np_V.conj().T
-  assert np.alltrue(np_V @ np_V == np_X), "np_V must be sqrt(np_X)."
 #+end_src
 
-**** Basic Unit Tests
-Very simple unit tests:
+#+name: test-numpy-paul-matrices
+#+begin_src python :tangle no :results replace :cache yes
+  assert np.alltrue(np_V @ np_V == np_X), "np_V must be sqrt(np_X)."
+  "PASSED"
+#+end_src
 
+#+RESULTS[7ea53f9d56fb981a7c31db953f50463f4947c381]: test-numpy-paul-matrices
+: PASSED
+
+**** Basic Unit Tests
 #+name: numpy-unit-tests-for-search-circuit
-#+begin_src python
+#+begin_src python :tangle no :results replace :cache yes
   np_adm_CX = np_make_all_CU(3, np_X, "CX", make_pred_CX(3))
   np_adm_CV = np_make_all_CU(3, np_V, "CV", make_pred_CV(3))
   np_adm_CVh = np_make_all_CU(3, np_Vt, "CVh", make_pred_CV(3))
@@ -531,24 +564,32 @@ Very simple unit tests:
   assert sorted(np_search_circuit(1, np_admissible_gates, np_CV02)) == ['CV(0, 2)'], "np_search_circuit: CV02"
   result = sorted(['CX(0, 1) @ CV(0, 2)', 'CV(0, 2) @ CX(0, 1)'])
   assert sorted(np_search_circuit(2, np_admissible_gates, np_CX01 @ np_CV02)) == result, "np_search_circuit: CX01 @ CV02"
+
+  "PASSED"
 #+end_src
 
+#+RESULTS[c3368e777ab6b253a58aa06c5a30e0916ac3a23e]: numpy-unit-tests-for-search-circuit
+: PASSED
+
 **** Find all minimal implementations of the Toffoli Gate
-Finally we can actually search for all realizations of the Toffoli Gate (=CCX=):
+Finally we can actually search for all realizations of the Toffoli Gate (=CCX=). The
+variable ~np_admissible_gates~ is taken from the [[numpy-unit-tests-for-search-circuit][unit tests]] above.
 
 #+name: numpy-search-toffoli
-#+begin_src python
+#+begin_src python :tangle no :results replace :cache yes
   np_Toff = np.array(Toff)
 
-  # we deactivate the code since it takes around 10 seconds to execute
-  if False:
-      np_search_circuit(5, np_admissible_gates, np_Toff)
+  # Takes around 10 seconds to execute.
+  results = np_search_circuit(5, np_admissible_gates, np_Toff)
   # Produces among 19 others the solution from the book:
   # 'CV(0, 2) @ CX(0, 1) @ CVt(1, 2) @ CX(0, 1) @ CV(1, 2)',
+
+  "\n".join(results)
 #+end_src
 
 We obtain 20 solutions using exactly 5 gates to represent the Toffoli (with less gates it is not possible):
 
+#+RESULTS[6a606862a2a99a46a2e316ff582bd10d6ef9d160]: numpy-search-toffoli
 #+begin_example
 CX(0, 1) @ CV(0, 2) @ CVh(1, 2) @ CX(0, 1) @ CV(1, 2)
 CX(0, 1) @ CV(1, 2) @ CX(0, 1) @ CVh(0, 2) @ CVh(1, 2)
@@ -625,12 +666,12 @@ Show that, up to a global phase, the π/8 gate satisfies $T = R_z(\pi/4)$.
 It is easy to see that $T = \exp(i\pi/8) \cdot R_z(\pi/4)$. We let ~sympy~ do the job:
 
 #+name: exercise-4.3-1
-#+begin_src python :results replace
+#+begin_src python :tangle no :results replace :cache yes
   rz = Rz.subs(theta, pi/4)
   exp(I*pi/8) * rz - T  # should be zero
 #+end_src
 
-#+RESULTS: exercise-4.3-1
+#+RESULTS[05d5cdbc180cef245309e9c98b210c052ce7c69c]: exercise-4.3-1
 : Matrix([[0, 0], [0, 0]])
 
 QED.
@@ -646,7 +687,7 @@ up to the phase factor. Due to the sqrt of 2 factor appearing in $H$ we deduce t
 is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
 
 #+name: exercise-4.4-1
-#+begin_src python
+#+begin_src python :tangle no
   a, b = sp.symbols('\\alpha \\beta')
 
   ra = Rz.subs(theta, a)
@@ -654,13 +695,13 @@ is a good bet. Knowing what comes we choose $\gamma=\pi/2$.
   rx = Rx.subs(theta, pi/2)
 
   h0 = ra * rx * rb
-  simp = sp.simplify(sqrt(2)*h0)
 #+end_src
 
 A short calculation leads to (use the code above to do it):
 
 #+name: exercise-4.4-2
-#+begin_src python :results value latex replace :exports none
+#+begin_src python :results value latex replace :exports none :cache yes :tangle no
+  simp = sp.simplify(sqrt(2)*h0)
   latex_formula = sp.latex(simp)
   #sp.preview(simp, viewer='file', filename='output.png', euler=False,
   #           dvioptions=['-D', '200', '-T', 'tight', '-bg', 'Transparent', '-fg', 'rgb 0.2 0.6 1.0'])
@@ -669,7 +710,7 @@ A short calculation leads to (use the code above to do it):
   latex_formula
 #+end_src
 
-#+RESULTS: exercise-4.4-2
+#+RESULTS[4cc17962fa3ae28f5b520b6994b68c6032369202]: exercise-4.4-2
 #+begin_export latex
 \left[\begin{matrix}e^{\frac{i \left(- \alpha - \beta\right)}{2}} & - i e^{- \frac{i \left(\alpha - \beta\right)}{2}}\\- i e^{\frac{i \left(\alpha - \beta\right)}{2}} & e^{\frac{i \left(\alpha + \beta\right)}{2}}\end{matrix}\right]
 #+end_export
@@ -693,14 +734,14 @@ Prove that $(\hat{n}\cdot\sigma)^2 = I$, and use this to verify Equation (4.8).
 This is easy to see from the following calculation:
 
 #+name: exercise-4.5-1
-#+begin_src python :results replace :exports both
+#+begin_src python :tangle no :results replace :exports both :cache yes
   nx, ny, nz = sp.symbols('n_x n_y n_z')
   r = nx*X + ny*Y + nz*Z
 
   sp.simplify(r*r)
 #+end_src
 
-#+RESULTS: exercise-4.5-1
+#+RESULTS[c8089cdc19c46b97cbd1da49ec29c9545b43b906]: exercise-4.5-1
 : Matrix([[n_x**2 + n_y**2 + n_z**2, 0], [0, n_x**2 + n_y**2 + n_z**2]])
 
 By assumption we have $n_x^2 + n_y^2 + n_z^2 = 1$, which implies the claim.
@@ -817,7 +858,7 @@ PROOF: We have to show that the positive eigenvector $v_+$ of $R_{\hat{n}(\alpha
 $\hat{n}$ on the Bloch sphere. Therefore let us calculate the eigenvalues:
 
 #+name: exercise-4.6
-#+begin_src python :results replace
+#+begin_src python :tangle no :results replace :cache yes
   x, y, z = sp.symbols('x y z')
   N = Matrix([[z, x - I*y], [x + I*y, -z]])
   ev = N.eigenvects()
@@ -830,7 +871,7 @@ $\hat{n}$ on the Bloch sphere. Therefore let us calculate the eigenvalues:
   output
 #+end_src
 
-#+RESULTS: exercise-4.6
+#+RESULTS[2ce8f9af89e7a452fb8bdc1bd2c30601eba34dd4]: exercise-4.6
 : eigenvalue = -sqrt(x**2 + y**2 + z**2)
 : eigenvector = [Matrix([
 : [z/(x + I*y) - sqrt(x**2 + y**2 + z**2)/(x + I*y)],
@@ -1124,9 +1165,7 @@ that we are not interested in Matrices. Essentially we still use the Pauli Rotat
 claim.
 
 #+name: exercise-4.15
-#+begin_src python :results replace
-  from sympy import Quaternion
-
+#+begin_src python :tangle no :results replace :cache yes
   x1, y1, z1 = sp.symbols('x1 y1 z1')
   x2, y2, z2 = sp.symbols('x2 y2 z2')
   c1, c2, s1, s2 = sp.symbols('c1 c2 s1 s2')
@@ -1137,27 +1176,24 @@ claim.
   R1 = c1 + s1*N1
   R2 = c2 + s2*N2
 
-  R2 * R1
+  result = R2 * R1
+
+  # Formatting for readability:
+  str(result).replace(' + (', '\n+ (')
 #+end_src
 
-#+RESULTS: exercise-4.15
-: (c1*c2 - s1*s2*x1*x2 - s1*s2*y1*y2 - s1*s2*z1*z2) + (c1*s2*x2 + c2*s1*x1 - s1*s2*y1*z2 + s1*s2*y2*z1)*i + (c1*s2*y2 + c2*s1*y1 + s1*s2*x1*z2 - s1*s2*x2*z1)*j + (c1*s2*z2 + c2*s1*z1 - s1*s2*x1*y2 + s1*s2*x2*y1)*k
-
-Rearranging the result for better readability:
-
-#+begin_example
-(c1*c2 - s1*s2*x1*x2 - s1*s2*y1*y2 - s1*s2*z1*z2)
-+ (c1*s2*x2 + c2*s1*x1 - s1*s2*y1*z2 + s1*s2*y2*z1)*i
-+ (c1*s2*y2 + c2*s1*y1 + s1*s2*x1*z2 - s1*s2*x2*z1)*j
-+ (c1*s2*z2 + c2*s1*z1 - s1*s2*x1*y2 + s1*s2*x2*y1)*k
-#+end_example
+#+RESULTS[90550c79075fc9e8ac6de316f753c23ac8078090]: exercise-4.15
+: (c1*c2 - s1*s2*x1*x2 - s1*s2*y1*y2 - s1*s2*z1*z2)
+: + (c1*s2*x2 + c2*s1*x1 - s1*s2*y1*z2 + s1*s2*y2*z1)*i
+: + (c1*s2*y2 + c2*s1*y1 + s1*s2*x1*z2 - s1*s2*x2*z1)*j
+: + (c1*s2*z2 + c2*s1*z1 - s1*s2*x1*y2 + s1*s2*x2*y1)*k
 
 From here we can directly read out the claim! QED.
 
 ** Exercise 4.16 (Matrix representation of multi-qubit gates)
 What is the 4×4 unitary matrix for the following circuits
 
-#+RESULTS: exercise-4.16-circuit
+#+RESULTS[fa5b8e22590df3e950064450a0222a752ea833b9]: exercise-4.16-circuit
 #+begin_example
 
 q_0: ─────
@@ -1173,7 +1209,7 @@ q_1: ─────
 #+end_example
 
 #+name: exercise-4.16-circuit
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc1 = QuantumCircuit(2)
   qc1.h(1)
 
@@ -1241,7 +1277,7 @@ q_1: ──■──
 
 For this reason, the =CZ= is often denoted in a symmetric form:
 
-#+RESULTS: exercise-4.18-circuit-1
+#+RESULTS[1721118418e881c286531b77bf81e07cdbe33f1a]: exercise-4.18-circuit-1
 :
 : q_0: ─■─
 :       │
@@ -1249,7 +1285,7 @@ For this reason, the =CZ= is often denoted in a symmetric form:
 :
 
 #+name: exercise-4.18-circuit-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2)
   qc.cz(0, 1)
 
@@ -1284,7 +1320,7 @@ $$
 ** Exercise 4.20 (=CNOT= basis transformations)
 Show that the following two circuits are equal:
 
-#+RESULTS: exercise-4.20-circuit-1
+#+RESULTS[5e0392a528e9aed994901883f35763239ef73df5]: exercise-4.20-circuit-1
 #+begin_example
      ┌───┐     ┌───┐
 q_0: ┤ H ├──■──┤ H ├
@@ -1310,7 +1346,7 @@ In other words: With respect to the eigenbasis of =X= the =CX= gate acts again l
 the control and target qubit switched.
 
 #+name: exercise-4.20-circuit-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc1 = QuantumCircuit(2)
   qc1.h(0)
   qc1.h(1)
@@ -1416,7 +1452,7 @@ $$
   C^1(R_y(\theta)) = C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS: exercise-4.22-circuit-1
+#+RESULTS[a60b16ccce94ba51f1031d0b6a01a2745355f50b]: exercise-4.22-circuit-1
 :
 : q_0: ─────────────■────────────────■──
 :      ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
@@ -1436,7 +1472,7 @@ $$
   C^1(R_x(\theta)) = R_{z,2}(-\pi/2) C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS: exercise-4.22-circuit-2
+#+RESULTS[029338e5afe5a7bc7fef28b3b127128c8129dd67]: exercise-4.22-circuit-2
 :
 : q_0: ─────────────────────────■────────────────■──────────────
 :      ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
@@ -1446,15 +1482,23 @@ $$
 # The code for the circuit plots:
 
 #+name: exercise-4.22-prepare
-#+begin_src python :exports none
+#+begin_src python :exports none :tangle no
   params = (Param('θ/2'), Param('-θ/2'), Param('-π/2'))
+#+end_src
 
+#+name: exercise-4.22-circuit-1
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc1 = QuantumCircuit(2)
   qc1.ry(params[0], 1)
   qc1.cx(0, 1)
   qc1.ry(params[1], 1)
   qc1.cx(0, 1)
 
+  str(qc1.draw('text'))
+#+end_src
+
+#+name: exercise-4.22-circuit-2
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc2 = QuantumCircuit(2)
   qc2.ry(params[0], 1)
   qc2.rz(params[2], 1)
@@ -1462,15 +1506,7 @@ $$
   qc2.ry(params[1], 1)
   qc2.cx(0, 1)
   qc2.rz(params[2], 1)
-#+end_src
 
-#+name: exercise-4.22-circuit-1
-#+begin_src python :results replace :exports results
-  str(qc1.draw('text'))
-#+end_src
-
-#+name: exercise-4.22-circuit-2
-#+begin_src python :results replace :exports results
   str(qc2.draw('text'))
 #+end_src
 
@@ -1545,7 +1581,7 @@ Recall that the Fredkin (controlled-swap) gate performs the transform:
 Taking the swap-gate construction from Figure 1.7 we may deduce that the following circuit might do
 what we want:
 
-#+RESULTS: exercise-4-25-circuit-1
+#+RESULTS[b39f1ee8ef22dac5dc1f74cd4d7e4a392dd52649]: exercise-4-25-circuit-1
 :
 : q_0: ──■────■────■──
 :        │  ┌─┴─┐  │
@@ -1557,15 +1593,19 @@ what we want:
 In fact, a short calculation yields the desired result.
 
 #+name: exercise-4-25-1
-#+begin_src python
+#+begin_src python :results replace :tangle no :cache yes
   T01 = make_CnU(3, [0, 1], 2, X)
   T02 = make_CnU(3, [0, 2], 1, X)
 
   assert T01 * T02 * T01 == Fred, "Exercise 4.25, Solution to 1."
+  "PASSED"
 #+end_src
 
+#+RESULTS[daf1db3af95360b335590f97a64aa1b5afa2448b]: exercise-4-25-1
+: PASSED
+
 #+name: exercise-4-25-circuit-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc1 = QuantumCircuit(3)
   qc1.ccx(0, 1, 2)
   qc1.ccx(0, 2, 1)
@@ -1577,7 +1617,7 @@ In fact, a short calculation yields the desired result.
 *** Solution to 2
 The following circuit equals the Fredkin Gate too:
 
-#+RESULTS: exercise-4-25-circuit-2
+#+RESULTS[a3b5c2d76e56588d5b6a54ea921ff3b1ac5403f3]: exercise-4-25-circuit-2
 :
 : q_0: ───────■───────
 :           ┌─┴─┐
@@ -1589,14 +1629,18 @@ The following circuit equals the Fredkin Gate too:
 In fact:
 
 #+name: exercise-4.25-2
-#+begin_src python
+#+begin_src python :results replace :exports results :tangle no :cache yes
   C12 = make_CU(3, 1, 2, X)
 
   assert C12 * T02 * C12 == Fred, "Exercise 4.25, Solution to 2."
+  "PASSED"
 #+end_src
 
+#+RESULTS[03d1ab7ca15c63fd0508e18ae42b590abb0d5ffc]: exercise-4.25-2
+: PASSED
+
 #+name: exercise-4-25-circuit-2
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc2 = QuantumCircuit(3)
   qc2.cx(1, 2)
   qc2.ccx(0, 2, 1)
@@ -1619,7 +1663,7 @@ hoping the find an equivalent circuit with on gate less - so far without success
 ** Exercise 4.26
 Show that the circuit
 
-#+RESULTS: exercise-4-26-circuit-1
+#+RESULTS[e38589ef5ef59e73a1c47129d32f03752d4c5193]: exercise-4-26-circuit-1
 :
 : q_0: ─────────────────────────────■───────────────────────────────
 :                                   │
@@ -1631,7 +1675,7 @@ Show that the circuit
 differs from a Toffoli gate only by relative phases $e^{i\theta(c_1,c_2,t)}$.
 
 #+name: exercise-4-26-circuit-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(3)
   params = (Param('π/?'), Param('-π/?'))
   qc.ry(params[0], 2)
@@ -1657,7 +1701,7 @@ $$
 $$
 
 #+name: exercise-4-8-get-circuit
-#+begin_src python
+#+begin_src python :results replace :tangle no :cache yes
   def get_circuit(n: int):
       """The n is the divisor missing in the Figure of Exercise 4.26 (the '?')."""
       R = tprod(Id, Id, Ry.subs(theta, pi / n))
@@ -1673,7 +1717,11 @@ $$
   Phase = tprod(Id, Id, Id) - 2*tprod(P1, P0, P0)  # Multiplies |100> by -1
 
   assert Phase * C == Toff, "Exercise 4.26: Circuit should be Toffoli up to Phase Factor"
+  "PASSED"
 #+end_src
+
+#+RESULTS[2bc346d577e664bb579939b22d0b02218cef5d9a]: exercise-4-8-get-circuit
+: PASSED
 
 ** Exercise 4.27
 Using just =CNOT= and Toffoli gates, construct a quantum circuit to perform the transformation
@@ -1747,30 +1795,30 @@ listed in the code block below.
 
 #+name: exercise-4-27-1
 #+begin_src python
-  # cxij means: control i, target j
-  cx01 = Perm(4, 6)(5, 7)
-  cx02 = Perm(4, 5)(6, 7)
-  cx12 = Perm(2, 3)(6, 7)
-  cx10 = Perm(2, 6)(3, 7)
-  cx20 = Perm(1, 5)(3, 7)
-  cx21 = Perm(1, 3)(5, 7)
+  # cx3ij means: control i, target j
+  cx301 = Perm(4, 6)(5, 7)
+  cx302 = Perm(4, 5)(6, 7)
+  cx312 = Perm(2, 3)(6, 7)
+  cx310 = Perm(2, 6)(3, 7)
+  cx320 = Perm(1, 5)(3, 7)
+  cx321 = Perm(1, 3)(5, 7)
 
-  # ti means: target at qubit i
-  t0 = Perm(3, 7)
-  t1 = Perm(5, 7)
-  t2 = Perm(6, 7)
+  # t3i means: target at qubit i
+  t30 = Perm(3, 7)
+  t31 = Perm(5, 7)
+  t32 = Perm(6, 7)
 #+end_src
 
 The following code defines an exhaustive search for solutions with a fixed number of gates.
 
 #+name: exercise-4-27-2
 #+begin_src python
-  perms = [cx01, cx02, cx12, cx10, cx20, cx21, t0, t1, t2]
-  names = ["cx01", "cx02", "cx12", "cx10", "cx20", "cx21", "t0", "t1", "t2"]
-  indices = list(range(len(perms)))
-
   def search_ex4_27(n: int):
       """Find all solutions to exercise 4.27 with n gates."""
+      perms = [cx301, cx302, cx312, cx310, cx320, cx321, t30, t31, t32]
+      names = ["cx301", "cx302", "cx312", "cx310", "cx320", "cx321", "t30", "t31", "t32"]
+      indices = list(range(len(perms)))
+
       for idxs in product(*([indices]*n)):
           ps = [perms[i] for i in idxs]
           prod = reduce((lambda x, y: x*y), ps)
@@ -1782,19 +1830,23 @@ Trying out some values of $n$ we see that $n=5$ is the minimal value which yield
 are six solutions in fact but they are similar in the sense that the last three permutations (gates)
 actually commute. The solutions are:
 
-#+begin_example
-t0 * cx21 * cx02 * cx12 * t2
-t0 * cx21 * cx02 * t2 * cx12
-t0 * cx21 * cx12 * cx02 * t2
-t0 * cx21 * cx12 * t2 * cx02
-t0 * cx21 * t2 * cx02 * cx12
-t0 * cx21 * t2 * cx12 * cx02
-#+end_example
+#+name: exercise-4-27-2-compute
+#+begin_src python :results replace output :tangle no :cache yes
+  search_ex4_27(5)
+#+end_src
+
+#+RESULTS[a65c15f9a713a9f7fcb1ba280f92ffc23c94e7a3]: exercise-4-27-2-compute
+: t30 * cx321 * cx302 * cx312 * t32
+: t30 * cx321 * cx302 * t32 * cx312
+: t30 * cx321 * cx312 * cx302 * t32
+: t30 * cx321 * cx312 * t32 * cx302
+: t30 * cx321 * t32 * cx302 * cx312
+: t30 * cx321 * t32 * cx312 * cx302
 
 One benefit of the "reversed" multiplication of the permutations is that it is the same ordering
 like in typical drawings of circuits. Let us just draw the third one:
 
-#+RESULTS: exercise-4-27-circuit
+#+RESULTS[1214d990423cc092b69bafc02130b0f8de9ef97c]: exercise-4-27-circuit
 :      ┌───┐
 : q_0: ┤ X ├────────────■────■──
 :      └─┬─┘┌───┐       │    │
@@ -1804,7 +1856,7 @@ like in typical drawings of circuits. Let us just draw the third one:
 :                └───┘└───┘└───┘
 
 #+name: exercise-4-27-circuit
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(3)
   qc.ccx(1, 2, 0)
   qc.cx(2, 1)
@@ -2010,7 +2062,7 @@ unitarily transform from the basis we wish to perform the measurement in to the 
 then measure. For example, show that the circuit
 
 #+name: exercise-4.33-bell-measurement
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2, 2)
   qc.cx(0, 1)
   qc.h(0)
@@ -2020,7 +2072,7 @@ then measure. For example, show that the circuit
   str(qc.draw('text'))
 #+end_src
 
-#+RESULTS: exercise-4.33-bell-measurement
+#+RESULTS[a438cd464dc1a5d6749e2849f6949438131c2717]: exercise-4.33-bell-measurement
 :           ┌───┐ ░ ┌─┐
 : q_0: ──■──┤ H ├─░─┤M├───
 :      ┌─┴─┐└───┘ ░ └╥┘┌─┐
@@ -2028,7 +2080,6 @@ then measure. For example, show that the circuit
 :      └───┘      ░  ║ └╥┘
 : c: 2/══════════════╩══╩═
 :                    0  1
-
 
 performs a measurement in the basis of the Bell states. More precisely, show that
 this circuit results in a measurement being performed with corresponding
@@ -2076,7 +2127,7 @@ this be implemented by a quantum circuit?  Show that the following circuit imple
 of $U$:
 
 #+name: exercise-4.34-measure-observable
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2, 1)
   qc.h(0)
   qc.cx(0, 1)  # this is CX but we hack it to CU below
@@ -2090,7 +2141,7 @@ of $U$:
       .replace('q_1', '|ψ>')
 #+end_src
 
-#+RESULTS: exercise-4.34-measure-observable
+#+RESULTS[b77f646a5b3bb23e25b9ddd0996c791d747c5882]: exercise-4.34-measure-observable
 :      ┌───┐     ┌───┐ ░ ┌─┐
 : |0>: ┤ H ├──■──┤ H ├─░─┤M├
 :      └───┘┌─┴─┐└───┘ ░ └╥┘
@@ -2174,7 +2225,7 @@ $$
 where $c=x_0\cdot y_0$ is the carry-bit. Recall that $C(X)$ implements binary addition
 modulo 2. Hence the following circuit, which is inspired by the above equation, does what we want:
 
-#+RESULTS: exercise-4.36-solution
+#+RESULTS[248a411dd90d3165066a3c34fb1744571c3e4ccb]: exercise-4.36-solution
 :
 : q_0: ──■────■───────
 :        │    │
@@ -2186,7 +2237,7 @@ modulo 2. Hence the following circuit, which is inspired by the above equation, 
 :      └───┘     └───┘
 
 #+name: exercise-4.36-solution
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(4)
   qc.ccx(0, 2, 3)
   qc.cx(0, 2)
@@ -2215,7 +2266,7 @@ which we study in more detail in the next chapter.
 We semi-automate the task with sympy. First we have to set up the matrix:
 
 #+name: exercise-4.37-1
-#+begin_src python
+#+begin_src python :tangle no
   F = Matrix([[I**(x*y) for x in range(4)] for y in range(4)]) / 2
 #+end_src
 
@@ -2224,7 +2275,7 @@ procedure from the book (note that in general we also had to use src_python{make
 we don't need it)):
 
 #+name: exercise-4.37-2
-#+begin_src python
+#+begin_src python :results replace :tangle no :cache yes
   U1 = sp.simplify(make_twolevel(4, [1,0], [1, -1]))
   U2 = sp.simplify(make_twolevel(4, [2,0], [1, -sqrt(2)]))
   U3 = sp.simplify(make_twolevel(4, [3,0], [1, -sqrt(3)]))
@@ -2233,7 +2284,11 @@ we don't need it)):
 
   F0 = make_CU(2, 0, 1, Matrix([[1, I], [-1, I]]) / sqrt(2))
   assert sp.simplify(U5*U4*U3*U2*U1*F) == F0
+  "PASSED"
 #+end_src
+
+#+RESULTS[8d550adbce9382e6f28d9eac8c192b9f0eefe472]: exercise-4.37-2
+: PASSED
 
 From this we can easily readout the decomposition:
 
@@ -2245,7 +2300,7 @@ $$
 The following code was used to produce the above latex expression:
 
 #+name: exercise-4.37-3
-#+begin_src python
+#+begin_src python :tangle no :eval no
   def get_latex_for_exercise_4_37():
       Vs = [U1.H, U2.H, U3.H, U4.H, U5.H, F0]
       return " \\cdot ".join([sp.latex(V) for V in Vs])
@@ -2355,7 +2410,7 @@ controlled $\tilde{U}$ gate with target $0$ and controls at all remaining wires.
 circuit implements $M$:
 
 #+name: exercise-4.39-1
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qcU = QuantumCircuit(1, name="Ũ")
   ccu = qcU.to_gate().control(2)
 
@@ -2367,7 +2422,7 @@ circuit implements $M$:
   str(qc.draw('text'))
 #+end_src
 
-#+RESULTS: exercise-4.39-1
+#+RESULTS[f5070d4f963f4c5a5ea25e38d03c8782ff05c70c]: exercise-4.39-1
 :           ┌───┐
 : q_0: ──o──┤ Ũ ├──o──
 :        │  └─┬─┘  │
@@ -2416,7 +2471,7 @@ enough (as elements of the unit circle)). QED.
 This and the next two exercises develop a construction showing that the Hadamard, phase, controlled-
 and Toffoli gates are universal. Show that this circuit
 
-#+RESULTS: exercise-4.41
+#+RESULTS[c388984801ef3ce4fa6274dfc69257cdfb6d3a54]: exercise-4.41
 :      ┌───┐               ┌───┐┌─┐
 : |0>: ┤ H ├──■─────────■──┤ H ├┤M├───
 :      ├───┤  │         │  ├───┤└╥┘┌─┐
@@ -2434,7 +2489,7 @@ circuit and $Z=S^2$ gates may be used to apply a $R_z(\theta)$ gate with probabi
 $1$.
 
 #+name: exercise-4.41
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(3, 2)
   qc.h(0)
   qc.h(1)
@@ -2808,7 +2863,7 @@ done by =sympy=. Hence let us define three symbols. Two non-commuting symbols fo
 a commuting symbol for the time:
 
 #+name: exercise-4.49-1
-#+begin_src python
+#+begin_src python :tangle no
   A, B = sp.symbols('A B', commutative=False)
   t = sp.symbols('t', commutative=True)  # commutes with A and B
 #+end_src
@@ -2816,12 +2871,12 @@ a commuting symbol for the time:
 For a warm up let us return to formula (1):
 
 #+name: exercise-4.49-2
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E1 = exp((A+B)*t) - exp(A*t)*exp(B*t)
   E1.series(t, 0, 3)
 #+end_src
 
-#+RESULTS: exercise-4.49-2
+#+RESULTS[85f5c2f185c70bdc5250c320376de27fd6a9a142]: exercise-4.49-2
 : t**2*(-A*B/2 + B*A/2) + O(t**3)
 
 This of course shows the claim again. But it is slightly more precise. The $t^2$ term as the
@@ -2830,23 +2885,23 @@ leading term is $I$). But let us check it anyway. We increase the order of the s
 $4$ since we are curious what the first non-vanishing term looks like:
 
 #+name: exercise-4.49-3
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E2 = exp((A+B)*t) - exp(A*t)*exp(B*t)*exp(-(A*B-B*A)*t**2/2)
   E2.series(t, 0, 4)
 #+end_src
 
-#+RESULTS: exercise-4.49-3
+#+RESULTS[1a4fc04ca84f4667100669ebfe9fb1a6c5f06b41]: exercise-4.49-3
 : t**3*(-A*B*A/3 - A*B**2/3 + A**2*B/6 + 2*B*A*B/3 + B*A**2/6 - B**2*A/3) + O(t**4)
 
 Now let us check formula (2):
 
 #+name: exercise-4.49-4
-#+begin_src python :results replace
+#+begin_src python :results replace :tangle no :cache yes
   E3 = exp((A+B)*t) - exp(B*t/2)*exp(A*t)*exp(B*t/2)
   E3.series(t, 0, 4)
 #+end_src
 
-#+RESULTS: exercise-4.49-4
+#+RESULTS[2eab52cd65ebe6327b2d8dcbdd8e2beb97fec2ed]: exercise-4.49-4
 : t**3*(A*B*A/6 + A*B**2/24 - A**2*B/12 - B*A*B/12 - B*A**2/12 + B**2*A/24) + O(t**4)
 
 Comparing this with the third order term of the BCH formula it looks like this formula has a
@@ -2931,7 +2986,7 @@ $$
 From the book we already know how to construct the operator in the middle (Figure 4.19). The
 complete circuit is:
 
-#+RESULTS: exercise-4.51
+#+RESULTS[2abd53fe40693a3d5284212cccb411ed43077f21]: exercise-4.51
 :         ┌───┐                                                ┌───┐
 : q_0: ───┤ H ├──────■───────────────────────────────────■─────┤ H ├────
 :      ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
@@ -2943,7 +2998,7 @@ complete circuit is:
 :                  └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
 
 #+name: exercise-4.51
-#+begin_src python :results replace :exports results
+#+begin_src python :results replace :exports results :tangle no :cache yes
   params = (Param('+π/2'), Param('-π/2'), Param('2Δt'))
 
   qc = QuantumCircuit(4)

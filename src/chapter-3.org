@@ -2,7 +2,7 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
-#+property: header-args:python :session *chapter-3*
+#+property: header-args:python :session *chapter-3* :tangle chapter_3.py
 
 #+toc: headlines 2
 
@@ -13,7 +13,7 @@
   from typing import Literal, NewType, Optional
   from collections.abc import Callable
 
-  # Terminal colors. TODO: Move somwhere else.
+  # Terminal colors. TODO: Move somewhere else.
   # Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")
   class TermColor:
       GREEN = '\033[32m'
@@ -33,7 +33,7 @@
 In this section we define a class ~TuringMachine~ which empowers us to execute a turing program like
 this one:
 
-#+name: tprog-constant-one
+#+name: turing-program-constant-one
 #+begin_example
 # This program computes the function f(n)=1.
 # Example: input="▶1001", output="▶1".
@@ -46,10 +46,14 @@ this one:
 (C,■,H,1,0) # H is the halt state
 #+end_example
 
+#+name: source-tp-constant-one
+#+begin_src python :var source_tp_constant_one=turing-program-constant-one :exports none
+#+end_src
+
 Below we initialize a turing machine ~my_tm~ from the above source code:
 
 #+name: chapter-3-turing-machine-demo
-#+begin_src python :var source=tprog-constant-one :tangle no :results output replace
+#+begin_src python :var source=turing-program-constant-one :tangle no :results output replace
   my_tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
   my_tm.LOG_LEVEL = 3
   my_tm.COLORED_LOG = False  # set to false since listing below does not support colors
@@ -327,85 +331,6 @@ Finally, the default parser:
       return program, source_map
 #+end_src
 
-*** Very basic unit tests
-Tests for ~TuringMachine~:
-
-#+name: chapter-3-turing-machine-tests-1
-#+begin_src python
-  # If the tape initially is blank, this prints "XYZ"
-  prog_print_XYZ = [
-      ("S", "■", "2", "X", +1),
-      ("2", "■", "3", "Y", +1),
-      ("3", "■", "H", "Z",  0),
-  ]
-
-  tm1 = TuringMachine(prog_print_XYZ, start_state="S", halt_state="H")
-
-  assert tm1.run("") == "XYZ", "test TuringMachine vs prog_print_XYZ - 1"
-  assert tm1.run("a") == "a", "test TuringMachine vs prog_print_XYZ - 1"
-
-  # The example from the book. Assume the input tape starts with "▶" followed by an integer n in
-  # binary followed by blanks. Then the turing machine outputs f(n)=1 (in the same format as the
-  # input). Any other input tape leads to undefined behavior (C++ speak), that is, we guarantee
-  # nothing in that case.
-  prog_compute_constant_1 = [
-    ("S", "▶", "1", "▶", +1),
-    ("1", "0", "1", "■", +1),
-    ("1", "1", "1", "■", +1),
-    ("1", "■", "2", "■", -1),
-    ("2", "■", "2", "■", -1),
-    ("2", "▶", "3", "▶", +1),
-    ("3", "■", "H", "1",  0),
-  ]
-
-  tm2 = TuringMachine(prog_compute_constant_1, start_state="S", halt_state="H")
-
-  assert tm2.run("▶1011") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 1"
-  assert tm2.run("▶0") == "▶1", "test TuringMachine vs prog_compute_constant_1 - 2"
-#+end_src
-
-
-Tests for the default parser:
-
-#+name: chapter-3-turing-machine-tests-2
-#+begin_src python
-  prog_print_XYZ_str = \
-  """# Anything behind '#' is a comment. Empty lines are ignored.
-
-  (S,■,2,X,+)  # We use "+" and "-" as shortcuts for +1 and -1.
-    (2,■,3,Y,+)  # Indentation is irrelevant.
-  (3,■,H1,Z,-)  # We go to the left before halting - just for fun
-  (H1,Y,H,Y,0)
-  # whitespace inside (...) is (mostly) important. We could not replace the last line by this:
-  # (H1,Y,H ,Y,0)
-  """
-
-  parsed_prog, source_map = parse_turing_program(prog_print_XYZ_str)
-  # Python seems to compare these structs recursively by value 👍:
-  assert source_map == [
-      (2, "(S,■,2,X,+)  # We use \"+\" and \"-\" as shortcuts for +1 and -1."),
-      (3, "  (2,■,3,Y,+)  # Indentation is irrelevant."),
-      (4, "(3,■,H1,Z,-)  # We go to the left before halting - just for fun"),
-      (5, "(H1,Y,H,Y,0)"),
-  ], "test parse_turing_program - 1"
-  assert parsed_prog == [
-      ('S', '■', '2', 'X', +1),
-      ('2', '■', '3', 'Y', +1),
-      ('3', '■', 'H1', 'Z', -1),
-      ('H1', 'Y', 'H', 'Y', 0)
-  ], "test parse_turing_program - 2"
-#+end_src
-
-Tests for ~TuringMachine.fromSource~. The ~source~ is taken from the [[tprog-constant-one][listing]] on the Turing machine
-computing $f(n)=1$.
-
-#+name: chapter-3-turing-machine-tests-3
-#+begin_src python :var source=tprog-constant-one
-  tm = TuringMachine.fromSource(source, start_state="S", halt_state="H")
-
-  assert tm.run("▶1001") == "▶1", "test TuringMachine.fromSource"
-#+end_src
-
 * WIP Exercises
 ** TODO Exercise 3.1 (Non-computable processes in Nature)
 How might we recognize that a process in Nature computes a function not computable by a Turing
@@ -595,6 +520,12 @@ To best understand the inline-proof read the following explanations:
 #   - output : "▶z...a■..." where z...a is the reversed string.
 # The head starts and finishes at "▶".
 
+# Note: in the following we assume that the input string is non-empty to simplify
+# the analysis of the *generic* case. But it is easy to check that this corner case
+# also works. This is more or less an accident as you can see by the fact that we rely
+# on the fact that (by our definition) a Turing machine halts if no matching line is
+# found.
+
 #
 ##
 ### Part 1: Map ▶a...z■...■ to ▶□...□z...a
@@ -759,20 +690,31 @@ To best understand the inline-proof read the following explanations:
 (h,▶,HALT,▶,0) # exit
 #+end_example
 
-Let the theory behind and plug this program into our python implementation of a (universal)
-~TuringMachine~. The variable ~source~ contains the contents of the [[exercise-3.3-solution-source][above listing]].
-
-#+name: exercise-3.3-turing-machine
-#+begin_src python :var source=exercise-3.3-solution-source
-  tm_ex3_3 = TuringMachine.fromSource(source)
-
-  assert tm_ex3_3.run("▶011") == "▶110", "test exercise-3.3-1"
-  assert tm_ex3_3.run("▶101011") == "▶110101", "test exercise-3.3-2"
-  # If something else is on the tape, then we need at least n+1 blanks (n=length-of-string) after the
-  # string. Trying the following with less blanks would fail:
-  assert tm_ex3_3.run("▶001■■■■xyz") == "▶100■■■■xyz", "test exercise-3.3-3"
-  assert tm_ex3_3.run("▶1") == "▶1", "test exercise-3.3-4"
+#+name: var-source_tp_ex_3_3
+#+begin_src python :var source_tp_ex_3_3=exercise-3.3-solution-source :exports none
 #+end_src
 
+Let the theory behind and plug this program into our python implementation of a (universal)
+~TuringMachine~. The variable ~source_tp_ex_3_3~ contains the contents of the [[exercise-3.3-solution-source][above listing]].
+
+#+name: exercise-3.3-turing-machine
+#+begin_src python :tangle no :results replace :cache yes
+  tm = TuringMachine.fromSource(source_tp_ex_3_3)
+
+  assert tm.run("▶011") == "▶110", "test exercise-3.3-1"
+  assert tm.run("▶101011") == "▶110101", "test exercise-3.3-2"
+  # If something else is on the tape, then we need at least n+1 blanks
+  # (n=length-of-string) after the string. Trying the following with less
+  # blanks would fail:
+  assert tm.run("▶001■■■■xyz") == "▶100■■■■xyz", "test exercise-3.3-3"
+  assert tm.run("▶1") == "▶1", "test exercise-3.3-4"
+  assert tm.run("▶") == "▶", "test exercise-3.3-4"  # corner case!
+
+  "PASSED"
+#+end_src
+
+#+RESULTS[b78af44c7bb32f2b5ba851740d596a0ccf2b8214]: exercise-3.3-turing-machine
+: PASSED
+
 These basic tests yield an alternative root of trust into the program. You are invited to try out
-~tm_ex3_3~ yourself. If configured appropirately it can also print each step it does.
+~tm~ yourself. If configured appropirately it can also print each step it does.
