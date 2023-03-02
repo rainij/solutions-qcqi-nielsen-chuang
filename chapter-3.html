@@ -12,35 +12,35 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org323876c">Setup</a>
+<li><a href="#org8562c64">Setup</a>
 <ul>
-<li><a href="#orgfa898be">Python Libraries</a></li>
-<li><a href="#org357c996">Turing Machines</a></li>
+<li><a href="#orgb849e08">Python Libraries</a></li>
+<li><a href="#org5f5c0f5">Turing Machines</a></li>
 </ul>
 </li>
-<li><a href="#org4f5d33e"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#orga425444"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#orgb6003f6"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
-<li><a href="#orgc0b140d">Exercise 3.2 (Turing numbers)</a></li>
-<li><a href="#org8ac9460">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+<li><a href="#orgc2cebf8"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#org4d1d74c">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#org45e649c">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org323876c" class="outline-2">
-<h2 id="org323876c">Setup</h2>
-<div class="outline-text-2" id="text-org323876c">
+<div id="outline-container-org8562c64" class="outline-2">
+<h2 id="org8562c64">Setup</h2>
+<div class="outline-text-2" id="text-org8562c64">
 </div>
-<div id="outline-container-orgfa898be" class="outline-3">
-<h3 id="orgfa898be">Python Libraries</h3>
-<div class="outline-text-3" id="text-orgfa898be">
+<div id="outline-container-orgb849e08" class="outline-3">
+<h3 id="orgb849e08">Python Libraries</h3>
+<div class="outline-text-3" id="text-orgb849e08">
 <div class="org-src-container">
-<pre class="src src-python" id="org87a0062"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
+<pre class="src src-python" id="orgc98a20a"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
 <span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Terminal colors. TODO: Move somwhere else.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Terminal colors. TODO: Move somewhere else.</span>
 <span class="org-comment-delimiter"># </span><span class="org-comment">Usage: print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")</span>
 <span class="org-keyword">class</span> <span class="org-type">TermColor</span>:
     <span class="org-variable-name">GREEN</span> = <span class="org-string">'\033[32m'</span>
@@ -51,19 +51,19 @@
 </div>
 </div>
 
-<div id="outline-container-org357c996" class="outline-3">
-<h3 id="org357c996">Turing Machines</h3>
-<div class="outline-text-3" id="text-org357c996">
+<div id="outline-container-org5f5c0f5" class="outline-3">
+<h3 id="org5f5c0f5">Turing Machines</h3>
+<div class="outline-text-3" id="text-org5f5c0f5">
 </div>
-<div id="outline-container-org45b9b3d" class="outline-4">
-<h4 id="org45b9b3d">Introduction</h4>
-<div class="outline-text-4" id="text-org45b9b3d">
+<div id="outline-container-orgdf17fcf" class="outline-4">
+<h4 id="orgdf17fcf">Introduction</h4>
+<div class="outline-text-4" id="text-orgdf17fcf">
 <p>
 In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
 this one:
 </p>
 
-<pre class="example" id="tprog-constant-one">
+<pre class="example" id="turing-program-constant-one">
 # This program computes the function f(n)=1.
 # Example: input="▶1001", output="▶1".
 (S,▶,A,▶,+) # S is the start state
@@ -80,7 +80,7 @@ Below we initialize a turing machine <code>my_tm</code> from the above source co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgde9e522"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<pre class="src src-python" id="orgcfa870f"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
 <span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
 <span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
 
@@ -136,19 +136,19 @@ result = '▶1'
 </div>
 </div>
 
-<div id="outline-container-org285fca1" class="outline-4">
-<h4 id="org285fca1">Implementation</h4>
-<div class="outline-text-4" id="text-org285fca1">
+<div id="outline-container-org5510a44" class="outline-4">
+<h4 id="org5510a44">Implementation</h4>
+<div class="outline-text-4" id="text-org5510a44">
 <p>
 First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
 readable or at least mnemonic state names. This would not be possible had we used integers. The
 <code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
-from the source-string/file. It is the reason why in the <a href="#orgde9e522">listing above</a> the <code>TuringMachine</code> instance
+from the source-string/file. It is the reason why in the <a href="#orgcfa870f">listing above</a> the <code>TuringMachine</code> instance
 can refer to its source (see the line starting with <code>source line =</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgb67250b"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<pre class="src src-python" id="org465808d"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
 <span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
 <span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
 <span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
@@ -160,7 +160,7 @@ can refer to its source (see the line starting with <code>source line =</code>).
 </div>
 
 <p>
-<a href="#orgcd52cef">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+<a href="#org90ca421">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
 implementation a bit. But it you ignore this the implementation is very simple and straightforward
 to understand (IMHO).
 </p>
@@ -198,7 +198,7 @@ particular, those cannot be used as characters on the tape.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgcd52cef"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+<pre class="src src-python" id="org90ca421"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
     <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
     BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
     <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
@@ -333,7 +333,7 @@ Finally, the default parser:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org255e008"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+<pre class="src src-python" id="org00ad953"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
     <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
 
 <span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
@@ -376,105 +376,16 @@ Finally, the default parser:
 </div>
 </div>
 </div>
-
-<div id="outline-container-org698540f" class="outline-4">
-<h4 id="org698540f">Very basic unit tests</h4>
-<div class="outline-text-4" id="text-org698540f">
-<p>
-Tests for <code>TuringMachine</code>:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-python" id="org299cc36"><span class="org-comment-delimiter"># </span><span class="org-comment">If the tape initially is blank, this prints "XYZ"</span>
-<span class="org-variable-name">prog_print_XYZ</span> = [
-    (<span class="org-string">"S"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"X"</span>, +1),
-    (<span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"3"</span>, <span class="org-string">"Y"</span>, +1),
-    (<span class="org-string">"3"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"H"</span>, <span class="org-string">"Z"</span>,  0),
-]
-
-<span class="org-variable-name">tm1</span> = TuringMachine(prog_print_XYZ, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
-
-<span class="org-keyword">assert</span> tm1.run(<span class="org-string">""</span>) == <span class="org-string">"XYZ"</span>, <span class="org-string">"test TuringMachine vs prog_print_XYZ - 1"</span>
-<span class="org-keyword">assert</span> tm1.run(<span class="org-string">"a"</span>) == <span class="org-string">"a"</span>, <span class="org-string">"test TuringMachine vs prog_print_XYZ - 1"</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">The example from the book. Assume the input tape starts with "&#9654;" followed by an integer n in</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">binary followed by blanks. Then the turing machine outputs f(n)=1 (in the same format as the</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">input). Any other input tape leads to undefined behavior (C++ speak), that is, we guarantee</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">nothing in that case.</span>
-<span class="org-variable-name">prog_compute_constant_1</span> = [
-  (<span class="org-string">"S"</span>, <span class="org-string">"&#9654;"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9654;"</span>, +1),
-  (<span class="org-string">"1"</span>, <span class="org-string">"0"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, +1),
-  (<span class="org-string">"1"</span>, <span class="org-string">"1"</span>, <span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, +1),
-  (<span class="org-string">"1"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, -1),
-  (<span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"2"</span>, <span class="org-string">"&#9632;"</span>, -1),
-  (<span class="org-string">"2"</span>, <span class="org-string">"&#9654;"</span>, <span class="org-string">"3"</span>, <span class="org-string">"&#9654;"</span>, +1),
-  (<span class="org-string">"3"</span>, <span class="org-string">"&#9632;"</span>, <span class="org-string">"H"</span>, <span class="org-string">"1"</span>,  0),
-]
-
-<span class="org-variable-name">tm2</span> = TuringMachine(prog_compute_constant_1, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
-
-<span class="org-keyword">assert</span> tm2.run(<span class="org-string">"&#9654;1011"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine vs prog_compute_constant_1 - 1"</span>
-<span class="org-keyword">assert</span> tm2.run(<span class="org-string">"&#9654;0"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine vs prog_compute_constant_1 - 2"</span>
-</pre>
-</div>
-
-
-<p>
-Tests for the default parser:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-python" id="org55041c5"><span class="org-variable-name">prog_print_XYZ_str</span> = \
-<span class="org-string">"""# Anything behind '#' is a comment. Empty lines are ignored.</span>
-
-<span class="org-string">(S,&#9632;,2,X,+)  # We use "+" and "-" as shortcuts for +1 and -1.</span>
-<span class="org-string">  (2,&#9632;,3,Y,+)  # Indentation is irrelevant.</span>
-<span class="org-string">(3,&#9632;,H1,Z,-)  # We go to the left before halting - just for fun</span>
-<span class="org-string">(H1,Y,H,Y,0)</span>
-<span class="org-string"># whitespace inside (...) is (mostly) important. We could not replace the last line by this:</span>
-<span class="org-string"># (H1,Y,H ,Y,0)</span>
-<span class="org-string">"""</span>
-
-<span class="org-variable-name">parsed_prog</span>, <span class="org-variable-name">source_map</span> = parse_turing_program(prog_print_XYZ_str)
-<span class="org-comment-delimiter"># </span><span class="org-comment">Python seems to compare these structs recursively by value &#128077;:</span>
-<span class="org-keyword">assert</span> source_map == [
-    (2, <span class="org-string">"(S,&#9632;,2,X,+)  # We use \"+\" and \"-\" as shortcuts for +1 and -1."</span>),
-    (3, <span class="org-string">"  (2,&#9632;,3,Y,+)  # Indentation is irrelevant."</span>),
-    (4, <span class="org-string">"(3,&#9632;,H1,Z,-)  # We go to the left before halting - just for fun"</span>),
-    (5, <span class="org-string">"(H1,Y,H,Y,0)"</span>),
-], <span class="org-string">"test parse_turing_program - 1"</span>
-<span class="org-keyword">assert</span> parsed_prog == [
-    (<span class="org-string">'S'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'2'</span>, <span class="org-string">'X'</span>, +1),
-    (<span class="org-string">'2'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'3'</span>, <span class="org-string">'Y'</span>, +1),
-    (<span class="org-string">'3'</span>, <span class="org-string">'&#9632;'</span>, <span class="org-string">'H1'</span>, <span class="org-string">'Z'</span>, -1),
-    (<span class="org-string">'H1'</span>, <span class="org-string">'Y'</span>, <span class="org-string">'H'</span>, <span class="org-string">'Y'</span>, 0)
-], <span class="org-string">"test parse_turing_program - 2"</span>
-</pre>
-</div>
-
-<p>
-Tests for <code>TuringMachine.fromSource</code>. The <code>source</code> is taken from the <a href="#org28374c1">listing</a> on the Turing machine
-computing \(f(n)=1\).
-</p>
-
-<div class="org-src-container">
-<pre class="src src-python" id="org64f16d6"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
-
-<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;1001"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test TuringMachine.fromSource"</span>
-</pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 
-<div id="outline-container-org4f5d33e" class="outline-2">
-<h2 id="org4f5d33e"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-org4f5d33e">
+<div id="outline-container-orga425444" class="outline-2">
+<h2 id="orga425444"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-orga425444">
 </div>
-<div id="outline-container-orgb6003f6" class="outline-3">
-<h3 id="orgb6003f6"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
-<div class="outline-text-3" id="text-orgb6003f6">
+<div id="outline-container-orgc2cebf8" class="outline-3">
+<h3 id="orgc2cebf8"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-orgc2cebf8">
 <p>
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -482,9 +393,9 @@ machine?
 </div>
 </div>
 
-<div id="outline-container-orgc0b140d" class="outline-3">
-<h3 id="orgc0b140d">Exercise 3.2 (Turing numbers)</h3>
-<div class="outline-text-3" id="text-orgc0b140d">
+<div id="outline-container-org4d1d74c" class="outline-3">
+<h3 id="org4d1d74c">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-org4d1d74c">
 <p>
 Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
 such a way that the number uniquely specifies the corresponding machine. We call this number the
@@ -494,9 +405,9 @@ and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
 </p>
 </div>
 
-<div id="outline-container-orgd87d302" class="outline-4">
-<h4 id="orgd87d302">Proof</h4>
-<div class="outline-text-4" id="text-orgd87d302">
+<div id="outline-container-org608319b" class="outline-4">
+<h4 id="org608319b">Proof</h4>
+<div class="outline-text-4" id="text-org608319b">
 <p>
 For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
 consider (one could easily relax this constraint without complicating the encoding). Hence we need
@@ -563,9 +474,9 @@ invertible and hence the Turing machine can be recovered from this (potentially 
 </div>
 </div>
 
-<div id="outline-container-org8ac9460" class="outline-3">
-<h3 id="org8ac9460">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
-<div class="outline-text-3" id="text-org8ac9460">
+<div id="outline-container-org45e649c" class="outline-3">
+<h3 id="org45e649c">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-org45e649c">
 <p>
 Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
 reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
@@ -573,9 +484,9 @@ and/or symbols other than ▶, 0, 1, and the blank.)
 </p>
 </div>
 
-<div id="outline-container-org4889756" class="outline-4">
-<h4 id="org4889756">Solution</h4>
-<div class="outline-text-4" id="text-org4889756">
+<div id="outline-container-org0d8a4c7" class="outline-4">
+<h4 id="org0d8a4c7">Solution</h4>
+<div class="outline-text-4" id="text-org0d8a4c7">
 <p>
 We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
 following.
@@ -685,7 +596,7 @@ Finally the third part acts like this:
 </pre>
 
 <p>
-In the following we present a <a href="#orgd5d2486">Turing program</a> which does exactly this. Don't worry, most of the
+In the following we present a <a href="#org1ba7e08">Turing program</a> which does exactly this. Don't worry, most of the
 program is just comments - explaining how it works, and at the same time giving a kind of
 <i>inline-proof</i> that the program is correct in the sense that it "does what we want".
 </p>
@@ -719,6 +630,12 @@ usually only very few succesor blocks for each block.</li>
 #     followed by at least length-of(a..z)+1 blanks (this is important).
 #   - output : "▶z...a■..." where z...a is the reversed string.
 # The head starts and finishes at "▶".
+
+# Note: in the following we assume that the input string is non-empty to simplify
+# the analysis of the *generic* case. But it is easy to check that this corner case
+# also works. This is more or less an accident as you can see by the fact that we rely
+# on the fact that (by our definition) a Turing machine halts if no matching line is
+# found.
 
 #
 ##
@@ -886,24 +803,33 @@ usually only very few succesor blocks for each block.</li>
 
 <p>
 Let the theory behind and plug this program into our python implementation of a (universal)
-<code>TuringMachine</code>. The variable <code>source</code> contains the contents of the <a href="#orgd5d2486">above listing</a>.
+<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org1ba7e08">above listing</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org6f6f8cf"><span class="org-variable-name">tm_ex3_3</span> = TuringMachine.fromSource(source)
+<pre class="src src-python" id="org972d301"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
 
-<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
-<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">If something else is on the tape, then we need at least n+1 blanks (n=length-of-string) after the</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">string. Trying the following with less blanks would fail:</span>
-<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;001&#9632;&#9632;&#9632;&#9632;xyz"</span>) == <span class="org-string">"&#9654;100&#9632;&#9632;&#9632;&#9632;xyz"</span>, <span class="org-string">"test exercise-3.3-3"</span>
-<span class="org-keyword">assert</span> tm_ex3_3.run(<span class="org-string">"&#9654;1"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test exercise-3.3-4"</span>
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">If something else is on the tape, then we need at least n+1 blanks</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">(n=length-of-string) after the string. Trying the following with less</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">blanks would fail:</span>
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;001&#9632;&#9632;&#9632;&#9632;xyz"</span>) == <span class="org-string">"&#9654;100&#9632;&#9632;&#9632;&#9632;xyz"</span>, <span class="org-string">"test exercise-3.3-3"</span>
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;1"</span>) == <span class="org-string">"&#9654;1"</span>, <span class="org-string">"test exercise-3.3-4"</span>
+<span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;"</span>) == <span class="org-string">"&#9654;"</span>, <span class="org-string">"test exercise-3.3-4"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">corner case!</span>
+
+<span class="org-string">"PASSED"</span>
 </pre>
 </div>
 
+<pre class="example">
+PASSED
+</pre>
+
+
 <p>
 These basic tests yield an alternative root of trust into the program. You are invited to try out
-<code>tm_ex3_3</code> yourself. If configured appropirately it can also print each step it does.
+<code>tm</code> yourself. If configured appropirately it can also print each step it does.
 </p>
 </div>
 </div>
