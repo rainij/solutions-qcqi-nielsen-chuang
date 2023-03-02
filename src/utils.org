@@ -1,0 +1,20 @@
+#+title:  Utilities
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session none :tangle utils.py
+
+The code in this file is available via src_python{import utils} (after tangling).
+
+The following class can be used to print colored text to the (ipython) terminal:
+
+#+begin_src python
+  class TermColor:
+      """Standard color sequences for coloring text on terminal.
+
+      Usage:
+      print(TermColor.RED + "In red" + TermColor.ENDC + " in normal color")"""
+      GREEN = '\033[32m'
+      RED = '\033[31m'
+      ENDC = '\033[0m'
+#+end_src
