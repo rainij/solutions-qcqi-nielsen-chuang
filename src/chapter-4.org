@@ -2,26 +2,33 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
-#+property: header-args:python :session *chapter-4*
+#+property: header-args:python :session *chapter-4* :tangle chapter_4.py
 
 #+toc: headlines 2
 
 * Setup
 ** Setup Python Libraries
-#+name: setup-chapter-4
+*** Tangled
+#+name: setup-chapter-4-1
 #+begin_src python
   from functools import reduce
   from itertools import product
   from typing import Any
 
+  # Importing sympy takes a few houndred milliseconds
   import sympy as sp
-  from sympy import cos, exp, I, Matrix, pi, Quaternion, sin, sqrt
+  from sympy import cos, exp, I, Matrix, pi, sin, sqrt
   from sympy.physics.quantum import TensorProduct
   from sympy.combinatorics import Permutation as Perm
 
   import numpy as np
   import numpy.typing as npt
+#+end_src
 
+*** Not tangled
+#+name: setup-chapter-4-2
+#+begin_src python :tangle no
+  from sympy import Quaterion
   from qiskit.circuit import QuantumCircuit, Parameter as Param
 #+end_src
 
