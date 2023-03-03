@@ -713,3 +713,137 @@ Let the theory behind and plug this program into our python implementation of a 
 
 These basic tests yield an alternative root of trust into the program. You are invited to try out
 ~tm~ yourself. If configured appropirately it can also print each step it does.
+
+** Exercise 3.4 (Turing machine to add modulo 2)
+Describe a Turing machine to add two binary numbers $x$ and $y$ modulo 2. The numbers are
+input on the Turing machine tape in binary, in the form $x$, followed by a single blank,
+followed by a $y$. If one number is not as long as the other then you may assume that it
+has been padded with leading 0s to make the two numbers the same length.
+
+*** Solution
+The idea of the [[turing-program-ex-3-4][program]] can be seen in the following example, adding =x=000= and =y=111=.
+
+- 1. prepare input :: =▶00■11■■= → =▶00□11□■=
+- 2. update x inplace ::
+  - =▶00□11□■= → =▶■0□11□■= → =▶■0□□1□■= → =▶10□□1□■=
+  - =▶10□□1□■= → =▶1■□□1□■= → =▶1■□□□□■= → =▶11□□□□■=
+- 3. cleanup and halt :: =▶11□□□□■= → =▶11■■■■■=
+
+In the first stage we replace the blank cell in the gap between $x$ and $y$ and the cell
+after $y$ by a white blank. This simplifies the Turing program. In the first step of the
+second stage we memorize the first bit of $x$ (a zero =0= here) and go to the right until
+we find the first bit of $y$. We add this to our memorized bit of $x$, replace it by a
+white blank and transport back the result to the marked location (the blank). Now we
+repeat the procedure with the next bit - and so on. Finally we have to replace the white
+blanks by ordinary blanks and move the head back to the beginning.
+
+#+name: turing-program-ex-3-4
+#+begin_example
+  # Turing machine to add modulo 2
+  #   - input  : "▶xxx■yyy■■..." where xxx and yyy are strings of 0s and 1s of equal length
+  #     followed by at least 2 blanks. x and y can be empty.
+  #   - output : "▶zzz■..." where zzz is the bitwise sum of xxx and yyy, followed by at
+  #     least n+2 blanks, where n is the length of x (and also of y).
+  # The head starts and finishes at "▶".
+
+  # (A)
+  # Prepare the input by marking the gap between x and y and the cell after y with white
+  # blanks (□)
+  (START,▶,prepare-gap,▶,+)
+  (prepare-gap,0,prepare-gap,0,+)
+  (prepare-gap,1,prepare-gap,1,+)
+  (prepare-gap,■,prepare-end,□,+)  # we assume only one gap cell!
+  (prepare-end,0,prepare-end,0,+)
+  (prepare-end,1,prepare-end,1,+)
+  (prepare-end,■,search-start,□,-)  # note: after that, head cell contains no ■
+  # Successors: (B)
+
+  # (B)
+  # Search the start marker ▶
+  (search-start,0,search-start,0,-)
+  (search-start,1,search-start,1,-)
+  (search-start,□,search-start,□,-)
+  (search-start,▶,begin-update-next-bit,▶,+)
+  # Successors: (C), (D)
+
+  # (C)
+  # Memorize next bit of x by a state, and its position by marking it with a
+  # blank cell.
+  (begin-update-next-bit,0,memorize-0,■,+)
+  (begin-update-next-bit,1,memorize-1,■,+)
+  # Successors: (E), (F)
+
+  # (D)
+  # Final steps:
+  #   - replace all the □ (we wrote ourselves) by ■
+  #   - move the head back to ▶,
+  #   - and halt!
+  (begin-update-next-bit,□,cleanup,■,+)
+  (cleanup,□,cleanup,■,+)
+  (cleanup,■,finalize,■,-)  # here we need that the input is followed by 2 blanks
+  (finalize,■,finalize,■,-)
+  (finalize,0,finalize,0,-)
+  (finalize,1,finalize,1,-)
+  (finalize,▶,HALT,▶,0)
+  # Successors: None (halts)
+
+  # (E)
+  # Traverse the rest of x (which might be empty)
+  (memorize-0,0,memorize-0,0,+)
+  (memorize-0,1,memorize-0,1,+)
+  (memorize-1,0,memorize-1,0,+)
+  (memorize-1,1,memorize-1,1,+)
+  # Successors: (F)
+
+  # (F)
+  # Traverse the gap between x and y (y is not empty here since initially it had the
+  # same length as x)
+  (memorize-0,□,memorize-0y,□,+)
+  (memorize-1,□,memorize-1y,□,+)
+  (memorize-0y,□,memorize-0y,□,+)
+  (memorize-1y,□,memorize-1y,□,+)
+  # Successors: (G)
+
+  # (G)
+  # Memorize the bitwise sum of the two corresponding bits
+  (memorize-0y,0,memorize-sum-0,□,-)
+  (memorize-0y,1,memorize-sum-1,□,-)
+  (memorize-1y,0,memorize-sum-1,□,-)
+  (memorize-1y,1,memorize-sum-0,□,-)
+  # Successors: (H)
+
+  # (H)
+  # Now we know the sum - transport it leftward
+  (memorize-sum-0,0,memorize-sum-0,0,-)
+  (memorize-sum-0,1,memorize-sum-0,1,-)
+  (memorize-sum-0,□,memorize-sum-0,□,-)
+  (memorize-sum-1,0,memorize-sum-1,0,-)
+  (memorize-sum-1,1,memorize-sum-1,1,-)
+  (memorize-sum-1,□,memorize-sum-1,□,-)
+  # Successors: (I)
+
+  # (I)
+  # Write the result to the marked position in x
+  (memorize-sum-0,■,begin-update-next-bit,0,+)
+  (memorize-sum-1,■,begin-update-next-bit,1,+)
+  # Successors: (C), (D)
+#+end_example
+
+#+name: source-tp-ex-3-4
+#+begin_src python :var source_tp_ex_3_4=turing-program-ex-3-4 :exports none
+#+end_src
+
+We conclude with a small demo:
+
+#+name: exercise-3.4-turing-machine
+#+begin_src python :tangle no :results replace :cache yes
+  tm = TuringMachine.fromSource(source_tp_ex_3_4)
+
+  assert tm.run("▶0■1") == "▶1"
+  assert tm.run("▶010■111") == "▶101"
+  assert tm.run("▶0111001■1101011") == "▶1010010"
+  "PASSED"
+#+end_src
+
+#+RESULTS[b97e21e96747058052473aaec5f0c5c59a148e16]: exercise-3.4-turing-machine
+: PASSED

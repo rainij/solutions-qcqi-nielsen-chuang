@@ -5,7 +5,8 @@ import pytest
 from chapter_3 import TuringMachine, parse_turing_program
 from chapter_3 import \
     source_tp_constant_one, \
-    source_tp_ex_3_3
+    source_tp_ex_3_3, \
+    source_tp_ex_3_4
 from resources.turing_programs import \
     prog_print_XYZ, \
     prog_compute_constant_1
@@ -27,6 +28,16 @@ from resources import turing_sources
     # If at least n+1 (n=length of bitstring) blanks follow the input, then the
     # turing machine is guaranteed "to work" (see its docstring).
     (source_tp_ex_3_3, "START", "HALT", "▶001■■■■xyz", "▶100■■■■xyz"),
+    # exercise 3.4 (add modulo 2)
+    (source_tp_ex_3_4, "START", "HALT", "▶0■0", "▶0"),
+    (source_tp_ex_3_4, "START", "HALT", "▶0■1", "▶1"),
+    (source_tp_ex_3_4, "START", "HALT", "▶1■0", "▶1"),
+    (source_tp_ex_3_4, "START", "HALT", "▶1■1", "▶0"),
+    (source_tp_ex_3_4, "START", "HALT", "▶01■10", "▶11"),
+    (source_tp_ex_3_4, "START", "HALT", "▶11■11", "▶00"),
+    (source_tp_ex_3_4, "START", "HALT", "▶010■111", "▶101"),
+    (source_tp_ex_3_4, "START", "HALT", "▶1100■0101", "▶1001"),
+    (source_tp_ex_3_4, "START", "HALT", "▶0111001■1101001", "▶1010000"),
 ], ids=itertools.count())  # ids set like this since default looks ugly
 def test_TuringMachine_fromSource(source, start, halt, inp, out):
     tm = TuringMachine.fromSource(source, start_state=start, halt_state=halt)
