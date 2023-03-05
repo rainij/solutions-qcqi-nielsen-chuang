@@ -847,3 +847,66 @@ We conclude with a small demo:
 
 #+RESULTS[b97e21e96747058052473aaec5f0c5c59a148e16]: exercise-3.4-turing-machine
 : PASSED
+** Exercise 3.5 (Halting problem with no inputs)
+Show that given a Turing machine $M$ there is no algorithm to determine whether $M$ halts
+when the input to the machine is a blank tape.
+
+*** Proof
+This problem can easily be reduced the version of the halting problem from Box 3.2. In
+fact, for any turing machine $M$ (expressed in terms of its program) we consider the
+turing machine $M'$ which first writes the Turing number of $M$ to the tape and then
+proceeds as $M$.
+
+Note that the mapping $M\mapsto M'$ can be effectively computed (by an algorithm). But we
+do not need this fact here - just nice to know.
+
+Clearly $M'$ halts upon the empty tape iff $M$ halts upon its Turing number being on the
+tape. Hence, this variant of the halting problem can not be computed effectively
+either. QED.
+** Exercise 3.6 (Probabilistic halting problem)
+Suppose we number the probabilistic Turing machines using a scheme similar to that found
+in Exercise 3.2 and define the probabilistic halting function $h_p(x)$ to be $1$ if
+machine $x$ halts on input of $x$ with probability at least $1/2$ and $0$ if machine $x$
+halts on input of $x$ with probability less than $1/2$. Show that there is no
+probabilistic Turing machine which can output $h_p(x)$ with probability of correctness
+strictly greater than $1/2$ for all $x$.
+
+*** Proof
+The reasoning from Box 3.2 applies here too.
+
+Assume that there is a Turing machine =HALT= which, for all inputs $x$, halts and returns
+$h_p(x)$ with probability $p_x>1/2$. This implies that with probability /at most/
+$1-p_x<1/2$ it returns the wrong result or does not halt.
+
+Define =TURING= in the same way as in Box 3.2 and let $t$ be its Turing number. If
+$h_p(t)=1$ we have =y=HALT(t)= with probability $p_t>1/2$. But the latter means that
+=TURING(t)= loops forever with a probability $p_t>1/2$ which implies $h_p(t)=0$ -
+contradiction. On the other hand $h_p(t)=0$ also leads to a contradiction. QED.
+
+** Exercise 3.7 (Halting oracle)
+Suppose a black box is made available to us which takes a non-negative integer $x$ as
+input, and then outputs the value of $h(x)$, where $h$ is the halting function defined in
+Box 3.2. This type of black box is sometimes known as an /oracle/ for the halting
+problem. Suppose we have a regular Turing machine which is augmented by the power to call
+the oracle. One way of accomplishing this is to use a two-tape Turing machine, and add an
+extra program instruction to the Turing machine which results in the oracle being called,
+and the value of $h(x)$ being printed on the second tape, where $x$ is the current
+contents of the second tape. It is clear that this model for computation is more powerful
+than the conventional Turing machine model, since it can be used to compute the halting
+function. Is the halting problem for this model of computation undecidable? That is, can a
+Turing machine aided by an oracle for the halting problem decide whether a program for the
+Turing machine with oracle will halt on a particular input?
+
+*** Solution
+This follows directly from the argument in Box 3.2. In fact, the argument does not impose
+any restrictions on the model of computation except that at least /some/ things are
+possible. So the answer is /no/. There is no such algorithm in this enhanced model of
+computation. More generally, any enhancements of the "usual" model of computation (in
+terms of added oracles which compute certain previously uncomputable functions) does
+suffer from the lack of a halting algorithm (implementable inside the model itself).
+
+On the other hand /weak/ models of computation may allow the existence of a halting
+algorithm. Particularly simple is the case of a programming language which just has
+branching (=if ... then ... else ... end=) as the only control structure (in particular no
+loops). In that case, any algorithm halts and the halting algorithm can be implemented in
+a trivial way.
