@@ -910,3 +910,66 @@ algorithm. Particularly simple is the case of a programming language which just 
 branching (=if ... then ... else ... end=) as the only control structure (in particular no
 loops). In that case, any algorithm halts and the halting algorithm can be implemented in
 a trivial way.
+** Exercise 3.8 (Universality of =NAND=)
+Show that the =NAND= gate can be used to simulate the =AND=, =XOR=, and =NOT= gates,
+provided wires, ancilla bits and =FANOUT= are available.
+
+*** Proof
+Let us denote the =NAND= operation by $\barwedge$. Recall that $x\barwedge y=\neg(x\land
+y)$. In the following we give one way to implement each of the three gates:
+
+- =NOT=: $\neg x = \neg x \lor 0 = x \barwedge 1 .$
+- =AND=: $x \land y = \neg (x \barwedge y) = (x \barwedge y) \barwedge 1 .$
+- =OR=: $ x \lor y = \neg x \barwedge \neg y = (x \barwedge 1) \barwedge (y \barwedge 1) .$
+
+QED.
+** SKIP Exercises 3.9-3.14
+I skip these exercises since they are too simple /and/ too many.
+** Exercise 3.15
+Suppose an $n$ element list is sorted by applying some sequence of compare-and-swap
+operations to the list. There are $n!$ possible initial orderings of the list. Show that
+after $k$ of the compare-and-swap operations have been applied, at most $2^k$ of the
+possible initial orderings will have been sorted into the correct order. Conclude that
+$\Omega(n\log(n))$ compare-and-swap operations are required to sort all possible initial
+orderings into the correct order.
+
+*** Proof
+First, let us note that starting from an orderd sequence of numbers, like $1,2,\ldots,n$
+applying at most $k$ compare-and-swap operations we can generate at most $2^k$
+sequences. From this statement easily follows the first part of the exercise since sorting
+is just the reverse of this "shuffling-procedure".
+
+In fact, we can see this by mathematical induction:
+
+- case $k=0$ :: Clearly we generate /exactly/ one sequence in that case.
+- induction step $k+1\leftarrow k$ :: Assume the statement holds for $k$ and consider
+  $k+1$. We know that after /at most/ $k$ steps we get at most $2^k$ sequences. If we
+  /optionally/ add another step we can at most double that number!
+
+This proves the first part. Therefore, to be able to sort all $n!$ permutations we need at
+least a number $k_n$ of steps which necessarily satisfies
+
+$$
+  2^{k_n} \geq n! .
+$$
+
+By a /very weak/ version of [[https://en.wikipedia.org/wiki/Stirling%27s_approximation][Stirlings Formula]] we have
+
+$$
+  \log(n!) = \Omega(n\log(n)) .
+$$
+
+By taking the logarithm of the first inequality and plugging in the second inequality we
+get $k_n=\Omega(n\log(n))$. QED.
+
+Just for completeness, here is a short proof of the our very weak Stirling-type
+inequality:
+
+$$
+  \log(n!) = \sum_{k=1}^n \log(k) \geq \sum_{k > n/e} \log(k)
+  \geq (n-\lfloor ne^{-1} \rfloor)(\log(n) - 1)
+  = \Omega(n\log(n)) .
+$$
+
+Note that $\log(n!)\leq n\log(n)$ is even easier to see. Hence we actually have proven
+that $\log(n!)=\Omega(n\log(n))$.
