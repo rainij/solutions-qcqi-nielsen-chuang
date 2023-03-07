@@ -12,36 +12,39 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org45f3150">Setup</a>
+<li><a href="#orgcc2ef40">Setup</a>
 <ul>
-<li><a href="#orgc79aca4">Python Libraries</a></li>
-<li><a href="#org0a442b9">Turing Machines</a></li>
+<li><a href="#org173b634">Python Libraries</a></li>
+<li><a href="#org3150350">Turing Machines</a></li>
 </ul>
 </li>
-<li><a href="#org8a8a86e"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#org17c62b8"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#orgdf8ce8c"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
-<li><a href="#orgc9c16bd">Exercise 3.2 (Turing numbers)</a></li>
-<li><a href="#org83b1992">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
-<li><a href="#orgb1541bc">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
-<li><a href="#orgb2939c8">Exercise 3.5 (Halting problem with no inputs)</a></li>
-<li><a href="#org37bbf33">Exercise 3.6 (Probabilistic halting problem)</a></li>
-<li><a href="#orge1aa6c1">Exercise 3.7 (Halting oracle)</a></li>
+<li><a href="#orge70c58a"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#org6fa4ac9">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#org53d3c7c">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+<li><a href="#orgff46543">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
+<li><a href="#org82cb314">Exercise 3.5 (Halting problem with no inputs)</a></li>
+<li><a href="#org44ef215">Exercise 3.6 (Probabilistic halting problem)</a></li>
+<li><a href="#orgd48e0ad">Exercise 3.7 (Halting oracle)</a></li>
+<li><a href="#orgfa8d74f">Exercise 3.8 (Universality of <code>NAND</code>)</a></li>
+<li><a href="#org0a5d7fa"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</a></li>
+<li><a href="#orgcecb93f">Exercise 3.15</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org45f3150" class="outline-2">
-<h2 id="org45f3150">Setup</h2>
-<div class="outline-text-2" id="text-org45f3150">
+<div id="outline-container-orgcc2ef40" class="outline-2">
+<h2 id="orgcc2ef40">Setup</h2>
+<div class="outline-text-2" id="text-orgcc2ef40">
 </div>
-<div id="outline-container-orgc79aca4" class="outline-3">
-<h3 id="orgc79aca4">Python Libraries</h3>
-<div class="outline-text-3" id="text-orgc79aca4">
+<div id="outline-container-org173b634" class="outline-3">
+<h3 id="org173b634">Python Libraries</h3>
+<div class="outline-text-3" id="text-org173b634">
 <div class="org-src-container">
-<pre class="src src-python" id="org3488336"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
+<pre class="src src-python" id="org6683e88"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
 <span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
 
 <span class="org-keyword">from</span> utils <span class="org-keyword">import</span> TermColor
@@ -50,13 +53,13 @@
 </div>
 </div>
 
-<div id="outline-container-org0a442b9" class="outline-3">
-<h3 id="org0a442b9">Turing Machines</h3>
-<div class="outline-text-3" id="text-org0a442b9">
+<div id="outline-container-org3150350" class="outline-3">
+<h3 id="org3150350">Turing Machines</h3>
+<div class="outline-text-3" id="text-org3150350">
 </div>
-<div id="outline-container-org63bbf22" class="outline-4">
-<h4 id="org63bbf22">Introduction</h4>
-<div class="outline-text-4" id="text-org63bbf22">
+<div id="outline-container-org0d3139e" class="outline-4">
+<h4 id="org0d3139e">Introduction</h4>
+<div class="outline-text-4" id="text-org0d3139e">
 <p>
 In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
 this one:
@@ -79,7 +82,7 @@ Below we initialize a turing machine <code>my_tm</code> from the above source co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org9a8882d"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<pre class="src src-python" id="org57b7ba4"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
 <span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
 <span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
 
@@ -135,19 +138,19 @@ result = '▶1'
 </div>
 </div>
 
-<div id="outline-container-org2bfd746" class="outline-4">
-<h4 id="org2bfd746">Implementation</h4>
-<div class="outline-text-4" id="text-org2bfd746">
+<div id="outline-container-org53d5710" class="outline-4">
+<h4 id="org53d5710">Implementation</h4>
+<div class="outline-text-4" id="text-org53d5710">
 <p>
 First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
 readable or at least mnemonic state names. This would not be possible had we used integers. The
 <code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
-from the source-string/file. It is the reason why in the <a href="#org9a8882d">listing above</a> the <code>TuringMachine</code> instance
+from the source-string/file. It is the reason why in the <a href="#org57b7ba4">listing above</a> the <code>TuringMachine</code> instance
 can refer to its source (see the line starting with <code>source line =</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org20a8c79"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<pre class="src src-python" id="org6601d11"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
 <span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
 <span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
 <span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
@@ -159,7 +162,7 @@ can refer to its source (see the line starting with <code>source line =</code>).
 </div>
 
 <p>
-<a href="#org94fad9f">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+<a href="#org482d9f8">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
 implementation a bit. But it you ignore this the implementation is very simple and straightforward
 to understand (IMHO).
 </p>
@@ -197,7 +200,7 @@ particular, those cannot be used as characters on the tape.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org94fad9f"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+<pre class="src src-python" id="org482d9f8"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
     <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
     BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
     <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
@@ -332,7 +335,7 @@ Finally, the default parser:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org683d313"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+<pre class="src src-python" id="org119eaa2"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
     <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
 
 <span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
@@ -378,13 +381,13 @@ Finally, the default parser:
 </div>
 </div>
 
-<div id="outline-container-org8a8a86e" class="outline-2">
-<h2 id="org8a8a86e"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-org8a8a86e">
+<div id="outline-container-org17c62b8" class="outline-2">
+<h2 id="org17c62b8"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-org17c62b8">
 </div>
-<div id="outline-container-orgdf8ce8c" class="outline-3">
-<h3 id="orgdf8ce8c"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
-<div class="outline-text-3" id="text-orgdf8ce8c">
+<div id="outline-container-orge70c58a" class="outline-3">
+<h3 id="orge70c58a"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-orge70c58a">
 <p>
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -392,9 +395,9 @@ machine?
 </div>
 </div>
 
-<div id="outline-container-orgc9c16bd" class="outline-3">
-<h3 id="orgc9c16bd">Exercise 3.2 (Turing numbers)</h3>
-<div class="outline-text-3" id="text-orgc9c16bd">
+<div id="outline-container-org6fa4ac9" class="outline-3">
+<h3 id="org6fa4ac9">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-org6fa4ac9">
 <p>
 Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
 such a way that the number uniquely specifies the corresponding machine. We call this number the
@@ -404,9 +407,9 @@ and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
 </p>
 </div>
 
-<div id="outline-container-org55d2f08" class="outline-4">
-<h4 id="org55d2f08">Proof</h4>
-<div class="outline-text-4" id="text-org55d2f08">
+<div id="outline-container-orga9e34d9" class="outline-4">
+<h4 id="orga9e34d9">Proof</h4>
+<div class="outline-text-4" id="text-orga9e34d9">
 <p>
 For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
 consider (one could easily relax this constraint without complicating the encoding). Hence we need
@@ -473,9 +476,9 @@ invertible and hence the Turing machine can be recovered from this (potentially 
 </div>
 </div>
 
-<div id="outline-container-org83b1992" class="outline-3">
-<h3 id="org83b1992">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
-<div class="outline-text-3" id="text-org83b1992">
+<div id="outline-container-org53d3c7c" class="outline-3">
+<h3 id="org53d3c7c">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-org53d3c7c">
 <p>
 Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
 reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
@@ -483,9 +486,9 @@ and/or symbols other than ▶, 0, 1, and the blank.)
 </p>
 </div>
 
-<div id="outline-container-org5c2eb1d" class="outline-4">
-<h4 id="org5c2eb1d">Solution</h4>
-<div class="outline-text-4" id="text-org5c2eb1d">
+<div id="outline-container-org46df0e7" class="outline-4">
+<h4 id="org46df0e7">Solution</h4>
+<div class="outline-text-4" id="text-org46df0e7">
 <p>
 We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
 following.
@@ -595,7 +598,7 @@ Finally the third part acts like this:
 </pre>
 
 <p>
-In the following we present a <a href="#orgd428c72">Turing program</a> which does exactly this. Don't worry, most of the
+In the following we present a <a href="#orgf3d4fdb">Turing program</a> which does exactly this. Don't worry, most of the
 program is just comments - explaining how it works, and at the same time giving a kind of
 <i>inline-proof</i> that the program is correct in the sense that it "does what we want".
 </p>
@@ -802,11 +805,11 @@ usually only very few succesor blocks for each block.</li>
 
 <p>
 Let the theory behind and plug this program into our python implementation of a (universal)
-<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#orgd428c72">above listing</a>.
+<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#orgf3d4fdb">above listing</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgdb01d6e"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
+<pre class="src src-python" id="org5c61c90"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
@@ -834,9 +837,9 @@ These basic tests yield an alternative root of trust into the program. You are i
 </div>
 </div>
 
-<div id="outline-container-orgb1541bc" class="outline-3">
-<h3 id="orgb1541bc">Exercise 3.4 (Turing machine to add modulo 2)</h3>
-<div class="outline-text-3" id="text-orgb1541bc">
+<div id="outline-container-orgff46543" class="outline-3">
+<h3 id="orgff46543">Exercise 3.4 (Turing machine to add modulo 2)</h3>
+<div class="outline-text-3" id="text-orgff46543">
 <p>
 Describe a Turing machine to add two binary numbers \(x\) and \(y\) modulo 2. The numbers are
 input on the Turing machine tape in binary, in the form \(x\), followed by a single blank,
@@ -845,11 +848,11 @@ has been padded with leading 0s to make the two numbers the same length.
 </p>
 </div>
 
-<div id="outline-container-orgce631fd" class="outline-4">
-<h4 id="orgce631fd">Solution</h4>
-<div class="outline-text-4" id="text-orgce631fd">
+<div id="outline-container-org8d363bb" class="outline-4">
+<h4 id="org8d363bb">Solution</h4>
+<div class="outline-text-4" id="text-org8d363bb">
 <p>
-The idea of the <a href="#org1897ed3">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
+The idea of the <a href="#org7e0cde8">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
 </p>
 
 <dl class="org-dl">
@@ -967,7 +970,7 @@ We conclude with a small demo:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgd29d487"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
+<pre class="src src-python" id="orgfe808f1"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;0&#9632;1"</span>) == <span class="org-string">"&#9654;1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;010&#9632;111"</span>) == <span class="org-string">"&#9654;101"</span>
@@ -982,18 +985,18 @@ PASSED
 </div>
 </div>
 </div>
-<div id="outline-container-orgb2939c8" class="outline-3">
-<h3 id="orgb2939c8">Exercise 3.5 (Halting problem with no inputs)</h3>
-<div class="outline-text-3" id="text-orgb2939c8">
+<div id="outline-container-org82cb314" class="outline-3">
+<h3 id="org82cb314">Exercise 3.5 (Halting problem with no inputs)</h3>
+<div class="outline-text-3" id="text-org82cb314">
 <p>
 Show that given a Turing machine \(M\) there is no algorithm to determine whether \(M\) halts
 when the input to the machine is a blank tape.
 </p>
 </div>
 
-<div id="outline-container-orgb4caa7d" class="outline-4">
-<h4 id="orgb4caa7d">Proof</h4>
-<div class="outline-text-4" id="text-orgb4caa7d">
+<div id="outline-container-orgef782a2" class="outline-4">
+<h4 id="orgef782a2">Proof</h4>
+<div class="outline-text-4" id="text-orgef782a2">
 <p>
 This problem can easily be reduced the version of the halting problem from Box 3.2. In
 fact, for any turing machine \(M\) (expressed in terms of its program) we consider the
@@ -1014,9 +1017,9 @@ either. QED.
 </div>
 </div>
 </div>
-<div id="outline-container-org37bbf33" class="outline-3">
-<h3 id="org37bbf33">Exercise 3.6 (Probabilistic halting problem)</h3>
-<div class="outline-text-3" id="text-org37bbf33">
+<div id="outline-container-org44ef215" class="outline-3">
+<h3 id="org44ef215">Exercise 3.6 (Probabilistic halting problem)</h3>
+<div class="outline-text-3" id="text-org44ef215">
 <p>
 Suppose we number the probabilistic Turing machines using a scheme similar to that found
 in Exercise 3.2 and define the probabilistic halting function \(h_p(x)\) to be \(1\) if
@@ -1027,9 +1030,9 @@ strictly greater than \(1/2\) for all \(x\).
 </p>
 </div>
 
-<div id="outline-container-org24a76d2" class="outline-4">
-<h4 id="org24a76d2">Proof</h4>
-<div class="outline-text-4" id="text-org24a76d2">
+<div id="outline-container-org5cc978d" class="outline-4">
+<h4 id="org5cc978d">Proof</h4>
+<div class="outline-text-4" id="text-org5cc978d">
 <p>
 The reasoning from Box 3.2 applies here too.
 </p>
@@ -1050,9 +1053,9 @@ contradiction. On the other hand \(h_p(t)=0\) also leads to a contradiction. QED
 </div>
 </div>
 
-<div id="outline-container-orge1aa6c1" class="outline-3">
-<h3 id="orge1aa6c1">Exercise 3.7 (Halting oracle)</h3>
-<div class="outline-text-3" id="text-orge1aa6c1">
+<div id="outline-container-orgd48e0ad" class="outline-3">
+<h3 id="orgd48e0ad">Exercise 3.7 (Halting oracle)</h3>
+<div class="outline-text-3" id="text-orgd48e0ad">
 <p>
 Suppose a black box is made available to us which takes a non-negative integer \(x\) as
 input, and then outputs the value of \(h(x)\), where \(h\) is the halting function defined in
@@ -1069,9 +1072,9 @@ Turing machine with oracle will halt on a particular input?
 </p>
 </div>
 
-<div id="outline-container-orgd697ed8" class="outline-4">
-<h4 id="orgd697ed8">Solution</h4>
-<div class="outline-text-4" id="text-orgd697ed8">
+<div id="outline-container-orgded8319" class="outline-4">
+<h4 id="orgded8319">Solution</h4>
+<div class="outline-text-4" id="text-orgded8319">
 <p>
 This follows directly from the argument in Box 3.2. In fact, the argument does not impose
 any restrictions on the model of computation except that at least <i>some</i> things are
@@ -1087,6 +1090,123 @@ algorithm. Particularly simple is the case of a programming language which just 
 branching (<code>if ... then ... else ... end</code>) as the only control structure (in particular no
 loops). In that case, any algorithm halts and the halting algorithm can be implemented in
 a trivial way.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfa8d74f" class="outline-3">
+<h3 id="orgfa8d74f">Exercise 3.8 (Universality of <code>NAND</code>)</h3>
+<div class="outline-text-3" id="text-orgfa8d74f">
+<p>
+Show that the <code>NAND</code> gate can be used to simulate the <code>AND</code>, <code>XOR</code>, and <code>NOT</code> gates,
+provided wires, ancilla bits and <code>FANOUT</code> are available.
+</p>
+</div>
+
+<div id="outline-container-org48fc393" class="outline-4">
+<h4 id="org48fc393">Proof</h4>
+<div class="outline-text-4" id="text-org48fc393">
+<p>
+Let us denote the <code>NAND</code> operation by \(\barwedge\). Recall that \(x\barwedge y=\neg(x\land
+y)\). In the following we give one way to implement each of the three gates:
+</p>
+
+<ul class="org-ul">
+<li><code>NOT</code>: $&not; x = &not; x &or; 0 = x \barwedge 1 .$</li>
+<li><code>AND</code>: $x &and; y = &not; (x \barwedge y) = (x \barwedge y) \barwedge 1 .$</li>
+<li><code>OR</code>: $ x &or; y = &not; x \barwedge &not; y = (x \barwedge 1) \barwedge (y \barwedge 1) .$</li>
+</ul>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0a5d7fa" class="outline-3">
+<h3 id="org0a5d7fa"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</h3>
+<div class="outline-text-3" id="text-org0a5d7fa">
+<p>
+I skip these exercises since they are too simple <i>and</i> too many.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcecb93f" class="outline-3">
+<h3 id="orgcecb93f">Exercise 3.15</h3>
+<div class="outline-text-3" id="text-orgcecb93f">
+<p>
+Suppose an \(n\) element list is sorted by applying some sequence of compare-and-swap
+operations to the list. There are \(n!\) possible initial orderings of the list. Show that
+after \(k\) of the compare-and-swap operations have been applied, at most \(2^k\) of the
+possible initial orderings will have been sorted into the correct order. Conclude that
+\(\Omega(n\log(n))\) compare-and-swap operations are required to sort all possible initial
+orderings into the correct order.
+</p>
+</div>
+
+<div id="outline-container-orgc7d3570" class="outline-4">
+<h4 id="orgc7d3570">Proof</h4>
+<div class="outline-text-4" id="text-orgc7d3570">
+<p>
+First, let us note that starting from an orderd sequence of numbers, like \(1,2,\ldots,n\)
+applying at most \(k\) compare-and-swap operations we can generate at most \(2^k\)
+sequences. From this statement easily follows the first part of the exercise since sorting
+is just the reverse of this "shuffling-procedure".
+</p>
+
+<p>
+In fact, we can see this by mathematical induction:
+</p>
+
+<dl class="org-dl">
+<dt>case \(k=0\)</dt><dd>Clearly we generate <i>exactly</i> one sequence in that case.</dd>
+<dt>induction step \(k+1\leftarrow k\)</dt><dd>Assume the statement holds for \(k\) and consider
+\(k+1\). We know that after <i>at most</i> \(k\) steps we get at most \(2^k\) sequences. If we
+<i>optionally</i> add another step we can at most double that number!</dd>
+</dl>
+
+<p>
+This proves the first part. Therefore, to be able to sort all \(n!\) permutations we need at
+least a number \(k_n\) of steps which necessarily satisfies
+</p>
+
+<p>
+\[
+  2^{k_n} \geq n! .
+\]
+</p>
+
+<p>
+By a <i>very weak</i> version of <a href="https://en.wikipedia.org/wiki/Stirling%27s_approximation">Stirlings Formula</a> we have
+</p>
+
+<p>
+\[
+  \log(n!) = \Omega(n\log(n)) .
+\]
+</p>
+
+<p>
+By taking the logarithm of the first inequality and plugging in the second inequality we
+get \(k_n=\Omega(n\log(n))\). QED.
+</p>
+
+<p>
+Just for completeness, here is a short proof of the our very weak Stirling-type
+inequality:
+</p>
+
+<p>
+\[
+  \log(n!) = \sum_{k=1}^n \log(k) \geq \sum_{k > n/e} \log(k)
+  \geq (n-\lfloor ne^{-1} \rfloor)(\log(n) - 1)
+  = \Omega(n\log(n)) .
+\]
+</p>
+
+<p>
+Note that \(\log(n!)\leq n\log(n)\) is even easier to see. Hence we actually have proven
+that \(\log(n!)=\Omega(n\log(n))\).
 </p>
 </div>
 </div>
