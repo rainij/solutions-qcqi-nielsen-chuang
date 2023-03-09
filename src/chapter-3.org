@@ -1232,18 +1232,17 @@ in pairs $(i,i+1)$ where the first one is the "entering" edge and the last one i
 this proves the Theorem.
 
 Our procedure to compute the Euler cycle makes use of the following subroutine
-=SimpleCycle=. Given a vertex $v$ and a set of /admissible/ edges the subroutine computes
-a nonempty circular path, containing $v$, visiting each of its vertices exactly once,
-containing only admissible edges.
+=PartialCycle=. Given a vertex $v$ and a set of /admissible/ edges the subroutine computes
+a nonempty closed path, containing $v$ and only admissible edges.
 
 - input: a graph,a vertex $v_s$ of the graph, and a set of admissible edges of the graph.
-- (I) Set the /current vertex/ equal to $v_s$ and mark it as /visited/.
+- (I) Set the /current vertex/ equal to $v_s$.
 - (L) Loop indefinitely over the following
-  - (L1) Take an unvisited admissible edge $e$ to some vertex $v$.
+  - (L1) Take an unvisited admissible edge $e$ of the current vertex to some vertex $v$.
   - (L2) Walk over $e$ to $v$.
   - (L3) Set $v$ to be the new current vertex.
-  - (L4) If $v$ was already marked /visited/ earlier: return the constructed path and halt.
-  - (L2) Mark $e$ and $v$ as visited.
+  - (L4) If $v=v_s$ return the constructed path and halt.
+  - (L5) Mark $e$ as visited.
 
 Note that (L1) implicitly assumes that we actually find an unvisited admissible edge. If
 this is always the case it is easy to see that the algorithm does what we want. Also note
@@ -1254,11 +1253,11 @@ Let us formulate the complete procedure for finding an Euler cycle. As a precond
 assume that each vertex has an even number of edges and that the graph is connected (the
 latter implying that no vertex has zero edges). This is justified by Euler's theorem.
 
-- Call =SimpleCycle= on some arbitrarily chosen vertex with all edges being admissible.
+- Call =PartialCycle= on some arbitrarily chosen vertex with all edges being admissible.
 - Initialize a path $p$ with the output of the previous step.
 - Loop indefinitely over the following:
   - Choose a vertex $v$ having edges not already in $p$. Halt if none exists.
-  - Call =SimpleCycle= on $v$ allowing only the complement of the edges of $p$ as
+  - Call =PartialCycle= on $v$ allowing only the complement of the edges of $p$ as
     admissible. Enlarge $p$ by inserting the output into $p$ directly after $v$.
 
 It is not hard to see that the procedure halts if and only if the path $p$ is already an
