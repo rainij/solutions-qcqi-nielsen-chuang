@@ -12,48 +12,48 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgbdbaca4">Setup</a>
+<li><a href="#org374685f">Setup</a>
 <ul>
-<li><a href="#orga04793e">Setup Python Libaries</a></li>
-<li><a href="#orga77ab26">Code from earlier Chapters</a></li>
-<li><a href="#orgbfb1848">Fourier Transform</a></li>
+<li><a href="#orgb85fec6">Setup Python Libaries</a></li>
+<li><a href="#orgdab1192">Code from earlier Chapters</a></li>
+<li><a href="#org11bfeb7">Fourier Transform</a></li>
 </ul>
 </li>
-<li><a href="#org489d78c"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#org6694d0a"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#org60fdcfd">Exercise 5.1</a></li>
-<li><a href="#orgc5a2ac3">Exercise 5.2</a></li>
-<li><a href="#org0aef34e">Exercise 5.3 (Classical fast Fourier transform)</a></li>
-<li><a href="#orgb76e570">Exercise 5.4</a></li>
-<li><a href="#org75160dd">Exercise 5.5</a></li>
-<li><a href="#orgf404c36">Exercise 5.6 (Approximate quantum Fourier transform)</a></li>
-<li><a href="#orge0057f6">Exercise 5.7</a></li>
-<li><a href="#orga4d1906">Exercise 5.8</a></li>
-<li><a href="#orgc2ade2b">Exercise 5.9</a></li>
-<li><a href="#org9f5bab7">Exercise 5.10</a></li>
-<li><a href="#orgf473c8f">Exercise 5.11</a></li>
-<li><a href="#orge30a7f3">Exercise 5.12</a></li>
-<li><a href="#orgfe84dc9">Exercise 5.13</a></li>
-<li><a href="#orgcbda534"><span class="todo TODO">TODO</span> Exercise 5.14</a></li>
+<li><a href="#org75d6ecb">Exercise 5.1</a></li>
+<li><a href="#org0768869">Exercise 5.2</a></li>
+<li><a href="#orgfc8128f">Exercise 5.3 (Classical fast Fourier transform)</a></li>
+<li><a href="#orgbc9ce35">Exercise 5.4</a></li>
+<li><a href="#org26b0081">Exercise 5.5</a></li>
+<li><a href="#org3d1cc1d">Exercise 5.6 (Approximate quantum Fourier transform)</a></li>
+<li><a href="#orge3227b4">Exercise 5.7</a></li>
+<li><a href="#org1ee1fa6">Exercise 5.8</a></li>
+<li><a href="#org39226e5">Exercise 5.9</a></li>
+<li><a href="#orgac76a9b">Exercise 5.10</a></li>
+<li><a href="#org08fd790">Exercise 5.11</a></li>
+<li><a href="#org58eb053">Exercise 5.12</a></li>
+<li><a href="#org1ba122f">Exercise 5.13</a></li>
+<li><a href="#org16292ff"><span class="todo TODO">TODO</span> Exercise 5.14</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbdbaca4" class="outline-2">
-<h2 id="orgbdbaca4">Setup</h2>
-<div class="outline-text-2" id="text-orgbdbaca4">
+<div id="outline-container-org374685f" class="outline-2">
+<h2 id="org374685f">Setup</h2>
+<div class="outline-text-2" id="text-org374685f">
 </div>
-<div id="outline-container-orga04793e" class="outline-3">
-<h3 id="orga04793e">Setup Python Libaries</h3>
-<div class="outline-text-3" id="text-orga04793e">
+<div id="outline-container-orgb85fec6" class="outline-3">
+<h3 id="orgb85fec6">Setup Python Libaries</h3>
+<div class="outline-text-3" id="text-orgb85fec6">
 <p>
 Tangled:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orge8c98b6"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<pre class="src src-python" id="orgb628967"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
 <span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> exp, I, pi
 </pre>
 </div>
@@ -69,9 +69,9 @@ Not tangled:
 </div>
 </div>
 
-<div id="outline-container-orga77ab26" class="outline-3">
-<h3 id="orga77ab26">Code from earlier Chapters</h3>
-<div class="outline-text-3" id="text-orga77ab26">
+<div id="outline-container-orgdab1192" class="outline-3">
+<h3 id="orgdab1192">Code from earlier Chapters</h3>
+<div class="outline-text-3" id="text-orgdab1192">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Rz, theta
 </pre>
@@ -79,15 +79,15 @@ Not tangled:
 </div>
 </div>
 
-<div id="outline-container-orgbfb1848" class="outline-3">
-<h3 id="orgbfb1848">Fourier Transform</h3>
-<div class="outline-text-3" id="text-orgbfb1848">
+<div id="outline-container-org11bfeb7" class="outline-3">
+<h3 id="org11bfeb7">Fourier Transform</h3>
+<div class="outline-text-3" id="text-org11bfeb7">
 <p>
 These are the operators \(R_k\) appearing in the implementation of the Fourier Transform:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orge3b6b30"><span class="org-variable-name">k</span> = sp.symbols(<span class="org-string">'k'</span>, integer=<span class="org-constant">True</span>)
+<pre class="src src-python" id="org0de4c49"><span class="org-variable-name">k</span> = sp.symbols(<span class="org-string">'k'</span>, integer=<span class="org-constant">True</span>)
 <span class="org-variable-name">Rk</span> = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
 </pre>
 </div>
@@ -95,13 +95,13 @@ These are the operators \(R_k\) appearing in the implementation of the Fourier T
 </div>
 </div>
 
-<div id="outline-container-org489d78c" class="outline-2">
-<h2 id="org489d78c"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-org489d78c">
+<div id="outline-container-org6694d0a" class="outline-2">
+<h2 id="org6694d0a"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-org6694d0a">
 </div>
-<div id="outline-container-org60fdcfd" class="outline-3">
-<h3 id="org60fdcfd">Exercise 5.1</h3>
-<div class="outline-text-3" id="text-org60fdcfd">
+<div id="outline-container-org75d6ecb" class="outline-3">
+<h3 id="org75d6ecb">Exercise 5.1</h3>
+<div class="outline-text-3" id="text-org75d6ecb">
 <p>
 Give a direct proof that the linear transformation defined by Equation (5.2):
 </p>
@@ -117,9 +117,9 @@ is unitary.
 </p>
 </div>
 
-<div id="outline-container-org925ee11" class="outline-4">
-<h4 id="org925ee11">Proof</h4>
-<div class="outline-text-4" id="text-org925ee11">
+<div id="outline-container-org69f2763" class="outline-4">
+<h4 id="org69f2763">Proof</h4>
+<div class="outline-text-4" id="text-org69f2763">
 <p>
 An operator is unitary iff it maps one (arbitrarily chosen) orthonormal basis to an orthonormal
 basis. In other words, it suffices to show that
@@ -152,17 +152,17 @@ On the other hand, for \(n=m\) the summation over \(k\) in the above equality ch
 </div>
 </div>
 
-<div id="outline-container-orgc5a2ac3" class="outline-3">
-<h3 id="orgc5a2ac3">Exercise 5.2</h3>
-<div class="outline-text-3" id="text-orgc5a2ac3">
+<div id="outline-container-org0768869" class="outline-3">
+<h3 id="org0768869">Exercise 5.2</h3>
+<div class="outline-text-3" id="text-org0768869">
 <p>
 Explicitly compute the Fourier transform of the \(n\) qubit state \(|00\ldots0\rangle\).
 </p>
 </div>
 
-<div id="outline-container-orgda9b12b" class="outline-4">
-<h4 id="orgda9b12b">Solution</h4>
-<div class="outline-text-4" id="text-orgda9b12b">
+<div id="outline-container-org76db4d3" class="outline-4">
+<h4 id="org76db4d3">Solution</h4>
+<div class="outline-text-4" id="text-org76db4d3">
 <p>
 We have
 </p>
@@ -181,9 +181,9 @@ usual).
 </div>
 </div>
 
-<div id="outline-container-org0aef34e" class="outline-3">
-<h3 id="org0aef34e">Exercise 5.3 (Classical fast Fourier transform)</h3>
-<div class="outline-text-3" id="text-org0aef34e">
+<div id="outline-container-orgfc8128f" class="outline-3">
+<h3 id="orgfc8128f">Exercise 5.3 (Classical fast Fourier transform)</h3>
+<div class="outline-text-3" id="text-orgfc8128f">
 <p>
 Suppose we wish to perform a Fourier transform of a vector containing \(2^n\) complex numbers on a
 classical computer. Verify that the straightforward method for performing the Fourier transform,
@@ -193,9 +193,9 @@ operations. Find a method for reducing this to \(\Theta(n2^n)\) operations, base
 </p>
 </div>
 
-<div id="outline-container-org0d5014e" class="outline-4">
-<h4 id="org0d5014e">Proof</h4>
-<div class="outline-text-4" id="text-org0d5014e">
+<div id="outline-container-orge4f36aa" class="outline-4">
+<h4 id="orge4f36aa">Proof</h4>
+<div class="outline-text-4" id="text-orge4f36aa">
 <p>
 First we consider the standard formula:
 </p>
@@ -390,17 +390,17 @@ number of operations. QED.
 </div>
 </div>
 
-<div id="outline-container-orgb76e570" class="outline-3">
-<h3 id="orgb76e570">Exercise 5.4</h3>
-<div class="outline-text-3" id="text-orgb76e570">
+<div id="outline-container-orgbc9ce35" class="outline-3">
+<h3 id="orgbc9ce35">Exercise 5.4</h3>
+<div class="outline-text-3" id="text-orgbc9ce35">
 <p>
 Give a decomposition of the controlled-\(R_k\) gate into single qubit and <code>CNOT</code> gates.
 </p>
 </div>
 
-<div id="outline-container-org585a2b5" class="outline-4">
-<h4 id="org585a2b5">Solution</h4>
-<div class="outline-text-4" id="text-org585a2b5">
+<div id="outline-container-org3f81744" class="outline-4">
+<h4 id="org3f81744">Solution</h4>
+<div class="outline-text-4" id="text-org3f81744">
 <p>
 Let us abbreviat \(\theta_k=2\pi2^{-k}\). Note that \(R_k=e^{\ii\theta_{k+1}}R_z(\theta_k)\). It is easy
 to find a solution based on the ABC-construction from Figure 4.6 and the proof of Corollary 4.2.
@@ -438,17 +438,17 @@ follows from this together with \(R_k=R_{k+1}^2\). QED.
 </div>
 </div>
 
-<div id="outline-container-org75160dd" class="outline-3">
-<h3 id="org75160dd">Exercise 5.5</h3>
-<div class="outline-text-3" id="text-org75160dd">
+<div id="outline-container-org26b0081" class="outline-3">
+<h3 id="org26b0081">Exercise 5.5</h3>
+<div class="outline-text-3" id="text-org26b0081">
 <p>
 Give a quantum circuit to perform the inverse quantum Fourier transform.
 </p>
 </div>
 
-<div id="outline-container-orge0e12f6" class="outline-4">
-<h4 id="orge0e12f6">Solution</h4>
-<div class="outline-text-4" id="text-orge0e12f6">
+<div id="outline-container-org707fb33" class="outline-4">
+<h4 id="org707fb33">Solution</h4>
+<div class="outline-text-4" id="text-org707fb33">
 <p>
 The standard way to get the invere of some circuit is to just write down all the gates in revers
 order and conjugate them (replace \(R_k\) by \(R_k^\dagger\) in our case since <code>SWAP</code> and \(H\) are
@@ -483,9 +483,9 @@ when deriving the product formula for the <i>inverse</i> Fourier transform:
 </div>
 </div>
 
-<div id="outline-container-orgf404c36" class="outline-3">
-<h3 id="orgf404c36">Exercise 5.6 (Approximate quantum Fourier transform)</h3>
-<div class="outline-text-3" id="text-orgf404c36">
+<div id="outline-container-org3d1cc1d" class="outline-3">
+<h3 id="org3d1cc1d">Exercise 5.6 (Approximate quantum Fourier transform)</h3>
+<div class="outline-text-3" id="text-org3d1cc1d">
 <p>
 The quantum circuit construction of the quantum Fourier transform apparently requires gates of
 exponential precision in the number of qubits used. However, such precision is never required in any
@@ -498,9 +498,9 @@ state.
 </p>
 </div>
 
-<div id="outline-container-orgf249562" class="outline-4">
-<h4 id="orgf249562">Proof</h4>
-<div class="outline-text-4" id="text-orgf249562">
+<div id="outline-container-orgeb60193" class="outline-4">
+<h4 id="orgeb60193">Proof</h4>
+<div class="outline-text-4" id="text-orgeb60193">
 <p>
 This is actually a direct consequence of Box 4.1 and the fact that the implementation of the Fourier
 transform has \(m=\Theta(n^2)\) gates. In fact, writing \(U=\prod_{i=1}^mU_i\) as the product of its
@@ -523,9 +523,9 @@ The first inequality is the second statement in Box 4.1 (errors of products of u
 </div>
 </div>
 
-<div id="outline-container-orge0057f6" class="outline-3">
-<h3 id="orge0057f6">Exercise 5.7</h3>
-<div class="outline-text-3" id="text-orge0057f6">
+<div id="outline-container-orge3227b4" class="outline-3">
+<h3 id="orge3227b4">Exercise 5.7</h3>
+<div class="outline-text-3" id="text-orge3227b4">
 <p>
 Additional insight into the circuit in Figure 5.2 may be obtained by showing, as you should now do,
 that the effect of the sequence of controlled-\(U\) operations like that in Figure 5.2 is to take the
@@ -534,9 +534,9 @@ state \(|j\rangle|u\rangle\) to \(|j\rangle\,U^j|u\rangle\) (Note that this does
 </p>
 </div>
 
-<div id="outline-container-orga7e95bf" class="outline-4">
-<h4 id="orga7e95bf">Proof</h4>
-<div class="outline-text-4" id="text-orga7e95bf">
+<div id="outline-container-org3bb186f" class="outline-4">
+<h4 id="org3bb186f">Proof</h4>
+<div class="outline-text-4" id="text-org3bb186f">
 <p>
 This is more or less obvious but let us go at least a little bit into detail.
 </p>
@@ -576,9 +576,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orga4d1906" class="outline-3">
-<h3 id="orga4d1906">Exercise 5.8</h3>
-<div class="outline-text-3" id="text-orga4d1906">
+<div id="outline-container-org1ee1fa6" class="outline-3">
+<h3 id="org1ee1fa6">Exercise 5.8</h3>
+<div class="outline-text-3" id="text-org1ee1fa6">
 <p>
 Suppose the phase estimation algorithm takes the state \(|0\rangle|u\rangle\) to the state
 \(|\tilde{\varphi}_u\rangle|u\rangle\), so that given the input \(|0\rangle(\sum_uc_u|u\rangle)\), the
@@ -588,9 +588,9 @@ conclusion of the phase estimation algorithm is at least \(|c_u|^2(1-\varepsilon
 </p>
 </div>
 
-<div id="outline-container-orgaed03ec" class="outline-4">
-<h4 id="orgaed03ec">Proof</h4>
-<div class="outline-text-4" id="text-orgaed03ec">
+<div id="outline-container-org0cbe9fd" class="outline-4">
+<h4 id="org0cbe9fd">Proof</h4>
+<div class="outline-text-4" id="text-org0cbe9fd">
 <p>
 The action of the phase estimation circuit is
 </p>
@@ -638,9 +638,9 @@ one of the \(b\) which approximate \(\varphi_v\) by at least \(n\) bits is at le
 </div>
 </div>
 
-<div id="outline-container-orgc2ade2b" class="outline-3">
-<h3 id="orgc2ade2b">Exercise 5.9</h3>
-<div class="outline-text-3" id="text-orgc2ade2b">
+<div id="outline-container-org39226e5" class="outline-3">
+<h3 id="org39226e5">Exercise 5.9</h3>
+<div class="outline-text-3" id="text-org39226e5">
 <p>
 Let \(U\) be a unitary transform with eigenvalues \(\pm1\), which acts on a state \(|\psi\rangle\). Using
 the phase estimation procedure, construct a quantum circuit to collapse \(|\psi\rangle\) into one or
@@ -649,9 +649,9 @@ final state is in. Compare your result with Exercise 4.34.
 </p>
 </div>
 
-<div id="outline-container-org6cb5eec" class="outline-4">
-<h4 id="org6cb5eec">Solution</h4>
-<div class="outline-text-4" id="text-org6cb5eec">
+<div id="outline-container-org72f5f5a" class="outline-4">
+<h4 id="org72f5f5a">Solution</h4>
+<div class="outline-text-4" id="text-org72f5f5a">
 <p>
 In this case the two phases are \(\varphi_+=0\) and \(\varphi_-=1/2\). Since these two numbers can be
 expressed <i>exactly</i>, utilizing just a single bit, it is sufficient to take the phase estimation
@@ -668,17 +668,17 @@ circuit. We also note that the Hadamard gate is the Fourier transform on a singl
 </div>
 </div>
 
-<div id="outline-container-org9f5bab7" class="outline-3">
-<h3 id="org9f5bab7">Exercise 5.10</h3>
-<div class="outline-text-3" id="text-org9f5bab7">
+<div id="outline-container-orgac76a9b" class="outline-3">
+<h3 id="orgac76a9b">Exercise 5.10</h3>
+<div class="outline-text-3" id="text-orgac76a9b">
 <p>
 Show that the order of \(x=5\) modulo \(N=21\) is \(6\).
 </p>
 </div>
 
-<div id="outline-container-org09e3087" class="outline-4">
-<h4 id="org09e3087">Proof</h4>
-<div class="outline-text-4" id="text-org09e3087">
+<div id="outline-container-org347a81f" class="outline-4">
+<h4 id="org347a81f">Proof</h4>
+<div class="outline-text-4" id="text-org347a81f">
 <p>
 It is probably easiest to just make a table:
 </p>
@@ -732,17 +732,17 @@ rest after deviding by \(21\). QED.
 </div>
 </div>
 
-<div id="outline-container-orgf473c8f" class="outline-3">
-<h3 id="orgf473c8f">Exercise 5.11</h3>
-<div class="outline-text-3" id="text-orgf473c8f">
+<div id="outline-container-org08fd790" class="outline-3">
+<h3 id="org08fd790">Exercise 5.11</h3>
+<div class="outline-text-3" id="text-org08fd790">
 <p>
 Show that the order of \(x\) satisfies \(r\leq N\).
 </p>
 </div>
 
-<div id="outline-container-org499ce32" class="outline-4">
-<h4 id="org499ce32">Proof</h4>
-<div class="outline-text-4" id="text-org499ce32">
+<div id="outline-container-orgd4c8780" class="outline-4">
+<h4 id="orgd4c8780">Proof</h4>
+<div class="outline-text-4" id="text-orgd4c8780">
 <p>
 By the pigeonhole principle there are \(a,b\in\{1,2,\ldots,N+1\}\) with \(a < b\) such that
 \(x^a=x^b\). Since \(x\) and \(N\) are coprime we can divide this by \(x^a\) (see also Exercise A4.12) and
@@ -762,18 +762,18 @@ Hence \(r\leq b-a\leq N\). QED.
 </div>
 </div>
 
-<div id="outline-container-orge30a7f3" class="outline-3">
-<h3 id="orge30a7f3">Exercise 5.12</h3>
-<div class="outline-text-3" id="text-orge30a7f3">
+<div id="outline-container-org58eb053" class="outline-3">
+<h3 id="org58eb053">Exercise 5.12</h3>
+<div class="outline-text-3" id="text-org58eb053">
 <p>
 Show that \(U\) (see (5.36)) is unitary (Hint: \(x\) is co-prime to \(N\), and therefore has an inverse
 modulo \(N\)).
 </p>
 </div>
 
-<div id="outline-container-org3ff05cd" class="outline-4">
-<h4 id="org3ff05cd">Proof</h4>
-<div class="outline-text-4" id="text-org3ff05cd">
+<div id="outline-container-org995a970" class="outline-4">
+<h4 id="org995a970">Proof</h4>
+<div class="outline-text-4" id="text-org995a970">
 <p>
 Recall that \(U\) only acts non-trivially on basis states \(|i\rangle\) with \(i < N\). In that case
 </p>
@@ -816,9 +816,9 @@ since \(\pi\) is a permutation. This implies that \(U\) is unitary. QED.
 </div>
 </div>
 
-<div id="outline-container-orgfe84dc9" class="outline-3">
-<h3 id="orgfe84dc9">Exercise 5.13</h3>
-<div class="outline-text-3" id="text-orgfe84dc9">
+<div id="outline-container-org1ba122f" class="outline-3">
+<h3 id="org1ba122f">Exercise 5.13</h3>
+<div class="outline-text-3" id="text-org1ba122f">
 <p>
 Prove (5.44). (Hint: \(\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}\).) In fact, prove that
 </p>
@@ -830,9 +830,9 @@ Prove (5.44). (Hint: \(\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}\).) In f
 </p>
 </div>
 
-<div id="outline-container-org2f5c045" class="outline-4">
-<h4 id="org2f5c045">Proof</h4>
-<div class="outline-text-4" id="text-org2f5c045">
+<div id="outline-container-orgd3d4801" class="outline-4">
+<h4 id="orgd3d4801">Proof</h4>
+<div class="outline-text-4" id="text-orgd3d4801">
 <p>
 Let us write \(x^k\) instead of \(x^k\mod N\) for short.
 </p>
@@ -853,9 +853,9 @@ The second equality uses the hint given in the formulation of the exercise. QED.
 </div>
 </div>
 
-<div id="outline-container-orgcbda534" class="outline-3">
-<h3 id="orgcbda534"><span class="todo TODO">TODO</span> Exercise 5.14</h3>
-<div class="outline-text-3" id="text-orgcbda534">
+<div id="outline-container-org16292ff" class="outline-3">
+<h3 id="org16292ff"><span class="todo TODO">TODO</span> Exercise 5.14</h3>
+<div class="outline-text-3" id="text-org16292ff">
 <p>
 The quantum state produced in the order-finding algorithm, before the inverse Fourier transform, is
 </p>
@@ -884,9 +884,9 @@ and start the second register in the state \(|0\rangle\). Also show how to const
 </p>
 </div>
 
-<div id="outline-container-orgec04de8" class="outline-4">
-<h4 id="orgec04de8">Proof</h4>
-<div class="outline-text-4" id="text-orgec04de8">
+<div id="outline-container-org8a21812" class="outline-4">
+<h4 id="org8a21812">Proof</h4>
+<div class="outline-text-4" id="text-org8a21812">
 <p>
 The first part of the claim, that we can replace the controlled \(U^j\) by \(V\) and \(|1\rangle\) by
 \(|0\rangle\) without changing the output of the algorithm is obvious. It remains to show the \(V\) can
