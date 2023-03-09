@@ -10,6 +10,7 @@
 ** Python Libraries
 #+name: chapter-3-setup
 #+begin_src python
+  from functools import reduce
   from typing import Literal, NewType, Optional
   from collections.abc import Callable
 
@@ -973,3 +974,351 @@ $$
 
 Note that $\log(n!)\leq n\log(n)$ is even easier to see. Hence we actually have proven
 that $\log(n!)=\Omega(n\log(n))$.
+** TODO Exercise 3.16 (Hard-to-compute functions exist)
+Show that there exist Boolean functions on $n$ inputs which require at least $2^n/\log(n)$
+logic gates to compute.
+
+** Exercise 3.17
+Prove that a polynomial-time algorithm for finding the factors of a number $m$ exists if
+and only if the factoring decision problem is in =P=.
+
+*** Proof
+It is clear that a polynomial-time algorithm for finding the factors of a number suffices
+to solve the decision problem in polynomial time. Thus we only have to proof one direction
+of the equivalence.
+
+Let $(x,t)\mapsto\mathrm{factp}(x,t)$ be a polynomial time (in the number of bits of $x$)
+algorithm to solve the decision problem. We have to prove that in this case a
+polynomial-time algorithm for finding the factors exists.
+
+We first give an algorithm to compute the /smallest/ divisor of $x$. The function takes
+=factp= as a callback. It solves a slightly more general problem to have a cleaner
+statement what the function does. See the docstring for the details:
+
+#+name: exercise-3.17-1
+#+begin_src python
+  def find_largest_if_not(x: int, factp: Callable[[int, int], bool]) -> int:
+      """Find the largest integer 1<=d<=x such that factp(x, l) is false.
+      Return 1 if none exists.
+
+      Preconditions:
+        - x >= 1
+        - factp(x, l) is defined for l=1,...,x
+        - If factp(x, l) is true for some l then so is factp(x, l+1)
+        - Either factp(x, l) is true of all l>sqrt(x) or it is always false.
+
+      In case of the factor problem factp(x, l) is true if x has a non-trivial divisor strictly
+      smaller than l.
+
+      Note: The third precondition is stricter than needed but it is satisfied for the
+      factor problem."""
+      if x == 1:  # corner case
+          return 1
+
+      # Find the smallest power of two for which factp is true (if it exists)
+      k = 1
+      while not factp(x, 2**k):
+          k = k + 1
+          if 2**k > x:
+              # Here x is prime if factp is decides the Factor problem. In the general case
+              # we rely on the third precondition here!
+              return x
+
+      # Here x is not prime if factp decides the Factor problem.
+
+      # d *will* be the smallest number with the desired property. Right now only the left
+      # most bit is correct. The following loop builds up d bit by bit.
+      d = 2**(k-1)
+
+      for i in range(k-2, -1, -1):
+          d1 = d + 2**i
+          if factp(x, d1):
+              d = d  # just for explicity
+          else:
+              d = d1
+
+      return d
+#+end_src
+
+Let $n=O(\log(x))$ be the number of bits of $x$. Let $f(n)=\Omega(n)$ be a function such
+that =factp= runs in $O(f(n))$ steps. Note that all /basic/ arithmetic operations, within
+the above function are (theoretically) $O(n)$ since the numbers involved are not larger
+then $2x$ and we only add or multiply by the very peculiar number two which works nice
+with binary numbers (we could easily avoid the powers of two but I kept them for
+readability).
+
+This algorithm calls =factp= around $O(n)$ times and hence runs in $O(nf(n))$
+steps. Clearly the number $x$ has at most $\log_2(x)=O(n)$ factors. Hence it suffices to
+call this procedure $O(n)$ times to compute all factors in $O(n^2f(n))$ steps. QED,
+
+Let us do a tiny non-systematic experiment - just having some fun with the above
+algorithm.  To generate the primes I used [[https://bigprimes.org/][bigprimes.org]] which claims to generate /true/
+primes with high probability. On the other hand, note that we do not really use the fact
+that these numbers are prime (due to our fake implementation of =factp=):
+
+#+name: exercise-3.17-2
+#+begin_src python :results replace output :tangle no :cache yes
+  # We assume that the first prime in each tuple is the smallest
+  prime_tuples = [
+    (34129,
+     63907),
+    (7081163707,
+     8680787539),
+    (6388797743,
+     6725672819,
+     6388797743),
+    (53935348593314365769,
+     90916509983980640933),
+    (312242331938588645593029053519,
+     75189371683335785392960817804971969),
+    (85885984977628802697002710823722671231249625512539,
+     173202242859416728004553100028078327188834835916135376079867),
+    (16454682855571279030686449830860047,
+     26432071998531033907383391746862621,
+     68404929161253247874640503692598161,
+     77570673742199569337801762624138099,
+     80645260483118874221181403055241113),
+  ]
+
+  for primes in prime_tuples:
+      x = reduce((lambda a, b: a*b), primes, 1)
+      count_calls_to_factp = 0
+
+      def factp_fake(x, l):
+          global count_calls_to_factp
+          count_calls_to_factp += 1
+          return l > primes[0]
+
+      assert find_largest_if_not(x, factp_fake) == primes[0]
+      print(f"Called factp {count_calls_to_factp} times for "\
+      f"{x.bit_length()} bit number with {len(primes)} prime factors.")
+#+end_src
+
+#+RESULTS[63e277f11017843be8d50b37065b21811c3bf102]: exercise-3.17-2
+: Called factp 31 times for 32 bit number with 2 prime factors.
+: Called factp 65 times for 66 bit number with 2 prime factors.
+: Called factp 65 times for 98 bit number with 3 prime factors.
+: Called factp 131 times for 132 bit number with 2 prime factors.
+: Called factp 195 times for 214 bit number with 2 prime factors.
+: Called factp 331 times for 363 bit number with 2 prime factors.
+: Called factp 227 times for 576 bit number with 5 prime factors.
+
+As expected, the number of calls to =factp= is roughly the number of bits of =x=. The
+worst case is when the number is a product of nearly equal prime numbers (of course, =x=
+being prime is even worse but this case is excluded above). If this is not the case the
+required number of calls can be much smaller.
+
+** Exercise 3.18
+Prove that if =coNP= is unequal to =NP= then =P= is unequal to =NP=.
+
+*** Proof
+So we assume that =coNP= is unequal to =NP=. There are two possible cases (both can be
+true at the same time of course):
+
+1. There is a language $L$ in =NP= which is not in =coNP=.
+2. There is a language $L$ in =coNP= which is not in =NP=.
+
+Furthermore note that =P= is part of the interection of =NP= and =coNP=. Hence in both
+cases $L$ cannot be in =P=. Thus in case 1 we immediately get the claim. We are left with
+case 2.
+
+But case 2 is not hard either. Just consider the language
+
+$$ L^c = \{s\in\Sigma^*; s\notin L\} . $$
+
+/Any/ Turing machine solving either of the languages - with our without wittness - can be reused
+for the other language, you just have to switch the "interpretation" of the two output
+states (yes/no). In case a wittness is used the wittness can be reused too.
+
+Two things follows from that: If there were a Turing machine solving either language in
+polynomial time, it would also solve the other language in polynomial time. Because we are
+in case 2, non of these languages is in =P=. On the other hand $L^c$ is in =NP= by the
+above argument (Turing machine with wittness). Hence =NP= contains a language ($L^c$)
+which is not in =P=. QED.
+
+** Exercise 3.19
+The =REACHABILITY= problem is to determine whether there is a path between two specified
+vertices in a graph. Show that =REACHABILITY= can be solved using $O(n^2)$ operations if the
+graph has $n$ vertices. Use the solution to show that it is possible to decide whether
+a graph is connected in $O(n^3)$ operations.
+
+Remark: The exercise statement deviates from the book, see [[https://www.michaelnielsen.org/qcqi/errata/errata/errata.html][errata]].
+
+*** Proof
+Let $m$ be the number of edges of the graph. Note that $m=O(n^2)$. We show the more
+informative bound $O(m)$ for the first statement and $O(nm)$ for the second. Note that for
+unconnected graphs $m$ might be much smaller than $n$. Even $m=0$ is possible which is a
+bit annoying when writing $O(nm)$, in that case we interpret the latter as $O(n)$ - sorry
+for the abuse of notation!
+
+Let us first prove the second part. The connectedness of a graph can be checked as
+follows. Take any vertex =A= and then check if it is connected to any of the other $n-1$
+vertices. If the answer is always "yes" the graph is connected, otherwise it is not. Since
+we called the =REACHABILITY= subroutine $n-1$ times this needs $O(nm)$ operations -
+assuming the subroutine, as we have to prove, needs $O(m)$ operations.
+
+Let us turn our attention to =REACHABILITY= of two vertices =A= and =B=.
+
+Preliminaries: The algorithm to be described uses two colors, /green/ and /red/, to color
+the edges of the graph. One way to implement such operations without modifying the data
+structure holding the graph is to build up a copy of the graph in terms of a modified data
+structure where this is possible. This can be done in $O(\max(n,m))$ operations. It can
+even be done in $O(m)$ steps if the auxiliary data structure is build up on the fly - just
+representing the connected region around =A= as we explore it. For simplicity of
+exposition we just assume that the original data structure supports these operations.
+
+When we say we /toggle/ the color of an edge we mean that red gets green and green gets
+red.
+
+Now we are in the position to describe the algorithm. First let us fix the pre- and
+post-conditions:
+
+- Precondition: The input is a graph with all edges being green.
+- Post condition: All edges are green (again), more generally the graph is not modified in
+  any way. It returns the correct answer to the problem.
+
+And here is how the algorithm operates:
+
+- (I) Initialize a set =pending_nodes= with just one element =A=.
+- (L) Loop over the following until =pending_nodes= is empty:
+  - (L1) Take a vertex =V= from =pending_nodes= and remove it from the set.
+  - (L2) Look at each edge of =V= and toggle its color.
+  - (L3) Consider all vertices connected to =V= via red nodes and add them to
+    =pending_nodes=. If one of them is =B= go to (Y).
+- (N) Cleanup and return =no= (and halt).
+- (Y) Cleanup and return =yes= (and halt).
+
+With "Cleanup" we mean to make all remaining red edges green again to ensure the first
+part of post condition. Of course, if we had a copy of the graph (or of the relevant
+connected component) this won't be necessary. Anyway, this can be done in $O(m)$ steps and
+hence it does not hurt much.
+
+To prevent a double insertion into =pending_nodes= in (L3) we can for example add a flag
+to each vertex saying whether it is already /pending/ or not. This allows us to implement
+=pending_nodes= as a simple list, with for example, just two operations: /push/ an element
+to the end and /pop/ an element from the end. In "ordinary" computers these operations
+often run in constant time. Of course, if an implementation of a /set/ is available which
+allows /checked/ insertion in constant time we could just use that (maybe a hash-set).
+
+We call a vertex /visited/ if it leaves the /pending/ state (gets taken out of
+=pending_nodes=). It is not hard to see by induction over the steps of the algorithm that
+a visited vertex never gets pending again and that each edge gets red at most one time.
+
+Hence we operate at most $O(m)$ time on the edges. But we also operate at most $O(m)$
+times on vertices since we never leave the connected component where =A= lives. QED
+
+- Remark ::  Note that the term /operation/ is somewhat vague (which is OK!). I
+  interpreted it as a simple task which can be done on a /real/ computer in /essentially/
+  constant time (like random access into memory). I doubt that one can find a Turing
+  machine (taking the definition of the book) which solves =REACHABILITY= in $O(n^2)$
+  steps.
+
+** Exercise 3.20 (Euler's theorem)
+Prove Euler's theorem. In particular, if each vertex has an even number of incident edges,
+give a constructive procedure for finding an Euler cycle.
+
+*** Proof
+To see Euler's Theorem consider a graph with $m$ edges and an Euler cycle. Let us draw
+tiny arrows at each edge showing the direction in which we walk. Moreover enumerate the
+edges along the path from $0$ to $m-1$ along the path - starting at an arbitrary
+position. Let us identify the edges with its numbers.
+
+Consider one of the vertices $v$. Let $i$ be one of the edges whose arrow points towards
+$v$. Clearly $i+1$ (modulo $m$) is an edge at $v$ whose arrow points away from $v$. Let
+$j$ be one of the edges whose arrow points away from $v$. Clearly $i-1$ (modulo $m$) is an
+edge at $v$ whose arrow points towards $v$. We see that the edges around $v$ always come
+in pairs $(i,i+1)$ where the first one is the "entering" edge and the last one is the
+"leaving" edge. Thus, the number of edges at $v$ must be even. Since $v$ was arbitrary
+this proves the Theorem.
+
+Our procedure to compute the Euler cycle makes use of the following subroutine
+=SimpleCycle=. Given a vertex $v$ and a set of /admissible/ edges the subroutine computes
+a nonempty circular path, containing $v$, visiting each of its vertices exactly once,
+containing only admissible edges.
+
+- input: a graph,a vertex $v_s$ of the graph, and a set of admissible edges of the graph.
+- (I) Set the /current vertex/ equal to $v_s$ and mark it as /visited/.
+- (L) Loop indefinitely over the following
+  - (L1) Take an unvisited admissible edge $e$ to some vertex $v$.
+  - (L2) Walk over $e$ to $v$.
+  - (L3) Set $v$ to be the new current vertex.
+  - (L4) If $v$ was already marked /visited/ earlier: return the constructed path and halt.
+  - (L2) Mark $e$ and $v$ as visited.
+
+Note that (L1) implicitly assumes that we actually find an unvisited admissible edge. If
+this is always the case it is easy to see that the algorithm does what we want. Also note
+that each vertex having an even number of admissible edges and $v_s$ having at least
+/some/ admissible edges guarantees that (L1) always succeeds!
+
+Let us formulate the complete procedure for finding an Euler cycle. As a precondition we
+assume that each vertex has an even number of edges and that the graph is connected (the
+latter implying that no vertex has zero edges). This is justified by Euler's theorem.
+
+- Call =SimpleCycle= on some arbitrarily chosen vertex with all edges being admissible.
+- Initialize a path $p$ with the output of the previous step.
+- Loop indefinitely over the following:
+  - Choose a vertex $v$ having edges not already in $p$. Halt if none exists.
+  - Call =SimpleCycle= on $v$ allowing only the complement of the edges of $p$ as
+    admissible. Enlarge $p$ by inserting the output into $p$ directly after $v$.
+
+It is not hard to see that the procedure halts if and only if the path $p$ is already an
+Euler cycle. QED.
+** Exercise 3.21 (Transitive property of reduction)
+Show that if a language $L_1$ is reducible to the language $L_2$ and the language $L_2$ is
+reducible to $L_3$ then the language $L_1$ is reducible to the language $L_3$.
+
+*** Proof
+By definition there are polynomial-time reduction functions $R_{12}$ and $R_{23}$ from
+$L_1$ to $L_2$ and from $L_2$ to $L_3$ respectively.
+
+Clearly $R_{23}\,\circ\,R_{12}$ is a reduction function from $L_1$ to $L_3$. It remains to
+show that it is polynomial-time.
+
+But first let us note that under a few minor assumptions the composition of two Turing
+machines can be implemented very naturally. The assumptions are that the input is
+presented as a "▶" followed by $x$ followed by infinitely (or sufficiently) many
+blanks. The output is required to be in the same format. At the start and when the machine
+halts we require the head to be at the (single) "▶" (which is not to be
+modified). Moreover we assume that the set of states of the two Turing machines is
+disjoint (if it is not make them disjoint). Under these assumptions the composition of
+both Turing machines is obtained by concatenating the two corresponding programs (not
+important which one first), defining the start state of the first machine as the common
+start state, the halting states of the second machine as the common halting state, adding
+program lines which make sure to translate the halting states of the first one into the
+start state of the second one (suffices when the head is at "▶").
+
+In the following let us identify the reduction functions with concrete Turing machines
+implementing them.
+
+Let $t(R,x)$ be the number of steps needed by $R$ to compute $R(x)$. Note that
+$|R(x)|\leq|x|+t(R,x)$ since a Turing machine writes at most one symbol to the tape at
+each time step. By assumption there is a polynomial $p(n)=C(1+n^k)$ such that
+
+$$
+  t(R,x) \leq p(|x|) \text{ for } R\in \{R_{12}, R_{23}\} .
+$$
+
+Hence
+
+$$
+  t(R_{23}\,\circ\,R_{12}, x) \leq t(R_{12}, x) + \max_{|y| \leq |x| + p(|x|)} t(R_{23}, y)
+  \leq p(|x|) + p(|x| + p(|x|)) .
+$$
+
+The RHS clearly is a polynomial in the length $|x|$ of $x$. QED.
+
+** Exercise 3.22
+Suppose $L$ is complete for a complexity class, and $L'$ is another language in the
+complexity class such that $L$ reduces to $L'$. Show that $L'$ is complete for the
+complexity class.
+
+*** Proof
+We assume that the reduction relation for the class is transitive in the same way as for
+natural reduction relation of =NP= (exercise 3.21). I note this here since not for all
+complexity classes the same definition of reduction makes sense. In fact, consider how
+useless [[https://en.wikipedia.org/wiki/P-complete][P-completenes]] would be if we used polynomial-time reduction as for =NP=.
+
+Let us now return to the actual exercise. Using transitivity this is almost trivial. In
+fact, let $K$ be any problem in the class then $K$ reduces to $L$ by completeness of
+$L$. But $L$ in turn reduces to $L'$ by assumption. Using transitivity we deduce that $K$
+reduces to $L'$. Since $K$ was arbitrary we conclude that $L'$ is complete too. QED.
