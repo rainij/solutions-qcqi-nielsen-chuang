@@ -12,46 +12,46 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org8e20947">Setup</a>
+<li><a href="#org7607e99">Setup</a>
 <ul>
-<li><a href="#orgdbedb32">Python Libraries</a></li>
-<li><a href="#org43ce79a">Turing Machines</a></li>
+<li><a href="#orgc67c545">Python Libraries</a></li>
+<li><a href="#org49c11bd">Turing Machines</a></li>
 </ul>
 </li>
-<li><a href="#orgfa6f8e7"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#orgd4c8504"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#orgfbfdc96"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
-<li><a href="#org3cd04be">Exercise 3.2 (Turing numbers)</a></li>
-<li><a href="#orgecfa514">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
-<li><a href="#orgd5a77e5">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
-<li><a href="#org11e1c94">Exercise 3.5 (Halting problem with no inputs)</a></li>
-<li><a href="#org23909f3">Exercise 3.6 (Probabilistic halting problem)</a></li>
-<li><a href="#org6c76350">Exercise 3.7 (Halting oracle)</a></li>
-<li><a href="#orgacde60c">Exercise 3.8 (Universality of <code>NAND</code>)</a></li>
-<li><a href="#orgdd21c41"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</a></li>
-<li><a href="#orgbb0d5dc">Exercise 3.15</a></li>
-<li><a href="#org11a5355"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</a></li>
-<li><a href="#org1d99f6a">Exercise 3.17</a></li>
-<li><a href="#org7331953">Exercise 3.18</a></li>
-<li><a href="#orgb3f4fa4">Exercise 3.19</a></li>
-<li><a href="#org1eb29a3">Exercise 3.20 (Euler's theorem)</a></li>
-<li><a href="#orge26a447">Exercise 3.21 (Transitive property of reduction)</a></li>
-<li><a href="#org96a7f2d">Exercise 3.22</a></li>
+<li><a href="#org75eed35"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#orgfbe54f9">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#org782043d">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+<li><a href="#orgbaa1669">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
+<li><a href="#orgbd24e03">Exercise 3.5 (Halting problem with no inputs)</a></li>
+<li><a href="#orga111a5b">Exercise 3.6 (Probabilistic halting problem)</a></li>
+<li><a href="#org38bc8a7">Exercise 3.7 (Halting oracle)</a></li>
+<li><a href="#org2c87aca">Exercise 3.8 (Universality of <code>NAND</code>)</a></li>
+<li><a href="#orgb267a94"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</a></li>
+<li><a href="#org24445b5">Exercise 3.15</a></li>
+<li><a href="#org328b8b1"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</a></li>
+<li><a href="#org991093d">Exercise 3.17</a></li>
+<li><a href="#org13539ea">Exercise 3.18</a></li>
+<li><a href="#orgdc90194">Exercise 3.19</a></li>
+<li><a href="#orgc2a77bc">Exercise 3.20 (Euler's theorem)</a></li>
+<li><a href="#org6406b32">Exercise 3.21 (Transitive property of reduction)</a></li>
+<li><a href="#org0960e73">Exercise 3.22</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8e20947" class="outline-2">
-<h2 id="org8e20947">Setup</h2>
-<div class="outline-text-2" id="text-org8e20947">
+<div id="outline-container-org7607e99" class="outline-2">
+<h2 id="org7607e99">Setup</h2>
+<div class="outline-text-2" id="text-org7607e99">
 </div>
-<div id="outline-container-orgdbedb32" class="outline-3">
-<h3 id="orgdbedb32">Python Libraries</h3>
-<div class="outline-text-3" id="text-orgdbedb32">
+<div id="outline-container-orgc67c545" class="outline-3">
+<h3 id="orgc67c545">Python Libraries</h3>
+<div class="outline-text-3" id="text-orgc67c545">
 <div class="org-src-container">
-<pre class="src src-python" id="org7fdc003"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-builtin">reduce</span>
+<pre class="src src-python" id="org14379bc"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-builtin">reduce</span>
 <span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
 <span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
 
@@ -61,13 +61,13 @@
 </div>
 </div>
 
-<div id="outline-container-org43ce79a" class="outline-3">
-<h3 id="org43ce79a">Turing Machines</h3>
-<div class="outline-text-3" id="text-org43ce79a">
+<div id="outline-container-org49c11bd" class="outline-3">
+<h3 id="org49c11bd">Turing Machines</h3>
+<div class="outline-text-3" id="text-org49c11bd">
 </div>
-<div id="outline-container-org0403883" class="outline-4">
-<h4 id="org0403883">Introduction</h4>
-<div class="outline-text-4" id="text-org0403883">
+<div id="outline-container-orgcbfe375" class="outline-4">
+<h4 id="orgcbfe375">Introduction</h4>
+<div class="outline-text-4" id="text-orgcbfe375">
 <p>
 In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
 this one:
@@ -90,7 +90,7 @@ Below we initialize a turing machine <code>my_tm</code> from the above source co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgc662ca4"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<pre class="src src-python" id="orge9722e4"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
 <span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
 <span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
 
@@ -146,19 +146,19 @@ result = '▶1'
 </div>
 </div>
 
-<div id="outline-container-orgfab405f" class="outline-4">
-<h4 id="orgfab405f">Implementation</h4>
-<div class="outline-text-4" id="text-orgfab405f">
+<div id="outline-container-orgb9a8e6c" class="outline-4">
+<h4 id="orgb9a8e6c">Implementation</h4>
+<div class="outline-text-4" id="text-orgb9a8e6c">
 <p>
 First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
 readable or at least mnemonic state names. This would not be possible had we used integers. The
 <code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
-from the source-string/file. It is the reason why in the <a href="#orgc662ca4">listing above</a> the <code>TuringMachine</code> instance
+from the source-string/file. It is the reason why in the <a href="#orge9722e4">listing above</a> the <code>TuringMachine</code> instance
 can refer to its source (see the line starting with <code>source line =</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org995c32f"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<pre class="src src-python" id="orgbb8dd67"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
 <span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
 <span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
 <span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
@@ -170,7 +170,7 @@ can refer to its source (see the line starting with <code>source line =</code>).
 </div>
 
 <p>
-<a href="#org7779ceb">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+<a href="#orgad8e95c">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
 implementation a bit. But it you ignore this the implementation is very simple and straightforward
 to understand (IMHO).
 </p>
@@ -208,7 +208,7 @@ particular, those cannot be used as characters on the tape.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org7779ceb"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+<pre class="src src-python" id="orgad8e95c"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
     <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
     BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
     <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
@@ -343,7 +343,7 @@ Finally, the default parser:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgd6176e3"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+<pre class="src src-python" id="org2fcd4e3"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
     <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
 
 <span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
@@ -389,13 +389,13 @@ Finally, the default parser:
 </div>
 </div>
 
-<div id="outline-container-orgfa6f8e7" class="outline-2">
-<h2 id="orgfa6f8e7"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-orgfa6f8e7">
+<div id="outline-container-orgd4c8504" class="outline-2">
+<h2 id="orgd4c8504"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-orgd4c8504">
 </div>
-<div id="outline-container-orgfbfdc96" class="outline-3">
-<h3 id="orgfbfdc96"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
-<div class="outline-text-3" id="text-orgfbfdc96">
+<div id="outline-container-org75eed35" class="outline-3">
+<h3 id="org75eed35"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-org75eed35">
 <p>
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -403,9 +403,9 @@ machine?
 </div>
 </div>
 
-<div id="outline-container-org3cd04be" class="outline-3">
-<h3 id="org3cd04be">Exercise 3.2 (Turing numbers)</h3>
-<div class="outline-text-3" id="text-org3cd04be">
+<div id="outline-container-orgfbe54f9" class="outline-3">
+<h3 id="orgfbe54f9">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-orgfbe54f9">
 <p>
 Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
 such a way that the number uniquely specifies the corresponding machine. We call this number the
@@ -415,9 +415,9 @@ and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
 </p>
 </div>
 
-<div id="outline-container-orgb686d52" class="outline-4">
-<h4 id="orgb686d52">Proof</h4>
-<div class="outline-text-4" id="text-orgb686d52">
+<div id="outline-container-orgb8511ad" class="outline-4">
+<h4 id="orgb8511ad">Proof</h4>
+<div class="outline-text-4" id="text-orgb8511ad">
 <p>
 For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
 consider (one could easily relax this constraint without complicating the encoding). Hence we need
@@ -484,9 +484,9 @@ invertible and hence the Turing machine can be recovered from this (potentially 
 </div>
 </div>
 
-<div id="outline-container-orgecfa514" class="outline-3">
-<h3 id="orgecfa514">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
-<div class="outline-text-3" id="text-orgecfa514">
+<div id="outline-container-org782043d" class="outline-3">
+<h3 id="org782043d">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-org782043d">
 <p>
 Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
 reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
@@ -494,9 +494,9 @@ and/or symbols other than ▶, 0, 1, and the blank.)
 </p>
 </div>
 
-<div id="outline-container-org00ddd5f" class="outline-4">
-<h4 id="org00ddd5f">Solution</h4>
-<div class="outline-text-4" id="text-org00ddd5f">
+<div id="outline-container-org29ceb55" class="outline-4">
+<h4 id="org29ceb55">Solution</h4>
+<div class="outline-text-4" id="text-org29ceb55">
 <p>
 We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
 following.
@@ -606,7 +606,7 @@ Finally the third part acts like this:
 </pre>
 
 <p>
-In the following we present a <a href="#org255181b">Turing program</a> which does exactly this. Don't worry, most of the
+In the following we present a <a href="#org559a902">Turing program</a> which does exactly this. Don't worry, most of the
 program is just comments - explaining how it works, and at the same time giving a kind of
 <i>inline-proof</i> that the program is correct in the sense that it "does what we want".
 </p>
@@ -813,11 +813,11 @@ usually only very few succesor blocks for each block.</li>
 
 <p>
 Let the theory behind and plug this program into our python implementation of a (universal)
-<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org255181b">above listing</a>.
+<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org559a902">above listing</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org2b5e278"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
+<pre class="src src-python" id="org768d17d"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
@@ -845,9 +845,9 @@ These basic tests yield an alternative root of trust into the program. You are i
 </div>
 </div>
 
-<div id="outline-container-orgd5a77e5" class="outline-3">
-<h3 id="orgd5a77e5">Exercise 3.4 (Turing machine to add modulo 2)</h3>
-<div class="outline-text-3" id="text-orgd5a77e5">
+<div id="outline-container-orgbaa1669" class="outline-3">
+<h3 id="orgbaa1669">Exercise 3.4 (Turing machine to add modulo 2)</h3>
+<div class="outline-text-3" id="text-orgbaa1669">
 <p>
 Describe a Turing machine to add two binary numbers \(x\) and \(y\) modulo 2. The numbers are
 input on the Turing machine tape in binary, in the form \(x\), followed by a single blank,
@@ -856,11 +856,11 @@ has been padded with leading 0s to make the two numbers the same length.
 </p>
 </div>
 
-<div id="outline-container-org6a189d9" class="outline-4">
-<h4 id="org6a189d9">Solution</h4>
-<div class="outline-text-4" id="text-org6a189d9">
+<div id="outline-container-org95ebcd1" class="outline-4">
+<h4 id="org95ebcd1">Solution</h4>
+<div class="outline-text-4" id="text-org95ebcd1">
 <p>
-The idea of the <a href="#org9d0f6b2">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
+The idea of the <a href="#org1d057dc">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
 </p>
 
 <dl class="org-dl">
@@ -978,7 +978,7 @@ We conclude with a small demo:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org1fd92c5"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
+<pre class="src src-python" id="orgc66335a"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;0&#9632;1"</span>) == <span class="org-string">"&#9654;1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;010&#9632;111"</span>) == <span class="org-string">"&#9654;101"</span>
@@ -993,18 +993,18 @@ PASSED
 </div>
 </div>
 </div>
-<div id="outline-container-org11e1c94" class="outline-3">
-<h3 id="org11e1c94">Exercise 3.5 (Halting problem with no inputs)</h3>
-<div class="outline-text-3" id="text-org11e1c94">
+<div id="outline-container-orgbd24e03" class="outline-3">
+<h3 id="orgbd24e03">Exercise 3.5 (Halting problem with no inputs)</h3>
+<div class="outline-text-3" id="text-orgbd24e03">
 <p>
 Show that given a Turing machine \(M\) there is no algorithm to determine whether \(M\) halts
 when the input to the machine is a blank tape.
 </p>
 </div>
 
-<div id="outline-container-org9b48d42" class="outline-4">
-<h4 id="org9b48d42">Proof</h4>
-<div class="outline-text-4" id="text-org9b48d42">
+<div id="outline-container-org921862e" class="outline-4">
+<h4 id="org921862e">Proof</h4>
+<div class="outline-text-4" id="text-org921862e">
 <p>
 This problem can easily be reduced the version of the halting problem from Box 3.2. In
 fact, for any turing machine \(M\) (expressed in terms of its program) we consider the
@@ -1025,9 +1025,9 @@ either. QED.
 </div>
 </div>
 </div>
-<div id="outline-container-org23909f3" class="outline-3">
-<h3 id="org23909f3">Exercise 3.6 (Probabilistic halting problem)</h3>
-<div class="outline-text-3" id="text-org23909f3">
+<div id="outline-container-orga111a5b" class="outline-3">
+<h3 id="orga111a5b">Exercise 3.6 (Probabilistic halting problem)</h3>
+<div class="outline-text-3" id="text-orga111a5b">
 <p>
 Suppose we number the probabilistic Turing machines using a scheme similar to that found
 in Exercise 3.2 and define the probabilistic halting function \(h_p(x)\) to be \(1\) if
@@ -1038,9 +1038,9 @@ strictly greater than \(1/2\) for all \(x\).
 </p>
 </div>
 
-<div id="outline-container-orgb615675" class="outline-4">
-<h4 id="orgb615675">Proof</h4>
-<div class="outline-text-4" id="text-orgb615675">
+<div id="outline-container-orgec5bede" class="outline-4">
+<h4 id="orgec5bede">Proof</h4>
+<div class="outline-text-4" id="text-orgec5bede">
 <p>
 The reasoning from Box 3.2 applies here too.
 </p>
@@ -1061,9 +1061,9 @@ contradiction. On the other hand \(h_p(t)=0\) also leads to a contradiction. QED
 </div>
 </div>
 
-<div id="outline-container-org6c76350" class="outline-3">
-<h3 id="org6c76350">Exercise 3.7 (Halting oracle)</h3>
-<div class="outline-text-3" id="text-org6c76350">
+<div id="outline-container-org38bc8a7" class="outline-3">
+<h3 id="org38bc8a7">Exercise 3.7 (Halting oracle)</h3>
+<div class="outline-text-3" id="text-org38bc8a7">
 <p>
 Suppose a black box is made available to us which takes a non-negative integer \(x\) as
 input, and then outputs the value of \(h(x)\), where \(h\) is the halting function defined in
@@ -1080,9 +1080,9 @@ Turing machine with oracle will halt on a particular input?
 </p>
 </div>
 
-<div id="outline-container-org45a84a7" class="outline-4">
-<h4 id="org45a84a7">Solution</h4>
-<div class="outline-text-4" id="text-org45a84a7">
+<div id="outline-container-org7edc5fe" class="outline-4">
+<h4 id="org7edc5fe">Solution</h4>
+<div class="outline-text-4" id="text-org7edc5fe">
 <p>
 This follows directly from the argument in Box 3.2. In fact, the argument does not impose
 any restrictions on the model of computation except that at least <i>some</i> things are
@@ -1102,18 +1102,18 @@ a trivial way.
 </div>
 </div>
 </div>
-<div id="outline-container-orgacde60c" class="outline-3">
-<h3 id="orgacde60c">Exercise 3.8 (Universality of <code>NAND</code>)</h3>
-<div class="outline-text-3" id="text-orgacde60c">
+<div id="outline-container-org2c87aca" class="outline-3">
+<h3 id="org2c87aca">Exercise 3.8 (Universality of <code>NAND</code>)</h3>
+<div class="outline-text-3" id="text-org2c87aca">
 <p>
 Show that the <code>NAND</code> gate can be used to simulate the <code>AND</code>, <code>XOR</code>, and <code>NOT</code> gates,
 provided wires, ancilla bits and <code>FANOUT</code> are available.
 </p>
 </div>
 
-<div id="outline-container-org717e02d" class="outline-4">
-<h4 id="org717e02d">Proof</h4>
-<div class="outline-text-4" id="text-org717e02d">
+<div id="outline-container-org50169c0" class="outline-4">
+<h4 id="org50169c0">Proof</h4>
+<div class="outline-text-4" id="text-org50169c0">
 <p>
 Let us denote the <code>NAND</code> operation by \(\barwedge\). Recall that \(x\barwedge y=\neg(x\land
 y)\). In the following we give one way to implement each of the three gates:
@@ -1131,17 +1131,17 @@ QED.
 </div>
 </div>
 </div>
-<div id="outline-container-orgdd21c41" class="outline-3">
-<h3 id="orgdd21c41"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</h3>
-<div class="outline-text-3" id="text-orgdd21c41">
+<div id="outline-container-orgb267a94" class="outline-3">
+<h3 id="orgb267a94"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</h3>
+<div class="outline-text-3" id="text-orgb267a94">
 <p>
 I skip these exercises since they are too simple <i>and</i> too many.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb0d5dc" class="outline-3">
-<h3 id="orgbb0d5dc">Exercise 3.15</h3>
-<div class="outline-text-3" id="text-orgbb0d5dc">
+<div id="outline-container-org24445b5" class="outline-3">
+<h3 id="org24445b5">Exercise 3.15</h3>
+<div class="outline-text-3" id="text-org24445b5">
 <p>
 Suppose an \(n\) element list is sorted by applying some sequence of compare-and-swap
 operations to the list. There are \(n!\) possible initial orderings of the list. Show that
@@ -1152,9 +1152,9 @@ orderings into the correct order.
 </p>
 </div>
 
-<div id="outline-container-orgeab2668" class="outline-4">
-<h4 id="orgeab2668">Proof</h4>
-<div class="outline-text-4" id="text-orgeab2668">
+<div id="outline-container-org121b4a7" class="outline-4">
+<h4 id="org121b4a7">Proof</h4>
+<div class="outline-text-4" id="text-org121b4a7">
 <p>
 First, let us note that starting from an orderd sequence of numbers, like \(1,2,\ldots,n\)
 applying at most \(k\) compare-and-swap operations we can generate at most \(2^k\)
@@ -1219,9 +1219,9 @@ that \(\log(n!)=\Omega(n\log(n))\).
 </div>
 </div>
 </div>
-<div id="outline-container-org11a5355" class="outline-3">
-<h3 id="org11a5355"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</h3>
-<div class="outline-text-3" id="text-org11a5355">
+<div id="outline-container-org328b8b1" class="outline-3">
+<h3 id="org328b8b1"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</h3>
+<div class="outline-text-3" id="text-org328b8b1">
 <p>
 Show that there exist Boolean functions on \(n\) inputs which require at least \(2^n/\log(n)\)
 logic gates to compute.
@@ -1229,18 +1229,18 @@ logic gates to compute.
 </div>
 </div>
 
-<div id="outline-container-org1d99f6a" class="outline-3">
-<h3 id="org1d99f6a">Exercise 3.17</h3>
-<div class="outline-text-3" id="text-org1d99f6a">
+<div id="outline-container-org991093d" class="outline-3">
+<h3 id="org991093d">Exercise 3.17</h3>
+<div class="outline-text-3" id="text-org991093d">
 <p>
 Prove that a polynomial-time algorithm for finding the factors of a number \(m\) exists if
 and only if the factoring decision problem is in <code>P</code>.
 </p>
 </div>
 
-<div id="outline-container-orgb112d78" class="outline-4">
-<h4 id="orgb112d78">Proof</h4>
-<div class="outline-text-4" id="text-orgb112d78">
+<div id="outline-container-org189529b" class="outline-4">
+<h4 id="org189529b">Proof</h4>
+<div class="outline-text-4" id="text-org189529b">
 <p>
 It is clear that a polynomial-time algorithm for finding the factors of a number suffices
 to solve the decision problem in polynomial time. Thus we only have to proof one direction
@@ -1260,7 +1260,7 @@ statement what the function does. See the docstring for the details:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgde35d11"><span class="org-keyword">def</span> <span class="org-function-name">find_largest_if_not</span>(x: <span class="org-builtin">int</span>, factp: Callable[[<span class="org-builtin">int</span>, <span class="org-builtin">int</span>], <span class="org-builtin">bool</span>]) -&gt; <span class="org-builtin">int</span>:
+<pre class="src src-python" id="org19c8137"><span class="org-keyword">def</span> <span class="org-function-name">find_largest_if_not</span>(x: <span class="org-builtin">int</span>, factp: Callable[[<span class="org-builtin">int</span>, <span class="org-builtin">int</span>], <span class="org-builtin">bool</span>]) -&gt; <span class="org-builtin">int</span>:
     <span class="org-doc">"""Find the largest integer 1&lt;=d&lt;=x such that factp(x, l) is false.</span>
 <span class="org-doc">    Return 1 if none exists.</span>
 
@@ -1327,7 +1327,7 @@ that these numbers are prime (due to our fake implementation of <code>factp</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgbd3dcc5"><span class="org-comment-delimiter"># </span><span class="org-comment">We assume that the first prime in each tuple is the smallest</span>
+<pre class="src src-python" id="org136fb23"><span class="org-comment-delimiter"># </span><span class="org-comment">We assume that the first prime in each tuple is the smallest</span>
 <span class="org-variable-name">prime_tuples</span> = [
   (34129,
    63907),
@@ -1385,17 +1385,17 @@ required number of calls can be much smaller.
 </div>
 </div>
 
-<div id="outline-container-org7331953" class="outline-3">
-<h3 id="org7331953">Exercise 3.18</h3>
-<div class="outline-text-3" id="text-org7331953">
+<div id="outline-container-org13539ea" class="outline-3">
+<h3 id="org13539ea">Exercise 3.18</h3>
+<div class="outline-text-3" id="text-org13539ea">
 <p>
 Prove that if <code>coNP</code> is unequal to <code>NP</code> then <code>P</code> is unequal to <code>NP</code>.
 </p>
 </div>
 
-<div id="outline-container-orgcd3ae3e" class="outline-4">
-<h4 id="orgcd3ae3e">Proof</h4>
-<div class="outline-text-4" id="text-orgcd3ae3e">
+<div id="outline-container-orgf5c0667" class="outline-4">
+<h4 id="orgf5c0667">Proof</h4>
+<div class="outline-text-4" id="text-orgf5c0667">
 <p>
 So we assume that <code>coNP</code> is unequal to <code>NP</code>. There are two possible cases (both can be
 true at the same time of course):
@@ -1437,9 +1437,9 @@ which is not in <code>P</code>. QED.
 </div>
 </div>
 
-<div id="outline-container-orgb3f4fa4" class="outline-3">
-<h3 id="orgb3f4fa4">Exercise 3.19</h3>
-<div class="outline-text-3" id="text-orgb3f4fa4">
+<div id="outline-container-orgdc90194" class="outline-3">
+<h3 id="orgdc90194">Exercise 3.19</h3>
+<div class="outline-text-3" id="text-orgdc90194">
 <p>
 The <code>REACHABILITY</code> problem is to determine whether there is a path between two specified
 vertices in a graph. Show that <code>REACHABILITY</code> can be solved using \(O(n^2)\) operations if the
@@ -1452,9 +1452,9 @@ Remark: The exercise statement deviates from the book, see <a href="https://www.
 </p>
 </div>
 
-<div id="outline-container-org87631a3" class="outline-4">
-<h4 id="org87631a3">Proof</h4>
-<div class="outline-text-4" id="text-org87631a3">
+<div id="outline-container-org2f440c8" class="outline-4">
+<h4 id="org2f440c8">Proof</h4>
+<div class="outline-text-4" id="text-org2f440c8">
 <p>
 Let \(m\) be the number of edges of the graph. Note that \(m=O(n^2)\). We show the more
 informative bound \(O(m)\) for the first statement and \(O(nm)\) for the second. Note that for
@@ -1556,18 +1556,18 @@ steps.</dd>
 </div>
 </div>
 
-<div id="outline-container-org1eb29a3" class="outline-3">
-<h3 id="org1eb29a3">Exercise 3.20 (Euler's theorem)</h3>
-<div class="outline-text-3" id="text-org1eb29a3">
+<div id="outline-container-orgc2a77bc" class="outline-3">
+<h3 id="orgc2a77bc">Exercise 3.20 (Euler's theorem)</h3>
+<div class="outline-text-3" id="text-orgc2a77bc">
 <p>
 Prove Euler's theorem. In particular, if each vertex has an even number of incident edges,
 give a constructive procedure for finding an Euler cycle.
 </p>
 </div>
 
-<div id="outline-container-org9dacc88" class="outline-4">
-<h4 id="org9dacc88">Proof</h4>
-<div class="outline-text-4" id="text-org9dacc88">
+<div id="outline-container-org098c80f" class="outline-4">
+<h4 id="org098c80f">Proof</h4>
+<div class="outline-text-4" id="text-org098c80f">
 <p>
 To see Euler's Theorem consider a graph with \(m\) edges and an Euler cycle. Let us draw
 tiny arrows at each edge showing the direction in which we walk. Moreover enumerate the
@@ -1587,21 +1587,20 @@ this proves the Theorem.
 
 <p>
 Our procedure to compute the Euler cycle makes use of the following subroutine
-<code>SimpleCycle</code>. Given a vertex \(v\) and a set of <i>admissible</i> edges the subroutine computes
-a nonempty circular path, containing \(v\), visiting each of its vertices exactly once,
-containing only admissible edges.
+<code>PartialCycle</code>. Given a vertex \(v\) and a set of <i>admissible</i> edges the subroutine computes
+a nonempty closed path, containing \(v\) and only admissible edges.
 </p>
 
 <ul class="org-ul">
 <li>input: a graph,a vertex \(v_s\) of the graph, and a set of admissible edges of the graph.</li>
-<li>(I) Set the <i>current vertex</i> equal to \(v_s\) and mark it as <i>visited</i>.</li>
+<li>(I) Set the <i>current vertex</i> equal to \(v_s\).</li>
 <li>(L) Loop indefinitely over the following
 <ul class="org-ul">
-<li>(L1) Take an unvisited admissible edge \(e\) to some vertex \(v\).</li>
+<li>(L1) Take an unvisited admissible edge \(e\) of the current vertex to some vertex \(v\).</li>
 <li>(L2) Walk over \(e\) to \(v\).</li>
 <li>(L3) Set \(v\) to be the new current vertex.</li>
-<li>(L4) If \(v\) was already marked <i>visited</i> earlier: return the constructed path and halt.</li>
-<li>(L2) Mark \(e\) and \(v\) as visited.</li>
+<li>(L4) If \(v=v_s\) return the constructed path and halt.</li>
+<li>(L5) Mark \(e\) as visited.</li>
 </ul></li>
 </ul>
 
@@ -1619,12 +1618,12 @@ latter implying that no vertex has zero edges). This is justified by Euler's the
 </p>
 
 <ul class="org-ul">
-<li>Call <code>SimpleCycle</code> on some arbitrarily chosen vertex with all edges being admissible.</li>
+<li>Call <code>PartialCycle</code> on some arbitrarily chosen vertex with all edges being admissible.</li>
 <li>Initialize a path \(p\) with the output of the previous step.</li>
 <li>Loop indefinitely over the following:
 <ul class="org-ul">
 <li>Choose a vertex \(v\) having edges not already in \(p\). Halt if none exists.</li>
-<li>Call <code>SimpleCycle</code> on \(v\) allowing only the complement of the edges of \(p\) as
+<li>Call <code>PartialCycle</code> on \(v\) allowing only the complement of the edges of \(p\) as
 admissible. Enlarge \(p\) by inserting the output into \(p\) directly after \(v\).</li>
 </ul></li>
 </ul>
@@ -1636,18 +1635,18 @@ Euler cycle. QED.
 </div>
 </div>
 </div>
-<div id="outline-container-orge26a447" class="outline-3">
-<h3 id="orge26a447">Exercise 3.21 (Transitive property of reduction)</h3>
-<div class="outline-text-3" id="text-orge26a447">
+<div id="outline-container-org6406b32" class="outline-3">
+<h3 id="org6406b32">Exercise 3.21 (Transitive property of reduction)</h3>
+<div class="outline-text-3" id="text-org6406b32">
 <p>
 Show that if a language \(L_1\) is reducible to the language \(L_2\) and the language \(L_2\) is
 reducible to \(L_3\) then the language \(L_1\) is reducible to the language \(L_3\).
 </p>
 </div>
 
-<div id="outline-container-org9a0f49f" class="outline-4">
-<h4 id="org9a0f49f">Proof</h4>
-<div class="outline-text-4" id="text-org9a0f49f">
+<div id="outline-container-org2983b5c" class="outline-4">
+<h4 id="org2983b5c">Proof</h4>
+<div class="outline-text-4" id="text-org2983b5c">
 <p>
 By definition there are polynomial-time reduction functions \(R_{12}\) and \(R_{23}\) from
 \(L_1\) to \(L_2\) and from \(L_2\) to \(L_3\) respectively.
@@ -1708,9 +1707,9 @@ The RHS clearly is a polynomial in the length \(|x|\) of \(x\). QED.
 </div>
 </div>
 
-<div id="outline-container-org96a7f2d" class="outline-3">
-<h3 id="org96a7f2d">Exercise 3.22</h3>
-<div class="outline-text-3" id="text-org96a7f2d">
+<div id="outline-container-org0960e73" class="outline-3">
+<h3 id="org0960e73">Exercise 3.22</h3>
+<div class="outline-text-3" id="text-org0960e73">
 <p>
 Suppose \(L\) is complete for a complexity class, and \(L'\) is another language in the
 complexity class such that \(L\) reduces to \(L'\). Show that \(L'\) is complete for the
@@ -1718,9 +1717,9 @@ complexity class.
 </p>
 </div>
 
-<div id="outline-container-org1a4eca0" class="outline-4">
-<h4 id="org1a4eca0">Proof</h4>
-<div class="outline-text-4" id="text-org1a4eca0">
+<div id="outline-container-org57ad638" class="outline-4">
+<h4 id="org57ad638">Proof</h4>
+<div class="outline-text-4" id="text-org57ad638">
 <p>
 We assume that the reduction relation for the class is transitive in the same way as for
 natural reduction relation of <code>NP</code> (exercise 3.21). I note this here since not for all
