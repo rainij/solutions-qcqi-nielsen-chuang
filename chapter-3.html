@@ -12,46 +12,46 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7607e99">Setup</a>
+<li><a href="#org374c0a6">Setup</a>
 <ul>
-<li><a href="#orgc67c545">Python Libraries</a></li>
-<li><a href="#org49c11bd">Turing Machines</a></li>
+<li><a href="#org29058f9">Python Libraries</a></li>
+<li><a href="#org13d939f">Turing Machines</a></li>
 </ul>
 </li>
-<li><a href="#orgd4c8504"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#org8ce9eb6"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#org75eed35"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
-<li><a href="#orgfbe54f9">Exercise 3.2 (Turing numbers)</a></li>
-<li><a href="#org782043d">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
-<li><a href="#orgbaa1669">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
-<li><a href="#orgbd24e03">Exercise 3.5 (Halting problem with no inputs)</a></li>
-<li><a href="#orga111a5b">Exercise 3.6 (Probabilistic halting problem)</a></li>
-<li><a href="#org38bc8a7">Exercise 3.7 (Halting oracle)</a></li>
-<li><a href="#org2c87aca">Exercise 3.8 (Universality of <code>NAND</code>)</a></li>
-<li><a href="#orgb267a94"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</a></li>
-<li><a href="#org24445b5">Exercise 3.15</a></li>
-<li><a href="#org328b8b1"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</a></li>
-<li><a href="#org991093d">Exercise 3.17</a></li>
-<li><a href="#org13539ea">Exercise 3.18</a></li>
-<li><a href="#orgdc90194">Exercise 3.19</a></li>
-<li><a href="#orgc2a77bc">Exercise 3.20 (Euler's theorem)</a></li>
-<li><a href="#org6406b32">Exercise 3.21 (Transitive property of reduction)</a></li>
-<li><a href="#org0960e73">Exercise 3.22</a></li>
+<li><a href="#org617c015"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</a></li>
+<li><a href="#orgdce2500">Exercise 3.2 (Turing numbers)</a></li>
+<li><a href="#org7f0db26">Exercise 3.3 (Turing machine to reverse a bit string)</a></li>
+<li><a href="#org86142cd">Exercise 3.4 (Turing machine to add modulo 2)</a></li>
+<li><a href="#org25a6423">Exercise 3.5 (Halting problem with no inputs)</a></li>
+<li><a href="#org57056fc">Exercise 3.6 (Probabilistic halting problem)</a></li>
+<li><a href="#orgec81eb5">Exercise 3.7 (Halting oracle)</a></li>
+<li><a href="#org513af75">Exercise 3.8 (Universality of <code>NAND</code>)</a></li>
+<li><a href="#org90af3b2"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</a></li>
+<li><a href="#orgb43b3ea">Exercise 3.15</a></li>
+<li><a href="#orga1d4e1b">Exercise 3.16 (Hard-to-compute functions exist)</a></li>
+<li><a href="#orga36995b">Exercise 3.17</a></li>
+<li><a href="#orgc9fc463">Exercise 3.18</a></li>
+<li><a href="#org3898f6b">Exercise 3.19</a></li>
+<li><a href="#orgacd7e31">Exercise 3.20 (Euler's theorem)</a></li>
+<li><a href="#org01e8f83">Exercise 3.21 (Transitive property of reduction)</a></li>
+<li><a href="#orgab18027">Exercise 3.22</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org7607e99" class="outline-2">
-<h2 id="org7607e99">Setup</h2>
-<div class="outline-text-2" id="text-org7607e99">
+<div id="outline-container-org374c0a6" class="outline-2">
+<h2 id="org374c0a6">Setup</h2>
+<div class="outline-text-2" id="text-org374c0a6">
 </div>
-<div id="outline-container-orgc67c545" class="outline-3">
-<h3 id="orgc67c545">Python Libraries</h3>
-<div class="outline-text-3" id="text-orgc67c545">
+<div id="outline-container-org29058f9" class="outline-3">
+<h3 id="org29058f9">Python Libraries</h3>
+<div class="outline-text-3" id="text-org29058f9">
 <div class="org-src-container">
-<pre class="src src-python" id="org14379bc"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-builtin">reduce</span>
+<pre class="src src-python" id="orga3f456b"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-builtin">reduce</span>
 <span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Literal, NewType, Optional
 <span class="org-keyword">from</span> collections.abc <span class="org-keyword">import</span> Callable
 
@@ -61,13 +61,13 @@
 </div>
 </div>
 
-<div id="outline-container-org49c11bd" class="outline-3">
-<h3 id="org49c11bd">Turing Machines</h3>
-<div class="outline-text-3" id="text-org49c11bd">
+<div id="outline-container-org13d939f" class="outline-3">
+<h3 id="org13d939f">Turing Machines</h3>
+<div class="outline-text-3" id="text-org13d939f">
 </div>
-<div id="outline-container-orgcbfe375" class="outline-4">
-<h4 id="orgcbfe375">Introduction</h4>
-<div class="outline-text-4" id="text-orgcbfe375">
+<div id="outline-container-orgb98b2d9" class="outline-4">
+<h4 id="orgb98b2d9">Introduction</h4>
+<div class="outline-text-4" id="text-orgb98b2d9">
 <p>
 In this section we define a class <code>TuringMachine</code> which empowers us to execute a turing program like
 this one:
@@ -90,7 +90,7 @@ Below we initialize a turing machine <code>my_tm</code> from the above source co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orge9722e4"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
+<pre class="src src-python" id="org73d8fdb"><span class="org-variable-name">my_tm</span> = TuringMachine.fromSource(source, start_state=<span class="org-string">"S"</span>, halt_state=<span class="org-string">"H"</span>)
 <span class="org-variable-name">my_tm.LOG_LEVEL</span> = 3
 <span class="org-variable-name">my_tm.COLORED_LOG</span> = <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">set to false since listing below does not support colors</span>
 
@@ -146,19 +146,19 @@ result = '▶1'
 </div>
 </div>
 
-<div id="outline-container-orgb9a8e6c" class="outline-4">
-<h4 id="orgb9a8e6c">Implementation</h4>
-<div class="outline-text-4" id="text-orgb9a8e6c">
+<div id="outline-container-org87896ce" class="outline-4">
+<h4 id="org87896ce">Implementation</h4>
+<div class="outline-text-4" id="text-org87896ce">
 <p>
 First we introduce some useful types. We represent the state by strings since this <i>allows</i> for
 readable or at least mnemonic state names. This would not be possible had we used integers. The
 <code>SourceMap</code> is responsible for connecting each parsed line of the turing program with its original
-from the source-string/file. It is the reason why in the <a href="#orge9722e4">listing above</a> the <code>TuringMachine</code> instance
+from the source-string/file. It is the reason why in the <a href="#org73d8fdb">listing above</a> the <code>TuringMachine</code> instance
 can refer to its source (see the line starting with <code>source line =</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgbb8dd67"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
+<pre class="src src-python" id="org8b2078a"><span class="org-variable-name">Char</span> = NewType(<span class="org-string">"Char"</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">better than nothing, represents a letter from the alphabet</span>
 <span class="org-variable-name">State</span> = NewType(<span class="org-string">"State"</span>, <span class="org-builtin">str</span>)
 <span class="org-variable-name">Move</span> = Literal[-1, 0, +1]
 <span class="org-variable-name">TuringProgLine</span> = <span class="org-builtin">tuple</span>[State, Char, State, Char, Move]  <span class="org-comment-delimiter"># </span><span class="org-comment">(s,c,s',c',m)</span>
@@ -170,7 +170,7 @@ can refer to its source (see the line starting with <code>source line =</code>).
 </div>
 
 <p>
-<a href="#orgad8e95c">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
+<a href="#orgebf8ba7">Below</a> follows the implementation of the <code>TuringMachine</code>. The logging functionality bloats the
 implementation a bit. But it you ignore this the implementation is very simple and straightforward
 to understand (IMHO).
 </p>
@@ -208,7 +208,7 @@ particular, those cannot be used as characters on the tape.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgad8e95c"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
+<pre class="src src-python" id="orgebf8ba7"><span class="org-keyword">class</span> <span class="org-type">TuringMachine</span>:
     <span class="org-doc">"""Given a turing program produces the corresponding turing machine."""</span>
     BLANK: <span class="org-variable-name">Char</span> = <span class="org-string">"&#9632;"</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Special symbol for the blank cell. Is used when tape dynamically grows.</span>
     <span class="org-variable-name">MAX_STEPS</span> = 1000000  <span class="org-comment-delimiter"># </span><span class="org-comment">Abort after running this many steps</span>
@@ -343,7 +343,7 @@ Finally, the default parser:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org2fcd4e3"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
+<pre class="src src-python" id="org150e405"><span class="org-keyword">def</span> <span class="org-function-name">parse_turing_program_line</span>(line: <span class="org-builtin">str</span>) -&gt; TuringProgLine | <span class="org-constant">None</span>:
     <span class="org-doc">"""Parse a single line of the form `(s,c,s',c',m)` (up to comments).</span>
 
 <span class="org-doc">    Empty or comment lines are ignored by returning `None`."""</span>
@@ -389,13 +389,13 @@ Finally, the default parser:
 </div>
 </div>
 
-<div id="outline-container-orgd4c8504" class="outline-2">
-<h2 id="orgd4c8504"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-orgd4c8504">
+<div id="outline-container-org8ce9eb6" class="outline-2">
+<h2 id="org8ce9eb6"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-org8ce9eb6">
 </div>
-<div id="outline-container-org75eed35" class="outline-3">
-<h3 id="org75eed35"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
-<div class="outline-text-3" id="text-org75eed35">
+<div id="outline-container-org617c015" class="outline-3">
+<h3 id="org617c015"><span class="todo TODO">TODO</span> Exercise 3.1 (Non-computable processes in Nature)</h3>
+<div class="outline-text-3" id="text-org617c015">
 <p>
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -403,9 +403,9 @@ machine?
 </div>
 </div>
 
-<div id="outline-container-orgfbe54f9" class="outline-3">
-<h3 id="orgfbe54f9">Exercise 3.2 (Turing numbers)</h3>
-<div class="outline-text-3" id="text-orgfbe54f9">
+<div id="outline-container-orgdce2500" class="outline-3">
+<h3 id="orgdce2500">Exercise 3.2 (Turing numbers)</h3>
+<div class="outline-text-3" id="text-orgdce2500">
 <p>
 Show that single-tape Turing machines can each be given a number from the list \(1,2,3,\ldots\) in
 such a way that the number uniquely specifies the corresponding machine. We call this number the
@@ -415,9 +415,9 @@ and \(a_1,a_2,\ldots,a_k\) are non-negative integers.)
 </p>
 </div>
 
-<div id="outline-container-orgb8511ad" class="outline-4">
-<h4 id="orgb8511ad">Proof</h4>
-<div class="outline-text-4" id="text-orgb8511ad">
+<div id="outline-container-org83cb2c7" class="outline-4">
+<h4 id="org83cb2c7">Proof</h4>
+<div class="outline-text-4" id="text-org83cb2c7">
 <p>
 For simplicity we assume that the state space and the alphabet are fixed for all Turing machines we
 consider (one could easily relax this constraint without complicating the encoding). Hence we need
@@ -484,9 +484,9 @@ invertible and hence the Turing machine can be recovered from this (potentially 
 </div>
 </div>
 
-<div id="outline-container-org782043d" class="outline-3">
-<h3 id="org782043d">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
-<div class="outline-text-3" id="text-org782043d">
+<div id="outline-container-org7f0db26" class="outline-3">
+<h3 id="org7f0db26">Exercise 3.3 (Turing machine to reverse a bit string)</h3>
+<div class="outline-text-3" id="text-org7f0db26">
 <p>
 Describe a Turing machine which takes a binary number \(x\) as input, and outputs the bits of \(x\) in
 reverse order. (Hint: In this exercise and the next it may help to use a multi-tape Turing machine
@@ -494,9 +494,9 @@ and/or symbols other than ▶, 0, 1, and the blank.)
 </p>
 </div>
 
-<div id="outline-container-org29ceb55" class="outline-4">
-<h4 id="org29ceb55">Solution</h4>
-<div class="outline-text-4" id="text-org29ceb55">
+<div id="outline-container-org290ae84" class="outline-4">
+<h4 id="org290ae84">Solution</h4>
+<div class="outline-text-4" id="text-org290ae84">
 <p>
 We use a single tape together with and additional symbol "□", which we call <i>white blank</i> in the
 following.
@@ -606,7 +606,7 @@ Finally the third part acts like this:
 </pre>
 
 <p>
-In the following we present a <a href="#org559a902">Turing program</a> which does exactly this. Don't worry, most of the
+In the following we present a <a href="#org79be3bc">Turing program</a> which does exactly this. Don't worry, most of the
 program is just comments - explaining how it works, and at the same time giving a kind of
 <i>inline-proof</i> that the program is correct in the sense that it "does what we want".
 </p>
@@ -813,11 +813,11 @@ usually only very few succesor blocks for each block.</li>
 
 <p>
 Let the theory behind and plug this program into our python implementation of a (universal)
-<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org559a902">above listing</a>.
+<code>TuringMachine</code>. The variable <code>source_tp_ex_3_3</code> contains the contents of the <a href="#org79be3bc">above listing</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org768d17d"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
+<pre class="src src-python" id="orgbda0b09"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_3)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;011"</span>) == <span class="org-string">"&#9654;110"</span>, <span class="org-string">"test exercise-3.3-1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;101011"</span>) == <span class="org-string">"&#9654;110101"</span>, <span class="org-string">"test exercise-3.3-2"</span>
@@ -845,9 +845,9 @@ These basic tests yield an alternative root of trust into the program. You are i
 </div>
 </div>
 
-<div id="outline-container-orgbaa1669" class="outline-3">
-<h3 id="orgbaa1669">Exercise 3.4 (Turing machine to add modulo 2)</h3>
-<div class="outline-text-3" id="text-orgbaa1669">
+<div id="outline-container-org86142cd" class="outline-3">
+<h3 id="org86142cd">Exercise 3.4 (Turing machine to add modulo 2)</h3>
+<div class="outline-text-3" id="text-org86142cd">
 <p>
 Describe a Turing machine to add two binary numbers \(x\) and \(y\) modulo 2. The numbers are
 input on the Turing machine tape in binary, in the form \(x\), followed by a single blank,
@@ -856,11 +856,11 @@ has been padded with leading 0s to make the two numbers the same length.
 </p>
 </div>
 
-<div id="outline-container-org95ebcd1" class="outline-4">
-<h4 id="org95ebcd1">Solution</h4>
-<div class="outline-text-4" id="text-org95ebcd1">
+<div id="outline-container-org2482dc7" class="outline-4">
+<h4 id="org2482dc7">Solution</h4>
+<div class="outline-text-4" id="text-org2482dc7">
 <p>
-The idea of the <a href="#org1d057dc">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
+The idea of the <a href="#orgc3cec00">program</a> can be seen in the following example, adding <code>x=000</code> and <code>y=111</code>.
 </p>
 
 <dl class="org-dl">
@@ -978,7 +978,7 @@ We conclude with a small demo:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgc66335a"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
+<pre class="src src-python" id="org3db21e2"><span class="org-variable-name">tm</span> = TuringMachine.fromSource(source_tp_ex_3_4)
 
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;0&#9632;1"</span>) == <span class="org-string">"&#9654;1"</span>
 <span class="org-keyword">assert</span> tm.run(<span class="org-string">"&#9654;010&#9632;111"</span>) == <span class="org-string">"&#9654;101"</span>
@@ -993,18 +993,18 @@ PASSED
 </div>
 </div>
 </div>
-<div id="outline-container-orgbd24e03" class="outline-3">
-<h3 id="orgbd24e03">Exercise 3.5 (Halting problem with no inputs)</h3>
-<div class="outline-text-3" id="text-orgbd24e03">
+<div id="outline-container-org25a6423" class="outline-3">
+<h3 id="org25a6423">Exercise 3.5 (Halting problem with no inputs)</h3>
+<div class="outline-text-3" id="text-org25a6423">
 <p>
 Show that given a Turing machine \(M\) there is no algorithm to determine whether \(M\) halts
 when the input to the machine is a blank tape.
 </p>
 </div>
 
-<div id="outline-container-org921862e" class="outline-4">
-<h4 id="org921862e">Proof</h4>
-<div class="outline-text-4" id="text-org921862e">
+<div id="outline-container-org0f9c850" class="outline-4">
+<h4 id="org0f9c850">Proof</h4>
+<div class="outline-text-4" id="text-org0f9c850">
 <p>
 This problem can easily be reduced the version of the halting problem from Box 3.2. In
 fact, for any turing machine \(M\) (expressed in terms of its program) we consider the
@@ -1025,9 +1025,9 @@ either. QED.
 </div>
 </div>
 </div>
-<div id="outline-container-orga111a5b" class="outline-3">
-<h3 id="orga111a5b">Exercise 3.6 (Probabilistic halting problem)</h3>
-<div class="outline-text-3" id="text-orga111a5b">
+<div id="outline-container-org57056fc" class="outline-3">
+<h3 id="org57056fc">Exercise 3.6 (Probabilistic halting problem)</h3>
+<div class="outline-text-3" id="text-org57056fc">
 <p>
 Suppose we number the probabilistic Turing machines using a scheme similar to that found
 in Exercise 3.2 and define the probabilistic halting function \(h_p(x)\) to be \(1\) if
@@ -1038,9 +1038,9 @@ strictly greater than \(1/2\) for all \(x\).
 </p>
 </div>
 
-<div id="outline-container-orgec5bede" class="outline-4">
-<h4 id="orgec5bede">Proof</h4>
-<div class="outline-text-4" id="text-orgec5bede">
+<div id="outline-container-orgd6cc5eb" class="outline-4">
+<h4 id="orgd6cc5eb">Proof</h4>
+<div class="outline-text-4" id="text-orgd6cc5eb">
 <p>
 The reasoning from Box 3.2 applies here too.
 </p>
@@ -1061,9 +1061,9 @@ contradiction. On the other hand \(h_p(t)=0\) also leads to a contradiction. QED
 </div>
 </div>
 
-<div id="outline-container-org38bc8a7" class="outline-3">
-<h3 id="org38bc8a7">Exercise 3.7 (Halting oracle)</h3>
-<div class="outline-text-3" id="text-org38bc8a7">
+<div id="outline-container-orgec81eb5" class="outline-3">
+<h3 id="orgec81eb5">Exercise 3.7 (Halting oracle)</h3>
+<div class="outline-text-3" id="text-orgec81eb5">
 <p>
 Suppose a black box is made available to us which takes a non-negative integer \(x\) as
 input, and then outputs the value of \(h(x)\), where \(h\) is the halting function defined in
@@ -1080,9 +1080,9 @@ Turing machine with oracle will halt on a particular input?
 </p>
 </div>
 
-<div id="outline-container-org7edc5fe" class="outline-4">
-<h4 id="org7edc5fe">Solution</h4>
-<div class="outline-text-4" id="text-org7edc5fe">
+<div id="outline-container-org63bff9f" class="outline-4">
+<h4 id="org63bff9f">Solution</h4>
+<div class="outline-text-4" id="text-org63bff9f">
 <p>
 This follows directly from the argument in Box 3.2. In fact, the argument does not impose
 any restrictions on the model of computation except that at least <i>some</i> things are
@@ -1102,18 +1102,18 @@ a trivial way.
 </div>
 </div>
 </div>
-<div id="outline-container-org2c87aca" class="outline-3">
-<h3 id="org2c87aca">Exercise 3.8 (Universality of <code>NAND</code>)</h3>
-<div class="outline-text-3" id="text-org2c87aca">
+<div id="outline-container-org513af75" class="outline-3">
+<h3 id="org513af75">Exercise 3.8 (Universality of <code>NAND</code>)</h3>
+<div class="outline-text-3" id="text-org513af75">
 <p>
 Show that the <code>NAND</code> gate can be used to simulate the <code>AND</code>, <code>XOR</code>, and <code>NOT</code> gates,
 provided wires, ancilla bits and <code>FANOUT</code> are available.
 </p>
 </div>
 
-<div id="outline-container-org50169c0" class="outline-4">
-<h4 id="org50169c0">Proof</h4>
-<div class="outline-text-4" id="text-org50169c0">
+<div id="outline-container-orgcec83ab" class="outline-4">
+<h4 id="orgcec83ab">Proof</h4>
+<div class="outline-text-4" id="text-orgcec83ab">
 <p>
 Let us denote the <code>NAND</code> operation by \(\barwedge\). Recall that \(x\barwedge y=\neg(x\land
 y)\). In the following we give one way to implement each of the three gates:
@@ -1131,17 +1131,17 @@ QED.
 </div>
 </div>
 </div>
-<div id="outline-container-orgb267a94" class="outline-3">
-<h3 id="orgb267a94"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</h3>
-<div class="outline-text-3" id="text-orgb267a94">
+<div id="outline-container-org90af3b2" class="outline-3">
+<h3 id="org90af3b2"><span class="todo SKIP">SKIP</span> Exercises 3.9-3.14</h3>
+<div class="outline-text-3" id="text-org90af3b2">
 <p>
 I skip these exercises since they are too simple <i>and</i> too many.
 </p>
 </div>
 </div>
-<div id="outline-container-org24445b5" class="outline-3">
-<h3 id="org24445b5">Exercise 3.15</h3>
-<div class="outline-text-3" id="text-org24445b5">
+<div id="outline-container-orgb43b3ea" class="outline-3">
+<h3 id="orgb43b3ea">Exercise 3.15</h3>
+<div class="outline-text-3" id="text-orgb43b3ea">
 <p>
 Suppose an \(n\) element list is sorted by applying some sequence of compare-and-swap
 operations to the list. There are \(n!\) possible initial orderings of the list. Show that
@@ -1152,9 +1152,9 @@ orderings into the correct order.
 </p>
 </div>
 
-<div id="outline-container-org121b4a7" class="outline-4">
-<h4 id="org121b4a7">Proof</h4>
-<div class="outline-text-4" id="text-org121b4a7">
+<div id="outline-container-orgf0deb7c" class="outline-4">
+<h4 id="orgf0deb7c">Proof</h4>
+<div class="outline-text-4" id="text-orgf0deb7c">
 <p>
 First, let us note that starting from an orderd sequence of numbers, like \(1,2,\ldots,n\)
 applying at most \(k\) compare-and-swap operations we can generate at most \(2^k\)
@@ -1219,31 +1219,333 @@ that \(\log(n!)=\Omega(n\log(n))\).
 </div>
 </div>
 </div>
-<div id="outline-container-org328b8b1" class="outline-3">
-<h3 id="org328b8b1"><span class="todo TODO">TODO</span> Exercise 3.16 (Hard-to-compute functions exist)</h3>
-<div class="outline-text-3" id="text-org328b8b1">
+<div id="outline-container-orga1d4e1b" class="outline-3">
+<h3 id="orga1d4e1b">Exercise 3.16 (Hard-to-compute functions exist)</h3>
+<div class="outline-text-3" id="text-orga1d4e1b">
 <p>
-Show that there exist Boolean functions on \(n\) inputs which require at least \(2^n/\log(n)\)
-logic gates to compute.
+Show that there exist Boolean functions on \(n\) inputs which requires \(\Omega(2^n/n)\) logic
+gates to compute.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The exercise statement deviates from the book, see <a href="https://www.michaelnielsen.org/qcqi/errata/errata/errata.html">errata</a>. The original
+statement was wrong, there is no boolean function which requires <i>at least</i>
+\(\Omega(2^n/\log(n))\) gates. We also prove this statement below.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org4c80f12" class="outline-4">
+<h4 id="org4c80f12">Proof</h4>
+<div class="outline-text-4" id="text-org4c80f12">
+<p>
+To be specific we assume that the circuits consist of <code>AND</code>, <code>OR</code>, and <code>NOT</code>
+gates. Moreover we allow arbitrary many <code>FANOUT</code> operations.
+</p>
+
+<p>
+The proof relies on the first two of the following lemmas. To avoid irrelevant corner
+cases we assume \(k\geq n\).
+</p>
+
+<ol class="org-ol">
+<li>The number of boolean functions on \(n\) inputs is \(2^{2^n}\).</li>
+<li>The number of boolean functions implementable with \(k\) gates and arbitrary many
+<code>FANOUT</code> operations is upper bounded by \((6k)^{2k}\).</li>
+<li>Bonus: A circuit with \(k\) gates and arbitrary many <code>FANOUT</code> can be replaced by a
+circuit using at most \(O(k^2)\) <code>FANOUT</code> which computes the same boolean function.</li>
+</ol>
+
+<p>
+We do not really need the third statement but it is nice to know that we do not <i>really</i>
+need <i>arbitrary</i> many <code>FANOUT</code> operations.
+</p>
+</div>
+
+<div id="outline-container-org08b8266" class="outline-5">
+<h5 id="org08b8266">Proof of 1</h5>
+<div class="outline-text-5" id="text-org08b8266">
+<p>
+The number of \(n\) bit numbers is \(2^n\) (a factor of two for each bit). For each of the
+\(2^n\) inputs we have two choices (\(0\) and \(1\)) to assign a value. This makes for
+\(2^{(2^n)}\) possibilities in total. QED.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org991093d" class="outline-3">
-<h3 id="org991093d">Exercise 3.17</h3>
-<div class="outline-text-3" id="text-org991093d">
+<div id="outline-container-org7e6d37c" class="outline-5">
+<h5 id="org7e6d37c">Proof of 3</h5>
+<div class="outline-text-5" id="text-org7e6d37c">
+<p>
+Conider an arbitrary circuit. Let us define the <i>spec</i> of the circuit as follows: For each
+of the \(k\) gates specify the type as being <code>AND</code>, <code>OR</code>, or <code>NOT</code>. This makes for \(3^k\)
+possibilities. For each of the <i>at most</i> \(2k\) inputs to all the gates specify to which
+other gate or original input they are connected. If the input comes over one or more
+<code>FANOUT</code> operations trace it back to the original gate where the input originates
+from. With our choice of gates (and \(k\geq n\)) this makes for at most
+\((k+n)^{2k}\leq(2k)^{2k}\) possibilities (at most \(2k\) inputs (at most two for each gate)
+and \(k+n\) positions to connect with).
+</p>
+
+<p>
+Note that each of our gates only has one output which we use here to simplify things but
+this is not really crucial. If there were gates with more than one output we would also
+specify which of the outputs is connected to which input of the next gate.
+</p>
+
+<p>
+In total there are at most \(3^k(2k)^{2k}\leq(6k)^{2k}\) possible specs. Note that two
+circuits with the same spec are guaranteed to compute the same functions. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5272ca9" class="outline-5">
+<h5 id="org5272ca9">Proof of 3 (Bonus)</h5>
+<div class="outline-text-5" id="text-org5272ca9">
+<p>
+The purpose of <code>FANOUT</code> operation is to copy either some of the inputs or some of the
+intermediate outputs of the gates. In that way different gates can share the same inputs
+(or one gate can obtain two versions of the same bit).
+</p>
+
+<p>
+There are only \(O(k)\) bits to copy (all \(n\) inputs and all the outputs of the \(O(k)\) gates
+together). Moreover, there are only \(O(k)\) destinations to copy to (all inputs of all the
+\(k\) gate). Hence the number of <i>actually</i> required <code>FANOUT</code> operation is at most
+\(O(k\,\cdot\,k)=O(k^2)\). QED
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb3c1643" class="outline-5">
+<h5 id="orgb3c1643">Conclusion</h5>
+<div class="outline-text-5" id="text-orgb3c1643">
+<p>
+Assume that \(l=l(n)\) is the minimal number of gates needed to implement any Boolean
+function on \(n\) bits. By 1 and 2 we necessarily have
+</p>
+
+<p>
+\[
+  (6l)^{2l} \geq 2^{2^n} .
+\]
+</p>
+
+<p>
+The careful reader might notice that we assumed \(k\geq n\) in 1 and 2. This was just used
+to simplify some constants. And indeed the reasoning here shows that \(k=n\) gates are not
+sufficient to generate all Boolean functions. Hence there is no problem. From the last
+equation we deduce \(2l\log_2(6l)\geq2^n\). Hence:
+</p>
+
+<p>
+\[
+  l \geq \frac{2^n}{2\log_2(6l)} = \frac{2^n}{2\log_2(6\cdot 2^n/(2\log_2(6l)))}
+  \geq \frac{2^n}{2(n+\log_2(3))} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org362f489" class="outline-4">
+<h4 id="org362f489">Proof of the reverse inequality</h4>
+<div class="outline-text-4" id="text-org362f489">
+<p>
+It can be shown that the bound is sharp up to a constant factor. That is, all functions
+can be implemented by \(O(2^n/n)\) gates. This proves that the uncorrected exercise was
+indeed wrong. Let us prove this now.
+</p>
+
+<ol class="org-ol">
+<li>Any circuit can be implemented by \(O(2^n)\) gates.</li>
+<li>There is a circuit with \(O(2^{2^n})\) gates which implements a function
+\(f:\{0,1\}^n\to\{0,1\}^{2^{2^n}}\) which returns the result of <i>any</i> Boolean function at
+the same time.</li>
+</ol>
+
+<p>
+The first version is a weaker version of what we want to prove. Actually we do not
+directly apply this Lemma. Instead we just use it to demonstrate special case of a
+slightly more involved construction later on.
+</p>
+</div>
+
+<div id="outline-container-org021f28a" class="outline-5">
+<h5 id="org021f28a">Proof of 1</h5>
+<div class="outline-text-5" id="text-org021f28a">
+<p>
+The proof is based on the identity:
+</p>
+
+<p>
+\[
+  f(x_1,\ldots,x_{n+1}) = \underbrace{f(x_1,\ldots,x_n,0)}_{=:f_0(\ldots)} x_{n+1}' +
+  \underbrace{f(x_1,\ldots,x_n,1)}_{=:f_1(\ldots)} x_{n+1}
+\]
+</p>
+
+<p>
+Here we use \(+\) as "or" and multiplication as "and". The prime denotes negation. Note that
+this is exactly the idea behind Figure 3.8 from the book (the <code>XOR</code> there could be a <code>OR</code>).
+</p>
+
+<p>
+Apart from the circuits implementing the two functions we only need five additional gates
+to implement \(f\). Hence, denoting \(c_n\) the (minimal) number of gates needed to implement
+any Boolean function:
+</p>
+
+<p>
+\[
+  c_{n+1} \leq 2c_n + 5 .
+\]
+</p>
+
+<p>
+By mathematical induction we get \(c_n=O(2^n)\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-org40ccb93" class="outline-5">
+<h5 id="org40ccb93">Proof of 2</h5>
+<div class="outline-text-5" id="text-org40ccb93">
+<p>
+The idea of the proof is essentially based on the same formula as for Lemma 1. Let \(d_n\)
+be the minimal number of gates needed. Any Boolean function \(f\) in \(n+1\) variables can be
+implemented in the following way:
+</p>
+
+<p>
+\[
+  f(x_1,\ldots,x_n,x_{n+1}) = f_0(x_1,\ldots,x_n)x_{n+1}' + f_1(x_1,\ldots,x_n)x_{n+1} ,
+\]
+</p>
+
+<p>
+where each of the two functions \(f_0\) and \(f_1\) can be chosen from \(2^{2^n}\)
+possibilities. From this we see
+</p>
+
+<p>
+\[
+  d_{n+1} \leq d_n + 3\cdot 2^{2^n} .
+\]
+</p>
+
+<p>
+The circuit for \(n+1\) basically consists of the circuit for \(n\) where each pair of the
+\(2^{2^n}\) outputs is recombined to the new \(2^{2^{n+1}}\) outputs. Each pair uses only two
+<code>AND</code> and one <code>OR</code> gates. <i>Overall</i> there is a <i>single</i> <code>NOT</code> gate needed which can be
+copied around by <code>FANOUT</code> as often as we need it.
+</p>
+
+<p>
+From the inequality it is easy to see by induction that \(d_n=O(2^{2^n})\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga9bfae8" class="outline-5">
+<h5 id="orga9bfae8">Conclusion</h5>
+<div class="outline-text-5" id="text-orga9bfae8">
+<p>
+The idea is as follows: The construction from Lemma 1 is already close to what we
+want. The circuit in Lemma 2 despite using a lot of gates has a very good <i>average</i> gate
+usage. In fact, only constantly many gates are used for each Boolean function on average!
+We try to combine the two approaches to push down the upper bound obtained in Lemma 1.
+</p>
+
+<p>
+Let \(m\leq n\) and write \(x=(y,z)\) where \(x=(x_1,\ldots,x_n)\) and \(y\) and \(z\) contain the first
+\(n-m\) and last \(m\) bits. Any Boolean function can be written as:
+</p>
+
+<p>
+\[
+  f(x) = \sum_{c\in\{0,1\}^{n-m}} y^c g_c(z) .
+\]
+</p>
+
+<p>
+Here \(y^c\) is a product of the bits in \(y\) where some of the bits are negated depending on
+whether \(c_i=1\) or not.
+</p>
+
+<p>
+By Lemma 2 there is a circuit of size \(O(2^{2^m})\) which implements <i>all</i> possibly
+required \(g_c\) at once. How many <i>additional</i> gates do we need to fully implement \(f\)? It
+is helpful to define \(k=n-m\) and do induction over \(k\), keeping \(m\) fixed. Lets call the
+required number of gates \(a_k\). Let us write the formula for \(f\) in the following form:
+</p>
+
+<p>
+\[
+  f(x) = \sum_{c_1\in\{0,1\}} y_1^{c_1} \left( \sum_{(c_2,\ldots,c_k)} \prod_{i=2}^k y_i^{c_i} \cdot g_c(z) \right)
+  = y_1' f_0(x_2,\ldots,x_n) + y_1 f_1(x_2,\ldots,x_n) .
+\]
+</p>
+
+<p>
+Note that \(f_0\) and \(f_1\) are functions like \(f\) but with "their" \(k\) being one less. Hence
+</p>
+
+<p>
+\[ a_{k+1} \leq 4 + 2a_k . \]
+</p>
+
+<p>
+By induction we get \(a_k=O(2^k)=O(2^{n-m})\). So in total there are at most this many gates
+needed to implement \(f\):
+</p>
+
+<p>
+\[
+  O(2^{2^m} + 2^{n-m}) .
+\]
+</p>
+
+<p>
+Note that \(m\) is a free parameter in that formula. We will minimize the expression. For
+simplicity let us replace \(2^m\) by a continuous variable \(a\). We have to minimize
+\(2^a+2^n/a\). But that is pretty simple (if we are not interested in constant global
+factors) Let us just set \(a=n/2\) and we get
+</p>
+
+<p>
+\[
+  O(2^{n/2} + 2^n/n) = O(2^n/n) .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga36995b" class="outline-3">
+<h3 id="orga36995b">Exercise 3.17</h3>
+<div class="outline-text-3" id="text-orga36995b">
 <p>
 Prove that a polynomial-time algorithm for finding the factors of a number \(m\) exists if
 and only if the factoring decision problem is in <code>P</code>.
 </p>
 </div>
 
-<div id="outline-container-org189529b" class="outline-4">
-<h4 id="org189529b">Proof</h4>
-<div class="outline-text-4" id="text-org189529b">
+<div id="outline-container-org9b823ca" class="outline-4">
+<h4 id="org9b823ca">Proof</h4>
+<div class="outline-text-4" id="text-org9b823ca">
 <p>
 It is clear that a polynomial-time algorithm for finding the factors of a number suffices
-to solve the decision problem in polynomial time. Thus we only have to proof one direction
+to solve the decision problem in polynomial time. Thus we only have to prove one direction
 of the equivalence.
 </p>
 
@@ -1260,7 +1562,7 @@ statement what the function does. See the docstring for the details:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org19c8137"><span class="org-keyword">def</span> <span class="org-function-name">find_largest_if_not</span>(x: <span class="org-builtin">int</span>, factp: Callable[[<span class="org-builtin">int</span>, <span class="org-builtin">int</span>], <span class="org-builtin">bool</span>]) -&gt; <span class="org-builtin">int</span>:
+<pre class="src src-python" id="org77551bc"><span class="org-keyword">def</span> <span class="org-function-name">find_largest_if_not</span>(x: <span class="org-builtin">int</span>, factp: Callable[[<span class="org-builtin">int</span>, <span class="org-builtin">int</span>], <span class="org-builtin">bool</span>]) -&gt; <span class="org-builtin">int</span>:
     <span class="org-doc">"""Find the largest integer 1&lt;=d&lt;=x such that factp(x, l) is false.</span>
 <span class="org-doc">    Return 1 if none exists.</span>
 
@@ -1327,7 +1629,7 @@ that these numbers are prime (due to our fake implementation of <code>factp</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org136fb23"><span class="org-comment-delimiter"># </span><span class="org-comment">We assume that the first prime in each tuple is the smallest</span>
+<pre class="src src-python" id="org3ab38d9"><span class="org-comment-delimiter"># </span><span class="org-comment">We assume that the first prime in each tuple is the smallest</span>
 <span class="org-variable-name">prime_tuples</span> = [
   (34129,
    63907),
@@ -1385,17 +1687,17 @@ required number of calls can be much smaller.
 </div>
 </div>
 
-<div id="outline-container-org13539ea" class="outline-3">
-<h3 id="org13539ea">Exercise 3.18</h3>
-<div class="outline-text-3" id="text-org13539ea">
+<div id="outline-container-orgc9fc463" class="outline-3">
+<h3 id="orgc9fc463">Exercise 3.18</h3>
+<div class="outline-text-3" id="text-orgc9fc463">
 <p>
 Prove that if <code>coNP</code> is unequal to <code>NP</code> then <code>P</code> is unequal to <code>NP</code>.
 </p>
 </div>
 
-<div id="outline-container-orgf5c0667" class="outline-4">
-<h4 id="orgf5c0667">Proof</h4>
-<div class="outline-text-4" id="text-orgf5c0667">
+<div id="outline-container-orgca506ca" class="outline-4">
+<h4 id="orgca506ca">Proof</h4>
+<div class="outline-text-4" id="text-orgca506ca">
 <p>
 So we assume that <code>coNP</code> is unequal to <code>NP</code>. There are two possible cases (both can be
 true at the same time of course):
@@ -1437,9 +1739,9 @@ which is not in <code>P</code>. QED.
 </div>
 </div>
 
-<div id="outline-container-orgdc90194" class="outline-3">
-<h3 id="orgdc90194">Exercise 3.19</h3>
-<div class="outline-text-3" id="text-orgdc90194">
+<div id="outline-container-org3898f6b" class="outline-3">
+<h3 id="org3898f6b">Exercise 3.19</h3>
+<div class="outline-text-3" id="text-org3898f6b">
 <p>
 The <code>REACHABILITY</code> problem is to determine whether there is a path between two specified
 vertices in a graph. Show that <code>REACHABILITY</code> can be solved using \(O(n^2)\) operations if the
@@ -1452,9 +1754,9 @@ Remark: The exercise statement deviates from the book, see <a href="https://www.
 </p>
 </div>
 
-<div id="outline-container-org2f440c8" class="outline-4">
-<h4 id="org2f440c8">Proof</h4>
-<div class="outline-text-4" id="text-org2f440c8">
+<div id="outline-container-orgc2c1263" class="outline-4">
+<h4 id="orgc2c1263">Proof</h4>
+<div class="outline-text-4" id="text-orgc2c1263">
 <p>
 Let \(m\) be the number of edges of the graph. Note that \(m=O(n^2)\). We show the more
 informative bound \(O(m)\) for the first statement and \(O(nm)\) for the second. Note that for
@@ -1556,18 +1858,18 @@ steps.</dd>
 </div>
 </div>
 
-<div id="outline-container-orgc2a77bc" class="outline-3">
-<h3 id="orgc2a77bc">Exercise 3.20 (Euler's theorem)</h3>
-<div class="outline-text-3" id="text-orgc2a77bc">
+<div id="outline-container-orgacd7e31" class="outline-3">
+<h3 id="orgacd7e31">Exercise 3.20 (Euler's theorem)</h3>
+<div class="outline-text-3" id="text-orgacd7e31">
 <p>
 Prove Euler's theorem. In particular, if each vertex has an even number of incident edges,
 give a constructive procedure for finding an Euler cycle.
 </p>
 </div>
 
-<div id="outline-container-org098c80f" class="outline-4">
-<h4 id="org098c80f">Proof</h4>
-<div class="outline-text-4" id="text-org098c80f">
+<div id="outline-container-orga435854" class="outline-4">
+<h4 id="orga435854">Proof</h4>
+<div class="outline-text-4" id="text-orga435854">
 <p>
 To see Euler's Theorem consider a graph with \(m\) edges and an Euler cycle. Let us draw
 tiny arrows at each edge showing the direction in which we walk. Moreover enumerate the
@@ -1635,18 +1937,18 @@ Euler cycle. QED.
 </div>
 </div>
 </div>
-<div id="outline-container-org6406b32" class="outline-3">
-<h3 id="org6406b32">Exercise 3.21 (Transitive property of reduction)</h3>
-<div class="outline-text-3" id="text-org6406b32">
+<div id="outline-container-org01e8f83" class="outline-3">
+<h3 id="org01e8f83">Exercise 3.21 (Transitive property of reduction)</h3>
+<div class="outline-text-3" id="text-org01e8f83">
 <p>
 Show that if a language \(L_1\) is reducible to the language \(L_2\) and the language \(L_2\) is
 reducible to \(L_3\) then the language \(L_1\) is reducible to the language \(L_3\).
 </p>
 </div>
 
-<div id="outline-container-org2983b5c" class="outline-4">
-<h4 id="org2983b5c">Proof</h4>
-<div class="outline-text-4" id="text-org2983b5c">
+<div id="outline-container-orgf1e0196" class="outline-4">
+<h4 id="orgf1e0196">Proof</h4>
+<div class="outline-text-4" id="text-orgf1e0196">
 <p>
 By definition there are polynomial-time reduction functions \(R_{12}\) and \(R_{23}\) from
 \(L_1\) to \(L_2\) and from \(L_2\) to \(L_3\) respectively.
@@ -1707,9 +2009,9 @@ The RHS clearly is a polynomial in the length \(|x|\) of \(x\). QED.
 </div>
 </div>
 
-<div id="outline-container-org0960e73" class="outline-3">
-<h3 id="org0960e73">Exercise 3.22</h3>
-<div class="outline-text-3" id="text-org0960e73">
+<div id="outline-container-orgab18027" class="outline-3">
+<h3 id="orgab18027">Exercise 3.22</h3>
+<div class="outline-text-3" id="text-orgab18027">
 <p>
 Suppose \(L\) is complete for a complexity class, and \(L'\) is another language in the
 complexity class such that \(L\) reduces to \(L'\). Show that \(L'\) is complete for the
@@ -1717,9 +2019,9 @@ complexity class.
 </p>
 </div>
 
-<div id="outline-container-org57ad638" class="outline-4">
-<h4 id="org57ad638">Proof</h4>
-<div class="outline-text-4" id="text-org57ad638">
+<div id="outline-container-orgc982ca9" class="outline-4">
+<h4 id="orgc982ca9">Proof</h4>
+<div class="outline-text-4" id="text-orgc982ca9">
 <p>
 We assume that the reduction relation for the class is transitive in the same way as for
 natural reduction relation of <code>NP</code> (exercise 3.21). I note this here since not for all
