@@ -973,7 +973,7 @@ $$
 $$
 
 Note that $\log(n!)\leq n\log(n)$ is even easier to see. Hence we actually have proven
-that $\log(n!)=\Omega(n\log(n))$.
+that $\log(n!)=\Theta(n\log(n))$.
 ** Exercise 3.16 (Hard-to-compute functions exist)
 Show that there exist Boolean functions on $n$ inputs which requires $\Omega(2^n/n)$ logic
 gates to compute.
@@ -1499,3 +1499,253 @@ Let us now return to the actual exercise. Using transitivity this is almost triv
 fact, let $K$ be any problem in the class then $K$ reduces to $L$ by completeness of
 $L$. But $L$ in turn reduces to $L'$ by assumption. Using transitivity we deduce that $K$
 reduces to $L'$. Since $K$ was arbitrary we conclude that $L'$ is complete too. QED.
+** Exercise 3.23
+Show that =SAT= is NP-complete by first showing that =SAT= is in NP, and then showing that
+reduces to =CSAT=. (Hint: for the reduction it may help to represent each distinct wire in an
+instance of =CSAT= by different variables in a Boolean formula.)
+
+**** Proof
+In boolean formulas we use the following logical connectives: $\neg$, $\land$, $\lor$,
+$\leftrightarrow$ with the obvious meaning. We only sketch the proof of the exercise
+statement in the following.
+
+The fact that =SAT= is in NP is intuitively clear. In fact, a /possible/ wittness of the
+satisfiability of a boolean function is just a concrete assignment of the input variables.
+
+It remains to show that =CSAT= reduces to =SAT=. As suggested we label each wire by a
+unique variable. In the following we replace each gate by a corresponding formula. For
+that we call the input wires $i$ and the output wires $o$. We give them an index in case
+more than one input and/or output is present.
+
+- =NOT= :: $o \leftrightarrow \neg i$
+- =OR= :: $o \leftrightarrow i_1 \lor i_2$
+- =AND= :: $o \leftrightarrow i_1 \land i_2$
+- =FANOUT= :: $o_1 \leftrightarrow i \land o_2 \leftrightarrow i$
+
+Now the boolean formula for the whole circuit is just the conjunction of all these smaller
+formulas. It is intuitively clear that this can be done in polynomial time with respect to
+the number of gates (including =FANOUT=). Note that this essentially does not change if we
+do not count the =FANOUT= operations since it is not hard to see that only a polynomial
+number of =FANOUT= is needed to implement any boolean function (so we can just disallow
+circuits with super-polynomial (in terms of the number of other gates) many =FANOUT=
+gates). QED.
+
+** Exercise 3.24 (=2SAT= has an efficient solution)
+Suppose $\varphi$ is a Boolean formula in conjunctive normal form, in which each clause
+contains only two literals.
+
+1. Construct a (directed) graph $G(\varphi)$ with directed edges in the following way: the
+   vertices of $G$ correspond to variables $x_j$ and their negations $\neg x_j$ in
+   $\varphi$.  There is a (directed) edge $(\alpha, \beta)$ in $G$ if and only if the
+   clause $(\neg\alpha\lor\beta)$ or the clause $(\beta\lor\neg\alpha)$ is present in
+   $\varphi$. Show that $\varphi$ is not satisfiable if and only if there exists a
+   variable $x$ such that there are paths from $x$ to $\neg x$ and from $\neg x$ to $x$ in
+   $G(\varphi)$.
+2. Show that given a directed graph $G$ containing $n$ vertices it is possible to
+   determine whether two vertices $v_1$ and $v_2$ are connected in polynomial time.
+3. Find an efficient algorithm to solve =2SAT=.
+
+*** Solution
+**** Proof of Statement 1
+Note that $(\neg\alpha\lor\beta)$ is identical to both of the /implication/ connectives
+$\alpha\rightarrow\beta$ and $\neg\beta\to\neg\alpha$. This makes the meaning of the graph very intuitive.
+
+A path from $x$ to $\neg x$ implies $x\to\neg x$ (since the implication connective is
+transitive and all clauses are implications). This means that a satisfying assignment
+cannot have $x$ to be true. In the same way a path from $\neg x$ to $x$ implies
+$\neg\,x\to\,x$. So, if both paths are present there cannot be a satisfying
+assignment. That was the easy part.
+
+Now assume that no such pair of paths exist. For this direction it is crucial that the
+graph has the property that whenever it contains the edge $(\alpha,\beta)$ it also
+contains $(\neg\beta,\neg\alpha)$. Otherwise a counterexample for this direction of the
+statement is quickly found:
+
+$$
+  (x\to y) \land (x\to\neg y) \land (\neg x\to x) .
+$$
+
+Lets call this property the /negation symmetry/. If there is a path from $x$ to $y$ let us
+write $x\tto y$.
+
+We call a variable $x$ a /root/ variable if either $x\tto\neg x$ or $\neg x\tto x$. Note
+that the assignment of root variables is unique. In the former case necessarily $x=0$ and
+in the latter case $x=1$. We say $x$ is /fixed/. We say that a variable is /derived/ if
+there is a (root) variable $x_1$ or $x_2$ such that at least one of the following holds
+
+\begin{align*}
+  \neg x_1 \tto x_1 &\tto y \\
+  x_1 \tto \neg x_1 &\tto y \\
+  \neg x_2 \tto x_2 &\tto \neg y \\
+  x_2 \tto \neg x_2 &\tto \neg y
+\end{align*}
+
+Note that a derived variable is also fixed. In the former two cases $y=1$ and in the
+latter two cases $y=0$ (necessarily). Can it happen that we get a contradictory
+assignment, that is, can it happen that an $x_1$ /and/ an $x_2$ as above exists? No this
+cannot happen. Lets consider the case where line 1 and line 3 hold (the other cases are
+similar). In that case, by the negation-symmetry, we also have $y\tto \neg x_1$ and
+$y\tto\neg x_2$. But this implies (for example) $x_2\,\tto\,\neg\,x_2$ - a contradiction
+to our assumption further above that a variable is not connected to its negation in /both/
+directions.
+
+It is not hard to see that the given assignment for root and derived variables is not
+contradictory. In fact, it just remains to investigate paths from derived to root, from
+root to another root, and derived to another derived. We leave the tedious argumentation
+to the reader 😉.
+
+There might be variables which are neither root nor derived. One /might/ think that one
+can assign them any truth value, but this is not true as can be seen by the very simple
+example $\varphi=x\to y$.
+
+Let $z$ be a variable which is neither root nor derived. There are three possible cases:
+
+- case 1 :: $$ \exists y_0 : z\tto y_0 \text{ and } z\tto \neg y_0 $$
+- case 2 :: $$ \exists y_1 : \neg z\tto y_1 \text{ and } \neg z\tto \neg y_1 $$
+- case 3 :: $$ \text{No such $y_0$ or $y_1$ exists.} $$
+
+It is not hard to see that $z$ is fixed in cases 1 and 2. In case 1 necessarily $z=0$ and
+in case 2 necessarily $z=1$. It is crucial that case 1 and case 2 do not happen at the
+same time. If they were it would follow that
+
+\begin{align*}
+  &y_0 \tto \neg z \tto \neg y_1 \tto z \tto \neg y_0 , \\
+  &\neg y_0 \tto \neg z \tto y_1 \tto z \tto y_0 . \\
+\end{align*}
+
+A contradiction to our assumption. Now let us replace $\varphi$ by $\varphi'$ as follows
+
+- In case 1: $\varphi'=\varphi\land(z\to\neg z)$.
+- In case 2: $\varphi'=\varphi\land(\neg z\to z)$.
+- In case 3: Do one of the above does not matter which one.
+
+Clearly a solution of $\varphi'$ is also a solution of $\varphi$. It is not hard to see
+that the graph of $\varphi'$ still has the property that no variable is connected to its
+negation in both directions. In fact, let us assume that we added $z\to\neg z$ (the other
+case is similar). So we are in case 1 or 3. Assume $\varphi'$ violates the property. Then
+there must be a $y$ which is connected to its negation in both ways and at least of the
+paths contains the segment $z\to\neg z$. But in fact both ways must lead through this
+segment since otherwise $y$ would be a root and $z$ were derived! Both ways through the
+segment means:
+
+\begin{align*}
+  &y \tto z \to \neg z \tto \neg y, \\
+  &\neg y \tto z \to \neg z \tto y.
+\end{align*}
+
+and hence case 2 is satisfied - contradiction, since we already know that we are in case 1
+or 2.
+
+Repeated application of this procedure shows that we can replace $\varphi$ by a formula
+$\psi$ which still has the property that no variable is connected both ways to its
+negation. Moreover $\psi$ has only root and derived variables. Hence it has a unique
+solution (we showed this above). This solution is also a satisfying assignment for
+$\varphi$. QED.
+
+**** Proof of Statement 2
+In exercise 3.19 we showed this for undirected graphs. The same algorithm also works for
+directed graphs.
+
+**** Solution of 3
+The proof of statement 1 essentially contains an algorithm. In the following we describe a
+routine =solve= to find a satisfying assignment. The algorithm works on the graph
+representation of $\varphi$. It makes use of two subroutines =reach= and =traverse=.
+
+=reach(a,b)= just decides if vertices =a= and =b= are connected. This can be done in
+$O(n^2)$ operations if $n$ is the number of variables (exercise 3.19). The function
+=traverse(a,f)= starts at vertex $a$ and walks over all vertices reachable by $a$. It calls
+=f(v)= for each vertex it reaches. Below the callback always has the form =v→t= where =t=
+is some truth value. If $v$ is the vertex of some variable $y$ or its negation it means
+that we assign $y=t$ or $y=\neg t$ depending on what is the case. Note that =traverse= can
+be implemented by the procedure driving =reach= (just take =b= to be some artificial
+vertex connected to nothing). So it runs in $O(n^2)$ operations too.
+
+- (R) For each variable $x$ do:
+  - Check if =reach(x,¬x)= or =reach(¬x,x)=.
+  - If both are true halt and return that no assignment exists.
+  - If the first checks out set $x=0$ and mark $x$ as /root/.
+  - If the second checks out set $x=1$ and mark $x$ as /root/.
+- (D) For each of the root variables $r$ do:
+  - Call =traverse(r,v→r)=.
+  - Call =traverse(¬r,v→¬r)=.
+- Remove all vertices from the graph which where visited by the calls to =traverse=,
+  including the root vertices (the function could mark each vertex upon visit to make this
+  possible). Also remove all "dangling" edges.
+- Take any of the remaining variables $z$.
+  - If no such $z$ exists we are done and we can return the assignments we found.
+  - *Try* to add $z\to\neg z$ to the graph and call =solve= recursively on this new graph.
+  - If the former fails add $\neg z\to z$ to the graph (instead) and call =solve= again
+    (this does not fail by what we have shown to prove statement 1).
+
+Each call to =solve=, not including the recursive call, needs $O(n^3)$ operations. In the
+worst case we have to call =solve= once for each variable which leads to $O(n^4)$. QED.
+** Exercise 3.25 (=PSPACE ⊆ EXP=)
+The complexity class =EXP= (for exponential time) contains all decision problems which may
+be decided by a Turing machine running in exponential time, that is time $O(2^{n^k})$,
+where $k$ is any constant. Prove that =PSPACE ⊆ EXP=. (Hint: If a Turing machine has $l$
+internal states, an $m$ letter alphabet, and uses space $O(p(n))$, argue that the machine
+can exist in one of at most $lm^{p(n)}$ different states, and that if the Turing machine
+is to avoid infinite loops then it must halt before revisiting a state.)
+
+*** Proof
+Lets do it as suggested in the hint. Consider a Turing machine and some input of length
+$n$. Let $S$ be the set of states, and $\Gamma$ the alphabet for the tape. Let us define
+the /configuration/ of the Turing machine to be
+
+$$
+  (h, s, t) \in \{1,\ldots,p(n)\} \times S \times \Gamma^{p(n)} ,
+$$
+
+where $h$ is the head position, $s$ is the current state and $t$ the content of the tape
+up to position $p(n)$. By assumption the Turing machine does not use more than the first
+$p(n)$ tape cells.
+
+Since the Turing machine is deterministic: if a configuration appears twice the Turing
+machine does not halt. Hence if it halts no configuration appears twice. The number of
+possible configurations is:
+
+$$
+  p(n) \cdot l \cdot m^{p(n)} .
+$$
+
+Hence this is also the maximial running time if the Turing machine halts. Clearly this is
+an exponential bound. QED.
+
+** Exercise 3.26 (=L ⊆ P=)
+The complexity class =L= (for logarithmic space) contains all decision problems which may
+be decided by a Turing machine running in logarithmic space, that is, in space
+$O(\log(n))$. More precisely, the class $L$ is defined using a two-tape Turing
+machine. The first tape contains the problem instance, of size $n$, and is a read-only
+tape, in the sense that only program lines which don’t change the contents of the first
+tape are allowed. The second tape is a working tape which initially contains only
+blanks. The logarithmic space requirement is imposed on the second, working tape
+only. Show that =L ⊆ P=.
+
+*** Proof
+The reasoning is basically the same as in the proof of =PSPACE ⊆ EXP= (exercise 3.25). But
+there is the caveat that a priori we have no bound on the possible head positions on the
+read-only tape. On the other hand, most definitions of $L$ do not really lead to this
+problem since they require the head position to be stored on the working tape. Therefore
+let us first assume that the read-only head can only traverse the $n$ input cells. We come
+back to this restriction at the end of the proof.
+
+Following the reasoning of the proof of exercise 3.25 we see that the number of
+configurations is at most
+
+$$
+  n \cdot O(\log(n)) \cdot l \cdot m^{O(\log(n))} = O(\mathrm{poly}(n)) ,
+$$
+
+where we multiply the possible positions of the read-only head ($n$), the possible
+positions of the working head ($O(\log(n)))$, the number of states ($l$), the number of
+letters ($m$) raised to the number of cells to be written $O(\log(n))$. This proves the
+claim.
+
+What happens if we do not restrict the read-only head to the first $n$ inputs? Let us
+assume that all other cells are blank (wouldn't make sense to allow that the read head
+reads other thing then the actual input). How far can the read-only head travel into the
+blank region? The answer is: only a polynomial amount of cells! In fact, during all the
+time the head points to a blank and hence does effectively not contribute to the
+configuration of the machine. So the amount of /consecutive/ time spend in the blank
+region is at most polynomial. Hence the number of positions of the read-only head is
+polynomial too. This implies the claim in the general case. QED.
