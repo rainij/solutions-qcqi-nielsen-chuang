@@ -17,6 +17,12 @@
   from utils import TermColor
 #+end_src
 
+# Just to draw circuits:
+#+name: chapter-3-setup-2
+#+begin_src python :exports none
+  from qiskit.circuit import QuantumCircuit
+#+end_src
+
 ** Turing Machines
 *** Introduction
 #+name: chapter-3-gather-turing-machine-sources
@@ -327,7 +333,7 @@ Finally, the default parser:
       return program, source_map
 #+end_src
 
-* WIP Exercises
+* Exercises
 ** TODO Exercise 3.1 (Non-computable processes in Nature)
 How might we recognize that a process in Nature computes a function not computable by a Turing
 machine?
@@ -1749,3 +1755,248 @@ time the head points to a blank and hence does effectively not contribute to the
 configuration of the machine. So the amount of /consecutive/ time spend in the blank
 region is at most polynomial. Hence the number of positions of the read-only head is
 polynomial too. This implies the claim in the general case. QED.
+** Exercise 3.27 (Approximation algorithm for =VERTEX COVER=)
+Let $G=(V,E)$ be an undirected graph. Prove that the following algorithm finds a vertex
+cover for $G$ that is within a factor two of being a minimal vertex cover:
+
+#+begin_example
+VC = ∅
+E' = E
+do until E' = ∅
+  let (α, β) be any edge of E'
+  VC = VC ∪ {α, β}
+  remove from E' every edge incident on α or β
+return VC.
+#+end_example
+
+*** Proof
+Consider a /minimal/ vertex cover =MVC=.  Note that the algorithm operates on a sequence
+of edges $(\alpha,\beta)$. None of these edges is visited twice. By definition of the
+vertex cover at least one of the vertices $\alpha,\beta$ /must/ be in =MVC=. The above
+algorithm adds both vertices to =VC=. Hence =VC= is at most twice as large as =MVC=. QED.
+
+** Exercise 3.28 (Arbitrariness of the constant in =BPP=)
+Suppose $k$ is a fixed constant, $1/2 < k\leq1$. Suppose $L$ is a language such that there
+exists a Turing machine $M$ with the property that whenever $x\in L$, $M$ accepts $x$ with
+probability at least $k$, and whenever $x\notin L$, $M$ rejects $x$ with probability at
+least $k$. Show that $L\in\mathrm{BPP}$.
+
+*** Proof
+For simplicity we assume that the Turing machine always halts. I think most definitions of
+=BPP= actually assume this. But this is not really crucial, because a polynomial time
+bound is required for the case where the machine guesses the correct value one can just
+introduce a step-counter which aborts after some /sufficiently/ large amount of polynomial
+time. In this case one can halt in either the accepting or the rejecting state (garbage),
+but "in practice" it would certainly be nicer to introduce a new halting state =ABORT=.
+
+Let $\varepsilon=k-1/2$ and $r\in\NN$. Consider the Turing machine $M_r$ which runs $M$ on
+the same input $r$ times and accepts if most individual runs return accept. It rejects
+otherwise. In case of a tie just reject (doesn't really matter but fits better into the
+argumentation of Box 3.4). Let us fix an input $x$ and assume $x\in L$. The case $x\notin
+L$ is similar and we omit it.
+
+Let $X_i$ be $1$ if the $M$ accepts and $0$ if it rejects upon $x$ as input.
+
+It is intuitively clear that the $X_i$ are /iid/ (independent, identically
+distributed). They are identically distributed since it is always the same machine and
+always the same input. They are independent since the individual coin tosses are
+independent (certainly a /reasonable/ assumption although it was never explicitly
+mentioned in the definition of the probabilistic Turing machine).
+
+Hence the Chernoff bound (Box 3.4) implies that $x$ is accepted by $M_r$ with probability
+at least $1-e^{-2\varepsilon^2r}$ which goes to $1$ if $r\to\infty$. The case $x\notin L$
+can be treated in the same way (here the $X_i$ are $1$ upon rejection and $0$ upon
+acceptance). Hence $k_r\geq1-e^{-2\varepsilon^2r}$ which can be made arbitrary close to
+$1$ if $r$ is sufficiently large. QED.
+
+** Exercise 3.29 (Fredkin gate is self-inverse)
+Show that applying two consecutive Fredkin gates gives the same outputs as inputs.
+
+*** Proof
+The action of the Fredkin gate can be briefly expressed by the following to laws of
+action:
+
+\begin{align*}
+  ab0 &\mapsto ab0 , \\
+  ab1 &\mapsto ba1 .
+\end{align*}
+
+It is very hard not to see that the Fredkin gate is self-inverse. QED.
+
+** TODO Exercise 3.30
+Verify that the billiard ball computer in Figure 3.14 computes the Fredkin gate.
+
+** Exercise 3.31 (Reversible half-adder)
+Construct a reversible circuit which, when two bits $x$ and $y$ are input, outputs
+$(x,y,c,x\oplus y)$, where $c$ is the carry bit when $x$ and $y$ are added.
+
+*** Solution
+Below we give a circuit which is made of Toffoli gates and implements the operation:
+
+$$
+  (x, y, 1, 0, a, b) \; \mapsto \, (x, y, 1, 0, a\oplus c, b\oplus x\oplus y) ,
+$$
+
+where $c=xy$ is the carry-bit. The two bits initially at $1$ and $0$ can be considered
+working registers. Note that no garbage is left behind. This operation is implemented by
+the following circuit.
+
+#+RESULTS[831d67a54801a5b753343a1f0e06eedd43d6d5ec]: exercise-3.31-circuit
+#+begin_example
+
+  x: ──■─────────■─────────■───────
+       │         │         │
+  y: ──■────■────┼─────────┼────■──
+       │    │    │         │    │
+  1: ──┼────■────■────■────■────■──
+       │  ┌─┴─┐┌─┴─┐  │  ┌─┴─┐┌─┴─┐
+  0: ──┼──┤ X ├┤ X ├──■──┤ X ├┤ X ├
+     ┌─┴─┐└───┘└───┘  │  └───┘└───┘
+  a: ┤ X ├────────────┼────────────
+     └───┘          ┌─┴─┐
+  b: ───────────────┤ X ├──────────
+                    └───┘
+#+end_example
+
+The first Toffoli directly adds the carry-bit to $a$. The second and the third Toffoli
+produce $x\oplus y$ within the working area. This is then added to $b$ by the fourth
+register. The two remaining Toffolis just uncompute the second and the third Toffoli.
+
+#+name: exercise-3.31-circuit
+#+begin_src python :results replace :exports results :tangle no :cache yes
+  qc = QuantumCircuit(6)
+
+  qc.ccx(0, 1, 4)
+  qc.ccx(1, 2, 3)
+  qc.ccx(0, 2, 3)
+  qc.ccx(2, 3, 5)
+  qc.ccx(0, 2, 3)
+  qc.ccx(1, 2, 3)
+
+  str(qc.draw()) \
+      .replace('q_0', '  x') \
+      .replace('q_1', '  y') \
+      .replace('q_2', '  1') \
+      .replace('q_3', '  0') \
+      .replace('q_4', '  a') \
+      .replace('q_5', '  b')
+#+end_src
+
+** Exercise 3.32 (From Fredkin to Toffoli and back again)
+What is the smallest number of Fredkin gates needed to simulate a Toffoli gate? What is
+the smallest number of Toffoli gates needed to simulate a Fredkin gate?
+
+*** Solution: Implement Fredkin by Toffoli
+The following circuit clearly implements the Fredkin gate in terms of three Toffoli
+gates. The nice thing is that no ancilla bits are needed.
+
+#+RESULTS[5a8e86aa717881404a40fc7793fa7d6e379e2dc0]: exercise-3.32-Fred-by-Toff
+:
+:   c: ──■────■────■──
+:        │  ┌─┴─┐  │
+:   x: ──■──┤ X ├──■──
+:      ┌─┴─┐└─┬─┘┌─┴─┐
+:   y: ┤ X ├──■──┤ X ├
+:      └───┘     └───┘
+
+Clearly the Fredkin gate cannot be implemented by one Toffoli gate since the former
+modifies (up to) two bits and the latter only one bit. It is also not very hard to see
+that two Toffolis are not sufficient either (even with ancilla bits). In fact, it is clear
+that the two targets are already fixed to target the $x$ and the $y$ bit. From that it
+follows that both Toffolis must have one control at $c$ since $c$ in the Fredkin gate has
+an effect on both $x$ and $y$. In the same way the second control is necessarily at $x$ or
+$y$ so there is no further freedom.
+
+#+name: exercise-3.32-Fred-by-Toff
+#+begin_src python :results replace :exports results :tangle no :cache yes
+  qc = QuantumCircuit(3)
+
+  qc.ccx(0, 1, 2)
+  qc.ccx(0, 2, 1)
+  qc.ccx(0, 1, 2)
+
+  str(qc.draw()) \
+      .replace('q_0', ' c1') \
+      .replace('q_1', ' c2') \
+      .replace('q_2', '  x')
+#+end_src
+
+*** Solution: Implement Toffoli by Fredkin
+The Toffoli gate can be implemented by three Fredkin gates and two ancilla bits /if/
+garbage is allowed:
+
+#+RESULTS[090cc5c8648cb23aa132fd3b8f6aa65427a008b7]: exercise-3.32-Toff-by-Fred
+#+begin_example
+
+  a: ────■────
+         │
+  b: ────┼──■─
+         │  │
+  x: ─■──┼──X─
+      │  │  │
+  0: ─X──X──X─
+      │  │
+  1: ─X──X────
+
+#+end_example
+
+Note that the first Fredkin gate is responsible for filling the second to last and the
+last wire with $x$ and $\overline{x}$. The other two Fredkin gates operate on three wires
+two of which contain $x$ and the third one contains $\overline{x}$. The $\overline{x}$ is
+moved into the third wire iff $a$ and $b$ are both $1$.
+
+We need ancilla bits since the Fredkin gate is conservative, that is, it preserves the
+number of ones (and zeros). The Toffoli gate does not do this. This also implies that we
+cannot uncompute the garbage. Note that two ancilla bits a $0$ /and/ a $1$ are /indeed/
+required because the Toffoli gate can either increase or decrease the number of ones.
+
+Clearly one Fredkin gate cannot produce the Toffoli gate. Let us demonstrate that it is
+still not possible with two Fredkin gates.
+
+Assume that to the contrary that an implementation with just two Fredkin gates
+exists. None of the targets of the first Fredkin gate lies on the first or second
+wire. Otherwise the second gate had to be used to move back the bit of that wire and hence
+had to occupy the same targets and the same control - there are a few corner cases for
+which this is not needed but they do not work for trivial reasons. It follows that also
+the second gate cannot have a target on one of the first two wires. On the other hand the
+operation must depend on /both/ $a$ and $b$ hence the controls must occupy $a$ and
+$b$. Without loss of generality we may assume that the first gate has $a$ as control
+and the second gate has $b$ as control. Clearly, the second gate must have the third wire
+as one of its targets since otherwise it would not contribute to the result. The other
+target must be an ancilla bit. Hence we have the following situation:
+
+#+begin_example
+  a: ─■────
+
+  b: ────■─
+         │
+  x: ────X─
+         │
+  ?: ────X─
+#+end_example
+
+Meaning that the second gate is already fixed and that we know the control of the first
+gate. Right before the execution of the second gate the fourth wire must contain
+$\overline{x}$ if $a=1$. Clearly there is no way how the first gate could accomplish that
+(in general). Contradiction! Hence three Fredkin gates are necessary.
+
+We have already seen that two ancilla bits are necessarily required (a $0$ and a
+$1$). Hence the given construction is optimal in the number of gates and ancilla bits at
+the same time.
+
+#+name: exercise-3.32-Toff-by-Fred
+#+begin_src python :results replace :exports results :tangle no :cache yes
+  qc = QuantumCircuit(5)
+
+  qc.fredkin(2, 3, 4)
+  qc.fredkin(0, 3, 4)
+  qc.fredkin(1, 2, 3)
+
+  str(qc.draw()) \
+      .replace('q_0', '  a') \
+      .replace('q_1', '  b') \
+      .replace('q_2', '  x') \
+      .replace('q_3', '  0') \
+      .replace('q_4', '  1')
+
+#+end_src
