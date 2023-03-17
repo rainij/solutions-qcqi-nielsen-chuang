@@ -20,7 +20,7 @@
 # Just to draw circuits:
 #+name: chapter-3-setup-2
 #+begin_src python :exports none
-  from qiskit.circuit import QuantumCircuit
+  from qiskit.circuit import QuantumCircuit, QuantumRegister as QuReg
 #+end_src
 
 ** Turing Machines
@@ -1278,7 +1278,7 @@ that these numbers are prime (due to our fake implementation of =factp=):
       f"{x.bit_length()} bit number with {len(primes)} prime factors.")
 #+end_src
 
-#+RESULTS[63e277f11017843be8d50b37065b21811c3bf102]: exercise-3.17-2
+#+RESULTS[9f574f062ec92ef9fe648f659ca24ca5f43f7b2c]: exercise-3.17-2
 : Called factp 31 times for 32 bit number with 2 prime factors.
 : Called factp 65 times for 66 bit number with 2 prime factors.
 : Called factp 65 times for 98 bit number with 3 prime factors.
@@ -1834,37 +1834,42 @@ $(x,y,c,x\oplus y)$, where $c$ is the carry bit when $x$ and $y$ are added.
 Below we give a circuit which is made of Toffoli gates and implements the operation:
 
 $$
-  (x, y, 1, 0, a, b) \; \mapsto \, (x, y, 1, 0, a\oplus c, b\oplus x\oplus y) ,
+  (x_0, x_1, 1, 0, a_0, a_1) \; \mapsto \, (x_0, x_1, 1, 0, a_0\oplus c, a_1\oplus x_0\oplus x_1) ,
 $$
 
-where $c=xy$ is the carry-bit. The two bits initially at $1$ and $0$ can be considered
-working registers. Note that no garbage is left behind. This operation is implemented by
-the following circuit.
+where $c=x_0x_1$ is the carry-bit. This operation is implemented by the following circuit
+(ancillas initialized to $1$ and $0$ in that order). Note that no garbage is left behind
+(we uncompute it).
 
-#+RESULTS[831d67a54801a5b753343a1f0e06eedd43d6d5ec]: exercise-3.31-circuit
+#+RESULTS[1209b93ccdc7022f9b2c46a456b5251004400f7a]: exercise-3.31-circuit
 #+begin_example
-
-  x: ──■─────────■─────────■───────
-       │         │         │
-  y: ──■────■────┼─────────┼────■──
-       │    │    │         │    │
-  1: ──┼────■────■────■────■────■──
-       │  ┌─┴─┐┌─┴─┐  │  ┌─┴─┐┌─┴─┐
-  0: ──┼──┤ X ├┤ X ├──■──┤ X ├┤ X ├
-     ┌─┴─┐└───┘└───┘  │  └───┘└───┘
-  a: ┤ X ├────────────┼────────────
-     └───┘          ┌─┴─┐
-  b: ───────────────┤ X ├──────────
-                    └───┘
+                         ░
+  x_0: ──────────────────░───■─────────■─────────■───────
+                         ░   │         │         │
+  x_1: ──────────────────░───■────■────┼─────────┼────■──
+       ┌───────────────┐ ░   │    │    │         │    │
+anc_0: ┤ Initialize(1) ├─░───┼────■────■────■────■────■──
+       ├───────────────┤ ░   │  ┌─┴─┐┌─┴─┐  │  ┌─┴─┐┌─┴─┐
+anc_1: ┤ Initialize(0) ├─░───┼──┤ X ├┤ X ├──■──┤ X ├┤ X ├
+       └───────────────┘ ░ ┌─┴─┐└───┘└───┘  │  └───┘└───┘
+  a_0: ──────────────────░─┤ X ├────────────┼────────────
+                         ░ └───┘          ┌─┴─┐
+  a_1: ──────────────────░────────────────┤ X ├──────────
+                         ░                └───┘
 #+end_example
 
-The first Toffoli directly adds the carry-bit to $a$. The second and the third Toffoli
-produce $x\oplus y$ within the working area. This is then added to $b$ by the fourth
+The first Toffoli directly adds the carry-bit to $a_0$. The second and the third Toffoli
+produce $x_0\oplus x_1$ within the working area. This is then added to $a_1$ by the fourth
 register. The two remaining Toffolis just uncompute the second and the third Toffoli.
 
 #+name: exercise-3.31-circuit
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(6)
+  qc = QuantumCircuit(QuReg(2, "x"), QuReg(2, "anc"), QuReg(2, "a"))
+
+  # Initialize in two steps for readability of the plot:
+  qc.initialize('1', [2])
+  qc.initialize('0', [3])
+  qc.barrier()
 
   qc.ccx(0, 1, 4)
   qc.ccx(1, 2, 3)
@@ -1873,13 +1878,7 @@ register. The two remaining Toffolis just uncompute the second and the third Tof
   qc.ccx(0, 2, 3)
   qc.ccx(1, 2, 3)
 
-  str(qc.draw()) \
-      .replace('q_0', '  x') \
-      .replace('q_1', '  y') \
-      .replace('q_2', '  1') \
-      .replace('q_3', '  0') \
-      .replace('q_4', '  a') \
-      .replace('q_5', '  b')
+  qc.draw()
 #+end_src
 
 ** Exercise 3.32 (From Fredkin to Toffoli and back again)
@@ -1890,65 +1889,64 @@ the smallest number of Toffoli gates needed to simulate a Fredkin gate?
 The following circuit clearly implements the Fredkin gate in terms of three Toffoli
 gates. The nice thing is that no ancilla bits are needed.
 
-#+RESULTS[5a8e86aa717881404a40fc7793fa7d6e379e2dc0]: exercise-3.32-Fred-by-Toff
+#+RESULTS[a9babb7e8474a814805e84b10f94d73b85f72142]: exercise-3.32-Fred-by-Toff
 :
 :   c: ──■────■────■──
 :        │  ┌─┴─┐  │
-:   x: ──■──┤ X ├──■──
+: x_0: ──■──┤ X ├──■──
 :      ┌─┴─┐└─┬─┘┌─┴─┐
-:   y: ┤ X ├──■──┤ X ├
+: x_1: ┤ X ├──■──┤ X ├
 :      └───┘     └───┘
 
 Clearly the Fredkin gate cannot be implemented by one Toffoli gate since the former
 modifies (up to) two bits and the latter only one bit. It is also not very hard to see
 that two Toffolis are not sufficient either (even with ancilla bits). In fact, it is clear
-that the two targets are already fixed to target the $x$ and the $y$ bit. From that it
+that the two targets are already fixed to target the $x_0$ and the $x_1$ bit. From that it
 follows that both Toffolis must have one control at $c$ since $c$ in the Fredkin gate has
-an effect on both $x$ and $y$. In the same way the second control is necessarily at $x$ or
-$y$ so there is no further freedom.
+an effect on both $x_0$ and $x_1$. In the same way the second control is necessarily at
+$x_0$ or $x_1$ so there is no further freedom.
 
 #+name: exercise-3.32-Fred-by-Toff
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(3)
+  qc = QuantumCircuit(QuReg(1, "c"), QuReg(2, "x"))
 
   qc.ccx(0, 1, 2)
   qc.ccx(0, 2, 1)
   qc.ccx(0, 1, 2)
 
-  str(qc.draw()) \
-      .replace('q_0', ' c1') \
-      .replace('q_1', ' c2') \
-      .replace('q_2', '  x')
+  qc.draw()
 #+end_src
 
 *** Solution: Implement Toffoli by Fredkin
-The Toffoli gate can be implemented by three Fredkin gates and two ancilla bits /if/
-garbage is allowed:
+The Toffoli gate can be implemented by three Fredkin gates and two ancilla bits
+(initialized to $0$ and $1$ in that order) /if/ garbage is allowed:
 
-#+RESULTS[090cc5c8648cb23aa132fd3b8f6aa65427a008b7]: exercise-3.32-Toff-by-Fred
+#+RESULTS[db480239c56d3d3f23c76b9f23e42a54ef872f47]: exercise-3.32-Toff-by-Fred
 #+begin_example
-
-  a: ────■────
-         │
-  b: ────┼──■─
-         │  │
-  x: ─■──┼──X─
-      │  │  │
-  0: ─X──X──X─
-      │  │
-  1: ─X──X────
-
+                         ░
+  c_0: ──────────────────░─────■────
+                         ░     │
+  c_1: ──────────────────░─────┼──■─
+                         ░     │  │
+    x: ──────────────────░──■──┼──X─
+       ┌───────────────┐ ░  │  │  │
+anc_0: ┤ Initialize(0) ├─░──X──X──X─
+       ├───────────────┤ ░  │  │
+anc_1: ┤ Initialize(1) ├─░──X──X────
+       └───────────────┘ ░
 #+end_example
 
 Note that the first Fredkin gate is responsible for filling the second to last and the
 last wire with $x$ and $\overline{x}$. The other two Fredkin gates operate on three wires
 two of which contain $x$ and the third one contains $\overline{x}$. The $\overline{x}$ is
-moved into the third wire iff $a$ and $b$ are both $1$.
+moved into the third wire iff $c_0$ and $c_1$ are both $1$.
 
 We need ancilla bits since the Fredkin gate is conservative, that is, it preserves the
 number of ones (and zeros). The Toffoli gate does not do this. This also implies that we
 cannot uncompute the garbage. Note that two ancilla bits a $0$ /and/ a $1$ are /indeed/
-required because the Toffoli gate can either increase or decrease the number of ones.
+required because the Toffoli gate can either increase or decrease the number of ones. Note
+that we assume ancilla bits to be zero initialized (qiskit convention) and hence we need a
+=NOT= (here called =X=) to generate a $1$ /as an initial value/.
 
 Clearly one Fredkin gate cannot produce the Toffoli gate. Let us demonstrate that it is
 still not possible with two Fredkin gates.
@@ -1959,16 +1957,16 @@ wire. Otherwise the second gate had to be used to move back the bit of that wire
 had to occupy the same targets and the same control - there are a few corner cases for
 which this is not needed but they do not work for trivial reasons. It follows that also
 the second gate cannot have a target on one of the first two wires. On the other hand the
-operation must depend on /both/ $a$ and $b$ hence the controls must occupy $a$ and
-$b$. Without loss of generality we may assume that the first gate has $a$ as control
-and the second gate has $b$ as control. Clearly, the second gate must have the third wire
+operation must depend on /both/ $c_0$ and $c_1$ hence the controls must occupy $c_0$ and
+$c_1$. Without loss of generality we may assume that the first gate has $c_0$ as control
+and the second gate has $c_1$ as control. Clearly, the second gate must have the third wire
 as one of its targets since otherwise it would not contribute to the result. The other
 target must be an ancilla bit. Hence we have the following situation:
 
 #+begin_example
-  a: ─■────
+c_0: ─■────
 
-  b: ────■─
+c_1: ────■─
          │
   x: ────X─
          │
@@ -1977,7 +1975,7 @@ target must be an ancilla bit. Hence we have the following situation:
 
 Meaning that the second gate is already fixed and that we know the control of the first
 gate. Right before the execution of the second gate the fourth wire must contain
-$\overline{x}$ if $a=1$. Clearly there is no way how the first gate could accomplish that
+$\overline{x}$ if $c_0=1$. Clearly there is no way how the first gate could accomplish that
 (in general). Contradiction! Hence three Fredkin gates are necessary.
 
 We have already seen that two ancilla bits are necessarily required (a $0$ and a
@@ -1986,17 +1984,15 @@ the same time.
 
 #+name: exercise-3.32-Toff-by-Fred
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(5)
+  qc = QuantumCircuit(QuReg(2, "c"), QuReg(1, "x"), QuReg(2, "anc"))
+
+  qc.initialize('0', [3])
+  qc.initialize('1', [4])
+  qc.barrier()
 
   qc.fredkin(2, 3, 4)
   qc.fredkin(0, 3, 4)
   qc.fredkin(1, 2, 3)
 
-  str(qc.draw()) \
-      .replace('q_0', '  a') \
-      .replace('q_1', '  b') \
-      .replace('q_2', '  x') \
-      .replace('q_3', '  0') \
-      .replace('q_4', '  1')
-
+  qc.draw()
 #+end_src
