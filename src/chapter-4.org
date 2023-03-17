@@ -30,8 +30,9 @@ Not tangled:
 
 #+name: setup-chapter-4-2
 #+begin_src python :tangle no
-  from sympy import Quaternion
-  from qiskit.circuit import QuantumCircuit, Parameter as Param
+   from sympy import Quaternion
+   from qiskit.circuit import QuantumCircuit, ControlledGate, Parameter as Param, \
+       QuantumRegister as QuReg, ClassicalRegister as ClReg
 #+end_src
 
 ** Pauli- and Rotation-Matrices
@@ -1453,12 +1454,12 @@ $$
   C^1(R_y(\theta)) = C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS[a60b16ccce94ba51f1031d0b6a01a2745355f50b]: exercise-4.22-circuit-1
+#+RESULTS[ac9f76828c0a4be9bc92fc988225e9baf5de23d1]: exercise-4.22-circuit-1
 :
-: q_0: ─────────────■────────────────■──
-:      ┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐
-: q_1: ┤ Ry(θ/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├
-:      └─────────┘└───┘└──────────┘└───┘
+: q_0: ──────────────■────────────────■──
+:      ┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐
+: q_1: ┤ Ry(+π/2) ├┤ X ├┤ Ry(-π/2) ├┤ X ├
+:      └──────────┘└───┘└──────────┘└───┘
 
 We get the same result if we use the proof of Corollary 4.2. For the x-rotation we first deduce from
 exercise 4.6 (interpretation as 3D rotations):
@@ -1473,12 +1474,12 @@ $$
   C^1(R_x(\theta)) = R_{z,2}(-\pi/2) C(X) \cdot R_{y,2}(-\theta/2) \cdot C(X) \cdot R_{z,2}(-\pi/2) R_{y,2}(\theta/2) .
 $$
 
-#+RESULTS[029338e5afe5a7bc7fef28b3b127128c8129dd67]: exercise-4.22-circuit-2
+#+RESULTS[45c2ad699e83926ca52c59649a213d51cd478588]: exercise-4.22-circuit-2
 :
-: q_0: ─────────────────────────■────────────────■──────────────
-:      ┌─────────┐┌──────────┐┌─┴─┐┌──────────┐┌─┴─┐┌──────────┐
-: q_1: ┤ Ry(θ/2) ├┤ Rz(-π/2) ├┤ X ├┤ Ry(-θ/2) ├┤ X ├┤ Rz(-π/2) ├
-:      └─────────┘└──────────┘└───┘└──────────┘└───┘└──────────┘
+: q_0: ─────────────────────────■────────────────■─────────────
+:      ┌──────────┐┌─────────┐┌─┴─┐┌──────────┐┌─┴─┐┌─────────┐
+: q_1: ┤ Ry(+π/2) ├┤ Rz(2Δt) ├┤ X ├┤ Ry(-π/2) ├┤ X ├┤ Rz(2Δt) ├
+:      └──────────┘└─────────┘└───┘└──────────┘└───┘└─────────┘
 
 # The code for the circuit plots:
 
@@ -1495,7 +1496,7 @@ $$
   qc1.ry(params[1], 1)
   qc1.cx(0, 1)
 
-  str(qc1.draw('text'))
+  qc1.draw('text')
 #+end_src
 
 #+name: exercise-4.22-circuit-2
@@ -1508,7 +1509,7 @@ $$
   qc2.cx(0, 1)
   qc2.rz(params[2], 1)
 
-  str(qc2.draw('text'))
+  qc2.draw('text')
 #+end_src
 
 ** Exercise 4.24
@@ -1573,7 +1574,7 @@ Recall that the Fredkin (controlled-swap) gate performs the transform:
 
 1. [X] Give a quantum circuit which uses three Toffoli gates to construct the Fredkin gate (Hint: think
    of the swap gate construction – you can control each gate, one at a time).
-2. [X] Show that the first and last Toffoli gates can be replaced by gates.
+2. [X] Show that the first and last Toffoli gates can be replaced by =CNOT= gates.
 3. [X] Now replace the middle Toffoli gate with the circuit in Figure 4.8 to obtain a Fredkin gate
    construction using only six two-qubit gates.
 4. [ ] Can you come up with an even simpler construction, with only five two-qubit gates?
@@ -1630,14 +1631,15 @@ The following circuit equals the Fredkin Gate too:
 In fact:
 
 #+name: exercise-4.25-2
-#+begin_src python :results replace :exports results :tangle no :cache yes
+#+begin_src python :results replace :exports both :tangle no :cache yes
   C12 = make_CU(3, 1, 2, X)
+  T02 = make_CnU(3, [0, 2], 1, X)
 
   assert C12 * T02 * C12 == Fred, "Exercise 4.25, Solution to 2."
   "PASSED"
 #+end_src
 
-#+RESULTS[03d1ab7ca15c63fd0508e18ae42b590abb0d5ffc]: exercise-4.25-2
+#+RESULTS[af346f525653f1e3170a97b04f92f60a5aca4370]: exercise-4.25-2
 : PASSED
 
 #+name: exercise-4-25-circuit-2
@@ -1847,18 +1849,11 @@ actually commute. The solutions are:
 One benefit of the "reversed" multiplication of the permutations is that it is the same ordering
 like in typical drawings of circuits. Let us just draw the third one:
 
-#+RESULTS[1214d990423cc092b69bafc02130b0f8de9ef97c]: exercise-4-27-circuit
-:      ┌───┐
-: q_0: ┤ X ├────────────■────■──
-:      └─┬─┘┌───┐       │    │
-: q_1: ──■──┤ X ├──■────┼────■──
-:        │  └─┬─┘┌─┴─┐┌─┴─┐┌─┴─┐
-: q_2: ──■────■──┤ X ├┤ X ├┤ X ├
-:                └───┘└───┘└───┘
+#+RESULTS[443d6bed5a602328d4d4dc9fe85075998a4e0e86]: exercise-4-27-circuit
 
 #+name: exercise-4-27-circuit
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(3)
+p  qc = QuantumCircuit(3)
   qc.ccx(1, 2, 0)
   qc.cx(2, 1)
   qc.cx(1, 2)
@@ -2070,10 +2065,10 @@ then measure. For example, show that the circuit
   qc.barrier(range(2)) # just to make the drawing nicer
   qc.measure(range(2), range(2))
 
-  str(qc.draw('text'))
+  qc.draw('text')
 #+end_src
 
-#+RESULTS[a438cd464dc1a5d6749e2849f6949438131c2717]: exercise-4.33-bell-measurement
+#+RESULTS[21d6c0ad5fa014c21c4f5d6a1c61f8f94747be78]: exercise-4.33-bell-measurement
 :           ┌───┐ ░ ┌─┐
 : q_0: ──■──┤ H ├─░─┤M├───
 :      ┌─┴─┐└───┘ ░ └╥┘┌─┐
@@ -2129,27 +2124,29 @@ of $U$:
 
 #+name: exercise-4.34-measure-observable
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(2, 1)
+  qc = QuantumCircuit(QuReg(1, "anc"), QuReg(1, "psi"), ClReg(1, "c"))
+
+  qc.initialize('0', [0])
+  qc.barrier()
+
   qc.h(0)
-  qc.cx(0, 1)  # this is CX but we hack it to CU below
+  CU = ControlledGate("CU", 2, [], base_gate=Gate("U", 1, []))
+  qc.append(CU, [0, 1])
   qc.h(0)
   qc.barrier(range(2)) # just to make the drawing nicer
   qc.measure(range(1), range(1))
 
-  str(qc.draw('text'))\
-      .replace('X', 'U')\
-      .replace('q_0', '|0>')\
-      .replace('q_1', '|ψ>')
+  qc.draw('text')
 #+end_src
 
-#+RESULTS[b77f646a5b3bb23e25b9ddd0996c791d747c5882]: exercise-4.34-measure-observable
-:      ┌───┐     ┌───┐ ░ ┌─┐
-: |0>: ┤ H ├──■──┤ H ├─░─┤M├
-:      └───┘┌─┴─┐└───┘ ░ └╥┘
-: |ψ>: ─────┤ U ├──────░──╫─
-:           └───┘      ░  ║
-: c: 1/═══════════════════╩═
-:                         0
+#+RESULTS[a1ef0b899752e32561824fa277bb16807008fd8b]: exercise-4.34-measure-observable
+:      ┌───────────────┐ ░ ┌───┐     ┌───┐ ░ ┌─┐
+: anc: ┤ Initialize(0) ├─░─┤ H ├──■──┤ H ├─░─┤M├
+:      └───────────────┘ ░ └───┘┌─┴─┐└───┘ ░ └╥┘
+: psi: ──────────────────░──────┤ U ├──────░──╫─
+:                        ░      └───┘      ░  ║
+: c: 1/═══════════════════════════════════════╩═
+:                                             0
 
 *** Proof
 Observe that the projections on the eigenvalues of $U$ are given by:
@@ -2226,7 +2223,7 @@ $$
 where $c=x_0\cdot y_0$ is the carry-bit. Recall that $C(X)$ implements binary addition
 modulo 2. Hence the following circuit, which is inspired by the above equation, does what we want:
 
-#+RESULTS[248a411dd90d3165066a3c34fb1744571c3e4ccb]: exercise-4.36-solution
+#+RESULTS[b0bf41a5e8f87cfdd88f1002b2d244b0b8ab2eb9]: exercise-4.36-solution
 :
 : q_0: ──■────■───────
 :        │    │
@@ -2244,7 +2241,7 @@ modulo 2. Hence the following circuit, which is inspired by the above equation, 
   qc.cx(0, 2)
   qc.cx(1, 3)
 
-  str(qc.draw('text'))
+  qc.draw('text')
 #+end_src
 
 ** Exercise 4.37
@@ -2420,10 +2417,10 @@ circuit implements $M$:
   qc.append(ccu, [1, 2, 0])
   qc.ccx(0, 1, 2, '10')
 
-  str(qc.draw('text'))
+  qc.draw('text')
 #+end_src
 
-#+RESULTS[f5070d4f963f4c5a5ea25e38d03c8782ff05c70c]: exercise-4.39-1
+#+RESULTS[eb4210adecd1798cc21018704c3420b045df2096]: exercise-4.39-1
 :           ┌───┐
 : q_0: ──o──┤ Ũ ├──o──
 :        │  └─┬─┘  │
@@ -2472,16 +2469,16 @@ enough (as elements of the unit circle)). QED.
 This and the next two exercises develop a construction showing that the Hadamard, phase, controlled-
 and Toffoli gates are universal. Show that this circuit
 
-#+RESULTS[c388984801ef3ce4fa6274dfc69257cdfb6d3a54]: exercise-4.41
-:      ┌───┐               ┌───┐┌─┐
-: |0>: ┤ H ├──■─────────■──┤ H ├┤M├───
-:      ├───┤  │         │  ├───┤└╥┘┌─┐
-: |0>: ┤ H ├──■─────────■──┤ H ├─╫─┤M├
-:      └───┘┌─┴─┐┌───┐┌─┴─┐└───┘ ║ └╥┘
-: |ψ>: ─────┤ X ├┤ S ├┤ X ├──────╫──╫─
-:           └───┘└───┘└───┘      ║  ║
-: c: 2/══════════════════════════╩══╩═
-:                                0  1
+#+RESULTS[44826f70eb23dc3286fad7cf84e95464aa4b254d]: exercise-4.41
+:        ┌───────────────┐ ░ ┌───┐               ┌───┐┌─┐
+: anc_0: ┤ Initialize(0) ├─░─┤ H ├──■─────────■──┤ H ├┤M├───
+:        ├───────────────┤ ░ ├───┤  │         │  ├───┤└╥┘┌─┐
+: anc_1: ┤ Initialize(0) ├─░─┤ H ├──■─────────■──┤ H ├─╫─┤M├
+:        └───────────────┘ ░ └───┘┌─┴─┐┌───┐┌─┴─┐└───┘ ║ └╥┘
+:   psi: ──────────────────░──────┤ X ├┤ S ├┤ X ├──────╫──╫─
+:                          ░      └───┘└───┘└───┘      ║  ║
+:   c: 2/══════════════════════════════════════════════╩══╩═
+:                                                      0  1
 
 applies the operation $R_z(\theta)$ to the third (target) qubit if the measurement outcomes are both
 $0$, where $\cos\theta=3/5$, and otherwise applies =Z= to the target qubit. Show that the
@@ -2491,7 +2488,13 @@ $1$.
 
 #+name: exercise-4.41
 #+begin_src python :results replace :exports results :tangle no :cache yes
-  qc = QuantumCircuit(3, 2)
+  qc = QuantumCircuit(QuReg(2, "anc"), QuReg(1, "psi"), ClReg(2, "c"))
+
+  qc.initialize('0', [0])
+  qc.initialize('0', [1])
+
+  qc.barrier()
+
   qc.h(0)
   qc.h(1)
   qc.ccx(0, 1, 2)
@@ -2501,10 +2504,7 @@ $1$.
   qc.h(0)
   qc.measure(range(2), range(2))
 
-  str(qc.draw('text')) \
-    .replace('q_0', '|0>') \
-    .replace('q_1', '|0>') \
-    .replace('q_2', '|ψ>')
+  qc.draw('text')
 #+end_src
 
 *** Proof
@@ -2987,22 +2987,25 @@ $$
 From the book we already know how to construct the operator in the middle (Figure 4.19). The
 complete circuit is:
 
-#+RESULTS[2abd53fe40693a3d5284212cccb411ed43077f21]: exercise-4.51
-:         ┌───┐                                                ┌───┐
-: q_0: ───┤ H ├──────■───────────────────────────────────■─────┤ H ├────
-:      ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
-: q_1: ┤ Rx(+π/2) ├──┼────■─────────────────────────■────┼──┤ Rx(-π/2) ├
-:      └──────────┘  │    │                         │    │  └──────────┘
-: q_2: ──────────────┼────┼────■───────────────■────┼────┼──────────────
-:                  ┌─┴─┐┌─┴─┐┌─┴─┐┌─────────┐┌─┴─┐┌─┴─┐┌─┴─┐
-: |0>: ────────────┤ X ├┤ X ├┤ X ├┤ Rz(2Δt) ├┤ X ├┤ X ├┤ X ├────────────
-:                  └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
+#+RESULTS[cf4e13107a8848658e724eaa4d25d936c0cc29ff]: exercise-4.51
+:                        ░    ┌───┐                                                ┌───┐
+: x_0: ──────────────────░────┤ H ├──────■───────────────────────────────────■─────┤ H ├────
+:                        ░ ┌──┴───┴───┐  │                                   │  ┌──┴───┴───┐
+: x_1: ──────────────────░─┤ Rx(+π/2) ├──┼────■─────────────────────────■────┼──┤ Rx(-π/2) ├
+:                        ░ └──────────┘  │    │                         │    │  └──────────┘
+: x_2: ──────────────────░───────────────┼────┼────■───────────────■────┼────┼──────────────
+:      ┌───────────────┐ ░             ┌─┴─┐┌─┴─┐┌─┴─┐┌─────────┐┌─┴─┐┌─┴─┐┌─┴─┐
+: anc: ┤ Initialize(0) ├─░─────────────┤ X ├┤ X ├┤ X ├┤ Rz(2Δt) ├┤ X ├┤ X ├┤ X ├────────────
+:      └───────────────┘ ░             └───┘└───┘└───┘└─────────┘└───┘└───┘└───┘
 
 #+name: exercise-4.51
 #+begin_src python :results replace :exports results :tangle no :cache yes
   params = (Param('+π/2'), Param('-π/2'), Param('2Δt'))
 
-  qc = QuantumCircuit(4)
+  qc = QuantumCircuit(QuReg(3, "x"), QuReg(1, "anc"))
+
+  qc.initialize('0', [3])
+  qc.barrier()
 
   qc.h(0)
   qc.rx(params[0], 1)
@@ -3020,5 +3023,5 @@ complete circuit is:
   qc.rx(params[1], 1)
   qc.h(0)
 
-  str(qc.draw('text')).replace('q_3', '|0>')
+  qc.draw('text')
 #+end_src
