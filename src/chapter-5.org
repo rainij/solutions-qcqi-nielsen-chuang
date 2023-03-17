@@ -229,7 +229,7 @@ to find a solution based on the ABC-construction from Figure 4.6 and the proof o
 
 In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{k+1}$) implements $C(R_k)$:
 
-#+RESULTS[e39481c771c8a0a5950038dc7d4a524569469525]: exercise-5.4-circuit
+#+RESULTS[c75a3bd7202b1d8b4f8e1e9d08ef1c56ac4ea46d]: exercise-5.4-circuit
 :                                          ┌─────────┐
 : q_0: ───────────────■─────────────────■──┤ R_{k+1} ├
 :      ┌───────────┐┌─┴─┐┌───────────┐┌─┴─┐└─┬─────┬─┘
@@ -239,6 +239,7 @@ In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{
 #+name: exercise-5.4-circuit
 #+begin_src python :results replace :exports results :tangle no :cache yes
   qc = QuantumCircuit(2)
+
   C = Gate("R_{k+1}^†", 1, [])
   qc.append(C, [1])
   qc.cx(0, 1)
@@ -250,7 +251,7 @@ In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{
   R = Gate("R_{k+1}", 1, [])
   qc.append(R, [0])
 
-  str(qc.draw('text'))
+  qc.draw('text')
 #+end_src
 
 To see this recall that $XZX=-Z$. Hence by the functional calculus
