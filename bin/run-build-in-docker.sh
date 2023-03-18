@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker build --rm -f docker/Dockerfile -t rs/emacs .
+docker build --rm -t rs/emacs ./docker
 
-docker run --rm rs/emacs "Guten Tag aus dem Container"
+docker run --rm rs/emacs --version
