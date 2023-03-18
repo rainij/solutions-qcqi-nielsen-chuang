@@ -1,8 +1,8 @@
 #!/bin/bash
 
-docker build --rm -t rs/emacs ./docker
+docker build --rm -t rs/make ./docker
 
 docker run --rm \
        -v ${PWD}:/repo \
        --workdir=/repo \
-       rs/emacs default
+       rs/make default

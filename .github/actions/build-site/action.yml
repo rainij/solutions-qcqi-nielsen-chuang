@@ -5,15 +5,7 @@ description: 'Build the Website as public.tar.gz'
 runs:
   using: "composite"
   steps:
-    # TODO
-
     - run: ./bin/run-build-in-docker.sh
       shell: bash
-
-    # Install non-GUI emacs:
-    #- run: sudo apt install emacs-nox --yes
-    #  shell: bash
-    #- run: make
-    #  shell: bash
     - run: tar -czf public.tar.gz public
       shell: bash
