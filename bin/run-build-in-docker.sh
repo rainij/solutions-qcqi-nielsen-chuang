@@ -2,4 +2,7 @@
 
 docker build --rm -t rs/emacs ./docker
 
-docker run --rm rs/emacs --version
+docker run --rm \
+       -v ${PWD}:/repo \
+       --workdir=/repo \
+       rs/emacs default

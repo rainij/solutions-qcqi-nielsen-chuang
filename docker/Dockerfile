@@ -21,6 +21,6 @@ RUN cd emacs-build && make -j3 && make install
 # Cleanup
 RUN rm -rf emacs-build
 # TODO: can I remove some more of the build depenendencies of emacs?
-RUN dnf -y remove git 'dnf-command(builddep)'
+RUN dnf -y remove 'dnf-command(builddep)'
 
-ENTRYPOINT ["emacs"]
+ENTRYPOINT ["make"]
