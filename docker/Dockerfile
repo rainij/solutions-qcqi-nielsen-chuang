@@ -1,3 +1,3 @@
-FROM alpine:3
+FROM alpine:3.17
 
-ENTRYPOINT echo "Hallo aus dem Container"
+ENTRYPOINT ["echo"]
