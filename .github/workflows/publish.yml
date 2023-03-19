@@ -2,7 +2,7 @@ name: Publish to GitHub Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master", "setup-ci-with-docker"] # TODO
     # Allows you to run this workflow manually from the Actions tab:
     workflow_dispatch:
 
@@ -11,14 +11,20 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
-jobs: # TODO: buildx
-  build:
+jobs:
+  build:  # TODO:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build Website and upload Artifact
-        uses: ./.github/actions/build-site-and-upload-artifacts
+      - name: Docker Buildx
+        uses: ./.github/actions/docker-buildx
+      - run: ./bin/run-build-in-docker.sh
+        shell: bash
+      - run: ./bin/run-tests-in-docker.sh
+        shell: bash
+      - name: Upload artifacts
+        uses: ./.github/actions/upload-artifacts
   deploy:
     runs-on: ubuntu-latest
     permissions:
@@ -30,7 +36,7 @@ jobs: # TODO: buildx
         with:
           name: public
       - run: tar -xf public.tar.gz
-      - name: Deploy public
+      - name: Deploy website to github pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           # For this to work the GITHUB_TOKEN needs read/write permissions. See
