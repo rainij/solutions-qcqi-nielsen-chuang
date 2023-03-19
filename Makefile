@@ -3,7 +3,7 @@
 default: website
 
 website:
-	./build-site.el
+	./bin/build-site.el
 
 tangle: $(addsuffix .py,$(basename $(wildcard src/chapter_*.org))) \
   src/utils.py
@@ -21,4 +21,4 @@ pull-latest-simple-css:
 	curl https://raw.githubusercontent.com/kevquirk/simple.css/main/simple.css -o ./src/css/simple.css
 
 src/%.py: src/%.org
-	emacs --batch --script ./build-site.el --eval "(org-babel-tangle-file \"$<\" \"$@\")"
+	emacs --batch --script ./bin/build-site.el --eval "(org-babel-tangle-file \"$<\" \"$@\")"
