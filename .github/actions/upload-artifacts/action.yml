@@ -1,0 +1,15 @@
+name: 'Upload Artifacts'
+
+description: 'Upload archive of built website'
+
+runs:
+  using: "composite"
+  steps:
+    - run: tar -czf public.tar.gz public
+      shell: bash
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: public
+        path: './public.tar.gz'
+        retention-days: 1
