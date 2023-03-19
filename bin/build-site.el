@@ -35,7 +35,7 @@
 (message "Using org-mode version: %s" org-version)
 
 
-(setq org-cite-global-bibliography (list (expand-file-name "./bibliography.bib"))
+(setq org-cite-global-bibliography (list (expand-file-name "./src/bibliography.bib"))
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css ; use classes for syntax highlighting of code blocks
       ;; Otherwise we get tons of "Can’t guess python-indent-offset, using defaults: 4":
