@@ -1,0 +1,15 @@
+name: 'Full build job'
+
+description: 'Build everything, and upload artifacts'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Docker Buildx
+      uses: ./.github/actions/docker-buildx
+    - run: ./bin/run-build-in-docker.sh
+      shell: bash
+    - run: ./bin/run-tests-in-docker.sh
+      shell: bash
+    - name: Upload artifacts
+      uses: ./.github/actions/upload-artifacts

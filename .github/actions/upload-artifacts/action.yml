@@ -1,12 +1,12 @@
-name: 'Build Site and upload Artifact'
+name: 'Upload Artifacts'
 
-description: 'Build the Website as public.tar.gz and upload this artifact'
+description: 'Upload archive of built website'
 
 runs:
   using: "composite"
   steps:
-    - name: Build Website
-      uses: ./.github/actions/build-site
+    - run: tar -czf public.tar.gz public
+      shell: bash
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:

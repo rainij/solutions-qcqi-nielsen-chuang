@@ -23,7 +23,12 @@
 (setq use-package-verbose t)
 (use-package esxml :ensure) ; use s-expressions to write xml (or html)
 (use-package htmlize :ensure)
-(use-package org)
+(use-package org
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t))))
 (use-package ox-publish)
 
 
