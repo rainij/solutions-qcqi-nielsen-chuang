@@ -1,12 +1,11 @@
-FROM fedora:37
+# #############################################################################
+# This stage just builds an emacs which is newer than fedoras
+# #############################################################################
+FROM fedora:37 as build-emacs
 
 WORKDIR /workdir
 
 RUN dnf -y install git
-
-# #############################################################################
-# Install a modern emacs
-# #############################################################################
 
 RUN git clone --depth=1 git://git.sv.gnu.org/emacs.git --branch emacs-29 --single-branch emacs-build
 
@@ -14,12 +13,19 @@ RUN dnf -y install 'dnf-command(builddep)' && \
     dnf -y builddep emacs
 RUN cd emacs-build && \
     ./autogen.sh && \
-    ./configure
-RUN cd emacs-build && make -j3 && make install
+    ./configure --prefix /opt/emacs --without-all && \
+    make -j3 && make install
 
 # #############################################################################
-# Setup python
+# The actual image
 # #############################################################################
+FROM fedora:37
+
+COPY --from=build-emacs /opt/emacs /opt/emacs
+ENV PATH /opt/emacs/bin:$PATH
+# Dirty hack: we just install fedoras emacs for the dependencies:
+RUN dnf -y install --setopt=install_weak_deps=False git make emacs && dnf clean all && \
+  rpm -e --nodeps emacs
 
 # After this 'python' refers to the virtual env:
 RUN python3 -m venv /opt/venv
@@ -27,21 +33,7 @@ ENV PATH /opt/venv/bin:$PATH
 
 COPY src/requirements.txt src_requirements.txt
 COPY test/requirements.txt test_requirements.txt
-RUN python -m pip install -r src_requirements.txt -r test_requirements.txt
-
-# #############################################################################
-# End
-# #############################################################################
-
-# TODO:
-# - remove repos
-# - uninstall builddeps
-#   - 'dnf-command(builddep)', make, git
-
-# Cleanup
-RUN rm -rf emacs-build
-# TODO: can I remove some more of the build depenendencies of emacs?
-RUN dnf -y remove 'dnf-command(builddep)'
+RUN python -m pip install --no-cache-dir -r src_requirements.txt -r test_requirements.txt
 
 # For local usage it makes sense to set this variable to your own UID (see the scripts in
 # ./bin for more infos):
