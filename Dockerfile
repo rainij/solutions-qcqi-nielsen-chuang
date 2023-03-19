@@ -1,7 +1,7 @@
 FROM fedora:37
 
 # For local usage it makes sense to set this variable to your own UID:
-ARG FEYNMAN_USER_ID
+ARG FEYNMAN_USER_ID=1918
 
 RUN useradd --uid $FEYNMAN_USER_ID feynman
 

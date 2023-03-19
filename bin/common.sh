@@ -2,15 +2,15 @@
 
 set -eu
 
-source $(dirname $0)/.env
-
-# .env-local  is not under vc
+# .env-local  is *not* under vc
 if [ -f $(dirname $0)/.env-local ]; then
     source $(dirname $0)/.env-local
+    ADDITIONAL_ARGS="--build-arg FEYNMAN_USER_ID=$FEYNMAN_USER_ID"
+else
+    ADDITIONAL_ARGS=""
 fi
 
-# Note that the docker cache does not see updates on our env variables.
-docker build --build-arg FEYNMAN_USER_ID=$FEYNMAN_USER_ID --rm -t rs/make .
+docker build $ADDITIONAL_ARGS --rm -t rs/make .
 
 docker_make () {
     targets="$@"
