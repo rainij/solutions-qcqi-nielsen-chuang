@@ -13,7 +13,7 @@ RUN dnf -y install 'dnf-command(builddep)' && \
     dnf -y builddep emacs
 RUN cd emacs-build && \
     ./autogen.sh && \
-    ./configure --prefix /opt/emacs --without-all && \
+    ./configure --prefix /opt/emacs && \
     make -j3 && make install
 
 # #############################################################################
