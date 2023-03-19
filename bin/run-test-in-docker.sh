@@ -2,4 +2,4 @@
 
 source  $(dirname $0)/common.sh
 
-docker_make tangle website
+docker_make test

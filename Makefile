@@ -1,6 +1,8 @@
-.PHONY: clean default pull-latest-simple-css tangle test
+.PHONY: clean default pull-latest-simple-css tangle test website
 
-default:
+default: website
+
+website:
 	./build-site.el
 
 tangle: $(addsuffix .py,$(basename $(wildcard src/chapter_*.org))) \
