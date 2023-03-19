@@ -1,10 +1,5 @@
 FROM fedora:37
 
-# For local usage it makes sense to set this variable to your own UID:
-ARG FEYNMAN_USER_ID=1918
-
-RUN useradd --uid $FEYNMAN_USER_ID feynman
-
 WORKDIR /workdir
 
 RUN dnf -y install git
@@ -48,5 +43,9 @@ RUN rm -rf emacs-build
 # TODO: can I remove some more of the build depenendencies of emacs?
 RUN dnf -y remove 'dnf-command(builddep)'
 
-USER feynman
+# For local usage it makes sense to set this variable to your own UID (see the scripts in
+# ./bin for more infos):
+ARG FEYNMAN_USER_ID=1918
+RUN useradd --uid $FEYNMAN_USER_ID feynman
+
 ENTRYPOINT ["make"]
