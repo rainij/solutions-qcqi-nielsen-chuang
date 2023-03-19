@@ -5,16 +5,16 @@ FROM fedora:37 as build-emacs
 
 WORKDIR /workdir
 
-RUN dnf -y install git
+RUN dnf -y install git 'dnf-command(builddep)' && \
+    dnf -y builddep emacs && \
+    dnf clean all
 
-RUN git clone --depth=1 git://git.sv.gnu.org/emacs.git --branch emacs-29 --single-branch emacs-build
-
-RUN dnf -y install 'dnf-command(builddep)' && \
-    dnf -y builddep emacs
-RUN cd emacs-build && \
+RUN git clone --depth=1 git://git.sv.gnu.org/emacs.git --branch emacs-29 --single-branch emacs-build && \
+    cd emacs-build && \
     ./autogen.sh && \
     ./configure --prefix /opt/emacs --without-all --with-gnutls && \
-    make -j3 && make install
+    make -j3 && make install && \
+    cd .. && rm -rf emacs-build
 
 # #############################################################################
 # The actual image
