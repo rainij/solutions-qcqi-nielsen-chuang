@@ -2,7 +2,7 @@
 
 set -eu
 
-docker build --rm -t rs/make ./docker
+docker build --rm -t rs/make .
 
 docker_make () {
     targets="$@"
