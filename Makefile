@@ -6,6 +6,7 @@ website:
 	./bin/build-site.el
 
 tangle: $(addsuffix .py,$(basename $(wildcard src/chapter_*.org))) \
+  src/continued_fractions.py \
   src/utils.py
 
 test:
@@ -13,7 +14,7 @@ test:
 
 clean:
 	rm -rf public
-	rm -f src/chapter_*.py src/utils.py
+	rm -f src/chapter_*.py src/continued_fractions.py src/utils.py
 
 # A minimalist "classless css framework".
 # See also https://simplecss.org/
