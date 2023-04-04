@@ -10,6 +10,7 @@
   --comment: #74af68;
   --operator: black;
   --constant: #e67128;
+  --target-color: var(--function);
 }
 
 /* dark mode */
@@ -26,6 +27,7 @@
     --operator1: #db3e00;
     --operator: white;
     --constant: #e67128;
+    --target-color: var(--function);
   }
 }
 
@@ -84,3 +86,8 @@ pre.src:before {
 }
 pre.src:hover:before { display: inline; margin-top: 14px;}
 pre.src-python:before { content: 'Python'; }
+
+/* A little bit brittle: if you are not careful the <a> might be wrapped in a <p> */
+a:target + mjx-container {
+  border-left: 2px solid var(--target-color);
+}
