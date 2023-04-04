@@ -1,0 +1,416 @@
+#+title:  On Continued Fractions
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session *continued-fractions* :tangle continued_fractions.py
+
+#+toc: headlines 2
+
+This chapter contains my own perspective on continued fractions. When I skimmed over the
+Appendix or read [[https://en.wikipedia.org/wiki/Continued_fraction][wikipedia]] I felt that there is something missing I should understand more
+deeply. Hence I decided to write down my own thoughts. In particular I think that one
+should put a lot of emphasis in the [[x-repr][representation formula]] in every introduction to continued
+fractions. A lot of interesting corollaries follow from it. Most importantly an nice [[x-error][error
+estimate]].
+
+* Definition
+Consider variables with values in $(0,\infty)$ and let us introduce the following notation
+inductively:
+
+\begin{align*}
+  [x] &= x, \\
+  [x,y] &= x + \frac{1}{y}, \\
+  [x_0,x_1\ldots,x_n] &= [x_0,[x_1,\ldots,x_n]], \\
+  [x_0,x_1,\ldots] &= \lim_{n\to\infty} [x_0,x_1\ldots,x_n] .
+\end{align*}
+
+For the last equation we require that the limit exist for the expression to be well-defined. To gain
+more flexibility we allow $x_0$ to be zero. Hence we call the arguments /admissible/ if the first
+one is non-negative and the rest is strictly positive.
+
+Given a non-negative real number $x$ we define its /continued fraction expansion/ $[a_0,\ldots]$ by
+the following series of term rewrites.
+
+\begin{align*}
+  x &\to [x] \\
+  [a_0, a_1,\ldots, a_n, z] &\to \begin{cases}
+    [a_0, a_1,\ldots, a_n, \floor{z}, (z - \floor{z})^{-1}] & \text{for } z \text{ not an integer}, \\
+    \text{stop rewriting otherwise.} \end{cases}
+\end{align*}
+
+If the procedure ever stops we call it a /finite/ continued fraction. Note that each rewrite
+preserves the value of the continued fraction as per the definition of the notation (proof by
+mathematical induction).
+
+The rational numbers
+
+$$
+  \frac{p_n}{q_n} = [a_0,\ldots,a_n]
+$$
+
+are called the /convergents/ of $x$.
+
+* Properties
+** Uniqueness and Non-uniqueness
+:PROPERTIES:
+:ID:       64abd9b0-3c15-4955-9a51-f1a2a8b699a5
+:END:
+Let $a_0,\ldots,a_n$ be /admissible integers/ and $z_{n+1}\geq 1$ a real number. Let
+$a'_0,\ldots,a'_n,z'_{n+1}$ be another bunch of integers with the same characteristics. Assume
+
+$$
+  [a_0,\ldots,a_n,z_{n+1}] = [a'_0,\ldots,a'_n,z'_{n+1}]
+$$
+
+Then $a_i=a'_i$ for all $i$, and $z_{n+1}=z'_{n+1}$.
+
+PROOF: For $n=0$ and $n=1$ this can be seen directly. For $n>1$ we use mathematical induction and
+the formula
+
+$$ [x_0,x_1\ldots,x_n] = [x_0,[x_1,\ldots,x_n]] $$
+
+from the definition. QED.
+
+Note that there is still some degree of Non-uniqueness possible:
+
+$$
+  [a_0,\ldots,a_n,z_{n+1}] = [a_0,\ldots,a_n,z_{n+1}-1,1] .
+$$
+
+This basically shows that irrational numbers have a unique infinite bracket-representation, while
+positive rationals have exactly two possible /finite/ representations.
+
+** Monotonicity
+:PROPERTIES:
+:CUSTOM_ID: monotonicity-section
+:END:
+Let $\lambda_n=[x_0,\ldots,x_n]$ for admissible reals $x_0,\ldots,x_n$. This value strictly increases for
+even indices and strictly decreases for odd indices. Moreover all odd values are larger than any
+even value.
+
+Proof: The statement follows once these formulas are proved for all $n$:
+$\lambda_{2n+1}>\lambda_{2n-1}$, $\lambda_{2n}<\lambda_{2n-2}$, and $\lambda_{2n+1}>\lambda_{2n}$. These can be proved by induction. QED.
+
+In particular, series of $\lambda_n$ has at most two accumulation points. We will soon see
+that for our application in continued fractions there is always a limit.
+
+** Recursive Formulas
+:PROPERTIES:
+:ID:       43f88c9e-9d77-4c0b-ac6d-1f89db57cf7f
+:END:
+Let $x\geq0$ and $x=[a_0,a_1,\ldots,a_n,z_{n+1}]$ be its continued fraction expansion with
+remainder $z_{n+1}$ (which is guaranteed to be at least $1$). Moreover let
+$p_n/q_n=[a_0,\ldots,a_n]$ be the $n$​-th convergent. Then we have:
+
+<<x-repr>>
+$$
+  x = \frac{z_{n+1}p_n + p_{n-1}}{z_{n+1}q_n + q_{n-1}} .
+$$
+
+and the convergents can be recursively defined by:
+
+<<convergent-recursion>>
+$$\begin{align*}
+  p_{n+1} = a_{n+1}p_n + p_{n-1} , \\
+  q_{n+1} = a_{n+1}q_n + q_{n-1} ,
+\end{align*}$$
+
+With $p_{-2},p_{-1}=0,1$ and $q_{-2},q_{-1}=1,0$.
+
+PROOF: Just define $p_n$ and $q_n$ by the above formula. It is not hard to see by induction that the
+formula for $x$ holds. After that just replace $z_{n+1}$ by $a_{n+1}$ to see that the $p_n$ and
+$q_n$ are the nominator and denominator of the convergents. QED.
+
+Corollary:
+
+<<coprime-identity>>
+$$ p_n q_{n-1} - p_{n-1} q_n = (-1)^n . $$
+
+Just subtract two consecutive convergents from each other to see this. This directly shows that
+$p_n$ and $q_n$ have no common divisor.
+
+** Error Estimates
+:PROPERTIES:
+:CUSTOM_ID: error-estimate-section
+:END:
+From the [[x-repr][representation formula]] of $x$ together with the [[coprime-identity][coprimness]] of $p_n$ and $q_n$ we see
+
+<<x-error>>
+$$
+  x - \frac{p_n}{q_n} = \frac{(-1)^{n+1}}{q_n(z_{n+1}q_n+q_{n-1})} .
+$$
+
+This implies that the convergent's distance strictly decreases on each iteration and that the
+convergents indeed converge toward $x$. Since $a_{n+1}\,\leq\,z_{n+1}\,\leq\,a_{n+1} + 1$ this also
+implies
+
+$$
+  \frac{1}{q_n(q_{n+1} + q_n)} \leq \abs{x - \frac{p_n}{q_n}} \leq \frac{1}{q_nq_{n+1}} .
+$$
+
+Remark: [[x-error][The formula]] on the error explains very clearly why it is said that the golden ratio
+$[1,1,1,\ldots]$ is the hardest to approximate irrational number. Small coefficients in the
+continued fraction expansion lead to small values for $q_n$ (by the [[convergent-recursion][recursion formula]]) and hence to
+a big error.
+
+** Best Approximation Property
+A rational $p/q$ is called a /best approximation/ of $x$ if no other rational with smaller
+denominator approximates $x$ better or equally well.
+
+Each convergent of $x$ is a best approximations (but not necessarily the other way around).
+
+PROOF: By the [[x-repr][representation formula]] for $x$ we see that any real number $y$ between $x$ and
+$p_n/q_n$ can be written as:
+
+$$
+  y = \frac{z p_n + p_{n-1}}{z q_n + q_{n-1}} = [a_0,\ldots,a_n,z] .
+$$
+
+for some $z\in(z_{n+1},\infty)$. In particular this implies that each /rational/ between $x$ and
+$p_n/q_n$ has $p_n/q_n=[a_0,\ldots,a_n]$ as convergent. So these rationals have a denominator which
+is bigger than $q_n$.
+
+What is with the other side of $x$? It is actually equally usefull to just show a stronger
+statement. In fact, all these rationals on $p_n/q_n$​'s side of $x$ have $[a_0,\ldots,a_n,a]$ for some
+$a>a_{n+1}$ as their convergent. This shows that their denominator is even larger than $q_{n+1}$
+(use [[convergent-recursion][recursive formula]] for the convergents to see this). This shows that any rational between
+$p_n/q_n$ and $p_{n+1}/q_{n+1}$ as denominator which is larger than $q_{n+1}$. QED.
+
+** Sufficient criterion to be a convergent
+:PROPERTIES:
+:ID:       6c146ca8-7130-4b91-9e06-983fcbf6143e
+:CUSTOM_ID: 6c146ca8-7130-4b91-9e06-983fcbf6143e
+:END:
+Let $x$ be a positive real number and $p/q$ a rational with:
+
+$$
+  \abs{x - \frac{p}{q}} \leq \frac{1}{2q^2}.
+$$
+
+Then necessarily $p/q$ is a convergent of $x$.
+
+PROOF: Let
+
+$$
+  \frac{p}{q} = \frac{p_n}{q_n} = [a_0, a_1,\ldots, a_n] .
+$$
+
+By the [[id:64abd9b0-3c15-4955-9a51-f1a2a8b699a5][non-uniqueness]] for rationals we may choose whether we want $n$ to be odd or even. We will use
+this freedom soon. By the assumption of the theorem there is a $z>1$ such that:
+
+$$
+  x - \frac{p}{q} = \frac{\pm1}{q_n(zq_n + q_{n-1})} .
+$$
+
+Compare this with the [[x-error][error estimate]] for convergents to get a motivation for this weird formula. As
+said we may choose the parity of $n$ so that
+
+$$ p_{n-1} q_n - p_n q_{n-1} = (-1)^{n+1} $$
+
+has the same sign as $x-p/q$. Hence clearly (just recall how we got the [[x-error][error estimate]]
+for the convergents)
+
+$$
+  x = \frac{z p_n + p_{n-1}}{z q_n + q_{n-1}} = [a_0,\ldots,a_n,z] ,
+$$
+
+which shows that $p/q$ is a convergent of $x$. QED.
+
+* Some Code!
+#+begin_src python
+  from fractions import Fraction
+  from numbers import Number, Integral, Rational
+  from typing import Any, Literal
+  import math
+#+end_src
+
+Let us first define a function to evaluate a given continued fraction expansion:
+
+#+begin_src python
+  OutputFormat = Literal["float"] | Literal["pair"] | Literal["rational"]
+
+
+  def eval_cfrac(*coeffs: list[Number], out_format: OutputFormat = "float", callback=lambda *_: None) -> Any:
+      """Evaluate the continued fraction given by coeffs."""
+      assert len(coeffs) != 0, "At least one coefficient is required"
+
+      p0, p1 = 0, 1
+      q0, q1 = 1, 0
+
+      for xi in coeffs:
+          p0, p1 = p1, p1*xi + p0
+          q0, q1 = q1, q1*xi + q0
+
+          abort_loop = callback(p1, q1, p0, q0)
+          if abort_loop:
+              break
+
+      if out_format == "float":
+          return p1/q1
+      elif out_format == "pair":
+          return p1, q1
+      elif "rational":
+          return Fraction(p1, q1)
+      else:
+          raise Exception(f"Unknown output format '{out_format}'")
+#+end_src
+
+The next function either takes a number as input and computes its continued fraction
+expansion up to a given order, or it extends a given expansion in place.
+
+#+begin_src python
+  def compute_cfrac(val_or_partial_cfrac: Number | list[Number], n: Integral, skip_remainder=False) -> list[Number]:
+      """Compute the continued fraction expansion [a_0,...,a_{n-1},z_n] of the first arg.
+
+      If the first arg is already a continued fraction expansion (with the last entry being
+      a *real* number) it is modified in place. In any case the result is returned."""
+      if isinstance(val_or_partial_cfrac, Number):
+          return compute_cfrac([val_or_partial_cfrac], n, skip_remainder=skip_remainder)
+
+      pfrac = val_or_partial_cfrac
+      n += 1 - len(pfrac)
+
+      for _ in range(n):
+          z = pfrac.pop()
+          a = math.floor(z)
+          z1 = z % 1
+
+          if z1 == 0:
+              pfrac.append(a)
+              break
+          else:
+              pfrac += [a, z1**(-1)]
+
+      return pfrac[:-1] if (z1 != 0 and skip_remainder) else pfrac
+#+end_src
+
+Let us demonstrate these functions on $\pi$:
+
+#+name: cfrac-pi
+#+begin_src python :results output replace :cache yes :tangle no
+  pi10 = compute_cfrac(math.pi, 10)
+  print(f"π = {pi10}")
+
+  print("\nConvergents of π:")
+  eval_cfrac(*pi10[:-1], callback=lambda p, q, *_: \
+             print(f"{str(Fraction(p,q)):20} | error = {abs(math.pi - p/q):.3E}"))
+#+end_src
+
+#+RESULTS[68c46da312b6ce5f8ce071d51979358ed595c0ee]: cfrac-pi
+#+begin_example
+π = [3, 7, 15, 1, 292, 1, 1, 1, 2, 1, 3.93464231529632]
+
+Convergents of π:
+3                    | error = 1.416E-01
+22/7                 | error = 1.264E-03
+333/106              | error = 8.322E-05
+355/113              | error = 2.668E-07
+103993/33102         | error = 5.779E-10
+104348/33215         | error = 3.316E-10
+208341/66317         | error = 1.224E-10
+312689/99532         | error = 2.914E-11
+833719/265381        | error = 8.715E-12
+1146408/364913       | error = 1.611E-12
+#+end_example
+
+We can nicely see that at first the error decreases rapidly, but then it slows down. The
+slow-down is consistent with the expansion starting with primarily large values followed by
+several small values. Also note that during the slow period the denominator increases only
+marginally.
+
+Let us give a *warning*: The above implementation of =compute_cfrac= is not very reliable
+/for certain inputs/. Unfortunately for "typical" /rational/ numbers it fails badly /if
+they are represented as floats/. See:
+
+#+begin_src python :results replace verbatim :cache yes :tangle no
+  # Expected result: [0, 1, 2, 1, 7, 3, 1]
+  compute_cfrac(0b1011_1110 / 2**8, 10)
+#+end_src
+
+#+RESULTS[51bdbc3ea96b8a80f2c40f70da4b856f064ac734]:
+: [0, 1, 2, 1, 7, 3, 1, 7036874417766, 2, 2, 102.00000000000036]
+
+We immediately see that the =7036874417766= looks a bit odd (following the little =1=). We
+also see that the error accumulates quickly since =math.log2(7036874417766)==42.678...=
+(which is well below $52$, the number of mantissa bits for double precision). So while
+this allows us to interactively determine the continued fraction of a binary such as
+=0.10111110= it makes automation very hard.
+
+Before we solve our dilemma let us briefly mention that there is already something built
+into python which behaves better:
+
+#+begin_src python :results replace :tangle no :cache yes
+  Fraction(0b1011_1110 / 2**8)
+#+end_src
+
+#+RESULTS[0b7b32bc56ae1c827ab2729baf3cfb26c4c3627f]:
+: 95/128
+
+Also it has a nice feature to limit the denominator:
+
+#+begin_src python :results replace :tangle no :cache yes
+  Fraction(0b1011_1110 / 2**8).limit_denominator(100)
+#+end_src
+
+#+RESULTS[f7b3d19647070ce272a67b12fa3b769bf95649a8]:
+: 72/97
+
+How do we solve our problem? Fortunately in case of order finding we already know the
+exact /rational/ representation of our input $\varphi$ (recall that it is given in terms
+of a finite binary expansion and hence rational!). Hence we can completely avoid floating
+point issues by using a /rational numerical type/:
+
+#+begin_src python :results replace verbatim :tangle no :cache yes
+  compute_cfrac(Fraction(0b1011_1110, 2**8), 10)
+#+end_src
+
+#+RESULTS[4fdd9500d57a961eecc9d35f88958a0befd2eae4]:
+: [0, 1, 2, 1, 7, 4]
+
+This also works for rationals which are not exactly representable by 64bit floats.
+
+Remark: Whenever we have a /float/ we could always read out its bit representation which
+directly yields a rational representation! That is not important for order finding but it
+is good to be aware of the fact that it is /pointless/ (in a sense) to apply =compute_cfrac=
+to a =float=.
+
+Finally let us define a function which will be helpful in order finding:
+
+#+begin_src python
+  def get_convergent(value: Rational, limit_denominator: Integral):
+      """Compute the last convergent of 'value' whose denominator is smaller than 'limit_denominator'."""
+      # Second arg is just something large enough for what we want:
+      cfrac = compute_cfrac(value, limit_denominator)
+      result = None
+
+      def callback(p, q, *args):
+          nonlocal result
+          if q <= limit_denominator:
+              result = Fraction(p, q)
+          else:
+              return True  # no need to further run evalutation
+
+      eval_cfrac(*cfrac, callback=callback)
+
+      return result
+#+end_src
+
+We note here that src_python{get_convergent(value, limit)} is not the same as
+src_python{Fraction(value).limit_denominator(limit)}. In fact, not every best
+approximation is a convergent. Let us demonstrate this with $\pi$ (again):
+
+#+begin_src python :results replace verbatim :cache yes :tangle no
+  l = []
+  for i in range(1,355):
+      frac = Fraction(math.pi).limit_denominator(i)
+      if not l or frac != l[-1]:
+          l.append(frac)
+
+  ", ".join([str(f) for f in l])
+#+end_src
+
+#+RESULTS[f19e2a69fe501d26b714b7a69cce35c78337a07d]:
+: 3, 13/4, 16/5, 19/6, 22/7, 179/57, 201/64, 223/71, 245/78, 267/85, 289/92, 311/99, 333/106, 355/113
+
+For example the fractions =13/4, 16/5, 19/6= are not convergents of $\pi$. Hence we
+*cannot* /directly/ use =Fraction= for order finding.
