@@ -19,6 +19,7 @@ Tangled:
 Not tangled:
 
 #+begin_src python :tangle no
+  from fractions import Fraction
   from qiskit.circuit import QuantumCircuit, Gate
 #+end_src
 
@@ -35,6 +36,85 @@ These are the operators $R_k$ appearing in the implementation of the Fourier Tra
   k = sp.symbols('k', integer=True)
   Rk = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
 #+end_src
+
+** Order Finding
+In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
+
+Recall that after executing the phase estimation routine we obtain an $2L+1$ bit number
+$\varphi$. If we are not too unlucky it equals /approximately/ $s/r$ for a non-zero $z$. The
+error is given by the number of bits used ($2L+1$). From a [[file:continued_fractions.org::#6c146ca8-7130-4b91-9e06-983fcbf6143e][sufficient criterion to be a
+convergent]] it is deduced that $s/r$ must be a convergent of $\varphi$.
+
+So far so good. But which of the convergents $p_n/q_n$ is the right one? The book does not
+really tell us. What we know is that $q_n < N$. It would be convenient if it is the last
+convergent with this property. *We prove that this is indeed true*. But first let us see
+why this is a non-trivial fact.
+
+*** What is the issue?
+To /illustrate/ the problem assume that $N$ is very large, say a number which needs
+$L=100$ bits. Moreover assume that the order $r$ is very small, say $r=3$. Assume $s=1$
+and observe that $s/r$ cannot be exactly represented in binary. Ask =python= what it
+/thinks/ the best rational approxmation to $1/3$ is:
+
+#+begin_src python :results replace :cache yes
+  Fraction(1/3)
+#+end_src
+
+#+RESULTS[f1f5db486d992e0b41dd5488ff006ba7417d9daa]:
+: 6004799503160661/18014398509481984
+
+Might we be at risk to deduce that the order is =18014398509481984=?
+
+The reason for this large denominator is that $1/3$ is represented by a =double= precision
+data type which by the [[https://en.wikipedia.org/wiki/Double-precision_floating-point_format][IEEE standard]] has =52= bits available for the fractional part. Also
+note that $1/3$ is slightly less than $2^{-1}$. Hence one might suspect that the double
+precision representation of $\frac{1}{3}$ starts to show its lack of exactness at a
+denominator size of roughly $2^{53}$. In fact, this is what happens:
+
+#+begin_src python :results output replace :cache yes
+  print(Fraction(1/3).limit_denominator(2**53))
+  print(Fraction(1/3).limit_denominator(2**54))
+#+end_src
+
+#+RESULTS[d19069a70d318c08a155e0da0cc041fb7d1a8c27]:
+: 1/3
+: 6004799503160661/18014398509481984
+
+Unsurprisingly the denominator is a power of two:
+
+#+begin_src python :results replace :cache yes
+  assert 18014398509481984 == 2**54
+  "PASSED"
+#+end_src
+
+#+RESULTS[12dac3f369c320e8003245167dd011372c4862cb]:
+: PASSED
+
+*** A lemma resolving the issue
+Let us show that the correct convergent $p_n/q_n$ is indeed the one with maximal $q_n$
+which still satisfies $q_n < N$. First let us show an important Lemma:
+
+Let $s < r < N$ be non-negative integers and $\varphi\in[0,1)$ real. Assume
+
+$$
+  \abs{\varphi - \frac{s}{r}} < \frac{1}{2 N^2} .
+$$
+
+Then $s/r$ is a convergent of $\varphi$ and the next convergent has a denominator which is
+larger than $N$.
+
+PROOF: That $s/r$ is a convergent follows from the [[file:continued_fractions.org::#6c146ca8-7130-4b91-9e06-983fcbf6143e][sufficient criterion]] to be a convergent
+together with $r < N$. Let us write $s/r=p_n/q_n$ with coprime nominator and denominator. By
+the [[file:continued_fractions.org::x-error][error formula]] for convergents and the [[file:continued_fractions.org::convergent-recursion][recursion formula]] for $p_n$ and $q_n$ we have:
+
+$$
+  q_n (q_{n+1} + q_n/z_{n+2}) = q_n (z_{n+1} q_n + q_{n-1}) > 2 N^2 .
+$$
+
+Since $q_n < N$, $q_n < q_{n+1}$, and $z_i\geq 1$ we deduce $q_{n+1}>N$. QED.
+
+Now recall (again) that $N$ is an $L$ bit integer and $\varphi$ is precise up to $2L+1$
+bits. This implies that the premise of the lemma is satisfied. This shows the claim.
 
 * WIP Exercises
 ** Exercise 5.1
@@ -229,7 +309,7 @@ to find a solution based on the ABC-construction from Figure 4.6 and the proof o
 
 In fact, the following circuit ($C=B=R_{k+1}^\dagger$, $A=R_k$, $\alpha=\theta_{k+1}$) implements $C(R_k)$:
 
-#+RESULTS[c75a3bd7202b1d8b4f8e1e9d08ef1c56ac4ea46d]: exercise-5.4-circuit
+#+RESULTS[615e320dbb4e2182c84c2f5a8352ad695bbd8999]: exercise-5.4-circuit
 :                                          ┌─────────┐
 : q_0: ───────────────■─────────────────■──┤ R_{k+1} ├
 :      ┌───────────┐┌─┴─┐┌───────────┐┌─┴─┐└─┬─────┬─┘
