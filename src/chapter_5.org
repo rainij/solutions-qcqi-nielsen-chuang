@@ -12,8 +12,17 @@ Tangled:
 
 #+name: chapter-5-python-imports
 #+begin_src python
+  import math
+  from numbers import Integral
+
   import sympy as sp
   from sympy import exp, I, pi
+
+  from qiskit import QuantumCircuit, QuantumRegister
+  from qiskit.circuit import Gate
+  from qiskit.circuit.library import TGate
+
+  from qiskit_aer import AerSimulator
 #+end_src
 
 Not tangled:
@@ -37,6 +46,231 @@ These are the operators $R_k$ appearing in the implementation of the Fourier Tra
   Rk = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
 #+end_src
 
+Next we define a function to generate a circuit implementing the quantum Fourier
+transform. This is very easy since the part containing the rotations has a nice recursive
+structure.
+
+#+begin_src python
+  def make_qft_circuit(size: Integral) -> QuantumCircuit:
+      qc = QuantumCircuit(size)
+
+      def append_rotations(qc: QuantumCircuit, size: Integral):
+          if size == 0:
+              return
+
+          qc.h(size - 1)
+          for i in range(size - 1, 0, -1):  # reversed order makes a nicer plot
+              qc.cp(math.pi * 2**(-i), size - 1, size - i - 1)
+
+          append_rotations(qc, size - 1)
+
+      def append_swaps(qc, size):
+          for i in range(size // 2):
+              qc.swap(i, size - i - 1)
+
+      append_rotations(qc, size)
+      qc.barrier()  # nicer plot
+      append_swaps(qc, size)
+
+      return qc
+#+end_src
+
+Note that qiskit orders the wires in a different order then the book.
+
+#+begin_src python :results replace :tangle no :cache yes
+  qc = make_qft_circuit(4)
+  qc.draw()
+#+end_src
+
+#+RESULTS[34c89f955a4b13ceb93a35102b0e35d2af6d11c4]:
+:                                                                           ┌───┐ ░
+: q_0: ──────■───────────────────────────────■──────────────────────■───────┤ H ├─░──X────
+:            │                               │                ┌───┐ │P(π/2) └───┘ ░  │
+: q_1: ──────┼────────■──────────────────────┼────────■───────┤ H ├─■─────────────░──┼──X─
+:            │        │                ┌───┐ │P(π/4)  │P(π/2) └───┘               ░  │  │
+: q_2: ──────┼────────┼────────■───────┤ H ├─■────────■───────────────────────────░──┼──X─
+:      ┌───┐ │P(π/8)  │P(π/4)  │P(π/2) └───┘                                      ░  │
+: q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────░──X────
+:      └───┘                                                                      ░
+
+** TODO Phase Estimation
+
+# TODO: docstring, testing
+#+begin_src python
+  def make_phase_estimation_circuit(phase_oracle: QuantumCircuit, init_params: str | list | int):
+      reg_t, reg_u = phase_oracle.qregs
+      t, u = reg_t.size, reg_u.size
+
+      qc = QuantumCircuit(reg_t, reg_u)
+
+      for i in range(t):
+          qc.h(reg_t[i])
+
+      qc.initialize(init_params, reg_u)
+      qc = qc.compose(phase_oracle)
+
+      qft_dagger = make_qft_circuit(t).inverse()
+      qc = qc.compose(qft_dagger, qubits=list(range(t)))
+
+      return qc
+#+end_src
+
+Here is a naive (inefficient) implementation of the phase oracle, given the unitary operator:
+
+#+begin_src python
+  def make_naive_phase_oracle(t: Integral, U: Gate) -> QuantumCircuit:
+      u = U.num_qubits
+      reg_t = QuantumRegister(t, name="t")
+      reg_u = QuantumRegister(u, name="u")
+
+      qc = QuantumCircuit(reg_t, reg_u)
+      CU = U.control()
+
+      for i in range(0, t):
+          for _ in range(2**i):  # really bad: exponentially many gates!
+              qc.append(CU, [reg_t[i], reg_u])
+
+      return qc
+#+end_src
+
+Example:
+
+#+begin_src python :results output replace :tangle no :cache yes
+  phase_oracle = make_naive_phase_oracle(4, TGate())
+  print(phase_oracle.draw())
+#+end_src
+
+#+RESULTS[de45889dcf003bd9b2068fa1b1c3bd0ece2688dd]:
+#+begin_example
+
+t_0: ──■────────────────────────────────────────────────────────────────────────
+       │
+t_1: ──┼────■────■──────────────────────────────────────────────────────────────
+       │    │    │
+t_2: ──┼────┼────┼────■────■────■────■──────────────────────────────────────────
+       │    │    │    │    │    │    │
+t_3: ──┼────┼────┼────┼────┼────┼────┼────■────■────■────■────■────■────■────■──
+     ┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐
+  u: ┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├
+     └───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
+#+end_example
+
+Another example
+
+#+begin_src python :results replace :tangle no :cache yes
+  phase_oracle = make_naive_phase_oracle(3, TGate())
+  qc = make_phase_estimation_circuit(phase_oracle, '1')
+  qc.draw()
+#+end_src
+
+#+RESULTS[0fbd70b3ad7d2af88dcba73e656b226ce0960c62]:
+:            ┌───┐                                             ░ ┌───┐
+: t_0: ──────┤ H ├────────■─────────────────────────────────X──░─┤ H ├─■────────────────────────■─────────────
+:            ├───┤        │                                 │  ░ └───┘ │P(-π/2) ┌───┐           │
+: t_1: ──────┤ H ├────────┼────■────■───────────────────────┼──░───────■────────┤ H ├─■─────────┼─────────────
+:            ├───┤        │    │    │                       │  ░                └───┘ │P(-π/2)  │P(-π/4) ┌───┐
+: t_2: ──────┤ H ├────────┼────┼────┼────■────■────■────■───X──░──────────────────────■─────────■────────┤ H ├
+:      ┌─────┴───┴─────┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐    ░                                         └───┘
+:   u: ┤ Initialize(1) ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├───────────────────────────────────────────────────
+:      └───────────────┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
+
+** TODO Addition in Fourier Space
+#+begin_src python :results replace
+  def make_fourier_incrementer_circuit(size: Integral, increment: Integral) -> QuantumCircuit:
+      """TODO"""
+      qc = QuantumCircuit(size)
+
+      for k in range(size):
+          qc.p(2*math.pi*increment*2**(-size+k), k)
+
+      return qc
+
+
+  def make_incrementer_circuit(size: Integral, increment: Integral) -> QuantumCircuit:
+      """TODO"""
+      qc = QuantumCircuit(size)
+      finc = make_fourier_incrementer_circuit(size, increment)
+      qft = make_qft_circuit(size)
+
+      qc.compose(qft, inplace=True)
+      qc.compose(finc, inplace=True)
+      qc.compose(qft.inverse(), inplace=True)
+
+      return qc
+
+  qc = make_incrementer_circuit(3, 3)
+  qc.draw()
+#+end_src
+
+#+RESULTS:
+:                                           ┌───┐ ░    ┌─────────┐    ░ ┌───┐
+: q_0: ──────■──────────────────────■───────┤ H ├─░──X─┤ P(3π/4) ├─X──░─┤ H ├─■────────────────────────■─────────────
+:            │                ┌───┐ │P(π/2) └───┘ ░  │ ├─────────┤ │  ░ └───┘ │P(-π/2) ┌───┐           │
+: q_1: ──────┼────────■───────┤ H ├─■─────────────░──┼─┤ P(3π/2) ├─┼──░───────■────────┤ H ├─■─────────┼─────────────
+:      ┌───┐ │P(π/4)  │P(π/2) └───┘               ░  │ └┬───────┬┘ │  ░                └───┘ │P(-π/2)  │P(-π/4) ┌───┐
+: q_2: ┤ H ├─■────────■───────────────────────────░──X──┤ P(3π) ├──X──░──────────────────────■─────────■────────┤ H ├
+:      └───┘                                      ░     └───────┘     ░                                         └───┘
+
+#+begin_src python
+  def quantum_add(a: int, b: int, size: int = None) -> int:
+      """Compute a+b using make_incrementer_circuit."""
+      if size is None:
+          size = max(a.bit_length(), b.bit_length()) + 1
+
+      qc = QuantumCircuit(size)
+      qc_inc = make_incrementer_circuit(increment=a, size=size)
+
+      qc.initialize(f"{b:0{size}b}")
+      qc.compose(qc_inc, inplace=True)
+      qc.measure_all()
+
+      sim = AerSimulator()
+      counts = sim.run(qc).result().get_counts()
+
+      largest_count = 0
+      for bits, count in counts.items():
+          if count > largest_count:
+              largest_count = count
+              result = int(bits, base=2)
+
+      return result
+#+end_src
+
+Next: modular incrementation
+
+#+begin_src python
+  def make_modular_fourier_incrementer_circuit(increment: int, modulus: int):
+      n = modulus.bit_length()
+      size = n + 1
+
+      qc_inc_a = make_fourier_incrementer_circuit(increment=increment, size=size)
+      qc_inc_N = make_fourier_incrementer_circuit(increment=modulus, size=size)
+      qft = make_qft_circuit(size)
+
+      qreg = QuantumRegister(size)
+      qreg_anc = QuantumRegister(1)
+
+      qc = QuantumCircuit(qreg, qreg_anc)
+
+      qc.compose(qc_inc_a, inplace=True)
+      qc.compose(qc_inc_N.inverse(), inplace=True)
+
+      qc.compose(qft.inverse(), inplace=True)
+      qc.cx(qreg[n], qreg_anc[0])
+      qc.compose(qft, inplace=True)
+
+      qc.compose(qc_inc_N, inplace=True)
+      qc.compose(qc_inc_a.inverse(), inplace=True)
+
+      qc.compose(qft.inverse(), inplace=True)
+      qc.cx(qreg[n], qreg_anc[0], ctrl_state=0)
+      qc.compose(qft, inplace=True)
+
+      qc.compose(qc_inc_a, inplace=True)
+
+      return qc
+#+end_src
+
 ** Order Finding
 In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
 
@@ -56,11 +290,11 @@ $L=100$ bits. Moreover assume that the order $r$ is very small, say $r=3$. Assum
 and observe that $s/r$ cannot be exactly represented in binary. Ask =python= what it
 /thinks/ the best rational approxmation to $1/3$ is:
 
-#+begin_src python :results replace :cache yes
+#+begin_src python :results replace :cache yes :tangle no
   Fraction(1/3)
 #+end_src
 
-#+RESULTS[f1f5db486d992e0b41dd5488ff006ba7417d9daa]:
+#+RESULTS[4369a81d23d8dcddaf02abc094f1ca4a4b133b6e]:
 : 6004799503160661/18014398509481984
 
 Might we be at risk to deduce that the order is =18014398509481984=?
@@ -71,23 +305,23 @@ note that $1/3$ is slightly less than $2^{-1}$. Hence one might suspect that the
 precision representation of $\frac{1}{3}$ starts to show its lack of exactness at a
 denominator size of roughly $2^{53}$. In fact, this is what happens:
 
-#+begin_src python :results output replace :cache yes
+#+begin_src python :results output replace :cache yes :tangle no
   print(Fraction(1/3).limit_denominator(2**53))
   print(Fraction(1/3).limit_denominator(2**54))
 #+end_src
 
-#+RESULTS[d19069a70d318c08a155e0da0cc041fb7d1a8c27]:
+#+RESULTS[6f27624e220e31fe9f51acff0ee33da72fa8ade8]:
 : 1/3
 : 6004799503160661/18014398509481984
 
 Unsurprisingly the denominator is a power of two:
 
-#+begin_src python :results replace :cache yes
+#+begin_src python :results replace :cache yes :tangle no
   assert 18014398509481984 == 2**54
   "PASSED"
 #+end_src
 
-#+RESULTS[12dac3f369c320e8003245167dd011372c4862cb]:
+#+RESULTS[51e9659508c841688a08006745742b208eb730fe]:
 : PASSED
 
 *** A lemma resolving the issue
