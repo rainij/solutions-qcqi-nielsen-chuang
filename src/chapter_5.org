@@ -18,7 +18,7 @@ Tangled:
   import sympy as sp
   from sympy import exp, I, pi
 
-  from qiskit import QuantumCircuit, QuantumRegister
+  from qiskit import QuantumCircuit, QuantumRegister, transpile
   from qiskit.circuit import Gate
   from qiskit.circuit.library import TGate
 
@@ -211,31 +211,6 @@ Another example
 : q_2: ┤ H ├─■────────■───────────────────────────░──X──┤ P(3π) ├──X──░──────────────────────■─────────■────────┤ H ├
 :      └───┘                                      ░     └───────┘     ░                                         └───┘
 
-#+begin_src python
-  def quantum_add(a: int, b: int, size: int = None) -> int:
-      """Compute a+b using make_incrementer_circuit."""
-      if size is None:
-          size = max(a.bit_length(), b.bit_length()) + 1
-
-      qc = QuantumCircuit(size)
-      qc_inc = make_incrementer_circuit(increment=a, size=size)
-
-      qc.initialize(f"{b:0{size}b}")
-      qc.compose(qc_inc, inplace=True)
-      qc.measure_all()
-
-      sim = AerSimulator()
-      counts = sim.run(qc).result().get_counts()
-
-      largest_count = 0
-      for bits, count in counts.items():
-          if count > largest_count:
-              largest_count = count
-              result = int(bits, base=2)
-
-      return result
-#+end_src
-
 Next: modular incrementation
 
 #+begin_src python
@@ -270,6 +245,43 @@ Next: modular incrementation
 
       return qc
 #+end_src
+
+For testing:
+
+#+begin_src python
+  def quantum_add(a: int, b: int, modulus: int = None, size: int = None) -> int:
+      """Compute a+b using make_incrementer_circuit."""
+      # TODO: move somewhere else
+      assert a >= 0 and b >= 0, "a and b must be positive"
+
+      if modulus is None:
+          assert size is not None, "Specify 'size'"
+          qc = QuantumCircuit(size)
+          qc_inc = make_incrementer_circuit(increment=a, size=size)
+      else:
+          assert a < modulus and b < modulus, "a and b must be smaller than modulus"
+          qc_inc = make_modular_fourier_incrementer_circuit(increment=a, modulus=modulus)
+          size = qc_inc.qregs[0].size + 1  # TODO: ugly
+          qc = QuantumCircuit(size)
+
+      qc.initialize(f"{b:0{size}b}")
+      qc.compose(qc_inc, inplace=True)  # TODO: ugly
+      qc.measure_all()  # TODO: rely on simplification that ancilla is zero
+
+      sim = AerSimulator()
+      qc_obj = transpile(qc, sim)
+      counts = sim.run(qc_obj).result().get_counts()
+
+      largest_count = 0
+      for bits, count in counts.items():
+          if count > largest_count:
+              largest_count = count
+              result = int(bits, base=2)
+
+      return result
+#+end_src
+
+
 
 ** Order Finding
 In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
