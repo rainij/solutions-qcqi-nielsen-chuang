@@ -69,7 +69,7 @@ structure.
               qc.swap(i, size - i - 1)
 
       append_rotations(qc, size)
-      qc.barrier()  # nicer plot
+      #qc.barrier()  # nicer plot
       append_swaps(qc, size)
 
       return qc
@@ -83,15 +83,15 @@ Note that qiskit orders the wires in a different order then the book.
 #+end_src
 
 #+RESULTS[34c89f955a4b13ceb93a35102b0e35d2af6d11c4]:
-:                                                                           ┌───┐ ░
-: q_0: ──────■───────────────────────────────■──────────────────────■───────┤ H ├─░──X────
-:            │                               │                ┌───┐ │P(π/2) └───┘ ░  │
-: q_1: ──────┼────────■──────────────────────┼────────■───────┤ H ├─■─────────────░──┼──X─
-:            │        │                ┌───┐ │P(π/4)  │P(π/2) └───┘               ░  │  │
-: q_2: ──────┼────────┼────────■───────┤ H ├─■────────■───────────────────────────░──┼──X─
-:      ┌───┐ │P(π/8)  │P(π/4)  │P(π/2) └───┘                                      ░  │
-: q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────░──X────
-:      └───┘                                                                      ░
+:                                                                           ┌───┐
+: q_0: ──────■───────────────────────────────■──────────────────────■───────┤ H ├─X─
+:            │                               │                ┌───┐ │P(π/2) └───┘ │
+: q_1: ──────┼────────■──────────────────────┼────────■───────┤ H ├─■─────────X───┼─
+:            │        │                ┌───┐ │P(π/4)  │P(π/2) └───┘           │   │
+: q_2: ──────┼────────┼────────■───────┤ H ├─■────────■───────────────────────X───┼─
+:      ┌───┐ │P(π/8)  │P(π/4)  │P(π/2) └───┘                                      │
+: q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────X─
+:      └───┘
 
 ** TODO Phase Estimation
 
@@ -192,28 +192,48 @@ Another example
       finc = make_fourier_incrementer_circuit(size, increment)
       qft = make_qft_circuit(size)
 
-      qc.compose(qft, inplace=True)
-      qc.compose(finc, inplace=True)
-      qc.compose(qft.inverse(), inplace=True)
+      qft_gate = qft.to_gate(label="QFT")
+      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
+      finc_gate = finc.to_gate(label=f"ϕinc({increment})")
+
+      qc.append(qft_gate, range(size))
+      qc.append(finc_gate, range(size))
+      qc.append(qft_dg_gate, range(size))
 
       return qc
 
-  qc = make_incrementer_circuit(3, 3)
-  qc.draw()
+  qc1 = make_fourier_incrementer_circuit(4, 3)
+  qc2 = make_incrementer_circuit(4, 3)
+
+  str(qc1.draw()) + "\n\n" + str(qc2.draw())
 #+end_src
 
 #+RESULTS:
-:                                           ┌───┐ ░    ┌─────────┐    ░ ┌───┐
-: q_0: ──────■──────────────────────■───────┤ H ├─░──X─┤ P(3π/4) ├─X──░─┤ H ├─■────────────────────────■─────────────
-:            │                ┌───┐ │P(π/2) └───┘ ░  │ ├─────────┤ │  ░ └───┘ │P(-π/2) ┌───┐           │
-: q_1: ──────┼────────■───────┤ H ├─■─────────────░──┼─┤ P(3π/2) ├─┼──░───────■────────┤ H ├─■─────────┼─────────────
-:      ┌───┐ │P(π/4)  │P(π/2) └───┘               ░  │ └┬───────┬┘ │  ░                └───┘ │P(-π/2)  │P(-π/4) ┌───┐
-: q_2: ┤ H ├─■────────■───────────────────────────░──X──┤ P(3π) ├──X──░──────────────────────■─────────■────────┤ H ├
-:      └───┘                                      ░     └───────┘     ░                                         └───┘
+#+begin_example
+     ┌─────────┐
+q_0: ┤ P(3π/8) ├
+     ├─────────┤
+q_1: ┤ P(3π/4) ├
+     ├─────────┤
+q_2: ┤ P(3π/2) ├
+     └┬───────┬┘
+q_3: ─┤ P(3π) ├─
+      └───────┘
+
+     ┌──────┐┌──────────┐┌────────┐
+q_0: ┤0     ├┤0         ├┤0       ├
+     │      ││          ││        │
+q_1: ┤1     ├┤1         ├┤1       ├
+     │  QFT ││  ϕinc(3) ││  QFT^† │
+q_2: ┤2     ├┤2         ├┤2       ├
+     │      ││          ││        │
+q_3: ┤3     ├┤3         ├┤3       ├
+     └──────┘└──────────┘└────────┘
+#+end_example
 
 Next: modular incrementation
 
-#+begin_src python
+#+begin_src python :results replace
   def make_modular_fourier_incrementer_circuit(increment: int, modulus: int):
       n = modulus.bit_length()
       size = n + 1
@@ -222,29 +242,100 @@ Next: modular incrementation
       qc_inc_N = make_fourier_incrementer_circuit(increment=modulus, size=size)
       qft = make_qft_circuit(size)
 
-      qreg = QuantumRegister(size)
-      qreg_anc = QuantumRegister(1)
+      inc_gate_a = qc_inc_a.to_gate(label=f"ϕinc({increment})")
+      inc_gate_N = qc_inc_N.to_gate(label=f"ϕinc({modulus})")
+
+      inc_gate_dg_a = qc_inc_a.inverse().to_gate(label=f"ϕinc({increment})^†")
+      inc_gate_dg_N = qc_inc_N.inverse().to_gate(label=f"ϕinc({modulus})^†")
+
+      qft_gate = qft.to_gate(label="QFT")
+      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
+
+      qreg = QuantumRegister(size, "q")
+      qreg_anc = QuantumRegister(1, "a")
 
       qc = QuantumCircuit(qreg, qreg_anc)
 
-      qc.compose(qc_inc_a, inplace=True)
-      qc.compose(qc_inc_N.inverse(), inplace=True)
+      qc.append(inc_gate_a, qreg)
+      qc.append(inc_gate_dg_N, qreg)
 
-      qc.compose(qft.inverse(), inplace=True)
+      qc.append(qft_dg_gate, qreg)
       qc.cx(qreg[n], qreg_anc[0])
-      qc.compose(qft, inplace=True)
+      qc.append(qft_gate, qreg)
 
-      qc.compose(qc_inc_N, inplace=True)
-      qc.compose(qc_inc_a.inverse(), inplace=True)
+      qc.append(inc_gate_N.control(), list(qreg_anc)+list(qreg))  # TODO
+      qc.append(inc_gate_dg_a, qreg)
 
-      qc.compose(qft.inverse(), inplace=True)
+      qc.append(qft_dg_gate, qreg)
       qc.cx(qreg[n], qreg_anc[0], ctrl_state=0)
-      qc.compose(qft, inplace=True)
+      qc.append(qft_gate, qreg)
 
-      qc.compose(qc_inc_a, inplace=True)
+      qc.append(inc_gate_a, qreg)
 
       return qc
+
+
+  def make_modular_incrementer_circuit(increment: int, modulus: int):
+      fourier_inc_mod = make_modular_fourier_incrementer_circuit(increment, modulus)
+      qreg, qreg_anc = fourier_inc_mod.qregs
+      qc = QuantumCircuit(qreg, qreg_anc)
+
+      qft = make_qft_circuit(qreg.size)
+
+      qft_gate = qft.to_gate(label="QFT")
+      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
+      fourier_inc_mod_gate = fourier_inc_mod.to_gate(label=f"inc({increment})mod({modulus})")
+
+      qc.append(qft_gate, qreg)
+      qc.append(fourier_inc_mod_gate, list(qreg)+list(qreg_anc))
+      qc.append(qft_dg_gate, qreg)
+
+      return qc
+
+
+  qc1 = make_modular_fourier_incrementer_circuit(3, 7)
+  qc2 = make_modular_incrementer_circuit(3, 7)
+
+  str(qc1.draw()) + "\n\n" + str(qc2.draw())
 #+end_src
+
+#+RESULTS:
+#+begin_example
+     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌──────────┐┌────────────┐┌────────┐               ┌──────┐»
+q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤0         ├┤0           ├┤0       ├───────────────┤0     ├»
+     │          ││            ││        │     │      ││          ││            ││        │               │      │»
+q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤1         ├┤1           ├┤1       ├───────────────┤1     ├»
+     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││  ϕinc(7) ││  ϕinc(3)^† ││  QFT^† │               │  QFT │»
+q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤2         ├┤2           ├┤2       ├───────────────┤2     ├»
+     │          ││            ││        │     │      ││          ││            ││        │┌───┐     ┌───┐│      │»
+q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤3         ├┤3           ├┤3       ├┤ X ├──■──┤ X ├┤3     ├»
+     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘└────┬─────┘└────────────┘└────────┘└───┘┌─┴─┐└───┘└──────┘»
+  a: ────────────────────────────────────┤ X ├─────────────■───────────────────────────────────┤ X ├─────────────»
+                                         └───┘                                                 └───┘             »
+«     ┌──────────┐
+«q_0: ┤0         ├
+«     │          │
+«q_1: ┤1         ├
+«     │  ϕinc(3) │
+«q_2: ┤2         ├
+«     │          │
+«q_3: ┤3         ├
+«     └──────────┘
+«  a: ────────────
+«
+
+     ┌──────┐┌───────────────┐┌────────┐
+q_0: ┤0     ├┤0              ├┤0       ├
+     │      ││               ││        │
+q_1: ┤1     ├┤1              ├┤1       ├
+     │  QFT ││               ││  QFT^† │
+q_2: ┤2     ├┤2 inc(3)mod(7) ├┤2       ├
+     │      ││               ││        │
+q_3: ┤3     ├┤3              ├┤3       ├
+     └──────┘│               │└────────┘
+  a: ────────┤4              ├──────────
+             └───────────────┘
+#+end_example
 
 For testing:
 
@@ -260,7 +351,7 @@ For testing:
           qc_inc = make_incrementer_circuit(increment=a, size=size)
       else:
           assert a < modulus and b < modulus, "a and b must be smaller than modulus"
-          qc_inc = make_modular_fourier_incrementer_circuit(increment=a, modulus=modulus)
+          qc_inc = make_modular_incrementer_circuit(increment=a, modulus=modulus)
           size = qc_inc.qregs[0].size + 1  # TODO: ugly
           qc = QuantumCircuit(size)
 
@@ -280,7 +371,6 @@ For testing:
 
       return result
 #+end_src
-
 
 
 ** Order Finding
