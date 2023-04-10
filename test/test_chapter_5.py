@@ -36,7 +36,7 @@ def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
     return tuple(sorted(result))
 
 
-# TODO: this test is very slow
+@pytest.mark.slow
 @pytest.mark.parametrize("a,modulus,maximizing_bits", {
     (3, 8, ('00000000', '10000000')),  # the order is r = 2, so s/r in {0, 0.5}
 })
