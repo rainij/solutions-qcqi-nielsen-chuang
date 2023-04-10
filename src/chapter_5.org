@@ -51,7 +51,7 @@ transform. This is very easy since the part containing the rotations has a nice 
 structure.
 
 #+begin_src python
-  def make_qft_circuit(size: Integral) -> QuantumCircuit:
+  def make_qft(size: Integral) -> Gate:
       qc = QuantumCircuit(size)
 
       def append_rotations(qc: QuantumCircuit, size: Integral):
@@ -72,17 +72,22 @@ structure.
       #qc.barrier()  # nicer plot
       append_swaps(qc, size)
 
-      return qc
+      return qc.to_gate(label="QFT")
+
+
+  def make_qft_dg(size: Integral) -> Gate:
+      qft = make_qft(size)
+      return qft.definition.inverse().to_gate(label="QFT^†")
 #+end_src
 
 Note that qiskit orders the wires in a different order then the book.
 
 #+begin_src python :results replace :tangle no :cache yes
-  qc = make_qft_circuit(4)
-  qc.draw()
+  qft = make_qft(4)
+  qft.definition.draw()
 #+end_src
 
-#+RESULTS[34c89f955a4b13ceb93a35102b0e35d2af6d11c4]:
+#+RESULTS[70fa89c3263a106383a4c5b72627a9c51e28f362]:
 :                                                                           ┌───┐
 : q_0: ──────■───────────────────────────────■──────────────────────■───────┤ H ├─X─
 :            │                               │                ┌───┐ │P(π/2) └───┘ │
@@ -109,8 +114,8 @@ Note that qiskit orders the wires in a different order then the book.
       qc.initialize(init_params, reg_u)
       qc = qc.compose(phase_oracle)
 
-      qft_dagger = make_qft_circuit(t).inverse()
-      qc = qc.compose(qft_dagger, qubits=list(range(t)))
+      qft_dg = make_qft_dg(t)
+      qc.append(qft_dg, reg_t)
 
       return qc
 #+end_src
@@ -164,48 +169,46 @@ Another example
 #+end_src
 
 #+RESULTS[0fbd70b3ad7d2af88dcba73e656b226ce0960c62]:
-:            ┌───┐                                             ░ ┌───┐
-: t_0: ──────┤ H ├────────■─────────────────────────────────X──░─┤ H ├─■────────────────────────■─────────────
-:            ├───┤        │                                 │  ░ └───┘ │P(-π/2) ┌───┐           │
-: t_1: ──────┤ H ├────────┼────■────■───────────────────────┼──░───────■────────┤ H ├─■─────────┼─────────────
-:            ├───┤        │    │    │                       │  ░                └───┘ │P(-π/2)  │P(-π/4) ┌───┐
-: t_2: ──────┤ H ├────────┼────┼────┼────■────■────■────■───X──░──────────────────────■─────────■────────┤ H ├
-:      ┌─────┴───┴─────┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐    ░                                         └───┘
-:   u: ┤ Initialize(1) ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├───────────────────────────────────────────────────
+:            ┌───┐                                         ┌────────┐
+: t_0: ──────┤ H ├────────■────────────────────────────────┤0       ├
+:            ├───┤        │                                │        │
+: t_1: ──────┤ H ├────────┼────■────■──────────────────────┤1 QFT^† ├
+:            ├───┤        │    │    │                      │        │
+: t_2: ──────┤ H ├────────┼────┼────┼────■────■────■────■──┤2       ├
+:      ┌─────┴───┴─────┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐└────────┘
+:   u: ┤ Initialize(1) ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├──────────
 :      └───────────────┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
 
 ** TODO Addition in Fourier Space
 #+begin_src python :results replace
-  def make_fourier_incrementer_circuit(size: Integral, increment: Integral) -> QuantumCircuit:
+  def make_fourier_incrementer(size: Integral, increment: Integral) -> Gate:
       """TODO"""
       qc = QuantumCircuit(size)
 
       for k in range(size):
           qc.p(2*math.pi*increment*2**(-size+k), k)
 
-      return qc
+      return qc.to_gate(label=f"ϕinc({increment})")
 
 
-  def make_incrementer_circuit(size: Integral, increment: Integral) -> QuantumCircuit:
+  def make_incrementer(size: Integral, increment: Integral) -> Gate:
       """TODO"""
       qc = QuantumCircuit(size)
-      finc = make_fourier_incrementer_circuit(size, increment)
-      qft = make_qft_circuit(size)
+      finc = make_fourier_incrementer(size, increment)
+      qft = make_qft(size)
+      qft_dg = make_qft_dg(size)
 
-      qft_gate = qft.to_gate(label="QFT")
-      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
-      finc_gate = finc.to_gate(label=f"ϕinc({increment})")
+      qc.append(qft, range(size))
+      qc.append(finc, range(size))
+      qc.append(qft_dg, range(size))
 
-      qc.append(qft_gate, range(size))
-      qc.append(finc_gate, range(size))
-      qc.append(qft_dg_gate, range(size))
+      return qc.to_gate(label=f"inc({increment})")
 
-      return qc
 
-  qc1 = make_fourier_incrementer_circuit(4, 3)
-  qc2 = make_incrementer_circuit(4, 3)
+  finc = make_fourier_incrementer(4, 3)
+  inc = make_incrementer(4, 3)
 
-  str(qc1.draw()) + "\n\n" + str(qc2.draw())
+  str(finc.definition.draw()) + "\n\n" + str(inc.definition.draw())
 #+end_src
 
 #+RESULTS:
@@ -234,107 +237,90 @@ q_3: ┤3     ├┤3         ├┤3       ├
 Next: modular incrementation
 
 #+begin_src python :results replace
-  def make_modular_fourier_incrementer_circuit(increment: int, modulus: int):
+  def make_modular_fourier_incrementer(increment: int, modulus: int) -> Gate:
+      """TODO"""
       n = modulus.bit_length()
       size = n + 1
-
-      qc_inc_a = make_fourier_incrementer_circuit(increment=increment, size=size)
-      qc_inc_N = make_fourier_incrementer_circuit(increment=modulus, size=size)
-      qft = make_qft_circuit(size)
-
-      inc_gate_a = qc_inc_a.to_gate(label=f"ϕinc({increment})")
-      inc_gate_N = qc_inc_N.to_gate(label=f"ϕinc({modulus})")
-
-      inc_gate_dg_a = qc_inc_a.inverse().to_gate(label=f"ϕinc({increment})^†")
-      inc_gate_dg_N = qc_inc_N.inverse().to_gate(label=f"ϕinc({modulus})^†")
-
-      qft_gate = qft.to_gate(label="QFT")
-      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
 
       qreg = QuantumRegister(size, "q")
       qreg_anc = QuantumRegister(1, "a")
 
       qc = QuantumCircuit(qreg, qreg_anc)
 
-      qc.append(inc_gate_a, qreg)
-      qc.append(inc_gate_dg_N, qreg)
+      inc_a = make_fourier_incrementer(increment=increment, size=size)
+      inc_N = make_fourier_incrementer(increment=modulus, size=size)
+      inc_a_dg = inc_a.definition.inverse().to_gate(label=f"{inc_a.label}^†")
+      inc_N_dg = inc_N.definition.inverse().to_gate(label=f"{inc_N.label}^†")
+      qft = make_qft(size)
+      qft_dg = make_qft_dg(size)
 
-      qc.append(qft_dg_gate, qreg)
+      qc.append(inc_a, qreg)
+      qc.append(inc_N_dg, qreg)
+
+      qc.append(qft_dg, qreg)
       qc.cx(qreg[n], qreg_anc[0])
-      qc.append(qft_gate, qreg)
+      qc.append(qft, qreg)
 
-      qc.append(inc_gate_N.control(), list(qreg_anc)+list(qreg))  # TODO
-      qc.append(inc_gate_dg_a, qreg)
+      qc.append(inc_N.control(), list(qreg_anc)+list(qreg))  # TODO
+      qc.append(inc_a_dg, qreg)
 
-      qc.append(qft_dg_gate, qreg)
+      qc.append(qft_dg, qreg)
       qc.cx(qreg[n], qreg_anc[0], ctrl_state=0)
-      qc.append(qft_gate, qreg)
+      qc.append(qft, qreg)
 
-      qc.append(inc_gate_a, qreg)
+      qc.append(inc_a, qreg)
 
-      return qc
-
-
-  def make_modular_incrementer_circuit(increment: int, modulus: int):
-      fourier_inc_mod = make_modular_fourier_incrementer_circuit(increment, modulus)
-      qreg, qreg_anc = fourier_inc_mod.qregs
-      qc = QuantumCircuit(qreg, qreg_anc)
-
-      qft = make_qft_circuit(qreg.size)
-
-      qft_gate = qft.to_gate(label="QFT")
-      qft_dg_gate = qft.inverse().to_gate(label="QFT^†")
-      fourier_inc_mod_gate = fourier_inc_mod.to_gate(label=f"inc({increment})mod({modulus})")
-
-      qc.append(qft_gate, qreg)
-      qc.append(fourier_inc_mod_gate, list(qreg)+list(qreg_anc))
-      qc.append(qft_dg_gate, qreg)
-
-      return qc
+      return qc.to_gate(label=f"ϕinc({increment})mod({modulus})")
 
 
-  qc1 = make_modular_fourier_incrementer_circuit(3, 7)
-  qc2 = make_modular_incrementer_circuit(3, 7)
+  def make_modular_incrementer(increment: int, modulus: int) -> Gate:
+      """TODO"""
+      finc_mod = make_modular_fourier_incrementer(increment, modulus)
+      qreg_size = finc_mod.num_qubits - 1  # one ancilla
 
-  str(qc1.draw()) + "\n\n" + str(qc2.draw())
+      qft = make_qft(qreg_size)
+      qft_dg = make_qft_dg(qreg_size)
+
+      qc = QuantumCircuit(qreg_size + 1)
+
+      qc.append(qft, range(qreg_size))
+      qc.append(finc_mod, range(qreg_size + 1))
+      qc.append(qft_dg, range(qreg_size))
+
+      return qc.to_gate(label=f"inc({increment})mod({modulus})")
+
+
+  finc_mod = make_modular_fourier_incrementer(3, 7)
+  inc_mod = make_modular_incrementer(3, 7)
+
+  str(finc_mod.definition.draw()) + "\n\n" + str(inc_mod.definition.draw())
 #+end_src
 
 #+RESULTS:
 #+begin_example
-     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌──────────┐┌────────────┐┌────────┐               ┌──────┐»
-q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤0         ├┤0           ├┤0       ├───────────────┤0     ├»
-     │          ││            ││        │     │      ││          ││            ││        │               │      │»
-q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤1         ├┤1           ├┤1       ├───────────────┤1     ├»
-     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││  ϕinc(7) ││  ϕinc(3)^† ││  QFT^† │               │  QFT │»
-q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤2         ├┤2           ├┤2       ├───────────────┤2     ├»
-     │          ││            ││        │     │      ││          ││            ││        │┌───┐     ┌───┐│      │»
-q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤3         ├┤3           ├┤3       ├┤ X ├──■──┤ X ├┤3     ├»
-     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘└────┬─────┘└────────────┘└────────┘└───┘┌─┴─┐└───┘└──────┘»
-  a: ────────────────────────────────────┤ X ├─────────────■───────────────────────────────────┤ X ├─────────────»
-                                         └───┘                                                 └───┘             »
-«     ┌──────────┐
-«q_0: ┤0         ├
-«     │          │
-«q_1: ┤1         ├
-«     │  ϕinc(3) │
-«q_2: ┤2         ├
-«     │          │
-«q_3: ┤3         ├
-«     └──────────┘
-«  a: ────────────
-«
+     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌──────────┐
+q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤0         ├┤0           ├┤0       ├─────┤0     ├┤0         ├
+     │          ││            ││        │     │      ││          ││            ││        │     │      ││          │
+q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤1         ├┤1           ├┤1       ├─────┤1     ├┤1         ├
+     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││  ϕinc(7) ││  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
+q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤2         ├┤2           ├┤2       ├─────┤2     ├┤2         ├
+     │          ││            ││        │     │      ││          ││            ││        │     │      ││          │
+q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤3         ├┤3           ├┤3       ├──o──┤3     ├┤3         ├
+     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘└────┬─────┘└────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
+q_4: ────────────────────────────────────┤ X ├─────────────■──────────────────────────────┤ X ├────────────────────
+                                         └───┘                                            └───┘
 
-     ┌──────┐┌───────────────┐┌────────┐
-q_0: ┤0     ├┤0              ├┤0       ├
-     │      ││               ││        │
-q_1: ┤1     ├┤1              ├┤1       ├
-     │  QFT ││               ││  QFT^† │
-q_2: ┤2     ├┤2 inc(3)mod(7) ├┤2       ├
-     │      ││               ││        │
-q_3: ┤3     ├┤3              ├┤3       ├
-     └──────┘│               │└────────┘
-  a: ────────┤4              ├──────────
-             └───────────────┘
+     ┌──────┐┌────────────────┐┌────────┐
+q_0: ┤0     ├┤0               ├┤0       ├
+     │      ││                ││        │
+q_1: ┤1     ├┤1               ├┤1       ├
+     │  QFT ││                ││  QFT^† │
+q_2: ┤2     ├┤2 ϕinc(3)mod(7) ├┤2       ├
+     │      ││                ││        │
+q_3: ┤3     ├┤3               ├┤3       ├
+     └──────┘│                │└────────┘
+q_4: ────────┤4               ├──────────
+             └────────────────┘
 #+end_example
 
 For testing:
@@ -348,16 +334,17 @@ For testing:
       if modulus is None:
           assert size is not None, "Specify 'size'"
           qc = QuantumCircuit(size)
-          qc_inc = make_incrementer_circuit(increment=a, size=size)
+          inc = make_incrementer(increment=a, size=size)
       else:
           assert a < modulus and b < modulus, "a and b must be smaller than modulus"
-          qc_inc = make_modular_incrementer_circuit(increment=a, modulus=modulus)
-          size = qc_inc.qregs[0].size + 1  # TODO: ugly
+          inc = make_modular_incrementer(increment=a, modulus=modulus)
+          size = inc.num_qubits
           qc = QuantumCircuit(size)
 
+      # Not nice but works: Implicitly treats ancilla for the modular case correctly.
       qc.initialize(f"{b:0{size}b}")
-      qc.compose(qc_inc, inplace=True)  # TODO: ugly
-      qc.measure_all()  # TODO: rely on simplification that ancilla is zero
+      qc.append(inc, range(size))
+      qc.measure_all()
 
       sim = AerSimulator()
       qc_obj = transpile(qc, sim)
