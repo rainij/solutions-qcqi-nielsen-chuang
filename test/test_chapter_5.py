@@ -38,7 +38,16 @@ def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
 
 @pytest.mark.slow
 @pytest.mark.parametrize("a,modulus,maximizing_bits", {
-    (3, 8, ('00000000', '10000000')),  # the order is r = 2, so s/r in {0, 0.5}
+    # Remark: Theoretically, if the order is a power of 2 the results should be *clean* in
+    # the sense that only the below mentioned strings get non-zero counts. In practice
+    # this does not seem to be the case. Maybe the reason is the small angle problem in
+    # the Fourier tronsform. Also note that we do addition in Fourier space (which might
+    # worsen the problem).
+
+    # The order is r = 2, so s/r in {0, 0.5}
+    (3, 8, ('00000000', '10000000')),
+    # The order is r = 4, so s/r in {0, 0.25, 0.5, 0.75}:
+    (7, 15, ('0000000000', '0100000000', '1000000000', '1100000000')),
 })
 def test_phase_estimation(a, modulus, maximizing_bits):
     qc = make_order_finding_phase_estimation(a, modulus, eps=0.5)
