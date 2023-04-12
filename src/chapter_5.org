@@ -20,7 +20,7 @@ Tangled:
 
   from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
   from qiskit.circuit import Gate
-  from qiskit.circuit.library import TGate, MCPhaseGate
+  from qiskit.circuit.library import TGate, MCPhaseGate, SwapGate
 
   from qiskit_aer import AerSimulator
 #+end_src
@@ -407,26 +407,27 @@ $$
       """TODO"""
       int_size = modulus_size(modulus) + 1
 
-      qreg_ctrl = QuantumRegister(num_ctrls, "c")  # TODO
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
       qreg_x = QuantumRegister(int_size, "x")
       qreg_b = QuantumRegister(int_size, "b")
       qreg_anc = AncillaRegister(1, "a")
 
-      qft = make_qft(int_size)
-      qft_dg = make_qft_dg(int_size)
+      qft = make_qft(int_size) if num_ctrls == 0 else make_qft(int_size).control(num_ctrls)
+      qft_dg = qft.inverse()
 
-      qc = QuantumCircuit(qreg_x, qreg_b, qreg_anc)
+      qc = QuantumCircuit(qreg_ctrl, qreg_x, qreg_b, qreg_anc)
 
-      qc.append(qft, qreg_b)
+      qc.append(qft, list(qreg_ctrl) + list(qreg_b))
 
       for i in range(int_size - 1):
           ai = a * 2**i % modulus
-          cfinc = make_modular_fourier_incrementer(ai, modulus, num_ctrls=1)
-          qc.append(cfinc, [qreg_x[i]] + list(qreg_b) + list(qreg_anc))
+          cfinc = make_modular_fourier_incrementer(ai, modulus, num_ctrls=num_ctrls + 1)
+          qc.append(cfinc, list(qreg_ctrl) + [qreg_x[i]] + list(qreg_b) + list(qreg_anc))
 
-      qc.append(qft_dg, qreg_b)
+      qc.append(qft_dg, list(qreg_ctrl) + list(qreg_b))
 
-      return qc.to_gate(label=f"b + {a}x mod {modulus}")
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}(b + {a}x mod {modulus})")
 
 
   gate = make_VaN(3, 11)
@@ -461,26 +462,29 @@ q_10: ────────┤5                ├┤5                ├┤5
 #+end_example
 
 #+begin_src python :results replace
-  def make_Ua(a: int, modulus: int) -> Gate:
+  def make_Ua(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
       int_size = modulus_size(modulus) + 1
 
-      VaN = make_VaN(a, modulus)
-      Va1N = make_VaN(pow(a, -1, modulus), modulus)
-      Va1N_dg = Va1N.definition.inverse().to_gate(label=f"({Va1N.label})^†")
-
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
       qreg = QuantumRegister(int_size)
       qreg_anc = AncillaRegister(int_size + 1)
 
-      qc = QuantumCircuit(qreg, qreg_anc)
+      VaN = make_VaN(a, modulus, num_ctrls)
+      Va1N = make_VaN(pow(a, -1, modulus), modulus, num_ctrls)
+      Va1N_dg = Va1N.definition.inverse().to_gate(label=f"({Va1N.label})^†")
 
-      qc.append(Va1N_dg, list(qreg) + list(qreg_anc))
+      qc = QuantumCircuit(qreg_ctrl ,qreg, qreg_anc)
+
+      qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
       for i in range(qreg.size - 1):  # last bit just for overflow
-          qc.swap(qreg[i], qreg_anc[i])
+          swap = SwapGate() if num_ctrls == 0 else SwapGate().control(num_ctrls)
+          qc.append(swap, list(qreg_ctrl) + [qreg[i], qreg_anc[i]])
 
-      qc.append(VaN, list(qreg) + list(qreg_anc))
+      qc.append(VaN, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
-      return qc.to_gate(label=f"{a}x mod {modulus}")
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}({a}x mod {modulus})")
 
 
   Ua = make_Ua(3, 7)
@@ -598,7 +602,6 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
 
   def make_order_finding_phase_estimation(a: int, modulus: int, eps: float) -> QuantumCircuit:
       L = modulus_size(modulus)
-      int_size = L + 1
       t = 2*L + 1 + eps_bits(eps)
 
       qreg_top = QuantumRegister(t, "t")
@@ -614,11 +617,9 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
       qc.x(qreg_bot[0])
 
       for i in range(t):
-          # TODO: making Ua controlled is slow
-          CUai = make_Ua(pow(a, 2**i, modulus), modulus).control()
+          CUai = make_Ua(pow(a, 2**i, modulus), modulus, num_ctrls=1)
           qc.append(CUai, [qreg_top[i]] + list(qreg_bot) + list(qreg_anc))
-          #Uai = make_Ua(pow(a, 2**i, modulus), modulus)
-          #qc.append(Uai, list(qreg_bot) + list(qreg_anc))
+          pass
 
       qft_dg = make_qft_dg(t)
       qc.append(qft_dg, qreg_top)
