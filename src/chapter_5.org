@@ -20,7 +20,7 @@ Tangled:
 
   from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
   from qiskit.circuit import Gate
-  from qiskit.circuit.library import TGate
+  from qiskit.circuit.library import TGate, MCPhaseGate
 
   from qiskit_aer import AerSimulator
 #+end_src
@@ -179,27 +179,55 @@ Another example
 :   u: ┤ Initialize(1) ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├──────────
 :      └───────────────┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
 
-** TODO Addition in Fourier Space
+** TODO NEW Addition in Fourier Space
 #+begin_src python :results replace
-  def make_fourier_incrementer(size: Integral, increment: Integral) -> Gate:
+  def append_fourier_incrementer(qc: QuantumCircuit, qreg: QuantumRegister | list[int], increment: int):
       """TODO"""
-      qc = QuantumCircuit(size)
-
+      size = len(qreg)
       for k in range(size):
-          qc.p(2*math.pi*increment*2**(-size+k), k)
+          qc.p(2*math.pi*increment*2**(-size+k), qreg[k])
 
-      return qc.to_gate(label=f"ϕinc({increment})")
+
+  def append_fourier_incrementer_dg(qc: QuantumCircuit, qreg: QuantumRegister | list[int], increment: int):
+      """TODO"""
+      size = len(qreg)
+      for k in range(size):
+          qc.p(-2*math.pi*increment*2**(-size+k), qreg[k])
+#+end_src
+
+** Addition in Fourier Space
+#+begin_src python :results replace
+  def make_control_prefix(num_ctrls: int):
+      return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
+
+
+  def make_fourier_incrementer(size: int, increment: int, num_ctrls: int = 0) -> Gate:
+      """TODO"""
+      assert num_ctrls >= 0, "num_ctrls must be non-negative"
+      qc = QuantumCircuit(size + num_ctrls)
+
+      if num_ctrls == 0:
+          for k in range(size):
+              qc.p(2*math.pi*increment*2**(-size+k), k)
+      else:
+          for k in range(size):
+              qc.append(MCPhaseGate(2*math.pi*increment*2**(-size+k), num_ctrls),
+                        list(range(num_ctrls)) + [num_ctrls + k])
+
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})")
 
 
   def make_incrementer(size: Integral, increment: Integral) -> Gate:
       """TODO"""
       qc = QuantumCircuit(size)
-      finc = make_fourier_incrementer(size, increment)
+      #finc = make_fourier_incrementer(size, increment)
       qft = make_qft(size)
       qft_dg = make_qft_dg(size)
 
       qc.append(qft, range(size))
-      qc.append(finc, range(size))
+      #qc.append(finc, range(size))
+      append_fourier_incrementer(qc, list(range(size)), increment)
       qc.append(qft_dg, range(size))
 
       return qc.to_gate(label=f"inc({increment})")
@@ -241,39 +269,44 @@ Next: modular incrementation
       return (modulus - 1).bit_length()
 
 
-  def make_modular_fourier_incrementer(increment: int, modulus: int) -> Gate:
+  def make_modular_fourier_incrementer(increment: int, modulus: int, num_ctrls: int=0) -> Gate:
       """TODO"""
       size = modulus_size(modulus) + 1
 
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
       qreg = QuantumRegister(size, "q")
       qreg_anc = QuantumRegister(1, "a")
 
-      qc = QuantumCircuit(qreg, qreg_anc)
+      qreg2 = list(qreg_ctrl) + list(qreg)
 
-      inc_a = make_fourier_incrementer(increment=increment, size=size)
-      inc_N = make_fourier_incrementer(increment=modulus, size=size)
-      inc_a_dg = inc_a.definition.inverse().to_gate(label=f"{inc_a.label}^†")
+      qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
+
+      cc_inc_a = make_fourier_incrementer(increment=increment, size=size, num_ctrls=num_ctrls)
+      inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=0)
+      c_inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=1)
+      cc_inc_a_dg = cc_inc_a.definition.inverse().to_gate(label=f"{cc_inc_a.label}^†")
       inc_N_dg = inc_N.definition.inverse().to_gate(label=f"{inc_N.label}^†")
       qft = make_qft(size)
       qft_dg = make_qft_dg(size)
 
-      qc.append(inc_a, qreg)
+      qc.append(cc_inc_a, qreg2)
       qc.append(inc_N_dg, qreg)
 
       qc.append(qft_dg, qreg)
       qc.cx(qreg[-1], qreg_anc[0])
       qc.append(qft, qreg)
 
-      qc.append(inc_N.control(), list(qreg_anc)+list(qreg))  # TODO
-      qc.append(inc_a_dg, qreg)
+      qc.append(c_inc_N, list(qreg_anc)+list(qreg))  # TODO
+      qc.append(cc_inc_a_dg, qreg2)
 
       qc.append(qft_dg, qreg)
       qc.cx(qreg[-1], qreg_anc[0], ctrl_state=0)
       qc.append(qft, qreg)
 
-      qc.append(inc_a, qreg)
+      qc.append(cc_inc_a, qreg2)
 
-      return qc.to_gate(label=f"ϕinc({increment})mod({modulus})")
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")
 
 
   def make_modular_incrementer(increment: int, modulus: int) -> Gate:
@@ -370,10 +403,11 @@ $$
 $$
 
 #+begin_src python :results replace
-  def make_VaN(a: int, modulus: int) -> Gate:
+  def make_VaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
       """TODO"""
       int_size = modulus_size(modulus) + 1
 
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")  # TODO
       qreg_x = QuantumRegister(int_size, "x")
       qreg_b = QuantumRegister(int_size, "b")
       qreg_anc = AncillaRegister(1, "a")
@@ -387,7 +421,7 @@ $$
 
       for i in range(int_size - 1):
           ai = a * 2**i % modulus
-          cfinc = make_modular_fourier_incrementer(ai, modulus).control()
+          cfinc = make_modular_fourier_incrementer(ai, modulus, num_ctrls=1)
           qc.append(cfinc, [qreg_x[i]] + list(qreg_b) + list(qreg_anc))
 
       qc.append(qft_dg, qreg_b)
@@ -580,8 +614,11 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
       qc.x(qreg_bot[0])
 
       for i in range(t):
+          # TODO: making Ua controlled is slow
           CUai = make_Ua(pow(a, 2**i, modulus), modulus).control()
           qc.append(CUai, [qreg_top[i]] + list(qreg_bot) + list(qreg_anc))
+          #Uai = make_Ua(pow(a, 2**i, modulus), modulus)
+          #qc.append(Uai, list(qreg_bot) + list(qreg_anc))
 
       qft_dg = make_qft_dg(t)
       qc.append(qft_dg, qreg_top)
