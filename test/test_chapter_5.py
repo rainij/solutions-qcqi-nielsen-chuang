@@ -3,7 +3,8 @@ import pytest
 from qiskit import transpile
 from qiskit_aer import AerSimulator
 
-from chapter_5 import quantum_add, make_order_finding_phase_estimation
+from chapter_5 import quantum_add, make_order_finding_phase_estimation, \
+    intlogx, is_power, find_factor
 
 
 
@@ -30,6 +31,7 @@ def test_modular_quantum_addition(a, b, modulus, expected):
     assert quantum_add(a, b, modulus=modulus) == expected
 
 
+# TODO code duplication
 def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
     result = sorted(counts.items(), key=lambda a: a[1], reverse=True)[:num]
     result = [a[0] for a in result]
@@ -60,3 +62,77 @@ def test_phase_estimation(a, modulus, maximizing_bits):
     result = get_maximizing_bits(counts, num)
 
     assert result == maximizing_bits
+
+
+@pytest.mark.parametrize("N, base, offset, exponent, expected", {
+    (7, 2, 0, 1, 2),
+    (8, 2, 0, 1, 3),
+    (100, 2, 90, 1, 3),
+    (1024, 2, 512, 1, 9),
+    (1023, 2, 512, 1, 8),
+    (1024, 2, 16, 2, 4),
+    (1023, 2, 16, 2, 3),
+    (1000, 3, 1, 3, 2),
+    (999, 3, 1, 3, 1),
+})
+def test_intlogx(N, base, offset, exponent, expected):
+    assert intlogx(N, base, offset, exponent) == expected
+
+
+@pytest.mark.parametrize("N", {
+    # These are probably all prime (https://bigprimes.org/):
+    7,
+    17,
+    87803,
+    63677916755048130433,
+    3653830433690631231215033779172394321457504060347295936059433436653593414026691052633975151578907267,
+    # Roughly 1000 bits:
+    694132660957031113047665284378532956251732011797289589969556436434735219310464570922895568634461408873887848260360545569006450572256819756449202403712996238839577863592506729956934258640602885447906264615930253012437897772899559071819968673582797974093477640282435584546082331225516832102340474835529,
+    # Products of two primes:
+    2341121591 * 3536648897,
+    33318506043084601978901983513127189439078469098941 * 57666386236412678991478313909997305232366971065901,
+    # Roughly 1000 bits
+    267235751626887712762234547639051825020255990491073909324282238093658784919122126843094712258943571265478372330167756989106909834248894847222757028093 * 442119851295683804328228639966196873910083006543457611240362529682859193457180901378680312821415860447501430305027501449183718893689426744660311637941,
+})
+def test_is_power_negative(N):
+    assert is_power(N) is None
+
+
+@pytest.mark.parametrize("a,b", {
+    # In all cases a**b is roughly a 1000 bit number
+    (2, 1000),
+    (5, 431),
+    (29, 207),
+    (5441, 83),
+    (1576052117, 37),
+    (7513950727, 31),
+    (173566555901126500012468354357, 13),
+})
+def test_is_power_positive(a, b):
+    x, y = is_power(a ** b)
+    assert x ** y == a ** b
+
+
+@pytest.mark.parametrize("N,factor", {
+    # special case: even numbers
+    (2, 2),
+    (8, 2),
+    (10385820, 2),
+    # powers:
+    (3**17, 3),
+    (5**9, 5),
+    (19**3, 19),
+})
+def test_find_factor_trivial_cases(N, factor):
+    # sometimes find_factor finds a larger factor:
+    assert find_factor(N) % factor == 0
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("N,factors,cheat_code", {
+    # The cheat_code guarantees that we only have to run the circuit once
+    (15, (3, 5), 7),  # smallest possible non-trivial case (already takes long)
+})
+def test_find_factor_non_trivial_cases(N, factors, cheat_code):
+    # TODO: random seed still needed
+    assert find_factor(N, lambda *_: cheat_code) in factors
