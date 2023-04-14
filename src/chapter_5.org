@@ -22,7 +22,7 @@ Tangled:
 
   from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
   from qiskit.circuit import Gate
-  from qiskit.circuit.library import TGate, MCPhaseGate, SwapGate
+  from qiskit.circuit.library import MCPhaseGate, SwapGate
 
   from qiskit_aer import AerSimulator
 #+end_src
@@ -100,30 +100,50 @@ Note that qiskit orders the wires in a different order then the book.
 : q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────X─
 :      └───┘
 
-** TODO NEW Addition in Fourier Space
+** Arithmetic in Fourier Space
+Recall that phase estimation for the order finding problem requires to exponentiate an
+operator $U_a:\ket{j}\mapsto\ket{aj\mod N}$. This operator has the nice property
+
+$$
+  U_a^n = U_{a^n \mod N} .
+$$
+
+Therefore having a way to implement $U_a$ for any $a$ already gives us the required
+powers. /This is important/ since implementing the powers of $U_a$ by just repeating the a
+circuit for $U_a$ would result in an /exponantially/ deep circuit.
+
+To implement $U_a$ we need to be able to perform basic arithmetic. We will implement the
+following operations:
+
+- Addition
+- Modular Addition
+- Modular Multiplication
+
+More precisely we only implement the unary versions of these operations. For example
+instead of $(a,b)\mapsto a+b$ we implement $b\mapsto a+b$ for a fixed integer $a$. We call
+this an /incrementer/.
+
+Our implementation closely follows [cite:@Draper2000] and [cite:@Beauregard2003]. For
+simplicity we omit some optimizations at the cost of a slower algorithm. We implement all
+operations in Fourier space. This saves qubits, at the cost of a deeper circuit.
+
+Let us start with the incrementation operator in Fourier space. Let us denote
+$\ket{\phi(j)}=\FT\ket{j}$. This circuit implements $\ket{\phi(j)}\mapsto\ket{\phi(a+j)}$
+for a fixed integer $a$.
+
 #+begin_src python
-  def append_fourier_incrementer(qc: QuantumCircuit, qreg: QuantumRegister | list[int], increment: int):
-      """TODO"""
-      size = len(qreg)
-      for k in range(size):
-          qc.p(2*math.pi*increment*2**(-size+k), qreg[k])
-
-
-  def append_fourier_incrementer_dg(qc: QuantumCircuit, qreg: QuantumRegister | list[int], increment: int):
-      """TODO"""
-      size = len(qreg)
-      for k in range(size):
-          qc.p(-2*math.pi*increment*2**(-size+k), qreg[k])
-#+end_src
-
-** Addition in Fourier Space
-#+begin_src python :results replace
   def make_control_prefix(num_ctrls: int):
       return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
 
 
   def make_fourier_incrementer(size: int, increment: int, num_ctrls: int = 0) -> Gate:
-      """TODO"""
+      """Implements |ϕ(j)> -> |ϕ(a+j)> where a is the increment.
+
+      Args:
+          size: Number of qubits used to represent the integers.
+          increment: The fixed increment hardcoded into the circuit.
+          num_ctrls: This many control qubits are added before all other qubits.
+      """
       assert num_ctrls >= 0, "num_ctrls must be non-negative"
       qc = QuantumCircuit(size + num_ctrls)
 
@@ -137,51 +157,48 @@ Note that qiskit orders the wires in a different order then the book.
 
       prefix = make_control_prefix(num_ctrls)
       return qc.to_gate(label=f"{prefix}ϕinc({increment})")
+#+end_src
 
+The actual incrementation operator can be obtained by conjugating this circuit by the
+Fourier transform:
 
+#+begin_src python
   def make_incrementer(size: Integral, increment: Integral) -> Gate:
-      """TODO"""
+      """Implements |j> -> |a+j> where a is the increment.
+
+      The arguments have the same meaning as in 'make_fourier_incrementer'.
+      """
       qc = QuantumCircuit(size)
-      #finc = make_fourier_incrementer(size, increment)
+      finc = make_fourier_incrementer(size, increment)
       qft = make_qft(size)
       qft_dg = make_qft_dg(size)
 
       qc.append(qft, range(size))
-      #qc.append(finc, range(size))
-      append_fourier_incrementer(qc, list(range(size)), increment)
+      qc.append(finc, range(size))
       qc.append(qft_dg, range(size))
 
       return qc.to_gate(label=f"inc({increment})")
-
-
-  finc = make_fourier_incrementer(4, 3)
-  inc = make_incrementer(4, 3)
-
-  str(finc.definition.draw()) + "\n\n" + str(inc.definition.draw())
 #+end_src
 
-#+RESULTS:
-#+begin_example
-     ┌─────────┐
-q_0: ┤ P(3π/8) ├
-     ├─────────┤
-q_1: ┤ P(3π/4) ├
-     ├─────────┤
-q_2: ┤ P(3π/2) ├
-     └┬───────┬┘
-q_3: ─┤ P(3π) ├─
-      └───────┘
+We actually do not need =make_incrementer= for our phase estimation (since we want to do
+as many operations as possible in the Fourier space due to the cost of the Fourier
+transform). But it is still nice to have it, for example for testing purposes.
 
-     ┌──────┐┌─────────┐┌────────┐
-q_0: ┤0     ├┤ P(3π/8) ├┤0       ├
-     │      │├─────────┤│        │
-q_1: ┤1     ├┤ P(3π/4) ├┤1       ├
-     │  QFT │├─────────┤│  QFT^† │
-q_2: ┤2     ├┤ P(3π/2) ├┤2       ├
-     │      │└┬───────┬┘│        │
-q_3: ┤3     ├─┤ P(3π) ├─┤3       ├
-     └──────┘ └───────┘ └────────┘
-#+end_example
+#+begin_src python :results replace :tangle no :cache yes
+  inc = make_incrementer(4, 3)
+  inc.definition.decompose('ϕinc(3)').draw()
+#+end_src
+
+#+RESULTS[b959b69d77c2bfff1ffac83c24d060df1e18d33b]:
+:      ┌──────┐┌─────────┐┌────────┐
+: q_0: ┤0     ├┤ P(3π/8) ├┤0       ├
+:      │      │├─────────┤│        │
+: q_1: ┤1     ├┤ P(3π/4) ├┤1       ├
+:      │  QFT │├─────────┤│  QFT^† │
+: q_2: ┤2     ├┤ P(3π/2) ├┤2       ├
+:      │      │└┬───────┬┘│        │
+: q_3: ┤3     ├─┤ P(3π) ├─┤3       ├
+:      └──────┘ └───────┘ └────────┘
 
 Next: modular incrementation
 
@@ -1167,3 +1184,6 @@ $O(L^3)$ gates.
 The first part of the claim, that we can replace the controlled $U^j$ by $V$ and $|1\rangle$ by
 $|0\rangle$ without changing the output of the algorithm is obvious. It remains to show the $V$ can
 be implemented by $O(L^3)$ gates.
+
+* References
+#+print_bibliography:
