@@ -40,7 +40,7 @@ Not tangled:
   from continued_fractions import get_convergent
 #+end_src
 
-** Fourier Transform
+** Quantum Fourier Transform
 These are the operators $R_k$ appearing in the implementation of the Fourier Transform:
 
 #+name: chapter-5-Rk
@@ -72,7 +72,6 @@ structure.
               qc.swap(i, size - i - 1)
 
       append_rotations(qc, size)
-      #qc.barrier()  # nicer plot
       append_swaps(qc, size)
 
       return qc.to_gate(label="QFT")
@@ -100,87 +99,6 @@ Note that qiskit orders the wires in a different order then the book.
 :      ┌───┐ │P(π/8)  │P(π/4)  │P(π/2) └───┘                                      │
 : q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────X─
 :      └───┘
-
-** TODO Phase Estimation
-
-# TODO: docstring, testing
-#+begin_src python
-  def make_phase_estimation_circuit(phase_oracle: QuantumCircuit, init_params: str | list | int):
-      reg_t, reg_u = phase_oracle.qregs
-      t, u = reg_t.size, reg_u.size
-
-      qc = QuantumCircuit(reg_t, reg_u)
-
-      for i in range(t):
-          qc.h(reg_t[i])
-
-      qc.initialize(init_params, reg_u)
-      qc = qc.compose(phase_oracle)
-
-      qft_dg = make_qft_dg(t)
-      qc.append(qft_dg, reg_t)
-
-      return qc
-#+end_src
-
-Here is a naive (inefficient) implementation of the phase oracle, given the unitary operator:
-
-#+begin_src python
-  def make_naive_phase_oracle(t: Integral, U: Gate) -> QuantumCircuit:
-      u = U.num_qubits
-      reg_t = QuantumRegister(t, name="t")
-      reg_u = QuantumRegister(u, name="u")
-
-      qc = QuantumCircuit(reg_t, reg_u)
-      CU = U.control()
-
-      for i in range(0, t):
-          for _ in range(2**i):  # really bad: exponentially many gates!
-              qc.append(CU, [reg_t[i], reg_u])
-
-      return qc
-#+end_src
-
-Example:
-
-#+begin_src python :results output replace :tangle no :cache yes
-  phase_oracle = make_naive_phase_oracle(4, TGate())
-  print(phase_oracle.draw())
-#+end_src
-
-#+RESULTS[de45889dcf003bd9b2068fa1b1c3bd0ece2688dd]:
-#+begin_example
-
-t_0: ──■────────────────────────────────────────────────────────────────────────
-       │
-t_1: ──┼────■────■──────────────────────────────────────────────────────────────
-       │    │    │
-t_2: ──┼────┼────┼────■────■────■────■──────────────────────────────────────────
-       │    │    │    │    │    │    │
-t_3: ──┼────┼────┼────┼────┼────┼────┼────■────■────■────■────■────■────■────■──
-     ┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐
-  u: ┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├
-     └───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
-#+end_example
-
-Another example
-
-#+begin_src python :results replace :tangle no :cache yes
-  phase_oracle = make_naive_phase_oracle(3, TGate())
-  qc = make_phase_estimation_circuit(phase_oracle, '1')
-  qc.draw()
-#+end_src
-
-#+RESULTS[0fbd70b3ad7d2af88dcba73e656b226ce0960c62]:
-:            ┌───┐                                         ┌────────┐
-: t_0: ──────┤ H ├────────■────────────────────────────────┤0       ├
-:            ├───┤        │                                │        │
-: t_1: ──────┤ H ├────────┼────■────■──────────────────────┤1 QFT^† ├
-:            ├───┤        │    │    │                      │        │
-: t_2: ──────┤ H ├────────┼────┼────┼────■────■────■────■──┤2       ├
-:      ┌─────┴───┴─────┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐┌─┴─┐└────────┘
-:   u: ┤ Initialize(1) ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├┤ T ├──────────
-:      └───────────────┘└───┘└───┘└───┘└───┘└───┘└───┘└───┘
 
 ** TODO NEW Addition in Fourier Space
 #+begin_src python
@@ -337,17 +255,28 @@ Next: modular incrementation
 
 #+RESULTS:
 #+begin_example
-     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐┌────────────┐┌────────┐     ┌──────┐┌──────────┐
-q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├┤0           ├┤0       ├─────┤0     ├┤0         ├
-     │          ││            ││        │     │      ││            ││            ││        │     │      ││          │
-q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├┤1           ├┤1       ├─────┤1     ├┤1         ├
-     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            ││  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
-q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├┤2           ├┤2       ├─────┤2     ├┤2         ├
-     │          ││            ││        │     │      ││            ││            ││        │     │      ││          │
-q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├┤3           ├┤3       ├──o──┤3     ├┤3         ├
-     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │└────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
-q_4: ────────────────────────────────────┤ X ├────────┤0           ├────────────────────────┤ X ├────────────────────
-                                         └───┘        └────────────┘                        └───┘
+     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐┌────────────┐┌────────┐     ┌──────┐»
+q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├┤0           ├┤0       ├─────┤0     ├»
+     │          ││            ││        │     │      ││            ││            ││        │     │      │»
+q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├┤1           ├┤1       ├─────┤1     ├»
+     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            ││  ϕinc(3)^† ││  QFT^† │     │  QFT │»
+q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├┤2           ├┤2       ├─────┤2     ├»
+     │          ││            ││        │     │      ││            ││            ││        │     │      │»
+q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├┤3           ├┤3       ├──o──┤3     ├»
+     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │└────────────┘└────────┘┌─┴─┐└──────┘»
+q_4: ────────────────────────────────────┤ X ├────────┤0           ├────────────────────────┤ X ├────────»
+                                         └───┘        └────────────┘                        └───┘        »
+«     ┌──────────┐
+«q_0: ┤0         ├
+«     │          │
+«q_1: ┤1         ├
+«     │  ϕinc(3) │
+«q_2: ┤2         ├
+«     │          │
+«q_3: ┤3         ├
+«     └──────────┘
+«q_4: ────────────
+«
 
      ┌──────┐┌────────────────┐┌────────┐
 q_0: ┤0     ├┤0               ├┤0       ├
