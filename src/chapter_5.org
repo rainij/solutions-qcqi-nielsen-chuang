@@ -100,7 +100,7 @@ Note that qiskit orders the wires in a different order then the book.
 : q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────X─
 :      └───┘
 
-** Arithmetic in Fourier Space
+** Addition in Fourier Space
 Recall that phase estimation for the order finding problem requires to exponentiate an
 operator $U_a:\ket{j}\mapsto\ket{aj\mod N}$. This operator has the nice property
 
@@ -109,7 +109,7 @@ $$
 $$
 
 Therefore having a way to implement $U_a$ for any $a$ already gives us the required
-powers. /This is important/ since implementing the powers of $U_a$ by just repeating the a
+powers. /This is important/ since implementing the powers of $U_a$ by just repeating the
 circuit for $U_a$ would result in an /exponantially/ deep circuit.
 
 To implement $U_a$ we need to be able to perform basic arithmetic. We will implement the
@@ -159,6 +159,9 @@ for a fixed integer $a$.
       return qc.to_gate(label=f"{prefix}ϕinc({increment})")
 #+end_src
 
+The reasoning to see that the circuit does what we want is essentially the same as the
+reasoning behind the representation of $\FT\ket{j}$ as a product state.
+
 The actual incrementation operator can be obtained by conjugating this circuit by the
 Fourier transform:
 
@@ -200,15 +203,38 @@ transform). But it is still nice to have it, for example for testing purposes.
 : q_3: ┤3     ├─┤ P(3π) ├─┤3       ├
 :      └──────┘ └───────┘ └────────┘
 
-Next: modular incrementation
+Next we implement modular incrementation. Unfortunately the circuit is a bit
+complicated. But the idea is simple: Let $a$ be the increment, $N$ the modulus, and let
+$b$ be the input to the circuit. We want to calculate $a+b\mod N$. The size of the circuit
+is chosen in a way that $a$ and $b$ can be represented with leading bit still being zero
+(this implies in particular that $a+b$ can be represented). The circuit /essentially/ does
+the following (arithmetic carried out in Fourier space):
 
-#+begin_src python :results replace
+- Let $s_1 = b + a - N$ allowing /underflow/ in case $N>a+b$.
+- Detect underflow by inspecting the most significant bit.
+- If no underflow occurs $s_1$ is already the result.
+- Otherwise if underflow occurs we must add back $N$ and then $s_2=s_1+N=a+b$ is the
+  result.
+
+Note that the =CNOT= is responsible to write a =1= into the ancillary qubit iff underflow
+occurs. The reason why the circuit looks more complicated is that we have to /uncompute/
+everything written to the ancilla.
+
+#+begin_src python
   def modulus_size(modulus: int):
       return (modulus - 1).bit_length()
 
 
   def make_modular_fourier_incrementer(increment: int, modulus: int, num_ctrls: int=0) -> Gate:
-      """TODO"""
+      """Implements |ϕ(j)> -> |ϕ(a+j mod N)> where a is the increment and N the modulus.
+
+      Args:
+          increment: The fixed increment hardcoded into the circuit.
+          modulus: The modulus hardcoded into the circuit.
+          num_ctrls: This many control qubits are added before all other qubits.
+
+      Note: The last wire is an ancillary qubit which needs to be initialized to |0>.
+      """
       size = modulus_size(modulus) + 1
 
       qreg_ctrl = QuantumRegister(num_ctrls, "c")
@@ -234,7 +260,7 @@ Next: modular incrementation
       qc.cx(qreg[-1], qreg_anc[0])
       qc.append(qft, qreg)
 
-      qc.append(c_inc_N, list(qreg_anc)+list(qreg))  # TODO
+      qc.append(c_inc_N, list(qreg_anc) + list(qreg))
       qc.append(cc_inc_a_dg, qreg2)
 
       qc.append(qft_dg, qreg)
@@ -245,10 +271,57 @@ Next: modular incrementation
 
       prefix = make_control_prefix(num_ctrls)
       return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")
+#+end_src
+
+You may wonder why this function (and =make_fourier_incrementer=) takes an argument
+=num_ctrls=. We could easily add controls by using the builtin =Gate.control= method. At
+first I did it this way but it turned out that building the phase estimation circuit took
+extremely long. Profiling with [[https://docs.python.org/3/library/profile.html][cProfile]] revealed that around 95% of the time was spent
+generating the controls. Hence I implemented it manually saving a lot of time. The main
+reason why this worked is that - at the time of writing this - the =Gate.control= method
+recursively adds controls to each gate contained in the circuit. But this is not necessary
+for this circuit, instead it suffices to put the control at just the incrementer for $a$.
 
 
+#+begin_src python :results replace :tangle no :cache yes
+  finc_mod = make_modular_fourier_incrementer(3, 7)
+  finc_mod.definition.draw(fold=80)
+#+end_src
+
+#+RESULTS[7aea9d90baf948838e6aee076dc5a30a349672cf]:
+#+begin_example
+     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐»
+q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├»
+     │          ││            ││        │     │      ││            │»
+q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├»
+     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            │»
+q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├»
+     │          ││            ││        │     │      ││            │»
+q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├»
+     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │»
+q_4: ────────────────────────────────────┤ X ├────────┤0           ├»
+                                         └───┘        └────────────┘»
+«     ┌────────────┐┌────────┐     ┌──────┐┌──────────┐
+«q_0: ┤0           ├┤0       ├─────┤0     ├┤0         ├
+«     │            ││        │     │      ││          │
+«q_1: ┤1           ├┤1       ├─────┤1     ├┤1         ├
+«     │  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
+«q_2: ┤2           ├┤2       ├─────┤2     ├┤2         ├
+«     │            ││        │     │      ││          │
+«q_3: ┤3           ├┤3       ├──o──┤3     ├┤3         ├
+«     └────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
+«q_4: ────────────────────────┤ X ├────────────────────
+«                             └───┘
+#+end_example
+
+We implement the corresponding operation in real space to have something to test against:
+
+#+begin_src python
   def make_modular_incrementer(increment: int, modulus: int) -> Gate:
-      """TODO"""
+      """Implements |j> -> |a+j mod N> where a is the increment and N is the modulus.
+
+      The arguments have the same meaning as in 'make_modular_fourier_incrementer'.
+      """
       finc_mod = make_modular_fourier_incrementer(increment, modulus)
       qreg_size = finc_mod.num_qubits - 1  # one ancilla
 
@@ -262,39 +335,15 @@ Next: modular incrementation
       qc.append(qft_dg, range(qreg_size))
 
       return qc.to_gate(label=f"inc({increment})mod({modulus})")
-
-
-  finc_mod = make_modular_fourier_incrementer(3, 7)
-  inc_mod = make_modular_incrementer(3, 7)
-
-  str(finc_mod.definition.draw()) + "\n\n" + str(inc_mod.definition.draw())
 #+end_src
 
-#+RESULTS:
-#+begin_example
-     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐┌────────────┐┌────────┐     ┌──────┐»
-q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├┤0           ├┤0       ├─────┤0     ├»
-     │          ││            ││        │     │      ││            ││            ││        │     │      │»
-q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├┤1           ├┤1       ├─────┤1     ├»
-     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            ││  ϕinc(3)^† ││  QFT^† │     │  QFT │»
-q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├┤2           ├┤2       ├─────┤2     ├»
-     │          ││            ││        │     │      ││            ││            ││        │     │      │»
-q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├┤3           ├┤3       ├──o──┤3     ├»
-     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │└────────────┘└────────┘┌─┴─┐└──────┘»
-q_4: ────────────────────────────────────┤ X ├────────┤0           ├────────────────────────┤ X ├────────»
-                                         └───┘        └────────────┘                        └───┘        »
-«     ┌──────────┐
-«q_0: ┤0         ├
-«     │          │
-«q_1: ┤1         ├
-«     │  ϕinc(3) │
-«q_2: ┤2         ├
-«     │          │
-«q_3: ┤3         ├
-«     └──────────┘
-«q_4: ────────────
-«
+#+begin_src python :results replace :tangle no :cache yes
+  inc_mod = make_modular_incrementer(3, 7)
+  inc_mod.definition.draw()
+#+end_src
 
+#+RESULTS[8afd2c5adc1aefe17a586166d39ce62bd6d99877]:
+#+begin_example
      ┌──────┐┌────────────────┐┌────────┐
 q_0: ┤0     ├┤0               ├┤0       ├
      │      ││                ││        │
@@ -308,12 +357,22 @@ q_4: ────────┤4               ├─────────�
              └────────────────┘
 #+end_example
 
-For testing:
+This function can be used to test (manually or via CI) that the above implementations for
+incrementation or modular incrementation works:
 
 #+begin_src python
   def quantum_add(a: int, b: int, modulus: int = None, size: int = None) -> int:
-      """Compute a+b using make_incrementer_circuit."""
-      # TODO: move somewhere else
+      """Compute a + b or a + b mod modulus.
+
+      Args:
+          a,b: The two summands.
+          size: The number of qubits to represent a and b. Ignored if modulus is given.
+          modulus: Some number required to be larger than a and b.
+
+      Note:
+          Uses make_incrementer or make_modular_incrementer depending whether modulus is
+          given or not.
+      """
       assert a >= 0 and b >= 0, "a and b must be positive"
 
       if modulus is None:
@@ -344,7 +403,7 @@ For testing:
       return result
 #+end_src
 
-** Modular Exponentiation
+** TODO Multiplication in Fourier Space
 First we implement
 
 $$
@@ -463,7 +522,7 @@ q_8: ┤8                  ├─────────┤8                ├
      └───────────────────┘         └─────────────────┘
 #+end_example
 
-** Order Finding
+** TODO Order Finding
 In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
 
 Recall that after executing the phase estimation routine we obtain an $2L+1$ bit number
