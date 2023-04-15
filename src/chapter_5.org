@@ -556,7 +556,8 @@ Note that three bits are sufficient to represent the number $7$. That explains w
 swap gates are used.
 
 ** Order Finding
-In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
+In this section I want to fill a (tiny) gap in the algorithm for order finding (section
+5.3.1).
 
 Recall that after executing the phase estimation routine we obtain an $2L+1$ bit number
 $\varphi$. If we are not too unlucky it equals /approximately/ $s/r$ for a non-zero $z$. The
@@ -634,14 +635,19 @@ Since $q_n < N$, $q_n < q_{n+1}$, and $z_i\geq 1$ we deduce $q_{n+1}>N$. QED.
 Now recall (again) that $N$ is an $L$ bit integer and $\varphi$ is precise up to $2L+1$
 bits. This implies that the premise of the lemma is satisfied. This shows the claim.
 
-*** TODO Implementation
+*** Implementation
+Next we implement phase estimation for order finding, following the book.
+
 #+begin_src python
   def eps_bits(eps: float) -> int:
-      """TODO"""
-      return 1  # TODO
+      """Number of additional qubits required to guarantee a success
+      probability of at least 1-eps (theoretically). See Chapter 5.2.1."""
+      assert eps > 0, "eps must be strictly positive."
+      return math.ceil(math.log(2.0 + 0.5/eps))
 
 
   def make_order_finding_phase_estimation(a: int, modulus: int, eps: float) -> QuantumCircuit:
+      """Make a phase estimation circuit to find the order of 'a'."""
       L = modulus_size(modulus)
       t = 2*L + 1 + eps_bits(eps)
 
@@ -671,62 +677,157 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
       return qc
 #+end_src
 
+The following example shows the circuit is already relatively big for very small
+parameters.
+
 #+begin_src python :results replace :tangle no :cache yes
-  qc = make_order_finding_phase_estimation(3, 7, 0.5)
-  qc.draw()
+  qc = make_order_finding_phase_estimation(3, 7, eps=0.5)
+  qc.draw(fold=80)
 #+end_src
 
-#+RESULTS[e67955dcf0218942505165bd2f317580d1ccf5a2]:
+#+RESULTS[ec7442e23cae4ea17df5fd7c46b88b213d093940]:
 #+begin_example
-     ┌───┐┌───────────────┐                                                                                                                       ┌────────┐┌─┐
-t_0: ┤ H ├┤0              ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤0       ├┤M├─────────────────────
-     ├───┤│               │┌───────────────┐                                                                                                      │        │└╥┘┌─┐
-t_1: ┤ H ├┤               ├┤0              ├──────────────────────────────────────────────────────────────────────────────────────────────────────┤1       ├─╫─┤M├──────────────────
-     ├───┤│               ││               │┌───────────────┐                                                                                     │        │ ║ └╥┘┌─┐
-t_2: ┤ H ├┤               ├┤               ├┤0              ├─────────────────────────────────────────────────────────────────────────────────────┤2       ├─╫──╫─┤M├───────────────
-     ├───┤│               ││               ││               │┌───────────────┐                                                                    │        │ ║  ║ └╥┘┌─┐
-t_3: ┤ H ├┤               ├┤               ├┤               ├┤0              ├────────────────────────────────────────────────────────────────────┤3       ├─╫──╫──╫─┤M├────────────
-     ├───┤│               ││               ││               ││               │┌───────────────┐                                                   │  QFT^† │ ║  ║  ║ └╥┘┌─┐
-t_4: ┤ H ├┤               ├┤               ├┤               ├┤               ├┤0              ├───────────────────────────────────────────────────┤4       ├─╫──╫──╫──╫─┤M├─────────
-     ├───┤│               ││               ││               ││               ││               │┌───────────────┐                                  │        │ ║  ║  ║  ║ └╥┘┌─┐
-t_5: ┤ H ├┤               ├┤               ├┤               ├┤               ├┤               ├┤0              ├──────────────────────────────────┤5       ├─╫──╫──╫──╫──╫─┤M├──────
-     ├───┤│               ││               ││               ││               ││               ││               │┌───────────────┐                 │        │ ║  ║  ║  ║  ║ └╥┘┌─┐
-t_6: ┤ H ├┤               ├┤               ├┤               ├┤               ├┤               ├┤               ├┤0              ├─────────────────┤6       ├─╫──╫──╫──╫──╫──╫─┤M├───
-     ├───┤│               ││               ││               ││               ││               ││               ││               │┌───────────────┐│        │ ║  ║  ║  ║  ║  ║ └╥┘┌─┐
-t_7: ┤ H ├┤               ├┤               ├┤               ├┤               ├┤               ├┤               ├┤               ├┤0              ├┤7       ├─╫──╫──╫──╫──╫──╫──╫─┤M├
-     ├───┤│               ││               ││               ││               ││               ││               ││               ││               │└────────┘ ║  ║  ║  ║  ║  ║  ║ └╥┘
-u_0: ┤ X ├┤1 c_(3x mod 7) ├┤1              ├┤1              ├┤1              ├┤1              ├┤1              ├┤1              ├┤1              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-     └───┘│               ││  c_(2x mod 7) ││               ││               ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-u_1: ─────┤2              ├┤2              ├┤2 c_(4x mod 7) ├┤2              ├┤2              ├┤2              ├┤2              ├┤2              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││  c_(2x mod 7) ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-u_2: ─────┤3              ├┤3              ├┤3              ├┤3              ├┤3 c_(4x mod 7) ├┤3              ├┤3              ├┤3              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││  c_(2x mod 7) ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-u_3: ─────┤4              ├┤4              ├┤4              ├┤4              ├┤4              ├┤4              ├┤4 c_(4x mod 7) ├┤4              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││               ││               ││  c_(2x mod 7) │           ║  ║  ║  ║  ║  ║  ║  ║
-a_0: ─────┤5              ├┤5              ├┤5              ├┤5              ├┤5              ├┤5              ├┤5              ├┤5              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-a_1: ─────┤6              ├┤6              ├┤6              ├┤6              ├┤6              ├┤6              ├┤6              ├┤6              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-a_2: ─────┤7              ├┤7              ├┤7              ├┤7              ├┤7              ├┤7              ├┤7              ├┤7              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-a_3: ─────┤8              ├┤8              ├┤8              ├┤8              ├┤8              ├┤8              ├┤8              ├┤8              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          │               ││               ││               ││               ││               ││               ││               ││               │           ║  ║  ║  ║  ║  ║  ║  ║
-a_4: ─────┤9              ├┤9              ├┤9              ├┤9              ├┤9              ├┤9              ├┤9              ├┤9              ├───────────╫──╫──╫──╫──╫──╫──╫──╫─
-          └───────────────┘└───────────────┘└───────────────┘└───────────────┘└───────────────┘└───────────────┘└───────────────┘└───────────────┘           ║  ║  ║  ║  ║  ║  ║  ║
-c: 8/════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╩══╩══╩══╩══╩══╩══╩══╩═
-                                                                                                                                                             0  1  2  3  4  5  6  7
+     ┌───┐┌───────────────┐                                                   »
+t_0: ┤ H ├┤0              ├───────────────────────────────────────────────────»
+     ├───┤│               │┌───────────────┐                                  »
+t_1: ┤ H ├┤               ├┤0              ├──────────────────────────────────»
+     ├───┤│               ││               │┌───────────────┐                 »
+t_2: ┤ H ├┤               ├┤               ├┤0              ├─────────────────»
+     ├───┤│               ││               ││               │┌───────────────┐»
+t_3: ┤ H ├┤               ├┤               ├┤               ├┤0              ├»
+     ├───┤│               ││               ││               ││               │»
+t_4: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_5: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_6: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_7: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_8: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│  c_(3x mod 7) ││               ││               ││               │»
+u_0: ┤ X ├┤1              ├┤1 c_(2x mod 7) ├┤1              ├┤1              ├»
+     └───┘│               ││               ││  c_(4x mod 7) ││               │»
+u_1: ─────┤2              ├┤2              ├┤2              ├┤2 c_(2x mod 7) ├»
+          │               ││               ││               ││               │»
+u_2: ─────┤3              ├┤3              ├┤3              ├┤3              ├»
+          │               ││               ││               ││               │»
+u_3: ─────┤4              ├┤4              ├┤4              ├┤4              ├»
+          │               ││               ││               ││               │»
+a_0: ─────┤5              ├┤5              ├┤5              ├┤5              ├»
+          │               ││               ││               ││               │»
+a_1: ─────┤6              ├┤6              ├┤6              ├┤6              ├»
+          │               ││               ││               ││               │»
+a_2: ─────┤7              ├┤7              ├┤7              ├┤7              ├»
+          │               ││               ││               ││               │»
+a_3: ─────┤8              ├┤8              ├┤8              ├┤8              ├»
+          │               ││               ││               ││               │»
+a_4: ─────┤9              ├┤9              ├┤9              ├┤9              ├»
+          └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
+c: 9/═════════════════════════════════════════════════════════════════════════»
+                                                                              »
+«                                                                         »
+«t_0: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_1: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_2: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_3: ────────────────────────────────────────────────────────────────────»
+«     ┌───────────────┐                                                   »
+«t_4: ┤0              ├───────────────────────────────────────────────────»
+«     │               │┌───────────────┐                                  »
+«t_5: ┤               ├┤0              ├──────────────────────────────────»
+«     │               ││               │┌───────────────┐                 »
+«t_6: ┤               ├┤               ├┤0              ├─────────────────»
+«     │               ││               ││               │┌───────────────┐»
+«t_7: ┤               ├┤               ├┤               ├┤0              ├»
+«     │               ││               ││               ││               │»
+«t_8: ┤               ├┤               ├┤               ├┤               ├»
+«     │               ││               ││               ││               │»
+«u_0: ┤1              ├┤1              ├┤1              ├┤1              ├»
+«     │               ││               ││               ││               │»
+«u_1: ┤2              ├┤2              ├┤2              ├┤2              ├»
+«     │  c_(4x mod 7) ││               ││               ││               │»
+«u_2: ┤3              ├┤3 c_(2x mod 7) ├┤3              ├┤3              ├»
+«     │               ││               ││  c_(4x mod 7) ││               │»
+«u_3: ┤4              ├┤4              ├┤4              ├┤4 c_(2x mod 7) ├»
+«     │               ││               ││               ││               │»
+«a_0: ┤5              ├┤5              ├┤5              ├┤5              ├»
+«     │               ││               ││               ││               │»
+«a_1: ┤6              ├┤6              ├┤6              ├┤6              ├»
+«     │               ││               ││               ││               │»
+«a_2: ┤7              ├┤7              ├┤7              ├┤7              ├»
+«     │               ││               ││               ││               │»
+«a_3: ┤8              ├┤8              ├┤8              ├┤8              ├»
+«     │               ││               ││               ││               │»
+«a_4: ┤9              ├┤9              ├┤9              ├┤9              ├»
+«     └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
+«c: 9/════════════════════════════════════════════════════════════════════»
+«                                                                         »
+«                      ┌────────┐┌─┐
+«t_0: ─────────────────┤0       ├┤M├────────────────────────
+«                      │        │└╥┘┌─┐
+«t_1: ─────────────────┤1       ├─╫─┤M├─────────────────────
+«                      │        │ ║ └╥┘┌─┐
+«t_2: ─────────────────┤2       ├─╫──╫─┤M├──────────────────
+«                      │        │ ║  ║ └╥┘┌─┐
+«t_3: ─────────────────┤3       ├─╫──╫──╫─┤M├───────────────
+«                      │        │ ║  ║  ║ └╥┘┌─┐
+«t_4: ─────────────────┤4 QFT^† ├─╫──╫──╫──╫─┤M├────────────
+«                      │        │ ║  ║  ║  ║ └╥┘┌─┐
+«t_5: ─────────────────┤5       ├─╫──╫──╫──╫──╫─┤M├─────────
+«                      │        │ ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_6: ─────────────────┤6       ├─╫──╫──╫──╫──╫──╫─┤M├──────
+«                      │        │ ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_7: ─────────────────┤7       ├─╫──╫──╫──╫──╫──╫──╫─┤M├───
+«     ┌───────────────┐│        │ ║  ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_8: ┤0              ├┤8       ├─╫──╫──╫──╫──╫──╫──╫──╫─┤M├
+«     │               │└────────┘ ║  ║  ║  ║  ║  ║  ║  ║ └╥┘
+«u_0: ┤1              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_1: ┤2              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_2: ┤3              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_3: ┤4              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │  c_(4x mod 7) │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_0: ┤5              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_1: ┤6              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_2: ┤7              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_3: ┤8              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_4: ┤9              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     └───────────────┘           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«c: 9/════════════════════════════╩══╩══╩══╩══╩══╩══╩══╩══╩═
+«                                 0  1  2  3  4  5  6  7  8
 #+end_example
 
-** TODO Factoring
+** Factoring
+Recall that the factoring problem is to find a non-trivial factor of a given number
+$N$. We may assume that the number is not a prime number (as satisfied when our task is to
+break RSA encryption). The quantum stuff needed to solve the factoring problem is
+essentially in place.
+
+But remember that the quantum part assumes that $N$ is neither even nor a power of a prime
+(compare e.g. with the assumptions of Theorem A4.13 in the book). Fortunately these corner
+cases are easily solved classically. Below I give a very simple solution which is probably
+far from optimal but which already suffices to show that the corner case is efficiently
+solvable.
+
 #+begin_src python
   def is_even(N: int) -> bool:
       return N % 2 == 0
 
 
   def intlogx(N: int, base: int, offset=0, exponent=1) -> int:
-      """Largest n such that (offset + base**n)**exponent <= N"""
-      assert base < N
-      assert base > 1
+      """Largest n such that (offset + base**n)**exponent <= N
+
+      For offset=0 and exponent=1 this is just floor(log_base(x))."""
+      assert 1 < base < N
 
       n = 1
       a = base
@@ -738,10 +839,15 @@ c: 8/═════════════════════════
 
 
   def is_power(N: int) -> int:
+      """Decide whether there is x, k > 1 such that x**k = N.
+
+      Returns: None if not, and *a* pair (x, k) as above otherwise."""
       k2 = intlogx(N, 2)
 
+      # For each k <= k2 check if there is an x with x**k == N
       for k in range(2, k2 + 1):
           x = 0
+          # This loop attempts to construct the binary representation of x:
           while x**k < N:
               i = intlogx(N, 2, offset=x, exponent=k)
               x += 2**i
@@ -752,17 +858,40 @@ c: 8/═════════════════════════
       return None
 #+end_src
 
-Next:
+The following example gives a hint that the code implementing =is_power= isn't too bad
+(see the tests in the repo form more examples):
+
+#+begin_src python :results replace verbatim :tangle no :cache yes
+  # We use primes to make the exponent unique:
+  a_1000_bit_number = 699093205353077798740186149229 ** 11
+  is_power(a_1000_bit_number)  # executes in a few dozen milliseconds on a modern laptop
+#+end_src
+
+#+RESULTS[ca5c2a6beb519f08f09a8f40e4d5abe9e8f12961]:
+: (699093205353077798740186149229, 11)
+
+Finally we implement the function =find_factor= which solves the factoring problem:
 
 #+begin_src python
-  def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
+  def get_maximizing_keys(counts: dict[str, int], num: int) -> tuple[str]:
+      """Get the 'num' keys of 'counts' with maximal associated values.
+
+      Returns: An *lexicographically* sorted num-tuple of the keys."""
       result = sorted(counts.items(), key=lambda a: a[1], reverse=True)[:num]
       result = [a[0] for a in result]
       return tuple(sorted(result))
 
 
-  def find_factor(N: int, randrange=None) -> int:
-      """Find a non-trivial factor of N - assuming it has one."""
+  def find_factor(N: int, eps=1.0, randrange=None) -> int:
+      """Find a non-trivial factor of N - assuming it has one.
+
+      Args:
+          N: An integer larger than 1 which is assumed to be not prime.
+          eps: A parameter for the phase estimation (smaller values lead to a
+              smaller error rate). Must be larger 0.
+          randrange: please ignore this parameter, just for testing (sorry).
+      """
+      assert eps > 0, "eps must be positive."
       assert N > 1, "N must be larger than 1."
 
       if is_even(N):
@@ -771,33 +900,33 @@ Next:
       if (ret := is_power(N)) is not None:
           return ret[0]
 
-      # Just for testing (sorry)
+      # Just for testing (sorry):
       randrange = randrange or random.randrange
 
       while True:
           a = randrange(2, N)
-          print(f"\n\na={a}")
+          print(f"Trying a={a}")
 
           gcd = math.gcd(a, N)
           if gcd > 1:
               return gcd
 
           # From here on N is a neither even, nor a power. By assumption it is also non-prime.
-          qc = make_order_finding_phase_estimation(a, N, eps=0.5)
+          qc = make_order_finding_phase_estimation(a, N, eps)
           sim = AerSimulator()
           qc_obj = transpile(qc, sim)
 
           # Note: on a simulator the number of shots does not significantly influence the
-          # running time. This reasonable since the simulator has access to the wave
+          # running time. This is reasonable since the simulator has access to the wave
           # function form which it can cheaply sample (at least this is how I guess it
           # works).
           counts = sim.run(qc_obj, shots=1000).result().get_counts()
 
           bit_list = list(counts.keys())
           weights = list(counts.values())
-          for _ in range(100):  # this simulates 100 independent runs
-              bits = random.choices(bit_list, weights)[0]  # distribution from frequencies
-              print(f"\nbits={bits}")
+          for i in range(100):  # this simulates 100 independent runs
+              bits = random.choices(bit_list, weights)[0]
+              print(f"Shot {i} measured {bits}")
 
               s_div_r = Fraction(int(bits), 2**len(bits))
               convergent = get_convergent(s_div_r, N)
@@ -820,6 +949,28 @@ Next:
                   if gcd > 1:
                       return gcd
 #+end_src
+
+Let us try to factor the smallest number for which phase estimation is needed (any smaller
+number is either prime, even, or a power of a prime). But note that the probability that
+$a$ has a common factor with $N$ is still high.
+
+#+begin_src python :results replace output :tangle no :cache yes
+  N = 15
+  factor = find_factor(N)
+  print(f"\nA factor of {N} is {factor}.")
+#+end_src
+
+#+RESULTS[76610aa82e7eb877adb53368b1536ba1c799a3b6]:
+: Trying a=7
+: Shot 0 measured 1100000000
+: r=4
+:
+: A factor of 15 is 3.
+
+It should take around 50 core-seconds to execute. Certainly not very impressive but it
+shows that it works in principle. But note that we can't go much beyond this tiny example
+since the simulation time depends exponentially on the number of qubits. For example to
+factor ~21~ based on ~a=19~ took around 54 core-minutes on my laptop.
 
 * WIP Exercises
 ** Exercise 5.1

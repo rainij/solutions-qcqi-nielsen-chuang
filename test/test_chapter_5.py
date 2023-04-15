@@ -43,7 +43,7 @@ def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
     # Remark: Theoretically, if the order is a power of 2 the results should be *clean* in
     # the sense that only the below mentioned strings get non-zero counts. In practice
     # this does not seem to be the case. Maybe the reason is the small angle problem in
-    # the Fourier tronsform. Also note that we do addition in Fourier space (which might
+    # the Fourier transform. Also note that we do addition in Fourier space (which might
     # worsen the problem).
 
     # The order is r = 2, so s/r in {0, 0.5}
@@ -52,7 +52,10 @@ def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
     (7, 15, ('0000000000', '0100000000', '1000000000', '1100000000')),
 })
 def test_phase_estimation(a, modulus, maximizing_bits):
-    qc = make_order_finding_phase_estimation(a, modulus, eps=0.5)
+    # Setting eps=1.0 is theoretically justified since the fractions are exactly
+    # representable in binary. So setting it to a smaller value won't help (at least this
+    # is not backed by the analysis from the book).
+    qc = make_order_finding_phase_estimation(a, modulus, eps=1.0)
 
     sim = AerSimulator()
     qc_obj = transpile(qc, sim)
@@ -80,7 +83,7 @@ def test_intlogx(N, base, offset, exponent, expected):
 
 
 @pytest.mark.parametrize("N", {
-    # These are probably all prime (https://bigprimes.org/):
+    # These numbers are *probably* all prime (https://bigprimes.org/):
     7,
     17,
     87803,
@@ -91,7 +94,7 @@ def test_intlogx(N, base, offset, exponent, expected):
     # Products of two primes:
     2341121591 * 3536648897,
     33318506043084601978901983513127189439078469098941 * 57666386236412678991478313909997305232366971065901,
-    # Roughly 1000 bits
+    # Roughly 1000 bits:
     267235751626887712762234547639051825020255990491073909324282238093658784919122126843094712258943571265478372330167756989106909834248894847222757028093 * 442119851295683804328228639966196873910083006543457611240362529682859193457180901378680312821415860447501430305027501449183718893689426744660311637941,
 })
 def test_is_power_negative(N):
@@ -109,8 +112,8 @@ def test_is_power_negative(N):
     (173566555901126500012468354357, 13),
 })
 def test_is_power_positive(a, b):
-    x, y = is_power(a ** b)
-    assert x ** y == a ** b
+    x, k = is_power(a ** b)
+    assert x ** k == a ** b
 
 
 @pytest.mark.parametrize("N,factor", {
@@ -135,4 +138,4 @@ def test_find_factor_trivial_cases(N, factor):
 })
 def test_find_factor_non_trivial_cases(N, factors, cheat_code):
     # TODO: random seed still needed
-    assert find_factor(N, lambda *_: cheat_code) in factors
+    assert find_factor(N, randrange=lambda *_: cheat_code) in factors
