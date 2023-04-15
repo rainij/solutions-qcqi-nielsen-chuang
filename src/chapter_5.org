@@ -403,7 +403,7 @@ incrementation or modular incrementation works:
       return result
 #+end_src
 
-** TODO Multiplication in Fourier Space
+** Multiplication in Fourier Space
 Next we implement
 
 $$
@@ -488,12 +488,16 @@ q_10: ────────┤6                  ├┤6                  ├
 Finally we arrive at the circuit we actually care for:
 
 $$
-  U_a: \ket{x} \mapsto \ket{ax \mod N}  .
+  U(a,N): \ket{x} \mapsto \ket{ax \mod N}  .
 $$
 
+The circuit works by first calculating the result using $V(a,N)$. In the second step the
+result is moved into the input register utilizing swap gates. Finally, in the third step,
+we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 
 #+begin_src python
-  def make_Ua(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
+  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
+      """Implements |x> -> |ax mod N>."""
       int_size = modulus_size(modulus) + 1
 
       qreg_ctrl = QuantumRegister(num_ctrls, "c")
@@ -506,48 +510,52 @@ $$
 
       qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
 
-      qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
+      qc.append(VaN, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
       for i in range(qreg.size - 1):  # last bit just for overflow
           swap = SwapGate() if num_ctrls == 0 else SwapGate().control(num_ctrls)
           qc.append(swap, list(qreg_ctrl) + [qreg[i], qreg_anc[i]])
 
-      qc.append(VaN, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
+      qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
       prefix = make_control_prefix(num_ctrls)
       return qc.to_gate(label=f"{prefix}({a}x mod {modulus})")
 #+end_src
 
+This is how looks like for $a=3$ and modulus $7$:
 
 #+begin_src python :results replace :tangle no :cache yes
-  Ua = make_Ua(3, 7)
+  Ua = make_UaN(3, 7)
   Ua.definition.draw()
 #+end_src
 
-#+RESULTS:
+#+RESULTS[2eafeb56007655fb43687f7ad11987bd73661510]:
 #+begin_example
-     ┌───────────────────┐         ┌─────────────────┐
-q_0: ┤0                  ├─X───────┤0                ├
-     │                   │ │       │                 │
-q_1: ┤1                  ├─┼──X────┤1                ├
-     │                   │ │  │    │                 │
-q_2: ┤2                  ├─┼──┼──X─┤2                ├
-     │                   │ │  │  │ │                 │
-q_3: ┤3                  ├─┼──┼──┼─┤3                ├
-     │                   │ │  │  │ │                 │
-q_4: ┤4 (b + 5x mod 7)^† ├─X──┼──┼─┤4 (b + 3x mod 7) ├
-     │                   │    │  │ │                 │
-q_5: ┤5                  ├────X──┼─┤5                ├
-     │                   │       │ │                 │
-q_6: ┤6                  ├───────X─┤6                ├
-     │                   │         │                 │
-q_7: ┤7                  ├─────────┤7                ├
-     │                   │         │                 │
-q_8: ┤8                  ├─────────┤8                ├
-     └───────────────────┘         └─────────────────┘
+     ┌─────────────────┐         ┌───────────────────┐
+q_0: ┤0                ├─X───────┤0                  ├
+     │                 │ │       │                   │
+q_1: ┤1                ├─┼──X────┤1                  ├
+     │                 │ │  │    │                   │
+q_2: ┤2                ├─┼──┼──X─┤2                  ├
+     │                 │ │  │  │ │                   │
+q_3: ┤3                ├─┼──┼──┼─┤3                  ├
+     │                 │ │  │  │ │                   │
+q_4: ┤4 (b + 3x mod 7) ├─X──┼──┼─┤4 (b + 5x mod 7)^† ├
+     │                 │    │  │ │                   │
+q_5: ┤5                ├────X──┼─┤5                  ├
+     │                 │       │ │                   │
+q_6: ┤6                ├───────X─┤6                  ├
+     │                 │         │                   │
+q_7: ┤7                ├─────────┤7                  ├
+     │                 │         │                   │
+q_8: ┤8                ├─────────┤8                  ├
+     └─────────────────┘         └───────────────────┘
 #+end_example
 
-** TODO Order Finding
+Note that three bits are sufficient to represent the number $7$. That explains why three
+swap gates are used.
+
+** Order Finding
 In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
 
 Recall that after executing the phase estimation routine we obtain an $2L+1$ bit number
@@ -626,7 +634,7 @@ Since $q_n < N$, $q_n < q_{n+1}$, and $z_i\geq 1$ we deduce $q_{n+1}>N$. QED.
 Now recall (again) that $N$ is an $L$ bit integer and $\varphi$ is precise up to $2L+1$
 bits. This implies that the premise of the lemma is satisfied. This shows the claim.
 
-*** Implementation
+*** TODO Implementation
 #+begin_src python
   def eps_bits(eps: float) -> int:
       """TODO"""
@@ -650,7 +658,7 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
       qc.x(qreg_bot[0])
 
       for i in range(t):
-          CUai = make_Ua(pow(a, 2**i, modulus), modulus, num_ctrls=1)
+          CUai = make_UaN(pow(a, 2**i, modulus), modulus, num_ctrls=1)
           qc.append(CUai, [qreg_top[i]] + list(qreg_bot) + list(qreg_anc))
           pass
 
