@@ -22,7 +22,7 @@ docker_make () {
     targets="$@"
 
     docker run --rm $ADDITIONAL_RUN_ARGS \
-       -v ${PWD}:/repo \
+       -v ${PWD}:/repo:z \
        --workdir=/repo \
        rs/make $targets
 }

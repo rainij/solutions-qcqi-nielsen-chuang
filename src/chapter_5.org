@@ -12,8 +12,18 @@ Tangled:
 
 #+name: chapter-5-python-imports
 #+begin_src python
+  import math
+  import random
+  from fractions import Fraction
+  from numbers import Integral
+
   import sympy as sp
-  from sympy import exp, I, pi
+  from qiskit import (AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister,
+                      transpile)
+  from qiskit.circuit import Gate
+  from qiskit.circuit.library import MCPhaseGate, SwapGate
+  from qiskit_aer import AerSimulator
+  from sympy import I, exp, pi
 #+end_src
 
 Not tangled:
@@ -26,9 +36,10 @@ Not tangled:
 ** Code from earlier Chapters
 #+begin_src python
   from chapter_4 import Rz, theta
+  from continued_fractions import get_convergent
 #+end_src
 
-** Fourier Transform
+** Quantum Fourier Transform
 These are the operators $R_k$ appearing in the implementation of the Fourier Transform:
 
 #+name: chapter-5-Rk
@@ -37,8 +48,515 @@ These are the operators $R_k$ appearing in the implementation of the Fourier Tra
   Rk = sp.simplify(exp(2*pi*I*2**(-k-1)) * Rz.subs(theta, 2*pi*2**(-k)))
 #+end_src
 
+Next we define a function to generate a circuit implementing the quantum Fourier
+transform. This is very easy since the part containing the rotations has a nice recursive
+structure.
+
+#+begin_src python
+  def make_qft(size: Integral) -> Gate:
+      qc = QuantumCircuit(size)
+
+      def append_rotations(qc: QuantumCircuit, size: Integral):
+          if size == 0:
+              return
+
+          qc.h(size - 1)
+          for i in range(size - 1, 0, -1):  # reversed order makes a nicer plot
+              qc.cp(math.pi * 2**(-i), size - 1, size - i - 1)
+
+          append_rotations(qc, size - 1)
+
+      def append_swaps(qc, size):
+          for i in range(size // 2):
+              qc.swap(i, size - i - 1)
+
+      append_rotations(qc, size)
+      append_swaps(qc, size)
+
+      return qc.to_gate(label="QFT")
+
+
+  def make_qft_dg(size: Integral) -> Gate:
+      qft = make_qft(size)
+      return qft.definition.inverse().to_gate(label="QFT^†")
+#+end_src
+
+Note that qiskit orders the wires in a different order then the book.
+
+#+begin_src python :results replace :tangle no :cache yes
+  qft = make_qft(4)
+  qft.definition.draw()
+#+end_src
+
+#+RESULTS[70fa89c3263a106383a4c5b72627a9c51e28f362]:
+:                                                                           ┌───┐
+: q_0: ──────■───────────────────────────────■──────────────────────■───────┤ H ├─X─
+:            │                               │                ┌───┐ │P(π/2) └───┘ │
+: q_1: ──────┼────────■──────────────────────┼────────■───────┤ H ├─■─────────X───┼─
+:            │        │                ┌───┐ │P(π/4)  │P(π/2) └───┘           │   │
+: q_2: ──────┼────────┼────────■───────┤ H ├─■────────■───────────────────────X───┼─
+:      ┌───┐ │P(π/8)  │P(π/4)  │P(π/2) └───┘                                      │
+: q_3: ┤ H ├─■────────■────────■──────────────────────────────────────────────────X─
+:      └───┘
+
+** Addition in Fourier Space
+Recall that phase estimation for the order finding problem requires to exponentiate an
+operator $U_a:\ket{j}\mapsto\ket{aj\mod N}$. This operator has the nice property
+
+$$
+  U_a^n = U_{a^n \mod N} .
+$$
+
+Therefore having a way to implement $U_a$ for any $a$ already gives us the required
+powers. /This is important/ since implementing the powers of $U_a$ by just repeating the
+circuit for $U_a$ would result in an /exponantially/ deep circuit.
+
+To implement $U_a$ we need to be able to perform basic arithmetic. We will implement the
+following operations:
+
+- Addition
+- Modular Addition
+- Modular Multiplication
+
+More precisely we only implement the unary versions of these operations. For example
+instead of $(a,b)\mapsto a+b$ we implement $b\mapsto a+b$ for a fixed integer $a$. We call
+this an /incrementer/.
+
+Our implementation closely follows [cite:@Draper2000] and [cite:@Beauregard2003]. For
+simplicity we omit some optimizations at the cost of a slower algorithm. We implement all
+operations in Fourier space. This saves qubits, at the cost of a deeper circuit.
+
+Let us start with the incrementation operator in Fourier space. Let us denote
+$\ket{\phi(j)}=\FT\ket{j}$. This circuit implements $\ket{\phi(j)}\mapsto\ket{\phi(a+j)}$
+for a fixed integer $a$.
+
+#+begin_src python
+  def make_control_prefix(num_ctrls: int):
+      return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
+
+
+  def make_fourier_incrementer(size: int, increment: int, num_ctrls: int = 0) -> Gate:
+      """Implements |ϕ(j)> -> |ϕ(a+j)> where a is the increment.
+
+      Args:
+          size: Number of qubits used to represent the integers.
+          increment: The fixed increment hardcoded into the circuit.
+          num_ctrls: This many control qubits are added before all other qubits.
+      """
+      assert num_ctrls >= 0, "num_ctrls must be non-negative"
+      qc = QuantumCircuit(size + num_ctrls)
+
+      if num_ctrls == 0:
+          for k in range(size):
+              qc.p(2*math.pi*increment*2**(-size+k), k)
+      else:
+          for k in range(size):
+              qc.append(MCPhaseGate(2*math.pi*increment*2**(-size+k), num_ctrls),
+                        list(range(num_ctrls)) + [num_ctrls + k])
+
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})")
+#+end_src
+
+The reasoning to see that the circuit does what we want is essentially the same as the
+reasoning behind the representation of $\FT\ket{j}$ as a product state.
+
+The actual incrementation operator can be obtained by conjugating this circuit by the
+Fourier transform:
+
+#+begin_src python
+  def make_incrementer(size: Integral, increment: Integral) -> Gate:
+      """Implements |j> -> |a+j> where a is the increment.
+
+      The arguments have the same meaning as in 'make_fourier_incrementer'.
+      """
+      qc = QuantumCircuit(size)
+      finc = make_fourier_incrementer(size, increment)
+      qft = make_qft(size)
+      qft_dg = make_qft_dg(size)
+
+      qc.append(qft, range(size))
+      qc.append(finc, range(size))
+      qc.append(qft_dg, range(size))
+
+      return qc.to_gate(label=f"inc({increment})")
+#+end_src
+
+We actually do not need =make_incrementer= for our phase estimation (since we want to do
+as many operations as possible in the Fourier space due to the cost of the Fourier
+transform). But it is still nice to have it, for example for testing purposes.
+
+#+begin_src python :results replace :tangle no :cache yes
+  inc = make_incrementer(4, 3)
+  inc.definition.decompose('ϕinc(3)').draw()
+#+end_src
+
+#+RESULTS[b959b69d77c2bfff1ffac83c24d060df1e18d33b]:
+:      ┌──────┐┌─────────┐┌────────┐
+: q_0: ┤0     ├┤ P(3π/8) ├┤0       ├
+:      │      │├─────────┤│        │
+: q_1: ┤1     ├┤ P(3π/4) ├┤1       ├
+:      │  QFT │├─────────┤│  QFT^† │
+: q_2: ┤2     ├┤ P(3π/2) ├┤2       ├
+:      │      │└┬───────┬┘│        │
+: q_3: ┤3     ├─┤ P(3π) ├─┤3       ├
+:      └──────┘ └───────┘ └────────┘
+
+Next we implement modular incrementation. Unfortunately the circuit is a bit
+complicated. But the idea is simple: Let $a$ be the increment, $N$ the modulus, and let
+$b$ be the input to the circuit. We want to calculate $a+b\mod N$. The size of the circuit
+is chosen in a way that $a$ and $b$ can be represented with leading bit still being zero
+(this implies in particular that $a+b$ can be represented). The circuit /essentially/ does
+the following (arithmetic carried out in Fourier space):
+
+- Let $s_1 = b + a - N$ allowing /underflow/ in case $N>a+b$.
+- Detect underflow by inspecting the most significant bit.
+- If no underflow occurs $s_1$ is already the result.
+- Otherwise if underflow occurs we must add back $N$ and then $s_2=s_1+N=a+b$ is the
+  result.
+
+Note that the =CNOT= is responsible to write a =1= into the ancillary qubit iff underflow
+occurs. The reason why the circuit looks more complicated is that we have to /uncompute/
+everything written to the ancilla.
+
+#+begin_src python
+  def modulus_size(modulus: int):
+      return (modulus - 1).bit_length()
+
+
+  def make_modular_fourier_incrementer(increment: int, modulus: int, num_ctrls: int=0) -> Gate:
+      """Implements |ϕ(j)> -> |ϕ(a+j mod N)> where a is the increment and N the modulus.
+
+      Args:
+          increment: The fixed increment hardcoded into the circuit.
+          modulus: The modulus hardcoded into the circuit.
+          num_ctrls: This many control qubits are added before all other qubits.
+
+      Note: The last wire is an ancillary qubit which needs to be initialized to |0>.
+      """
+      size = modulus_size(modulus) + 1
+
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
+      qreg = QuantumRegister(size, "q")
+      qreg_anc = QuantumRegister(1, "a")
+
+      qreg2 = list(qreg_ctrl) + list(qreg)
+
+      qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
+
+      cc_inc_a = make_fourier_incrementer(increment=increment, size=size, num_ctrls=num_ctrls)
+      inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=0)
+      c_inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=1)
+      cc_inc_a_dg = cc_inc_a.definition.inverse().to_gate(label=f"{cc_inc_a.label}^†")
+      inc_N_dg = inc_N.definition.inverse().to_gate(label=f"{inc_N.label}^†")
+      qft = make_qft(size)
+      qft_dg = make_qft_dg(size)
+
+      qc.append(cc_inc_a, qreg2)
+      qc.append(inc_N_dg, qreg)
+
+      qc.append(qft_dg, qreg)
+      qc.cx(qreg[-1], qreg_anc[0])
+      qc.append(qft, qreg)
+
+      qc.append(c_inc_N, list(qreg_anc) + list(qreg))
+      qc.append(cc_inc_a_dg, qreg2)
+
+      qc.append(qft_dg, qreg)
+      qc.cx(qreg[-1], qreg_anc[0], ctrl_state=0)
+      qc.append(qft, qreg)
+
+      qc.append(cc_inc_a, qreg2)
+
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")
+#+end_src
+
+You may wonder why this function (and =make_fourier_incrementer=) takes an argument
+=num_ctrls=. We could easily add controls by using the builtin =Gate.control= method. At
+first I did it this way but it turned out that building the phase estimation circuit took
+extremely long. Profiling with [[https://docs.python.org/3/library/profile.html][cProfile]] revealed that around 95% of the time was spent
+generating the controls. Hence I implemented it manually saving a lot of time. The main
+reason why this worked is that - at the time of writing this - the =Gate.control= method
+recursively adds controls to each gate contained in the circuit. But this is not necessary
+for this circuit, instead it suffices to put the control at just the incrementer for $a$.
+
+
+#+begin_src python :results replace :tangle no :cache yes
+  finc_mod = make_modular_fourier_incrementer(3, 7)
+  finc_mod.definition.draw(fold=80)
+#+end_src
+
+#+RESULTS[7aea9d90baf948838e6aee076dc5a30a349672cf]:
+#+begin_example
+     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐»
+q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├»
+     │          ││            ││        │     │      ││            │»
+q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├»
+     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            │»
+q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├»
+     │          ││            ││        │     │      ││            │»
+q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├»
+     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │»
+q_4: ────────────────────────────────────┤ X ├────────┤0           ├»
+                                         └───┘        └────────────┘»
+«     ┌────────────┐┌────────┐     ┌──────┐┌──────────┐
+«q_0: ┤0           ├┤0       ├─────┤0     ├┤0         ├
+«     │            ││        │     │      ││          │
+«q_1: ┤1           ├┤1       ├─────┤1     ├┤1         ├
+«     │  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
+«q_2: ┤2           ├┤2       ├─────┤2     ├┤2         ├
+«     │            ││        │     │      ││          │
+«q_3: ┤3           ├┤3       ├──o──┤3     ├┤3         ├
+«     └────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
+«q_4: ────────────────────────┤ X ├────────────────────
+«                             └───┘
+#+end_example
+
+We implement the corresponding operation in real space to have something to test against:
+
+#+begin_src python
+  def make_modular_incrementer(increment: int, modulus: int) -> Gate:
+      """Implements |j> -> |a+j mod N> where a is the increment and N is the modulus.
+
+      The arguments have the same meaning as in 'make_modular_fourier_incrementer'.
+      """
+      finc_mod = make_modular_fourier_incrementer(increment, modulus)
+      qreg_size = finc_mod.num_qubits - 1  # one ancilla
+
+      qft = make_qft(qreg_size)
+      qft_dg = make_qft_dg(qreg_size)
+
+      qc = QuantumCircuit(qreg_size + 1)
+
+      qc.append(qft, range(qreg_size))
+      qc.append(finc_mod, range(qreg_size + 1))
+      qc.append(qft_dg, range(qreg_size))
+
+      return qc.to_gate(label=f"inc({increment})mod({modulus})")
+#+end_src
+
+#+begin_src python :results replace :tangle no :cache yes
+  inc_mod = make_modular_incrementer(3, 7)
+  inc_mod.definition.draw()
+#+end_src
+
+#+RESULTS[8afd2c5adc1aefe17a586166d39ce62bd6d99877]:
+#+begin_example
+     ┌──────┐┌────────────────┐┌────────┐
+q_0: ┤0     ├┤0               ├┤0       ├
+     │      ││                ││        │
+q_1: ┤1     ├┤1               ├┤1       ├
+     │  QFT ││                ││  QFT^† │
+q_2: ┤2     ├┤2 ϕinc(3)mod(7) ├┤2       ├
+     │      ││                ││        │
+q_3: ┤3     ├┤3               ├┤3       ├
+     └──────┘│                │└────────┘
+q_4: ────────┤4               ├──────────
+             └────────────────┘
+#+end_example
+
+This function can be used to test (manually or via CI) that the above implementations for
+incrementation or modular incrementation works:
+
+#+begin_src python
+  def quantum_add(a: int, b: int, modulus: int = None, size: int = None) -> int:
+      """Compute a + b or a + b mod modulus.
+
+      Args:
+          a,b: The two summands.
+          size: The number of qubits to represent a and b. Ignored if modulus is given.
+          modulus: Some number required to be larger than a and b.
+
+      Note:
+          Uses make_incrementer or make_modular_incrementer depending whether modulus is
+          given or not.
+      """
+      assert a >= 0 and b >= 0, "a and b must be positive"
+
+      if modulus is None:
+          assert size is not None, "Specify 'size'"
+          qc = QuantumCircuit(size)
+          inc = make_incrementer(increment=a, size=size)
+      else:
+          assert a < modulus and b < modulus, "a and b must be smaller than modulus"
+          inc = make_modular_incrementer(increment=a, modulus=modulus)
+          size = inc.num_qubits
+          qc = QuantumCircuit(size)
+
+      # Not nice but works: Implicitly treats ancilla for the modular case correctly.
+      qc.initialize(f"{b:0{size}b}")
+      qc.append(inc, range(size))
+      qc.measure_all()
+
+      sim = AerSimulator()
+      qc_obj = transpile(qc, sim)
+      counts = sim.run(qc_obj).result().get_counts()
+
+      largest_count = 0
+      for bits, count in counts.items():
+          if count > largest_count:
+              largest_count = count
+              result = int(bits, base=2)
+
+      return result
+#+end_src
+
+** Multiplication in Fourier Space
+Next we implement
+
+$$
+  V(a,N): \quad \ket{x,b} \mapsto \ket{x, b + ax \mod N} .
+$$
+
+This is essentially the multiplication operation using an auxiliary register which serves
+as the output register. The idea of the circuit is simple. It is based on the identity:
+
+$$
+  ax \mod N = \sum_{i=0}^n x_i(a\cdot 2^i) ,
+$$
+
+where $n$ is the number of bits. The sum on the right can be implemented by a series of
+$n+1$ controlled (by the $x_i$) incrementation operations.
+
+#+begin_src python
+  def make_VaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
+      """Implements |x,b> -> |x,b+ax mod N>.
+
+      Optionally add controls.
+      """
+      int_size = modulus_size(modulus) + 1
+
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
+      qreg_x = QuantumRegister(int_size, "x")
+      qreg_b = QuantumRegister(int_size, "b")
+      qreg_anc = AncillaRegister(1, "a")
+
+      qft = make_qft(int_size) if num_ctrls == 0 else make_qft(int_size).control(num_ctrls)
+      qft_dg = make_qft_dg(int_size) if num_ctrls == 0 else make_qft_dg(int_size).control(num_ctrls)
+
+      qc = QuantumCircuit(qreg_ctrl, qreg_x, qreg_b, qreg_anc)
+
+      qc.append(qft, list(qreg_ctrl) + list(qreg_b))
+
+      for i in range(int_size - 1):
+          ai = a * 2**i % modulus
+          cfinc = make_modular_fourier_incrementer(ai, modulus, num_ctrls=num_ctrls + 1)
+          qc.append(cfinc, list(qreg_ctrl) + [qreg_x[i]] + list(qreg_b) + list(qreg_anc))
+
+      qc.append(qft_dg, list(qreg_ctrl) + list(qreg_b))
+
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}(b + {a}x mod {modulus})")
+#+end_src
+
+As an example, here is a circuit which multiplies the input by =3= modulo =11=:
+
+#+begin_src python :results replace :tangle no :cache yes
+  gate = make_VaN(3, 11)
+  gate.definition.draw()
+#+end_src
+
+#+RESULTS[f9f60d2ad34c5f70d3bc6a1595dcffc11e47cd89]:
+#+begin_example
+              ┌───────────────────┐
+ q_0: ────────┤0                  ├─────────────────────────────────────────────────────────────────────────
+              │                   │┌───────────────────┐
+ q_1: ────────┤                   ├┤0                  ├────────────────────────────────────────────────────
+              │                   ││                   │┌───────────────────┐
+ q_2: ────────┤                   ├┤                   ├┤0                  ├───────────────────────────────
+              │                   ││                   ││                   │┌───────────────────┐
+ q_3: ────────┤                   ├┤                   ├┤                   ├┤0                  ├──────────
+              │                   ││                   ││                   ││                   │
+ q_4: ────────┤                   ├┤                   ├┤                   ├┤                   ├──────────
+      ┌──────┐│                   ││                   ││                   ││                   │┌────────┐
+ q_5: ┤0     ├┤1 c_ϕinc(3)mod(11) ├┤1                  ├┤1                  ├┤1                  ├┤0       ├
+      │      ││                   ││  c_ϕinc(6)mod(11) ││                   ││                   ││        │
+ q_6: ┤1     ├┤2                  ├┤2                  ├┤2 c_ϕinc(1)mod(11) ├┤2                  ├┤1       ├
+      │      ││                   ││                   ││                   ││  c_ϕinc(2)mod(11) ││        │
+ q_7: ┤2 QFT ├┤3                  ├┤3                  ├┤3                  ├┤3                  ├┤2 QFT^† ├
+      │      ││                   ││                   ││                   ││                   ││        │
+ q_8: ┤3     ├┤4                  ├┤4                  ├┤4                  ├┤4                  ├┤3       ├
+      │      ││                   ││                   ││                   ││                   ││        │
+ q_9: ┤4     ├┤5                  ├┤5                  ├┤5                  ├┤5                  ├┤4       ├
+      └──────┘│                   ││                   ││                   ││                   │└────────┘
+q_10: ────────┤6                  ├┤6                  ├┤6                  ├┤6                  ├──────────
+              └───────────────────┘└───────────────────┘└───────────────────┘└───────────────────┘
+#+end_example
+
+Finally we arrive at the circuit we actually care for:
+
+$$
+  U(a,N): \ket{x} \mapsto \ket{ax \mod N}  .
+$$
+
+The circuit works by first calculating the result using $V(a,N)$. In the second step the
+result is moved into the input register utilizing swap gates. Finally, in the third step,
+we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
+
+#+begin_src python
+  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
+      """Implements |x> -> |ax mod N>."""
+      int_size = modulus_size(modulus) + 1
+
+      qreg_ctrl = QuantumRegister(num_ctrls, "c")
+      qreg = QuantumRegister(int_size)
+      qreg_anc = AncillaRegister(int_size + 1)
+
+      VaN = make_VaN(a, modulus, num_ctrls)
+      Va1N = make_VaN(pow(a, -1, modulus), modulus, num_ctrls)
+      Va1N_dg = Va1N.definition.inverse().to_gate(label=f"{Va1N.label}^†")
+
+      qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
+
+      qc.append(VaN, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
+
+      for i in range(qreg.size - 1):  # last bit just for overflow
+          swap = SwapGate() if num_ctrls == 0 else SwapGate().control(num_ctrls)
+          qc.append(swap, list(qreg_ctrl) + [qreg[i], qreg_anc[i]])
+
+      qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
+
+      prefix = make_control_prefix(num_ctrls)
+      return qc.to_gate(label=f"{prefix}({a}x mod {modulus})")
+#+end_src
+
+This is how looks like for $a=3$ and modulus $7$:
+
+#+begin_src python :results replace :tangle no :cache yes
+  Ua = make_UaN(3, 7)
+  Ua.definition.draw()
+#+end_src
+
+#+RESULTS[2eafeb56007655fb43687f7ad11987bd73661510]:
+#+begin_example
+     ┌─────────────────┐         ┌───────────────────┐
+q_0: ┤0                ├─X───────┤0                  ├
+     │                 │ │       │                   │
+q_1: ┤1                ├─┼──X────┤1                  ├
+     │                 │ │  │    │                   │
+q_2: ┤2                ├─┼──┼──X─┤2                  ├
+     │                 │ │  │  │ │                   │
+q_3: ┤3                ├─┼──┼──┼─┤3                  ├
+     │                 │ │  │  │ │                   │
+q_4: ┤4 (b + 3x mod 7) ├─X──┼──┼─┤4 (b + 5x mod 7)^† ├
+     │                 │    │  │ │                   │
+q_5: ┤5                ├────X──┼─┤5                  ├
+     │                 │       │ │                   │
+q_6: ┤6                ├───────X─┤6                  ├
+     │                 │         │                   │
+q_7: ┤7                ├─────────┤7                  ├
+     │                 │         │                   │
+q_8: ┤8                ├─────────┤8                  ├
+     └─────────────────┘         └───────────────────┘
+#+end_example
+
+Note that three bits are sufficient to represent the number $7$. That explains why three
+swap gates are used.
+
 ** Order Finding
-In this section I want to fill a gap in the algorithm for order finding (section 5.3.1).
+In this section I want to fill a (tiny) gap in the algorithm for order finding (section
+5.3.1).
 
 Recall that after executing the phase estimation routine we obtain an $2L+1$ bit number
 $\varphi$. If we are not too unlucky it equals /approximately/ $s/r$ for a non-zero $z$. The
@@ -56,11 +574,11 @@ $L=100$ bits. Moreover assume that the order $r$ is very small, say $r=3$. Assum
 and observe that $s/r$ cannot be exactly represented in binary. Ask =python= what it
 /thinks/ the best rational approxmation to $1/3$ is:
 
-#+begin_src python :results replace :cache yes
+#+begin_src python :results replace :cache yes :tangle no
   Fraction(1/3)
 #+end_src
 
-#+RESULTS[f1f5db486d992e0b41dd5488ff006ba7417d9daa]:
+#+RESULTS[4369a81d23d8dcddaf02abc094f1ca4a4b133b6e]:
 : 6004799503160661/18014398509481984
 
 Might we be at risk to deduce that the order is =18014398509481984=?
@@ -71,23 +589,23 @@ note that $1/3$ is slightly less than $2^{-1}$. Hence one might suspect that the
 precision representation of $\frac{1}{3}$ starts to show its lack of exactness at a
 denominator size of roughly $2^{53}$. In fact, this is what happens:
 
-#+begin_src python :results output replace :cache yes
+#+begin_src python :results output replace :cache yes :tangle no
   print(Fraction(1/3).limit_denominator(2**53))
   print(Fraction(1/3).limit_denominator(2**54))
 #+end_src
 
-#+RESULTS[d19069a70d318c08a155e0da0cc041fb7d1a8c27]:
+#+RESULTS[6f27624e220e31fe9f51acff0ee33da72fa8ade8]:
 : 1/3
 : 6004799503160661/18014398509481984
 
 Unsurprisingly the denominator is a power of two:
 
-#+begin_src python :results replace :cache yes
+#+begin_src python :results replace :cache yes :tangle no
   assert 18014398509481984 == 2**54
   "PASSED"
 #+end_src
 
-#+RESULTS[12dac3f369c320e8003245167dd011372c4862cb]:
+#+RESULTS[51e9659508c841688a08006745742b208eb730fe]:
 : PASSED
 
 *** A lemma resolving the issue
@@ -115,6 +633,343 @@ Since $q_n < N$, $q_n < q_{n+1}$, and $z_i\geq 1$ we deduce $q_{n+1}>N$. QED.
 
 Now recall (again) that $N$ is an $L$ bit integer and $\varphi$ is precise up to $2L+1$
 bits. This implies that the premise of the lemma is satisfied. This shows the claim.
+
+*** Implementation
+Next we implement phase estimation for order finding, following the book.
+
+#+begin_src python
+  def eps_bits(eps: float) -> int:
+      """Number of additional qubits required to guarantee a success
+      probability of at least 1-eps (theoretically). See Chapter 5.2.1."""
+      assert eps > 0, "eps must be strictly positive."
+      return math.ceil(math.log(2.0 + 0.5/eps))
+
+
+  def make_order_finding_phase_estimation(a: int, modulus: int, eps: float) -> QuantumCircuit:
+      """Make a phase estimation circuit to find the order of 'a'."""
+      L = modulus_size(modulus)
+      t = 2*L + 1 + eps_bits(eps)
+
+      qreg_top = QuantumRegister(t, "t")
+      qreg_bot = QuantumRegister(L + 1, "u")  # one qubit for overflow
+      qreg_anc = AncillaRegister(L + 2, "a")
+      creg = ClassicalRegister(t, "c")
+
+      qc = QuantumCircuit(qreg_top, qreg_bot, qreg_anc, creg)
+
+      for i in range(t):
+          qc.h(qreg_top[i])
+
+      qc.x(qreg_bot[0])
+
+      for i in range(t):
+          CUai = make_UaN(pow(a, 2**i, modulus), modulus, num_ctrls=1)
+          qc.append(CUai, [qreg_top[i]] + list(qreg_bot) + list(qreg_anc))
+          pass
+
+      qft_dg = make_qft_dg(t)
+      qc.append(qft_dg, qreg_top)
+
+      for i in range(t):
+          qc.measure(qreg_top[i], creg[i])
+
+      return qc
+#+end_src
+
+The following example shows the circuit is already relatively big for very small
+parameters.
+
+#+begin_src python :results replace :tangle no :cache yes
+  qc = make_order_finding_phase_estimation(3, 7, eps=0.5)
+  qc.draw(fold=80)
+#+end_src
+
+#+RESULTS[ec7442e23cae4ea17df5fd7c46b88b213d093940]:
+#+begin_example
+     ┌───┐┌───────────────┐                                                   »
+t_0: ┤ H ├┤0              ├───────────────────────────────────────────────────»
+     ├───┤│               │┌───────────────┐                                  »
+t_1: ┤ H ├┤               ├┤0              ├──────────────────────────────────»
+     ├───┤│               ││               │┌───────────────┐                 »
+t_2: ┤ H ├┤               ├┤               ├┤0              ├─────────────────»
+     ├───┤│               ││               ││               │┌───────────────┐»
+t_3: ┤ H ├┤               ├┤               ├┤               ├┤0              ├»
+     ├───┤│               ││               ││               ││               │»
+t_4: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_5: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_6: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_7: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│               ││               ││               ││               │»
+t_8: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
+     ├───┤│  c_(3x mod 7) ││               ││               ││               │»
+u_0: ┤ X ├┤1              ├┤1 c_(2x mod 7) ├┤1              ├┤1              ├»
+     └───┘│               ││               ││  c_(4x mod 7) ││               │»
+u_1: ─────┤2              ├┤2              ├┤2              ├┤2 c_(2x mod 7) ├»
+          │               ││               ││               ││               │»
+u_2: ─────┤3              ├┤3              ├┤3              ├┤3              ├»
+          │               ││               ││               ││               │»
+u_3: ─────┤4              ├┤4              ├┤4              ├┤4              ├»
+          │               ││               ││               ││               │»
+a_0: ─────┤5              ├┤5              ├┤5              ├┤5              ├»
+          │               ││               ││               ││               │»
+a_1: ─────┤6              ├┤6              ├┤6              ├┤6              ├»
+          │               ││               ││               ││               │»
+a_2: ─────┤7              ├┤7              ├┤7              ├┤7              ├»
+          │               ││               ││               ││               │»
+a_3: ─────┤8              ├┤8              ├┤8              ├┤8              ├»
+          │               ││               ││               ││               │»
+a_4: ─────┤9              ├┤9              ├┤9              ├┤9              ├»
+          └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
+c: 9/═════════════════════════════════════════════════════════════════════════»
+                                                                              »
+«                                                                         »
+«t_0: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_1: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_2: ────────────────────────────────────────────────────────────────────»
+«                                                                         »
+«t_3: ────────────────────────────────────────────────────────────────────»
+«     ┌───────────────┐                                                   »
+«t_4: ┤0              ├───────────────────────────────────────────────────»
+«     │               │┌───────────────┐                                  »
+«t_5: ┤               ├┤0              ├──────────────────────────────────»
+«     │               ││               │┌───────────────┐                 »
+«t_6: ┤               ├┤               ├┤0              ├─────────────────»
+«     │               ││               ││               │┌───────────────┐»
+«t_7: ┤               ├┤               ├┤               ├┤0              ├»
+«     │               ││               ││               ││               │»
+«t_8: ┤               ├┤               ├┤               ├┤               ├»
+«     │               ││               ││               ││               │»
+«u_0: ┤1              ├┤1              ├┤1              ├┤1              ├»
+«     │               ││               ││               ││               │»
+«u_1: ┤2              ├┤2              ├┤2              ├┤2              ├»
+«     │  c_(4x mod 7) ││               ││               ││               │»
+«u_2: ┤3              ├┤3 c_(2x mod 7) ├┤3              ├┤3              ├»
+«     │               ││               ││  c_(4x mod 7) ││               │»
+«u_3: ┤4              ├┤4              ├┤4              ├┤4 c_(2x mod 7) ├»
+«     │               ││               ││               ││               │»
+«a_0: ┤5              ├┤5              ├┤5              ├┤5              ├»
+«     │               ││               ││               ││               │»
+«a_1: ┤6              ├┤6              ├┤6              ├┤6              ├»
+«     │               ││               ││               ││               │»
+«a_2: ┤7              ├┤7              ├┤7              ├┤7              ├»
+«     │               ││               ││               ││               │»
+«a_3: ┤8              ├┤8              ├┤8              ├┤8              ├»
+«     │               ││               ││               ││               │»
+«a_4: ┤9              ├┤9              ├┤9              ├┤9              ├»
+«     └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
+«c: 9/════════════════════════════════════════════════════════════════════»
+«                                                                         »
+«                      ┌────────┐┌─┐
+«t_0: ─────────────────┤0       ├┤M├────────────────────────
+«                      │        │└╥┘┌─┐
+«t_1: ─────────────────┤1       ├─╫─┤M├─────────────────────
+«                      │        │ ║ └╥┘┌─┐
+«t_2: ─────────────────┤2       ├─╫──╫─┤M├──────────────────
+«                      │        │ ║  ║ └╥┘┌─┐
+«t_3: ─────────────────┤3       ├─╫──╫──╫─┤M├───────────────
+«                      │        │ ║  ║  ║ └╥┘┌─┐
+«t_4: ─────────────────┤4 QFT^† ├─╫──╫──╫──╫─┤M├────────────
+«                      │        │ ║  ║  ║  ║ └╥┘┌─┐
+«t_5: ─────────────────┤5       ├─╫──╫──╫──╫──╫─┤M├─────────
+«                      │        │ ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_6: ─────────────────┤6       ├─╫──╫──╫──╫──╫──╫─┤M├──────
+«                      │        │ ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_7: ─────────────────┤7       ├─╫──╫──╫──╫──╫──╫──╫─┤M├───
+«     ┌───────────────┐│        │ ║  ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_8: ┤0              ├┤8       ├─╫──╫──╫──╫──╫──╫──╫──╫─┤M├
+«     │               │└────────┘ ║  ║  ║  ║  ║  ║  ║  ║ └╥┘
+«u_0: ┤1              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_1: ┤2              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_2: ┤3              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_3: ┤4              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │  c_(4x mod 7) │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_0: ┤5              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_1: ┤6              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_2: ┤7              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_3: ┤8              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_4: ┤9              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     └───────────────┘           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«c: 9/════════════════════════════╩══╩══╩══╩══╩══╩══╩══╩══╩═
+«                                 0  1  2  3  4  5  6  7  8
+#+end_example
+
+** Factoring
+Recall that the factoring problem is to find a non-trivial factor of a given number
+$N$. We may assume that the number is not a prime number (as satisfied when our task is to
+break RSA encryption). The quantum stuff needed to solve the factoring problem is
+essentially in place.
+
+But remember that the quantum part assumes that $N$ is neither even nor a power of a prime
+(compare e.g. with the assumptions of Theorem A4.13 in the book). Fortunately these corner
+cases are easily solved classically. Below I give a very simple solution which is probably
+far from optimal but which already suffices to show that the corner case is efficiently
+solvable.
+
+#+begin_src python
+  def is_even(N: int) -> bool:
+      return N % 2 == 0
+
+
+  def intlogx(N: int, base: int, offset=0, exponent=1) -> int:
+      """Largest n such that (offset + base**n)**exponent <= N
+
+      For offset=0 and exponent=1 this is just floor(log_base(x))."""
+      assert 1 < base < N
+
+      n = 1
+      a = base
+      while (value := (offset + a)**exponent) < N:
+          a *= base
+          n += 1
+
+      return n if value == N else n - 1
+
+
+  def is_power(N: int) -> int:
+      """Decide whether there is x, k > 1 such that x**k = N.
+
+      Returns: None if not, and *a* pair (x, k) as above otherwise."""
+      k2 = intlogx(N, 2)
+
+      # For each k <= k2 check if there is an x with x**k == N
+      for k in range(2, k2 + 1):
+          x = 0
+          # This loop attempts to construct the binary representation of x:
+          while x**k < N:
+              i = intlogx(N, 2, offset=x, exponent=k)
+              x += 2**i
+
+          if x**k == N:
+              return x, k
+
+      return None
+#+end_src
+
+The following example gives a hint that the code implementing =is_power= isn't too bad
+(see the tests in the repo form more examples):
+
+#+begin_src python :results replace verbatim :tangle no :cache yes
+  # We use primes to make the exponent unique:
+  a_1000_bit_number = 699093205353077798740186149229 ** 11
+  is_power(a_1000_bit_number)  # executes in a few dozen milliseconds on a modern laptop
+#+end_src
+
+#+RESULTS[ca5c2a6beb519f08f09a8f40e4d5abe9e8f12961]:
+: (699093205353077798740186149229, 11)
+
+Finally we implement the function =find_factor= which solves the factoring problem:
+
+#+begin_src python
+  def get_maximizing_keys(counts: dict[str, int], num: int) -> tuple[str]:
+      """Get the 'num' keys of 'counts' with maximal associated values.
+
+      Returns: An *lexicographically* sorted num-tuple of the keys."""
+      result = sorted(counts.items(), key=lambda a: a[1], reverse=True)[:num]
+      result = [a[0] for a in result]
+      return tuple(sorted(result))
+
+
+  def find_factor(N: int, eps=1.0, randrange=None) -> int:
+      """Find a non-trivial factor of N - assuming it has one.
+
+      Args:
+          N: An integer larger than 1 which is assumed to be not prime.
+          eps: A parameter for the phase estimation (smaller values lead to a
+              smaller error rate). Must be larger 0.
+          randrange: please ignore this parameter, just for testing (sorry).
+      """
+      assert eps > 0, "eps must be positive."
+      assert N > 1, "N must be larger than 1."
+
+      if is_even(N):
+          return 2
+
+      if (ret := is_power(N)) is not None:
+          return ret[0]
+
+      # Just for testing (sorry):
+      randrange = randrange or random.randrange
+
+      while True:
+          a = randrange(2, N)
+          print(f"Trying a={a}")
+
+          gcd = math.gcd(a, N)
+          if gcd > 1:
+              return gcd
+
+          # From here on N is a neither even, nor a power. By assumption it is also non-prime.
+          qc = make_order_finding_phase_estimation(a, N, eps)
+          sim = AerSimulator()
+          qc_obj = transpile(qc, sim)
+
+          # Note: on a simulator the number of shots does not significantly influence the
+          # running time. This is reasonable since the simulator has access to the wave
+          # function form which it can cheaply sample (at least this is how I guess it
+          # works).
+          counts = sim.run(qc_obj, shots=1000).result().get_counts()
+
+          bit_list = list(counts.keys())
+          weights = list(counts.values())
+          for i in range(100):  # this simulates 100 independent runs
+              bits = random.choices(bit_list, weights)[0]
+              print(f"Shot {i} measured {bits}")
+
+              s_div_r = Fraction(int(bits), 2**len(bits))
+              convergent = get_convergent(s_div_r, N)
+              r = convergent.denominator
+              print(f"r={r}")
+
+              if not is_even(r):
+                  continue
+
+              r2 = r // 2
+              x = (a ** r2) % N
+
+              if x != 1:
+                  gcd = math.gcd(x - 1, N)
+                  if gcd > 1:
+                      return gcd
+
+              if x != N - 1:
+                  gcd = math.gcd(x + 1, N)
+                  if gcd > 1:
+                      return gcd
+#+end_src
+
+Let us try to factor the smallest number for which phase estimation is needed (any smaller
+number is either prime, even, or a power of a prime). But note that the probability that
+$a$ has a common factor with $N$ is still high.
+
+#+begin_src python :results replace output :tangle no :cache yes
+  N = 15
+  factor = find_factor(N)
+  print(f"\nA factor of {N} is {factor}.")
+#+end_src
+
+#+RESULTS[76610aa82e7eb877adb53368b1536ba1c799a3b6]:
+: Trying a=7
+: Shot 0 measured 1100000000
+: r=4
+:
+: A factor of 15 is 3.
+
+It should take around 50 core-seconds to execute. Certainly not very impressive but it
+shows that it works in principle. But note that we can't go much beyond this tiny example
+since the simulation time depends exponentially on the number of qubits. For example to
+factor ~21~ based on ~a=19~ took around 54 core-minutes on my laptop.
 
 * WIP Exercises
 ** Exercise 5.1
@@ -571,3 +1426,6 @@ $O(L^3)$ gates.
 The first part of the claim, that we can replace the controlled $U^j$ by $V$ and $|1\rangle$ by
 $|0\rangle$ without changing the output of the algorithm is obvious. It remains to show the $V$ can
 be implemented by $O(L^3)$ gates.
+
+* References
+#+print_bibliography:

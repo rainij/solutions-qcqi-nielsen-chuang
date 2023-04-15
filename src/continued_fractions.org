@@ -377,7 +377,7 @@ to a =float=.
 Finally let us define a function which will be helpful in order finding:
 
 #+begin_src python
-  def get_convergent(value: Rational, limit_denominator: Integral):
+  def get_convergent(value: Rational, limit_denominator: Integral) -> Fraction:
       """Compute the last convergent of 'value' whose denominator is smaller than 'limit_denominator'."""
       # Second arg is just something large enough for what we want:
       cfrac = compute_cfrac(value, limit_denominator)
