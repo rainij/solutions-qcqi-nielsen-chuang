@@ -1,11 +1,9 @@
 import pytest
-
 from qiskit import transpile
 from qiskit_aer import AerSimulator
 
-from chapter_5 import quantum_add, make_order_finding_phase_estimation, \
-    intlogx, is_power, find_factor, get_maximizing_keys
-
+from chapter_5 import (find_factor, get_maximizing_keys, intlogx, is_power,
+                       make_order_finding_phase_estimation, quantum_add)
 
 
 @pytest.mark.parametrize("a,b,size,expected", {
