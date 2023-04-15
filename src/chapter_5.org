@@ -404,15 +404,28 @@ incrementation or modular incrementation works:
 #+end_src
 
 ** TODO Multiplication in Fourier Space
-First we implement
+Next we implement
 
 $$
   V(a,N): \quad \ket{x,b} \mapsto \ket{x, b + ax \mod N} .
 $$
 
-#+begin_src python :results replace
+This is essentially the multiplication operation using an auxiliary register which serves
+as the output register. The idea of the circuit is simple. It is based on the identity:
+
+$$
+  ax \mod N = \sum_{i=0}^n x_i(a\cdot 2^i) ,
+$$
+
+where $n$ is the number of bits. The sum on the right can be implemented by a series of
+$n+1$ controlled (by the $x_i$) incrementation operations.
+
+#+begin_src python
   def make_VaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
-      """TODO"""
+      """Implements |x,b> -> |x,b+ax mod N>.
+
+      Optionally add controls.
+      """
       int_size = modulus_size(modulus) + 1
 
       qreg_ctrl = QuantumRegister(num_ctrls, "c")
@@ -436,13 +449,16 @@ $$
 
       prefix = make_control_prefix(num_ctrls)
       return qc.to_gate(label=f"{prefix}(b + {a}x mod {modulus})")
+#+end_src
 
+As an example, here is a circuit which multiplies the input by =3= modulo =11=:
 
+#+begin_src python :results replace :tangle no :cache yes
   gate = make_VaN(3, 11)
   gate.definition.draw()
 #+end_src
 
-#+RESULTS:
+#+RESULTS[f9f60d2ad34c5f70d3bc6a1595dcffc11e47cd89]:
 #+begin_example
               ┌───────────────────┐
  q_0: ────────┤0                  ├─────────────────────────────────────────────────────────────────────────
@@ -469,7 +485,14 @@ q_10: ────────┤6                  ├┤6                  ├
               └───────────────────┘└───────────────────┘└───────────────────┘└───────────────────┘
 #+end_example
 
-#+begin_src python :results replace
+Finally we arrive at the circuit we actually care for:
+
+$$
+  U_a: \ket{x} \mapsto \ket{ax \mod N}  .
+$$
+
+
+#+begin_src python
   def make_Ua(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
       int_size = modulus_size(modulus) + 1
 
@@ -481,7 +504,7 @@ q_10: ────────┤6                  ├┤6                  ├
       Va1N = make_VaN(pow(a, -1, modulus), modulus, num_ctrls)
       Va1N_dg = Va1N.definition.inverse().to_gate(label=f"{Va1N.label}^†")
 
-      qc = QuantumCircuit(qreg_ctrl ,qreg, qreg_anc)
+      qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
 
       qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
@@ -493,8 +516,10 @@ q_10: ────────┤6                  ├┤6                  ├
 
       prefix = make_control_prefix(num_ctrls)
       return qc.to_gate(label=f"{prefix}({a}x mod {modulus})")
+#+end_src
 
 
+#+begin_src python :results replace :tangle no :cache yes
   Ua = make_Ua(3, 7)
   Ua.definition.draw()
 #+end_src
