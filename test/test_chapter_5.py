@@ -4,7 +4,7 @@ from qiskit import transpile
 from qiskit_aer import AerSimulator
 
 from chapter_5 import quantum_add, make_order_finding_phase_estimation, \
-    intlogx, is_power, find_factor
+    intlogx, is_power, find_factor, get_maximizing_keys
 
 
 
@@ -31,13 +31,6 @@ def test_modular_quantum_addition(a, b, modulus, expected):
     assert quantum_add(a, b, modulus=modulus) == expected
 
 
-# TODO code duplication
-def get_maximizing_bits(counts: dict[str, int], num: int) -> tuple[str]:
-    result = sorted(counts.items(), key=lambda a: a[1], reverse=True)[:num]
-    result = [a[0] for a in result]
-    return tuple(sorted(result))
-
-
 @pytest.mark.slow
 @pytest.mark.parametrize("a,modulus,maximizing_bits", {
     # Remark: Theoretically, if the order is a power of 2 the results should be *clean* in
@@ -62,7 +55,7 @@ def test_phase_estimation(a, modulus, maximizing_bits):
     counts = sim.run(qc_obj).result().get_counts()
 
     num = len(maximizing_bits)
-    result = get_maximizing_bits(counts, num)
+    result = get_maximizing_keys(counts, num)
 
     assert result == maximizing_bits
 
@@ -137,5 +130,4 @@ def test_find_factor_trivial_cases(N, factor):
     (15, (3, 5), 7),  # smallest possible non-trivial case (already takes long)
 })
 def test_find_factor_non_trivial_cases(N, factors, cheat_code):
-    # TODO: random seed still needed
     assert find_factor(N, randrange=lambda *_: cheat_code) in factors
