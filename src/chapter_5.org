@@ -595,7 +595,7 @@ result is moved into the input register utilizing swap gates. Finally, in the th
 we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 
 #+begin_src python
-  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> QuantumCircuit:
+  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
       """Implements |x> -> |ax mod N>."""
       L = modulus_size(modulus) + 1
 
@@ -617,7 +617,9 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 
       qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
-      return qc
+      # FIXME: for some weird reason I *must* convert this to_gate here (and convert it back during
+      # usage) to make the transpile step work.
+      return qc.to_gate()
 
 
   class UaNGate(Gate):
@@ -641,7 +643,7 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
           self._modulus = modulus
 
       def _define(self):
-          qc = make_UaN(self._increment, self._modulus)
+          qc = make_UaN(self._increment, self._modulus).definition
           self.definition = qc
 
 
