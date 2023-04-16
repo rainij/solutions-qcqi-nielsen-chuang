@@ -16,12 +16,12 @@ Tangled:
   import random
   from fractions import Fraction
   from numbers import Integral
-  from typing import Optional
+  from typing import Optional, Union
 
   import sympy as sp
   from qiskit import (AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister,
                       transpile)
-  from qiskit.circuit import Gate
+  from qiskit.circuit import Gate, ControlledGate
   from qiskit.circuit.library import MCPhaseGate, SwapGate
   from qiskit_aer import AerSimulator
   from sympy import I, exp, pi
@@ -275,7 +275,79 @@ everything written to the ancilla.
       qc.append(cc_inc_a, qreg2)
 
       prefix = make_control_prefix(num_ctrls)
-      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")  # TODO
+
+
+  class ModularFourierIncrementGate(Gate):
+      """Implements |ϕ(j)> -> |ϕ(a+j mod N)>."""
+
+      def __init__(self, increment: int, modulus: int,
+                   label: Optional[str] = None):
+          """Create a new modular Fourier incrementer gate.
+
+          Args:
+              increment: The increment 'a' hardcoded into the circuit.
+              modulus: The modulus 'N' hardcoded into the circuit.
+
+          Note: The last wire is an ancillary qubit which needs to be initialized to |0>.
+          """
+          num_qubits = modulus_size(modulus) + 2
+          super().__init__(f"ϕinc({increment})mod({modulus})", num_qubits, [], label=label)
+          self._increment = increment
+          self._modulus = modulus
+
+      def _define(self):
+          # TODO
+          qc = make_modular_fourier_incrementer(self._increment, self._modulus).definition
+          self.definition = qc
+
+      def control(
+              self,
+              num_ctrl_qubits: int = 1,
+              label: Optional[str] = None,
+              ctrl_state: Optional[Union[str, int]] = None,
+      ):
+          gate = MCModularFourierIncrementGate(
+              self._increment, self._modulus, num_ctrl_qubits)
+          gate.base_label = self.label
+          return gate
+
+
+  class MCModularFourierIncrementGate(ControlledGate):
+      """Implements controlled version of |ϕ(j)> -> |ϕ(a+j mod N)>."""
+
+      def __init__(
+              self,
+              increment: int,
+              modulus: int,
+              num_ctrl_qubits: int,
+              ctrl_state: Optional[Union[str, int]] = None,
+              label: Optional[str] = None):
+          """Create a new modular Fourier incrementer gate.
+
+          Args:
+              increment: The increment 'a' hardcoded into the circuit.
+              modulus: The modulus 'N' hardcoded into the circuit.
+              num_ctrl_qubits: The number of controls added to the front.
+
+          Note: The last wire is an ancillary qubit which needs to be initialized to |0>.
+          """
+          assert ctrl_state is None, "sorry ctrl_state not implemented"
+          super().__init__(
+              "mcfinc",
+              num_ctrl_qubits + modulus_size(modulus) + 2,
+              [],
+              num_ctrl_qubits=num_ctrl_qubits,
+              base_gate=ModularFourierIncrementGate(increment, modulus, label=label),
+              label=label,
+          )
+          self._increment = increment
+          self._modulus = modulus
+
+      def _define(self):
+          qc = make_modular_fourier_incrementer(
+              self._increment, self._modulus, self.num_ctrl_qubits).definition  # TODO
+          self.definition = qc
 #+end_src
 
 You may wonder why this function (and =make_fourier_incrementer=) takes an argument
@@ -322,39 +394,54 @@ q_4: ─────────────────────────
 We implement the corresponding operation in real space to have something to test against:
 
 #+begin_src python
-  def make_modular_incrementer(increment: int, modulus: int) -> Gate:
-      """Implements |j> -> |a+j mod N> where a is the increment and N is the modulus.
+  class ModularIncrementGate(Gate):
+      """Implements |j> -> |a+j mod N>."""
 
-      The arguments have the same meaning as in 'make_modular_fourier_incrementer'.
-      """
-      finc_mod = make_modular_fourier_incrementer(increment, modulus)
-      qreg_size = finc_mod.num_qubits - 1  # one ancilla
+      def __init__(self, increment: int, modulus: int,
+                   label: Optional[str] = None):
+          """Create a new modular incrementer gate.
 
-      qft = make_qft(qreg_size)
-      qft_dg = make_qft_dg(qreg_size)
+          Args:
+              increment: The increment 'a' hardcoded into the circuit.
+              modulus: The modulus 'N' hardcoded into the circuit.
 
-      qc = QuantumCircuit(qreg_size + 1)
+          Note: The last wire is an ancillary qubit which needs to be initialized to |0>.
+          """
+          num_qubits = modulus_size(modulus) + 2
+          super().__init__(f"inc({increment})mod({modulus})", num_qubits, [], label=label)
+          self._increment = increment
+          self._modulus = modulus
 
-      qc.append(qft, range(qreg_size))
-      qc.append(finc_mod, range(qreg_size + 1))
-      qc.append(qft_dg, range(qreg_size))
+      def _define(self):
+          mfinc = ModularFourierIncrementGate(self._increment, self._modulus)
 
-      return qc.to_gate(label=f"inc({increment})mod({modulus})")
+          qreg_size = mfinc.num_qubits - 1  # one ancilla
+
+          qft = make_qft(qreg_size)
+          qft_dg = make_qft_dg(qreg_size)
+
+          qc = QuantumCircuit(qreg_size + 1)
+
+          qc.append(qft, range(qreg_size))
+          qc.append(mfinc, range(qreg_size + 1))
+          qc.append(qft_dg, range(qreg_size))
+
+          self.definition = qc
 #+end_src
 
 #+begin_src python :results replace :tangle no :cache yes
-  inc_mod = make_modular_incrementer(3, 7)
-  inc_mod.definition.draw()
+  gate = ModularIncrementGate(3, 7)
+  gate.definition.draw()
 #+end_src
 
-#+RESULTS[8afd2c5adc1aefe17a586166d39ce62bd6d99877]:
+#+RESULTS[4ecdc18bb8339e1a21f1bd8cbbe95f4c163f99b0]:
 #+begin_example
      ┌──────┐┌────────────────┐┌────────┐
 q_0: ┤0     ├┤0               ├┤0       ├
      │      ││                ││        │
 q_1: ┤1     ├┤1               ├┤1       ├
      │  QFT ││                ││  QFT^† │
-q_2: ┤2     ├┤2 ϕinc(3)mod(7) ├┤2       ├
+q_2: ┤2     ├┤2 Φinc(3)mod(7) ├┤2       ├
      │      ││                ││        │
 q_3: ┤3     ├┤3               ├┤3       ├
      └──────┘│                │└────────┘
@@ -382,11 +469,11 @@ incrementation or modular incrementation works:
 
       if modulus is None:
           assert size is not None, "Specify 'size'"
-          qc = QuantumCircuit(size)
           inc = IncrementGate(size, a)
+          qc = QuantumCircuit(size)
       else:
           assert a < modulus and b < modulus, "a and b must be smaller than modulus"
-          inc = make_modular_incrementer(increment=a, modulus=modulus)
+          inc = ModularIncrementGate(a, modulus)
           size = inc.num_qubits
           qc = QuantumCircuit(size)
 
@@ -447,7 +534,7 @@ $n+1$ controlled (by the $x_i$) incrementation operations.
 
       for i in range(int_size - 1):
           ai = a * 2**i % modulus
-          cfinc = make_modular_fourier_incrementer(ai, modulus, num_ctrls=num_ctrls + 1)
+          cfinc = ModularFourierIncrementGate(ai, modulus).control(num_ctrls + 1)
           qc.append(cfinc, list(qreg_ctrl) + [qreg_x[i]] + list(qreg_b) + list(qreg_anc))
 
       qc.append(qft_dg, list(qreg_ctrl) + list(qreg_b))
