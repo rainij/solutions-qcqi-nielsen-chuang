@@ -132,7 +132,7 @@ $\ket{\phi(j)}=\FT\ket{j}$. This circuit implements $\ket{\phi(j)}\mapsto\ket{\p
 for a fixed integer $a$.
 
 #+begin_src python
-  def make_control_prefix(num_ctrls: int):  # TODO: not needed anymore
+  def make_control_prefix(num_ctrls: int):  # TODO: not needed anymore?
       return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
 
 
@@ -595,13 +595,13 @@ result is moved into the input register utilizing swap gates. Finally, in the th
 we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 
 #+begin_src python
-  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> Gate:
+  def make_UaN(a: int, modulus: int, num_ctrls: int = 0) -> QuantumCircuit:
       """Implements |x> -> |ax mod N>."""
       L = modulus_size(modulus) + 1
 
       qreg_ctrl = QuantumRegister(num_ctrls, "c")
-      qreg = QuantumRegister(L)
-      qreg_anc = AncillaRegister(L + 1)
+      qreg = QuantumRegister(L, "q")
+      qreg_anc = AncillaRegister(L + 1, "a")
 
       VaN = make_VaN(a, modulus, num_ctrls)
       Va1N = make_VaN(pow(a, -1, modulus), modulus, num_ctrls)
@@ -617,8 +617,7 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 
       qc.append(Va1N_dg, list(qreg_ctrl) + list(qreg) + list(qreg_anc))
 
-      prefix = make_control_prefix(num_ctrls)
-      return qc.to_gate(label=f"{prefix}({a}x mod {modulus})")
+      return qc
 
 
   class UaNGate(Gate):
@@ -642,7 +641,7 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
           self._modulus = modulus
 
       def _define(self):
-          qc = make_UaN(self._increment, self._modulus).definition  # TODO
+          qc = make_UaN(self._increment, self._modulus)
           self.definition = qc
 
 
@@ -679,35 +678,35 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
 This is how looks like for $a=3$ and modulus $7$:
 
 #+begin_src python :results replace :tangle no :cache yes
-  Ua = make_UaN(3, 11)
+  Ua = UaNGate(3, 11)
   Ua.definition.draw()
 #+end_src
 
-#+RESULTS[7704b501de1eae1176daa94083b565d3ffe6e332]:
+#+RESULTS[934928c8e2e8d0b56c46d1030b3960018baad490]:
 #+begin_example
-      ┌───────────────────┐            ┌─────────────────────┐
- q_0: ┤0                  ├─X──────────┤0                    ├
-      │                   │ │          │                     │
- q_1: ┤1                  ├─┼──X───────┤1                    ├
-      │                   │ │  │       │                     │
- q_2: ┤2                  ├─┼──┼──X────┤2                    ├
-      │                   │ │  │  │    │                     │
- q_3: ┤3                  ├─┼──┼──┼──X─┤3                    ├
-      │                   │ │  │  │  │ │                     │
- q_4: ┤4                  ├─┼──┼──┼──┼─┤4                    ├
-      │                   │ │  │  │  │ │                     │
- q_5: ┤5  (b + 3x mod 11) ├─X──┼──┼──┼─┤5  (b + 4x mod 11)^† ├
-      │                   │    │  │  │ │                     │
- q_6: ┤6                  ├────X──┼──┼─┤6                    ├
-      │                   │       │  │ │                     │
- q_7: ┤7                  ├───────X──┼─┤7                    ├
-      │                   │          │ │                     │
- q_8: ┤8                  ├──────────X─┤8                    ├
-      │                   │            │                     │
- q_9: ┤9                  ├────────────┤9                    ├
-      │                   │            │                     │
-q_10: ┤10                 ├────────────┤10                   ├
-      └───────────────────┘            └─────────────────────┘
+     ┌───────────────────┐            ┌─────────────────────┐
+q_0: ┤0                  ├─X──────────┤0                    ├
+     │                   │ │          │                     │
+q_1: ┤1                  ├─┼──X───────┤1                    ├
+     │                   │ │  │       │                     │
+q_2: ┤2                  ├─┼──┼──X────┤2                    ├
+     │                   │ │  │  │    │                     │
+q_3: ┤3                  ├─┼──┼──┼──X─┤3                    ├
+     │                   │ │  │  │  │ │                     │
+q_4: ┤4                  ├─┼──┼──┼──┼─┤4                    ├
+     │                   │ │  │  │  │ │                     │
+a_0: ┤5  (b + 3x mod 11) ├─X──┼──┼──┼─┤5  (b + 4x mod 11)^† ├
+     │                   │    │  │  │ │                     │
+a_1: ┤6                  ├────X──┼──┼─┤6                    ├
+     │                   │       │  │ │                     │
+a_2: ┤7                  ├───────X──┼─┤7                    ├
+     │                   │          │ │                     │
+a_3: ┤8                  ├──────────X─┤8                    ├
+     │                   │            │                     │
+a_4: ┤9                  ├────────────┤9                    ├
+     │                   │            │                     │
+a_5: ┤10                 ├────────────┤10                   ├
+     └───────────────────┘            └─────────────────────┘
 #+end_example
 
 Note that three bits are sufficient to represent the number $7$. That explains why three
@@ -822,8 +821,6 @@ Next we implement phase estimation for order finding, following the book.
       qc.x(qreg_bot[0])
 
       for i in range(t):
-          # NOTE: There is not big differenc between these two lines wrt performance:
-          # CUai = make_UaN(pow(a, 2**i, modulus), modulus, num_ctrls=1)
           CUai = MCUaNGate(pow(a, 2**i, modulus), modulus, num_ctrl_qubits=1)
           qc.append(CUai, [qreg_top[i]] + list(qreg_bot) + list(qreg_anc))
           pass
