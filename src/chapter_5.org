@@ -16,6 +16,7 @@ Tangled:
   import random
   from fractions import Fraction
   from numbers import Integral
+  from typing import Optional
 
   import sympy as sp
   from qiskit import (AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister,
@@ -131,31 +132,28 @@ $\ket{\phi(j)}=\FT\ket{j}$. This circuit implements $\ket{\phi(j)}\mapsto\ket{\p
 for a fixed integer $a$.
 
 #+begin_src python
-  def make_control_prefix(num_ctrls: int):
+  def make_control_prefix(num_ctrls: int):  # TODO: not needed anymore
       return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
 
 
-  def make_fourier_incrementer(size: int, increment: int, num_ctrls: int = 0) -> Gate:
-      """Implements |ϕ(j)> -> |ϕ(a+j)> where a is the increment.
+  class FourierIncrementGate(Gate):
+      """Implements |ϕ(j)> -> |ϕ(a+j)> where a is the increment."""
 
-      Args:
-          size: Number of qubits used to represent the integers.
-          increment: The fixed increment hardcoded into the circuit.
-          num_ctrls: This many control qubits are added before all other qubits.
-      """
-      assert num_ctrls >= 0, "num_ctrls must be non-negative"
-      qc = QuantumCircuit(size + num_ctrls)
+      def __init__(self, num_qubits: int, increment: int,
+                   label: Optional[str] = None):
+          """Create a new Fourier incrementer gate."""
+          super().__init__(f"ϕinc({increment})", num_qubits, [], label=label)
+          assert 2**num_qubits > increment, \
+              f"Increment {increment} is too large for {num_qubits} bits."
+          self._increment = increment
 
-      if num_ctrls == 0:
-          for k in range(size):
-              qc.p(2*math.pi*increment*2**(-size+k), k)
-      else:
-          for k in range(size):
-              qc.append(MCPhaseGate(2*math.pi*increment*2**(-size+k), num_ctrls),
-                        list(range(num_ctrls)) + [num_ctrls + k])
+      def _define(self):
+          qc = QuantumCircuit(self._num_qubits)
 
-      prefix = make_control_prefix(num_ctrls)
-      return qc.to_gate(label=f"{prefix}ϕinc({increment})")
+          for k in range(self._num_qubits):
+              qc.p(2*math.pi*self._increment*2**(-self._num_qubits+k), k)
+
+          self.definition = qc
 #+end_src
 
 The reasoning to see that the circuit does what we want is essentially the same as the
@@ -165,21 +163,28 @@ The actual incrementation operator can be obtained by conjugating this circuit b
 Fourier transform:
 
 #+begin_src python
-  def make_incrementer(size: Integral, increment: Integral) -> Gate:
-      """Implements |j> -> |a+j> where a is the increment.
+  class IncrementGate(Gate):
+      """Implements |j> -> |a+j> where a is the increment."""
 
-      The arguments have the same meaning as in 'make_fourier_incrementer'.
-      """
-      qc = QuantumCircuit(size)
-      finc = make_fourier_incrementer(size, increment)
-      qft = make_qft(size)
-      qft_dg = make_qft_dg(size)
+      def __init__(self, num_qubits: int, increment: int,
+                   label: Optional[str] = None):
+          """Create a new incrementer gate."""
+          super().__init__(f"inc({increment})", num_qubits, [], label=label)
+          assert 2**num_qubits > increment, \
+              f"Increment {increment} is too large for {num_qubits} bits."
+          self._increment = increment
 
-      qc.append(qft, range(size))
-      qc.append(finc, range(size))
-      qc.append(qft_dg, range(size))
+      def _define(self):
+          qc = QuantumCircuit(self._num_qubits)
+          finc = FourierIncrementGate(self._num_qubits, self._increment)
+          qft = make_qft(self._num_qubits)  # TODO: use builtin?
+          qft_dg = make_qft_dg(self._num_qubits)
 
-      return qc.to_gate(label=f"inc({increment})")
+          qc.append(qft, range(self._num_qubits))
+          qc.append(finc, range(self._num_qubits))
+          qc.append(qft_dg, range(self._num_qubits))
+
+          self.definition = qc
 #+end_src
 
 We actually do not need =make_incrementer= for our phase estimation (since we want to do
@@ -187,11 +192,11 @@ as many operations as possible in the Fourier space due to the cost of the Fouri
 transform). But it is still nice to have it, for example for testing purposes.
 
 #+begin_src python :results replace :tangle no :cache yes
-  inc = make_incrementer(4, 3)
+  inc = IncrementGate(4, 3)
   inc.definition.decompose('ϕinc(3)').draw()
 #+end_src
 
-#+RESULTS[b959b69d77c2bfff1ffac83c24d060df1e18d33b]:
+#+RESULTS[7f98948b7ee92991125a562150ea023c77890b8a]:
 :      ┌──────┐┌─────────┐┌────────┐
 : q_0: ┤0     ├┤ P(3π/8) ├┤0       ├
 :      │      │├─────────┤│        │
@@ -244,11 +249,12 @@ everything written to the ancilla.
 
       qc = QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
 
-      cc_inc_a = make_fourier_incrementer(increment=increment, size=size, num_ctrls=num_ctrls)
-      inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=0)
-      c_inc_N = make_fourier_incrementer(increment=modulus, size=size, num_ctrls=1)
-      cc_inc_a_dg = cc_inc_a.definition.inverse().to_gate(label=f"{cc_inc_a.label}^†")
-      inc_N_dg = inc_N.definition.inverse().to_gate(label=f"{inc_N.label}^†")
+      inc_a = FourierIncrementGate(size, increment)
+      cc_inc_a = inc_a if num_ctrls == 0 else inc_a.control(num_ctrls)
+      inc_N = FourierIncrementGate(size, modulus)
+      c_inc_N = FourierIncrementGate(size, modulus).control(1)
+      cc_inc_a_dg = cc_inc_a.inverse()
+      inc_N_dg = inc_N.inverse()
       qft = make_qft(size)
       qft_dg = make_qft_dg(size)
 
@@ -289,28 +295,28 @@ for this circuit, instead it suffices to put the control at just the incrementer
 
 #+RESULTS[7aea9d90baf948838e6aee076dc5a30a349672cf]:
 #+begin_example
-     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐»
-q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├»
-     │          ││            ││        │     │      ││            │»
-q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├»
-     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            │»
-q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├»
-     │          ││            ││        │     │      ││            │»
-q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├»
-     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │»
-q_4: ────────────────────────────────────┤ X ├────────┤0           ├»
-                                         └───┘        └────────────┘»
-«     ┌────────────┐┌────────┐     ┌──────┐┌──────────┐
-«q_0: ┤0           ├┤0       ├─────┤0     ├┤0         ├
-«     │            ││        │     │      ││          │
-«q_1: ┤1           ├┤1       ├─────┤1     ├┤1         ├
-«     │  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
-«q_2: ┤2           ├┤2       ├─────┤2     ├┤2         ├
-«     │            ││        │     │      ││          │
-«q_3: ┤3           ├┤3       ├──o──┤3     ├┤3         ├
-«     └────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
-«q_4: ────────────────────────┤ X ├────────────────────
-«                             └───┘
+     ┌──────────┐┌─────────────┐┌────────┐     ┌──────┐┌──────────┐»
+q_0: ┤0         ├┤0            ├┤0       ├─────┤0     ├┤0         ├»
+     │          ││             ││        │     │      ││          │»
+q_1: ┤1         ├┤1            ├┤1       ├─────┤1     ├┤1         ├»
+     │  Φinc(3) ││  ϕinc(7)_dg ││  QFT^† │     │  QFT ││  Φinc(7) │»
+q_2: ┤2         ├┤2            ├┤2       ├─────┤2     ├┤2         ├»
+     │          ││             ││        │     │      ││          │»
+q_3: ┤3         ├┤3            ├┤3       ├──■──┤3     ├┤3         ├»
+     └──────────┘└─────────────┘└────────┘┌─┴─┐└──────┘└────┬─────┘»
+q_4: ─────────────────────────────────────┤ X ├─────────────■──────»
+                                          └───┘                    »
+«     ┌─────────────┐┌────────┐     ┌──────┐┌──────────┐
+«q_0: ┤0            ├┤0       ├─────┤0     ├┤0         ├
+«     │             ││        │     │      ││          │
+«q_1: ┤1            ├┤1       ├─────┤1     ├┤1         ├
+«     │  ϕinc(3)_dg ││  QFT^† │     │  QFT ││  Φinc(3) │
+«q_2: ┤2            ├┤2       ├─────┤2     ├┤2         ├
+«     │             ││        │     │      ││          │
+«q_3: ┤3            ├┤3       ├──o──┤3     ├┤3         ├
+«     └─────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
+«q_4: ─────────────────────────┤ X ├────────────────────
+«                              └───┘
 #+end_example
 
 We implement the corresponding operation in real space to have something to test against:
@@ -377,7 +383,7 @@ incrementation or modular incrementation works:
       if modulus is None:
           assert size is not None, "Specify 'size'"
           qc = QuantumCircuit(size)
-          inc = make_incrementer(increment=a, size=size)
+          inc = IncrementGate(size, a)
       else:
           assert a < modulus and b < modulus, "a and b must be smaller than modulus"
           inc = make_modular_incrementer(increment=a, modulus=modulus)
