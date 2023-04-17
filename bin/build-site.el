@@ -116,7 +116,7 @@
        :with-toc nil) ; `nil' enables us to place the toc where we want it to be
       ("static"
        ,@rs/default-publish-params
-       :base-extension "css\\|js\\|svg"
+       :base-extension "css\\|js\\|svg\\|tar.gz"
        :publishing-function org-publish-attachment)
       ("all" :components ("pages" "static"))))
 
