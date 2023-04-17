@@ -18,62 +18,63 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd8615f1">Setup</a>
+<li><a href="#org58db012">Setup</a>
 <ul>
-<li><a href="#orgf3c9d1d">Setup Python Libaries</a></li>
-<li><a href="#orgcfbc8e5">Code from earlier Chapters</a></li>
-<li><a href="#orgd525e7b">Quantum Fourier Transform</a></li>
-<li><a href="#orge1043ec">Addition in Fourier Space</a></li>
-<li><a href="#org87ea279">Multiplication in Fourier Space</a></li>
-<li><a href="#org0a2807d">Order Finding</a></li>
-<li><a href="#orgbdbec95">Factoring</a></li>
+<li><a href="#org6610d0a">Setup Python Libaries</a></li>
+<li><a href="#org480c190">Code from earlier Chapters</a></li>
+<li><a href="#orgf525cdb">Quantum Fourier Transform</a></li>
+<li><a href="#org60721ef">Addition in Fourier Space</a></li>
+<li><a href="#orga768f33">Multiplication in Fourier Space</a></li>
+<li><a href="#orgad3175c">Order Finding</a></li>
+<li><a href="#org645d003">Factoring</a></li>
 </ul>
 </li>
-<li><a href="#orgfcde486"><span class="todo WIP">WIP</span> Exercises</a>
+<li><a href="#orgca97846"><span class="todo WIP">WIP</span> Exercises</a>
 <ul>
-<li><a href="#org8bd8dd1">Exercise 5.1</a></li>
-<li><a href="#orgc669114">Exercise 5.2</a></li>
-<li><a href="#orgdf1f4db">Exercise 5.3 (Classical fast Fourier transform)</a></li>
-<li><a href="#org59c5b7b">Exercise 5.4</a></li>
-<li><a href="#org8b46c8e">Exercise 5.5</a></li>
-<li><a href="#org22c9ffc">Exercise 5.6 (Approximate quantum Fourier transform)</a></li>
-<li><a href="#org4d9ce55">Exercise 5.7</a></li>
-<li><a href="#org8c234fb">Exercise 5.8</a></li>
-<li><a href="#orgc394e76">Exercise 5.9</a></li>
-<li><a href="#orgc9e9129">Exercise 5.10</a></li>
-<li><a href="#org14e28bd">Exercise 5.11</a></li>
-<li><a href="#orgbea7891">Exercise 5.12</a></li>
-<li><a href="#orge5fbc61">Exercise 5.13</a></li>
-<li><a href="#orgd0977be"><span class="todo TODO">TODO</span> Exercise 5.14</a></li>
+<li><a href="#org59450ba">Exercise 5.1</a></li>
+<li><a href="#org7bee6a1">Exercise 5.2</a></li>
+<li><a href="#orgdbe9f4e">Exercise 5.3 (Classical fast Fourier transform)</a></li>
+<li><a href="#org292763c">Exercise 5.4</a></li>
+<li><a href="#org32aed51">Exercise 5.5</a></li>
+<li><a href="#org98751f4">Exercise 5.6 (Approximate quantum Fourier transform)</a></li>
+<li><a href="#org2e7486b">Exercise 5.7</a></li>
+<li><a href="#orgf075a49">Exercise 5.8</a></li>
+<li><a href="#org8dd3ca7">Exercise 5.9</a></li>
+<li><a href="#orga1d459b">Exercise 5.10</a></li>
+<li><a href="#org59f14c9">Exercise 5.11</a></li>
+<li><a href="#org5765c8c">Exercise 5.12</a></li>
+<li><a href="#org50b1a1f">Exercise 5.13</a></li>
+<li><a href="#org5d804df"><span class="todo TODO">TODO</span> Exercise 5.14</a></li>
 </ul>
 </li>
-<li><a href="#orgcae650b">References</a></li>
+<li><a href="#orgd0b2a9a">References</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgd8615f1" class="outline-2">
-<h2 id="orgd8615f1">Setup</h2>
-<div class="outline-text-2" id="text-orgd8615f1">
+<div id="outline-container-org58db012" class="outline-2">
+<h2 id="org58db012">Setup</h2>
+<div class="outline-text-2" id="text-org58db012">
 </div>
-<div id="outline-container-orgf3c9d1d" class="outline-3">
-<h3 id="orgf3c9d1d">Setup Python Libaries</h3>
-<div class="outline-text-3" id="text-orgf3c9d1d">
+<div id="outline-container-org6610d0a" class="outline-3">
+<h3 id="org6610d0a">Setup Python Libaries</h3>
+<div class="outline-text-3" id="text-org6610d0a">
 <p>
 Tangled:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org93b4bc8"><span class="org-keyword">import</span> math
+<pre class="src src-python" id="org7c88a07"><span class="org-keyword">import</span> math
 <span class="org-keyword">import</span> random
 <span class="org-keyword">from</span> fractions <span class="org-keyword">import</span> Fraction
 <span class="org-keyword">from</span> numbers <span class="org-keyword">import</span> Integral
+<span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Optional, Union
 
 <span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
 <span class="org-keyword">from</span> qiskit <span class="org-keyword">import</span> (AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister,
                     transpile)
-<span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> Gate
-<span class="org-keyword">from</span> qiskit.circuit.library <span class="org-keyword">import</span> MCPhaseGate, SwapGate
+<span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> ControlledGate, Gate
+<span class="org-keyword">from</span> qiskit.circuit.library <span class="org-keyword">import</span> SwapGate
 <span class="org-keyword">from</span> qiskit_aer <span class="org-keyword">import</span> AerSimulator
 <span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> I, exp, pi
 </pre>
@@ -88,12 +89,30 @@ Not tangled:
 <span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> QuantumCircuit, Gate
 </pre>
 </div>
+
+<p>
+NOTE: In this chapter I implement Shor's Algorithm using Qiskit. It works but it is not
+pretty. Do not expect it to factor anything larger than 15 or 21 (via simulation). I did
+not do any optimizations to reduce the number of qubits or gates required. My goal was to
+closely follow the presentation in the book and stay conceptually simple. For a simulation
+<i>probably</i> the number of qubits is the critical measure.
+</p>
+
+<p>
+Also note that I tried to put the sub-circuits into didicated <code>Gate</code> and <code>ControlledGate</code>
+classes. Mainly to have nice drawings. For example the <code>ControlledGate</code> makes sure that
+you clearly see which qubits are the controls. Unfortunately this seem to come with a
+major performance bottleneck for big circuits (I did not investigate this deeper but it
+seems that a lot of stuff is copied around and work is repeated). Therefore sometimes had
+to do strange workarounds making the code less readable - sorry for that. This is my first
+time <i>really</i> using Qiskit so do not expect too much from the code.
+</p>
 </div>
 </div>
 
-<div id="outline-container-orgcfbc8e5" class="outline-3">
-<h3 id="orgcfbc8e5">Code from earlier Chapters</h3>
-<div class="outline-text-3" id="text-orgcfbc8e5">
+<div id="outline-container-org480c190" class="outline-3">
+<h3 id="org480c190">Code from earlier Chapters</h3>
+<div class="outline-text-3" id="text-org480c190">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Rz, theta
 <span class="org-keyword">from</span> continued_fractions <span class="org-keyword">import</span> get_convergent
@@ -102,15 +121,15 @@ Not tangled:
 </div>
 </div>
 
-<div id="outline-container-orgd525e7b" class="outline-3">
-<h3 id="orgd525e7b">Quantum Fourier Transform</h3>
-<div class="outline-text-3" id="text-orgd525e7b">
+<div id="outline-container-orgf525cdb" class="outline-3">
+<h3 id="orgf525cdb">Quantum Fourier Transform</h3>
+<div class="outline-text-3" id="text-orgf525cdb">
 <p>
 These are the operators \(R_k\) appearing in the implementation of the Fourier Transform:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgd503ba3"><span class="org-variable-name">k</span> <span class="org-operator">=</span> sp.symbols(<span class="org-string">'k'</span>, integer<span class="org-operator">=</span><span class="org-constant">True</span>)
+<pre class="src src-python" id="org37fce4e"><span class="org-variable-name">k</span> <span class="org-operator">=</span> sp.symbols(<span class="org-string">'k'</span>, integer<span class="org-operator">=</span><span class="org-constant">True</span>)
 <span class="org-variable-name">Rk</span> <span class="org-operator">=</span> sp.simplify(exp(2<span class="org-operator">*</span>pi<span class="org-operator">*</span>I<span class="org-operator">*</span>2<span class="org-operator">**</span>(<span class="org-operator">-</span>k<span class="org-operator">-</span>1)) <span class="org-operator">*</span> Rz.subs(theta, 2<span class="org-operator">*</span>pi<span class="org-operator">*</span>2<span class="org-operator">**</span>(<span class="org-operator">-</span>k)))
 </pre>
 </div>
@@ -175,9 +194,9 @@ q_3: ┤ H ├─■────────■────────■──
 </div>
 </div>
 
-<div id="outline-container-orge1043ec" class="outline-3">
-<h3 id="orge1043ec">Addition in Fourier Space</h3>
-<div class="outline-text-3" id="text-orge1043ec">
+<div id="outline-container-org60721ef" class="outline-3">
+<h3 id="org60721ef">Addition in Fourier Space</h3>
+<div class="outline-text-3" id="text-org60721ef">
 <p>
 Recall that phase estimation for the order finding problem requires to exponentiate an
 operator \(U_a:\ket{j}\mapsto\ket{aj\mod N}\). This operator has the nice property
@@ -192,7 +211,7 @@ operator \(U_a:\ket{j}\mapsto\ket{aj\mod N}\). This operator has the nice proper
 <p>
 Therefore having a way to implement \(U_a\) for any \(a\) already gives us the required
 powers. <i>This is important</i> since implementing the powers of \(U_a\) by just repeating the
-circuit for \(U_a\) would result in an <i>exponantially</i> deep circuit.
+circuit for \(U_a\) would result in an <i>exponantially</i> deep circuit for phase estimation.
 </p>
 
 <p>
@@ -229,27 +248,24 @@ for a fixed integer \(a\).
     <span class="org-keyword">return</span> <span class="org-string">""</span> <span class="org-keyword">if</span> num_ctrls <span class="org-operator">==</span> 0 <span class="org-keyword">else</span> <span class="org-string">"c"</span><span class="org-operator">*</span>num_ctrls <span class="org-operator">+</span> <span class="org-string">"_"</span>
 
 
-<span class="org-keyword">def</span> <span class="org-function-name">make_fourier_incrementer</span>(size: <span class="org-builtin">int</span>, increment: <span class="org-builtin">int</span>, num_ctrls: <span class="org-builtin">int</span> <span class="org-operator">=</span> 0) <span class="org-operator">-&gt;</span> Gate:
-    <span class="org-doc">"""Implements |&#981;(j)&gt; -&gt; |&#981;(a+j)&gt; where a is the increment.</span>
+<span class="org-keyword">class</span> <span class="org-type">FourierIncrementGate</span>(Gate):
+    <span class="org-doc">"""Implements |&#981;(j)&gt; -&gt; |&#981;(a+j)&gt; where a is the increment."""</span>
 
-<span class="org-doc">    Args:</span>
-<span class="org-doc">        size: Number of qubits used to represent the integers.</span>
-<span class="org-doc">        increment: The fixed increment hardcoded into the circuit.</span>
-<span class="org-doc">        num_ctrls: This many control qubits are added before all other qubits.</span>
-<span class="org-doc">    """</span>
-    <span class="org-keyword">assert</span> num_ctrls <span class="org-operator">&gt;=</span> 0, <span class="org-string">"num_ctrls must be non-negative"</span>
-    <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(size <span class="org-operator">+</span> num_ctrls)
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, num_qubits: <span class="org-builtin">int</span>, increment: <span class="org-builtin">int</span>,
+                 label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>):
+        <span class="org-doc">"""Create a new Fourier incrementer gate."""</span>
+        <span class="org-builtin">super</span>().__init__(f<span class="org-string">"&#981;inc(</span>{increment}<span class="org-string">)"</span>, num_qubits, [], label<span class="org-operator">=</span>label)
+        <span class="org-keyword">assert</span> 2<span class="org-operator">**</span>num_qubits <span class="org-operator">&gt;</span> increment, \
+            f<span class="org-string">"Increment </span>{increment}<span class="org-string"> is too large for </span>{num_qubits}<span class="org-string"> bits."</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> increment
 
-    <span class="org-keyword">if</span> num_ctrls <span class="org-operator">==</span> 0:
-        <span class="org-keyword">for</span> k <span class="org-keyword">in</span> <span class="org-builtin">range</span>(size):
-            qc.p(2<span class="org-operator">*</span>math.pi<span class="org-operator">*</span>increment<span class="org-operator">*</span>2<span class="org-operator">**</span>(<span class="org-operator">-</span>size<span class="org-operator">+</span>k), k)
-    <span class="org-keyword">else</span>:
-        <span class="org-keyword">for</span> k <span class="org-keyword">in</span> <span class="org-builtin">range</span>(size):
-            qc.append(MCPhaseGate(2<span class="org-operator">*</span>math.pi<span class="org-operator">*</span>increment<span class="org-operator">*</span>2<span class="org-operator">**</span>(<span class="org-operator">-</span>size<span class="org-operator">+</span>k), num_ctrls),
-                      <span class="org-builtin">list</span>(<span class="org-builtin">range</span>(num_ctrls)) <span class="org-operator">+</span> [num_ctrls <span class="org-operator">+</span> k])
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(<span class="org-keyword">self</span>._num_qubits)
 
-    <span class="org-variable-name">prefix</span> <span class="org-operator">=</span> make_control_prefix(num_ctrls)
-    <span class="org-keyword">return</span> qc.to_gate(label<span class="org-operator">=</span>f<span class="org-string">"</span>{prefix}<span class="org-string">&#981;inc(</span>{increment}<span class="org-string">)"</span>)
+        <span class="org-keyword">for</span> k <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-keyword">self</span>._num_qubits):
+            qc.p(2<span class="org-operator">*</span>math.pi<span class="org-operator">*</span><span class="org-keyword">self</span>._increment<span class="org-operator">*</span>2<span class="org-operator">**</span>(<span class="org-operator">-</span><span class="org-keyword">self</span>._num_qubits<span class="org-operator">+</span>k), k)
+
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
 </pre>
 </div>
 
@@ -264,21 +280,28 @@ Fourier transform:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">make_incrementer</span>(size: Integral, increment: Integral) <span class="org-operator">-&gt;</span> Gate:
-    <span class="org-doc">"""Implements |j&gt; -&gt; |a+j&gt; where a is the increment.</span>
+<pre class="src src-python"><span class="org-keyword">class</span> <span class="org-type">IncrementGate</span>(Gate):
+    <span class="org-doc">"""Implements |j&gt; -&gt; |a+j&gt; where a is the increment."""</span>
 
-<span class="org-doc">    The arguments have the same meaning as in 'make_fourier_incrementer'.</span>
-<span class="org-doc">    """</span>
-    <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(size)
-    <span class="org-variable-name">finc</span> <span class="org-operator">=</span> make_fourier_incrementer(size, increment)
-    <span class="org-variable-name">qft</span> <span class="org-operator">=</span> make_qft(size)
-    <span class="org-variable-name">qft_dg</span> <span class="org-operator">=</span> make_qft_dg(size)
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, num_qubits: <span class="org-builtin">int</span>, increment: <span class="org-builtin">int</span>,
+                 label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>):
+        <span class="org-doc">"""Create a new incrementer gate."""</span>
+        <span class="org-builtin">super</span>().__init__(f<span class="org-string">"inc(</span>{increment}<span class="org-string">)"</span>, num_qubits, [], label<span class="org-operator">=</span>label)
+        <span class="org-keyword">assert</span> 2<span class="org-operator">**</span>num_qubits <span class="org-operator">&gt;</span> increment, \
+            f<span class="org-string">"Increment </span>{increment}<span class="org-string"> is too large for </span>{num_qubits}<span class="org-string"> bits."</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> increment
 
-    qc.append(qft, <span class="org-builtin">range</span>(size))
-    qc.append(finc, <span class="org-builtin">range</span>(size))
-    qc.append(qft_dg, <span class="org-builtin">range</span>(size))
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(<span class="org-keyword">self</span>._num_qubits)
+        <span class="org-variable-name">finc</span> <span class="org-operator">=</span> FourierIncrementGate(<span class="org-keyword">self</span>._num_qubits, <span class="org-keyword">self</span>._increment)
+        <span class="org-variable-name">qft</span> <span class="org-operator">=</span> make_qft(<span class="org-keyword">self</span>._num_qubits)
+        <span class="org-variable-name">qft_dg</span> <span class="org-operator">=</span> make_qft_dg(<span class="org-keyword">self</span>._num_qubits)
 
-    <span class="org-keyword">return</span> qc.to_gate(label<span class="org-operator">=</span>f<span class="org-string">"inc(</span>{increment}<span class="org-string">)"</span>)
+        qc.append(qft, <span class="org-builtin">range</span>(<span class="org-keyword">self</span>._num_qubits))
+        qc.append(finc, <span class="org-builtin">range</span>(<span class="org-keyword">self</span>._num_qubits))
+        qc.append(qft_dg, <span class="org-builtin">range</span>(<span class="org-keyword">self</span>._num_qubits))
+
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
 </pre>
 </div>
 
@@ -289,7 +312,7 @@ transform). But it is still nice to have it, for example for testing purposes.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-variable-name">inc</span> <span class="org-operator">=</span> make_incrementer(4, 3)
+<pre class="src src-python"><span class="org-variable-name">inc</span> <span class="org-operator">=</span> IncrementGate(4, 3)
 inc.definition.decompose(<span class="org-string">'&#981;inc(3)'</span>).draw()
 </pre>
 </div>
@@ -355,11 +378,12 @@ everything written to the ancilla.
 
     <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(qreg_ctrl, qreg, qreg_anc)
 
-    <span class="org-variable-name">cc_inc_a</span> <span class="org-operator">=</span> make_fourier_incrementer(increment<span class="org-operator">=</span>increment, size<span class="org-operator">=</span>size, num_ctrls<span class="org-operator">=</span>num_ctrls)
-    <span class="org-variable-name">inc_N</span> <span class="org-operator">=</span> make_fourier_incrementer(increment<span class="org-operator">=</span>modulus, size<span class="org-operator">=</span>size, num_ctrls<span class="org-operator">=</span>0)
-    <span class="org-variable-name">c_inc_N</span> <span class="org-operator">=</span> make_fourier_incrementer(increment<span class="org-operator">=</span>modulus, size<span class="org-operator">=</span>size, num_ctrls<span class="org-operator">=</span>1)
-    <span class="org-variable-name">cc_inc_a_dg</span> <span class="org-operator">=</span> cc_inc_a.definition.inverse().to_gate(label<span class="org-operator">=</span>f<span class="org-string">"</span>{cc_inc_a.label}<span class="org-string">^&#8224;"</span>)
-    <span class="org-variable-name">inc_N_dg</span> <span class="org-operator">=</span> inc_N.definition.inverse().to_gate(label<span class="org-operator">=</span>f<span class="org-string">"</span>{inc_N.label}<span class="org-string">^&#8224;"</span>)
+    <span class="org-variable-name">inc_a</span> <span class="org-operator">=</span> FourierIncrementGate(size, increment)
+    <span class="org-variable-name">cc_inc_a</span> <span class="org-operator">=</span> inc_a <span class="org-keyword">if</span> num_ctrls <span class="org-operator">==</span> 0 <span class="org-keyword">else</span> inc_a.control(num_ctrls)
+    <span class="org-variable-name">inc_N</span> <span class="org-operator">=</span> FourierIncrementGate(size, modulus)
+    <span class="org-variable-name">c_inc_N</span> <span class="org-operator">=</span> FourierIncrementGate(size, modulus).control(1)
+    <span class="org-variable-name">cc_inc_a_dg</span> <span class="org-operator">=</span> cc_inc_a.inverse()
+    <span class="org-variable-name">inc_N_dg</span> <span class="org-operator">=</span> inc_N.inverse()
     <span class="org-variable-name">qft</span> <span class="org-operator">=</span> make_qft(size)
     <span class="org-variable-name">qft_dg</span> <span class="org-operator">=</span> make_qft_dg(size)
 
@@ -381,6 +405,77 @@ everything written to the ancilla.
 
     <span class="org-variable-name">prefix</span> <span class="org-operator">=</span> make_control_prefix(num_ctrls)
     <span class="org-keyword">return</span> qc.to_gate(label<span class="org-operator">=</span>f<span class="org-string">"</span>{prefix}<span class="org-string">&#981;inc(</span>{increment}<span class="org-string">)mod(</span>{modulus}<span class="org-string">)"</span>)
+
+
+<span class="org-keyword">class</span> <span class="org-type">ModularFourierIncrementGate</span>(Gate):
+    <span class="org-doc">"""Implements |&#981;(j)&gt; -&gt; |&#981;(a+j mod N)&gt;."""</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, increment: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>,
+                 label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>):
+        <span class="org-doc">"""Create a new modular Fourier incrementer gate.</span>
+
+<span class="org-doc">        Args:</span>
+<span class="org-doc">            increment: The increment 'a' hardcoded into the circuit.</span>
+<span class="org-doc">            modulus: The modulus 'N' hardcoded into the circuit.</span>
+
+<span class="org-doc">        Note: The last wire is an ancillary qubit which needs to be initialized to |0&gt;.</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">num_qubits</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 2
+        <span class="org-builtin">super</span>().__init__(f<span class="org-string">"&#981;inc(</span>{increment}<span class="org-string">)mod(</span>{modulus}<span class="org-string">)"</span>, num_qubits, [], label<span class="org-operator">=</span>label)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> increment
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_modulus</span> <span class="org-operator">=</span> modulus
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> make_modular_fourier_incrementer(<span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus).definition
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
+
+    <span class="org-keyword">def</span> <span class="org-function-name">control</span>(
+            <span class="org-keyword">self</span>,
+            num_ctrl_qubits: <span class="org-builtin">int</span> <span class="org-operator">=</span> 1,
+            label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+            ctrl_state: Optional[Union[<span class="org-builtin">str</span>, <span class="org-builtin">int</span>]] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+    ):
+        <span class="org-variable-name">gate</span> <span class="org-operator">=</span> MCModularFourierIncrementGate(
+            <span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus, num_ctrl_qubits)
+        gate.<span class="org-variable-name">base_label</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.label
+        <span class="org-keyword">return</span> gate
+
+
+<span class="org-keyword">class</span> <span class="org-type">MCModularFourierIncrementGate</span>(ControlledGate):
+    <span class="org-doc">"""Implements controlled version of |&#981;(j)&gt; -&gt; |&#981;(a+j mod N)&gt;."""</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(
+            <span class="org-keyword">self</span>,
+            increment: <span class="org-builtin">int</span>,
+            modulus: <span class="org-builtin">int</span>,
+            num_ctrl_qubits: <span class="org-builtin">int</span>,
+            ctrl_state: Optional[Union[<span class="org-builtin">str</span>, <span class="org-builtin">int</span>]] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+            label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>):
+        <span class="org-doc">"""Create a new modular Fourier incrementer gate.</span>
+
+<span class="org-doc">        Args:</span>
+<span class="org-doc">            increment: The increment 'a' hardcoded into the circuit.</span>
+<span class="org-doc">            modulus: The modulus 'N' hardcoded into the circuit.</span>
+<span class="org-doc">            num_ctrl_qubits: The number of controls added to the front.</span>
+
+<span class="org-doc">        Note: The last wire is an ancillary qubit which needs to be initialized to |0&gt;.</span>
+<span class="org-doc">        """</span>
+        <span class="org-keyword">assert</span> ctrl_state <span class="org-keyword">is</span> <span class="org-constant">None</span>, <span class="org-string">"sorry ctrl_state not implemented"</span>
+        <span class="org-builtin">super</span>().__init__(
+            <span class="org-string">"mcfinc"</span>,
+            num_ctrl_qubits <span class="org-operator">+</span> modulus_size(modulus) <span class="org-operator">+</span> 2,
+            [],
+            num_ctrl_qubits<span class="org-operator">=</span>num_ctrl_qubits,
+            base_gate<span class="org-operator">=</span>ModularFourierIncrementGate(increment, modulus, label<span class="org-operator">=</span>label),
+            label<span class="org-operator">=</span>label,
+        )
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> increment
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_modulus</span> <span class="org-operator">=</span> modulus
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> make_modular_fourier_incrementer(
+            <span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus, <span class="org-keyword">self</span>.num_ctrl_qubits).definition
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
 </pre>
 </div>
 
@@ -402,29 +497,29 @@ finc_mod.definition.draw(fold<span class="org-operator">=</span>80)
 </pre>
 </div>
 
-<pre class="example" id="org3cda4f0">
-     ┌──────────┐┌────────────┐┌────────┐     ┌──────┐┌────────────┐»
-q_0: ┤0         ├┤0           ├┤0       ├─────┤0     ├┤1           ├»
-     │          ││            ││        │     │      ││            │»
-q_1: ┤1         ├┤1           ├┤1       ├─────┤1     ├┤2           ├»
-     │  ϕinc(3) ││  ϕinc(7)^† ││  QFT^† │     │  QFT ││            │»
-q_2: ┤2         ├┤2           ├┤2       ├─────┤2     ├┤3 c_ϕinc(7) ├»
-     │          ││            ││        │     │      ││            │»
-q_3: ┤3         ├┤3           ├┤3       ├──■──┤3     ├┤4           ├»
-     └──────────┘└────────────┘└────────┘┌─┴─┐└──────┘│            │»
-q_4: ────────────────────────────────────┤ X ├────────┤0           ├»
-                                         └───┘        └────────────┘»
-«     ┌────────────┐┌────────┐     ┌──────┐┌──────────┐
-«q_0: ┤0           ├┤0       ├─────┤0     ├┤0         ├
-«     │            ││        │     │      ││          │
-«q_1: ┤1           ├┤1       ├─────┤1     ├┤1         ├
-«     │  ϕinc(3)^† ││  QFT^† │     │  QFT ││  ϕinc(3) │
-«q_2: ┤2           ├┤2       ├─────┤2     ├┤2         ├
-«     │            ││        │     │      ││          │
-«q_3: ┤3           ├┤3       ├──o──┤3     ├┤3         ├
-«     └────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
-«q_4: ────────────────────────┤ X ├────────────────────
-«                             └───┘
+<pre class="example" id="org532783a">
+     ┌──────────┐┌─────────────┐┌────────┐     ┌──────┐┌──────────┐»
+q_0: ┤0         ├┤0            ├┤0       ├─────┤0     ├┤0         ├»
+     │          ││             ││        │     │      ││          │»
+q_1: ┤1         ├┤1            ├┤1       ├─────┤1     ├┤1         ├»
+     │  Φinc(3) ││  ϕinc(7)_dg ││  QFT^† │     │  QFT ││  Φinc(7) │»
+q_2: ┤2         ├┤2            ├┤2       ├─────┤2     ├┤2         ├»
+     │          ││             ││        │     │      ││          │»
+q_3: ┤3         ├┤3            ├┤3       ├──■──┤3     ├┤3         ├»
+     └──────────┘└─────────────┘└────────┘┌─┴─┐└──────┘└────┬─────┘»
+q_4: ─────────────────────────────────────┤ X ├─────────────■──────»
+                                          └───┘                    »
+«     ┌─────────────┐┌────────┐     ┌──────┐┌──────────┐
+«q_0: ┤0            ├┤0       ├─────┤0     ├┤0         ├
+«     │             ││        │     │      ││          │
+«q_1: ┤1            ├┤1       ├─────┤1     ├┤1         ├
+«     │  ϕinc(3)_dg ││  QFT^† │     │  QFT ││  Φinc(3) │
+«q_2: ┤2            ├┤2       ├─────┤2     ├┤2         ├
+«     │             ││        │     │      ││          │
+«q_3: ┤3            ├┤3       ├──o──┤3     ├┤3         ├
+«     └─────────────┘└────────┘┌─┴─┐└──────┘└──────────┘
+«q_4: ─────────────────────────┤ X ├────────────────────
+«                              └───┘
 </pre>
 
 <p>
@@ -432,40 +527,55 @@ We implement the corresponding operation in real space to have something to test
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">make_modular_incrementer</span>(increment: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> Gate:
-    <span class="org-doc">"""Implements |j&gt; -&gt; |a+j mod N&gt; where a is the increment and N is the modulus.</span>
+<pre class="src src-python"><span class="org-keyword">class</span> <span class="org-type">ModularIncrementGate</span>(Gate):
+    <span class="org-doc">"""Implements |j&gt; -&gt; |a+j mod N&gt;."""</span>
 
-<span class="org-doc">    The arguments have the same meaning as in 'make_modular_fourier_incrementer'.</span>
-<span class="org-doc">    """</span>
-    <span class="org-variable-name">finc_mod</span> <span class="org-operator">=</span> make_modular_fourier_incrementer(increment, modulus)
-    <span class="org-variable-name">qreg_size</span> <span class="org-operator">=</span> finc_mod.num_qubits <span class="org-operator">-</span> 1  <span class="org-comment-delimiter"># </span><span class="org-comment">one ancilla</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, increment: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>,
+                 label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>):
+        <span class="org-doc">"""Create a new modular incrementer gate.</span>
 
-    <span class="org-variable-name">qft</span> <span class="org-operator">=</span> make_qft(qreg_size)
-    <span class="org-variable-name">qft_dg</span> <span class="org-operator">=</span> make_qft_dg(qreg_size)
+<span class="org-doc">        Args:</span>
+<span class="org-doc">            increment: The increment 'a' hardcoded into the circuit.</span>
+<span class="org-doc">            modulus: The modulus 'N' hardcoded into the circuit.</span>
 
-    <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(qreg_size <span class="org-operator">+</span> 1)
+<span class="org-doc">        Note: The last wire is an ancillary qubit which needs to be initialized to |0&gt;.</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">num_qubits</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 2
+        <span class="org-builtin">super</span>().__init__(f<span class="org-string">"inc(</span>{increment}<span class="org-string">)mod(</span>{modulus}<span class="org-string">)"</span>, num_qubits, [], label<span class="org-operator">=</span>label)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> increment
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_modulus</span> <span class="org-operator">=</span> modulus
 
-    qc.append(qft, <span class="org-builtin">range</span>(qreg_size))
-    qc.append(finc_mod, <span class="org-builtin">range</span>(qreg_size <span class="org-operator">+</span> 1))
-    qc.append(qft_dg, <span class="org-builtin">range</span>(qreg_size))
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">mfinc</span> <span class="org-operator">=</span> ModularFourierIncrementGate(<span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus)
 
-    <span class="org-keyword">return</span> qc.to_gate(label<span class="org-operator">=</span>f<span class="org-string">"inc(</span>{increment}<span class="org-string">)mod(</span>{modulus}<span class="org-string">)"</span>)
+        <span class="org-variable-name">qreg_size</span> <span class="org-operator">=</span> mfinc.num_qubits <span class="org-operator">-</span> 1  <span class="org-comment-delimiter"># </span><span class="org-comment">one ancilla</span>
+
+        <span class="org-variable-name">qft</span> <span class="org-operator">=</span> make_qft(qreg_size)
+        <span class="org-variable-name">qft_dg</span> <span class="org-operator">=</span> make_qft_dg(qreg_size)
+
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(qreg_size <span class="org-operator">+</span> 1)
+
+        qc.append(qft, <span class="org-builtin">range</span>(qreg_size))
+        qc.append(mfinc, <span class="org-builtin">range</span>(qreg_size <span class="org-operator">+</span> 1))
+        qc.append(qft_dg, <span class="org-builtin">range</span>(qreg_size))
+
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-variable-name">inc_mod</span> <span class="org-operator">=</span> make_modular_incrementer(3, 7)
-inc_mod.definition.draw()
+<pre class="src src-python"><span class="org-variable-name">gate</span> <span class="org-operator">=</span> ModularIncrementGate(3, 7)
+gate.definition.draw()
 </pre>
 </div>
 
-<pre class="example" id="org7435698">
+<pre class="example" id="org7814b83">
      ┌──────┐┌────────────────┐┌────────┐
 q_0: ┤0     ├┤0               ├┤0       ├
      │      ││                ││        │
 q_1: ┤1     ├┤1               ├┤1       ├
      │  QFT ││                ││  QFT^† │
-q_2: ┤2     ├┤2 ϕinc(3)mod(7) ├┤2       ├
+q_2: ┤2     ├┤2 Φinc(3)mod(7) ├┤2       ├
      │      ││                ││        │
 q_3: ┤3     ├┤3               ├┤3       ├
      └──────┘│                │└────────┘
@@ -495,11 +605,11 @@ incrementation or modular incrementation works:
 
     <span class="org-keyword">if</span> modulus <span class="org-keyword">is</span> <span class="org-constant">None</span>:
         <span class="org-keyword">assert</span> size <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>, <span class="org-string">"Specify 'size'"</span>
+        <span class="org-variable-name">inc</span> <span class="org-operator">=</span> IncrementGate(size, a)
         <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(size)
-        <span class="org-variable-name">inc</span> <span class="org-operator">=</span> make_incrementer(increment<span class="org-operator">=</span>a, size<span class="org-operator">=</span>size)
     <span class="org-keyword">else</span>:
         <span class="org-keyword">assert</span> a <span class="org-operator">&lt;</span> modulus <span class="org-keyword">and</span> b <span class="org-operator">&lt;</span> modulus, <span class="org-string">"a and b must be smaller than modulus"</span>
-        <span class="org-variable-name">inc</span> <span class="org-operator">=</span> make_modular_incrementer(increment<span class="org-operator">=</span>a, modulus<span class="org-operator">=</span>modulus)
+        <span class="org-variable-name">inc</span> <span class="org-operator">=</span> ModularIncrementGate(a, modulus)
         <span class="org-variable-name">size</span> <span class="org-operator">=</span> inc.num_qubits
         <span class="org-variable-name">qc</span> <span class="org-operator">=</span> QuantumCircuit(size)
 
@@ -524,9 +634,9 @@ incrementation or modular incrementation works:
 </div>
 </div>
 
-<div id="outline-container-org87ea279" class="outline-3">
-<h3 id="org87ea279">Multiplication in Fourier Space</h3>
-<div class="outline-text-3" id="text-org87ea279">
+<div id="outline-container-orga768f33" class="outline-3">
+<h3 id="orga768f33">Multiplication in Fourier Space</h3>
+<div class="outline-text-3" id="text-orga768f33">
 <p>
 Next we implement
 </p>
@@ -554,10 +664,12 @@ where \(n\) is the number of bits. The sum on the right can be implemented by a 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">make_VaN</span>(a: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>, num_ctrls: <span class="org-builtin">int</span> <span class="org-operator">=</span> 0) <span class="org-operator">-&gt;</span> Gate:
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">make_VaN</span>(a: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>, num_ctrls: <span class="org-builtin">int</span> <span class="org-operator">=</span> 0, fast_mode<span class="org-operator">=</span><span class="org-constant">True</span>) <span class="org-operator">-&gt;</span> Gate:
     <span class="org-doc">"""Implements |x,b&gt; -&gt; |x,b+ax mod N&gt;.</span>
 
-<span class="org-doc">    Optionally add controls.</span>
+<span class="org-doc">    Args:</span>
+<span class="org-doc">        fast_mode: Usage of ModularFourierIncrementGate slows down everything dramatically,</span>
+<span class="org-doc">            use make_modular_fourier_incrementer directly in case of fast_mode=True.</span>
 <span class="org-doc">    """</span>
     <span class="org-variable-name">int_size</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 1
 
@@ -575,7 +687,12 @@ where \(n\) is the number of bits. The sum on the right can be implemented by a 
 
     <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(int_size <span class="org-operator">-</span> 1):
         <span class="org-variable-name">ai</span> <span class="org-operator">=</span> a <span class="org-operator">*</span> 2<span class="org-operator">**</span>i <span class="org-operator">%</span> modulus
-        <span class="org-variable-name">cfinc</span> <span class="org-operator">=</span> make_modular_fourier_incrementer(ai, modulus, num_ctrls<span class="org-operator">=</span>num_ctrls <span class="org-operator">+</span> 1)
+
+        <span class="org-keyword">if</span> fast_mode:
+            <span class="org-variable-name">cfinc</span> <span class="org-operator">=</span> make_modular_fourier_incrementer(ai, modulus, num_ctrls<span class="org-operator">=</span>num_ctrls <span class="org-operator">+</span> 1)
+        <span class="org-keyword">else</span>:
+            <span class="org-variable-name">cfinc</span> <span class="org-operator">=</span> ModularFourierIncrementGate(ai, modulus).control(num_ctrls <span class="org-operator">+</span> 1)
+
         qc.append(cfinc, <span class="org-builtin">list</span>(qreg_ctrl) <span class="org-operator">+</span> [qreg_x[i]] <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_b) <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_anc))
 
     qc.append(qft_dg, <span class="org-builtin">list</span>(qreg_ctrl) <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_b))
@@ -590,35 +707,35 @@ As an example, here is a circuit which multiplies the input by <code>3</code> mo
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-variable-name">gate</span> <span class="org-operator">=</span> make_VaN(3, 11)
+<pre class="src src-python"><span class="org-variable-name">gate</span> <span class="org-operator">=</span> make_VaN(3, 11, fast_mode<span class="org-operator">=</span><span class="org-constant">False</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">Nicer picture without fast_mode - sorry</span>
 gate.definition.draw()
 </pre>
 </div>
 
-<pre class="example" id="org68e4639">
-              ┌───────────────────┐
- q_0: ────────┤0                  ├─────────────────────────────────────────────────────────────────────────
-              │                   │┌───────────────────┐
- q_1: ────────┤                   ├┤0                  ├────────────────────────────────────────────────────
-              │                   ││                   │┌───────────────────┐
- q_2: ────────┤                   ├┤                   ├┤0                  ├───────────────────────────────
-              │                   ││                   ││                   │┌───────────────────┐
- q_3: ────────┤                   ├┤                   ├┤                   ├┤0                  ├──────────
-              │                   ││                   ││                   ││                   │
- q_4: ────────┤                   ├┤                   ├┤                   ├┤                   ├──────────
-      ┌──────┐│                   ││                   ││                   ││                   │┌────────┐
- q_5: ┤0     ├┤1 c_ϕinc(3)mod(11) ├┤1                  ├┤1                  ├┤1                  ├┤0       ├
-      │      ││                   ││  c_ϕinc(6)mod(11) ││                   ││                   ││        │
- q_6: ┤1     ├┤2                  ├┤2                  ├┤2 c_ϕinc(1)mod(11) ├┤2                  ├┤1       ├
-      │      ││                   ││                   ││                   ││  c_ϕinc(2)mod(11) ││        │
- q_7: ┤2 QFT ├┤3                  ├┤3                  ├┤3                  ├┤3                  ├┤2 QFT^† ├
-      │      ││                   ││                   ││                   ││                   ││        │
- q_8: ┤3     ├┤4                  ├┤4                  ├┤4                  ├┤4                  ├┤3       ├
-      │      ││                   ││                   ││                   ││                   ││        │
- q_9: ┤4     ├┤5                  ├┤5                  ├┤5                  ├┤5                  ├┤4       ├
-      └──────┘│                   ││                   ││                   ││                   │└────────┘
-q_10: ────────┤6                  ├┤6                  ├┤6                  ├┤6                  ├──────────
-              └───────────────────┘└───────────────────┘└───────────────────┘└───────────────────┘
+<pre class="example" id="orga9fd3c8">
+
+ q_0: ─────────────────■────────────────────────────────────────────────────────────────────────────
+                       │
+ q_1: ─────────────────┼──────────────────■─────────────────────────────────────────────────────────
+                       │                  │
+ q_2: ─────────────────┼──────────────────┼──────────────────■──────────────────────────────────────
+                       │                  │                  │
+ q_3: ─────────────────┼──────────────────┼──────────────────┼──────────────────■───────────────────
+                       │                  │                  │                  │
+ q_4: ─────────────────┼──────────────────┼──────────────────┼──────────────────┼───────────────────
+      ┌──────┐┌────────┴────────┐┌────────┴────────┐┌────────┴────────┐┌────────┴────────┐┌────────┐
+ q_5: ┤0     ├┤0                ├┤0                ├┤0                ├┤0                ├┤0       ├
+      │      ││                 ││                 ││                 ││                 ││        │
+ q_6: ┤1     ├┤1                ├┤1                ├┤1                ├┤1                ├┤1       ├
+      │      ││                 ││                 ││                 ││                 ││        │
+ q_7: ┤2 QFT ├┤2                ├┤2                ├┤2                ├┤2                ├┤2 QFT^† ├
+      │      ││  Φinc(3)mod(11) ││  Φinc(6)mod(11) ││  Φinc(1)mod(11) ││  Φinc(2)mod(11) ││        │
+ q_8: ┤3     ├┤3                ├┤3                ├┤3                ├┤3                ├┤3       ├
+      │      ││                 ││                 ││                 ││                 ││        │
+ q_9: ┤4     ├┤4                ├┤4                ├┤4                ├┤4                ├┤4       ├
+      └──────┘│                 ││                 ││                 ││                 │└────────┘
+q_10: ────────┤5                ├┤5                ├┤5                ├┤5                ├──────────
+              └─────────────────┘└─────────────────┘└─────────────────┘└─────────────────┘
 </pre>
 
 <p>
@@ -640,11 +757,11 @@ we need to uncompute garbage, what can be done by \(V(a^{-1},N)^\dagger\).
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">make_UaN</span>(a: <span class="org-builtin">int</span>, modulus: <span class="org-builtin">int</span>, num_ctrls: <span class="org-builtin">int</span> <span class="org-operator">=</span> 0) <span class="org-operator">-&gt;</span> Gate:
     <span class="org-doc">"""Implements |x&gt; -&gt; |ax mod N&gt;."""</span>
-    <span class="org-variable-name">int_size</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 1
+    <span class="org-variable-name">L</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 1
 
     <span class="org-variable-name">qreg_ctrl</span> <span class="org-operator">=</span> QuantumRegister(num_ctrls, <span class="org-string">"c"</span>)
-    <span class="org-variable-name">qreg</span> <span class="org-operator">=</span> QuantumRegister(int_size)
-    <span class="org-variable-name">qreg_anc</span> <span class="org-operator">=</span> AncillaRegister(int_size <span class="org-operator">+</span> 1)
+    <span class="org-variable-name">qreg</span> <span class="org-operator">=</span> QuantumRegister(L, <span class="org-string">"q"</span>)
+    <span class="org-variable-name">qreg_anc</span> <span class="org-operator">=</span> AncillaRegister(L <span class="org-operator">+</span> 1, <span class="org-string">"a"</span>)
 
     <span class="org-variable-name">VaN</span> <span class="org-operator">=</span> make_VaN(a, modulus, num_ctrls)
     <span class="org-variable-name">Va1N</span> <span class="org-operator">=</span> make_VaN(<span class="org-builtin">pow</span>(a, <span class="org-operator">-</span>1, modulus), modulus, num_ctrls)
@@ -660,8 +777,64 @@ we need to uncompute garbage, what can be done by \(V(a^{-1},N)^\dagger\).
 
     qc.append(Va1N_dg, <span class="org-builtin">list</span>(qreg_ctrl) <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg) <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_anc))
 
-    <span class="org-variable-name">prefix</span> <span class="org-operator">=</span> make_control_prefix(num_ctrls)
-    <span class="org-keyword">return</span> qc.to_gate(label<span class="org-operator">=</span>f<span class="org-string">"</span>{prefix}<span class="org-string">(</span>{a}<span class="org-string">x mod </span>{modulus}<span class="org-string">)"</span>)
+    <span class="org-comment-delimiter"># </span><span class="org-comment">FIXME: for some weird reason I *must* convert this to_gate here (and convert it back during</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">usage) to make the transpile step work.</span>
+    <span class="org-keyword">return</span> qc.to_gate()
+
+
+<span class="org-keyword">class</span> <span class="org-type">UaNGate</span>(Gate):
+    <span class="org-doc">"""Implements |x&gt; -&gt; |ax mod N&gt;."""</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(
+            <span class="org-keyword">self</span>, a: <span class="org-builtin">int</span>,
+            modulus: <span class="org-builtin">int</span>,
+            label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+    ):
+        <span class="org-doc">"""Create a new U(a, N) gate."""</span>
+        <span class="org-variable-name">L</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 1
+        <span class="org-variable-name">num_qubits</span> <span class="org-operator">=</span> 2<span class="org-operator">*</span>L <span class="org-operator">+</span> 1
+        <span class="org-builtin">super</span>().__init__(
+            f<span class="org-string">"</span>{a}<span class="org-string">x mod </span>{modulus}<span class="org-string">"</span>,
+            num_qubits,
+            [],
+            label<span class="org-operator">=</span>label,
+        )
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> a
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_modulus</span> <span class="org-operator">=</span> modulus
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> make_UaN(<span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus).definition
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
+
+
+<span class="org-keyword">class</span> <span class="org-type">MCUaNGate</span>(ControlledGate):
+    <span class="org-doc">"""Implements controlled version of |x&gt; -&gt; |ax mod N&gt;."""</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(
+            <span class="org-keyword">self</span>, a: <span class="org-builtin">int</span>,
+            modulus: <span class="org-builtin">int</span>,
+            num_ctrl_qubits: <span class="org-builtin">int</span>,
+            ctrl_state: Optional[Union[<span class="org-builtin">str</span>, <span class="org-builtin">int</span>]] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+            label: Optional[<span class="org-builtin">str</span>] <span class="org-operator">=</span> <span class="org-constant">None</span>,
+    ):
+        <span class="org-doc">"""Create a new CU(a, N) gate."""</span>
+        <span class="org-keyword">assert</span> ctrl_state <span class="org-keyword">is</span> <span class="org-constant">None</span>, <span class="org-string">"sorry ctrl_state not implemented"</span>
+        <span class="org-variable-name">L</span> <span class="org-operator">=</span> modulus_size(modulus) <span class="org-operator">+</span> 1
+        <span class="org-variable-name">num_qubits</span> <span class="org-operator">=</span> 2<span class="org-operator">*</span>L <span class="org-operator">+</span> 1
+        <span class="org-builtin">super</span>().__init__(
+            f<span class="org-string">"mcuan"</span>,
+            num_qubits <span class="org-operator">+</span> num_ctrl_qubits,
+            [],
+            num_ctrl_qubits<span class="org-operator">=</span>num_ctrl_qubits,
+            label<span class="org-operator">=</span>label,
+            base_gate<span class="org-operator">=</span>UaNGate(a, modulus),
+        )
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_increment</span> <span class="org-operator">=</span> a
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_modulus</span> <span class="org-operator">=</span> modulus
+
+    <span class="org-keyword">def</span> <span class="org-function-name">_define</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">qc</span> <span class="org-operator">=</span> make_UaN(<span class="org-keyword">self</span>._increment, <span class="org-keyword">self</span>._modulus, num_ctrls<span class="org-operator">=</span><span class="org-keyword">self</span>.num_ctrl_qubits).definition
+        <span class="org-keyword">self</span>.<span class="org-variable-name">definition</span> <span class="org-operator">=</span> qc
 </pre>
 </div>
 
@@ -670,31 +843,35 @@ This is how looks like for \(a=3\) and modulus \(7\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-variable-name">Ua</span> <span class="org-operator">=</span> make_UaN(3, 7)
+<pre class="src src-python"><span class="org-variable-name">Ua</span> <span class="org-operator">=</span> UaNGate(3, 11)
 Ua.definition.draw()
 </pre>
 </div>
 
-<pre class="example" id="orgb881fe4">
-     ┌─────────────────┐         ┌───────────────────┐
-q_0: ┤0                ├─X───────┤0                  ├
-     │                 │ │       │                   │
-q_1: ┤1                ├─┼──X────┤1                  ├
-     │                 │ │  │    │                   │
-q_2: ┤2                ├─┼──┼──X─┤2                  ├
-     │                 │ │  │  │ │                   │
-q_3: ┤3                ├─┼──┼──┼─┤3                  ├
-     │                 │ │  │  │ │                   │
-q_4: ┤4 (b + 3x mod 7) ├─X──┼──┼─┤4 (b + 5x mod 7)^† ├
-     │                 │    │  │ │                   │
-q_5: ┤5                ├────X──┼─┤5                  ├
-     │                 │       │ │                   │
-q_6: ┤6                ├───────X─┤6                  ├
-     │                 │         │                   │
-q_7: ┤7                ├─────────┤7                  ├
-     │                 │         │                   │
-q_8: ┤8                ├─────────┤8                  ├
-     └─────────────────┘         └───────────────────┘
+<pre class="example" id="orgbfd81b2">
+      ┌───────────────────┐            ┌─────────────────────┐
+ q_0: ┤0                  ├─X──────────┤0                    ├
+      │                   │ │          │                     │
+ q_1: ┤1                  ├─┼──X───────┤1                    ├
+      │                   │ │  │       │                     │
+ q_2: ┤2                  ├─┼──┼──X────┤2                    ├
+      │                   │ │  │  │    │                     │
+ q_3: ┤3                  ├─┼──┼──┼──X─┤3                    ├
+      │                   │ │  │  │  │ │                     │
+ q_4: ┤4                  ├─┼──┼──┼──┼─┤4                    ├
+      │                   │ │  │  │  │ │                     │
+ q_5: ┤5  (b + 3x mod 11) ├─X──┼──┼──┼─┤5  (b + 4x mod 11)^† ├
+      │                   │    │  │  │ │                     │
+ q_6: ┤6                  ├────X──┼──┼─┤6                    ├
+      │                   │       │  │ │                     │
+ q_7: ┤7                  ├───────X──┼─┤7                    ├
+      │                   │          │ │                     │
+ q_8: ┤8                  ├──────────X─┤8                    ├
+      │                   │            │                     │
+ q_9: ┤9                  ├────────────┤9                    ├
+      │                   │            │                     │
+q_10: ┤10                 ├────────────┤10                   ├
+      └───────────────────┘            └─────────────────────┘
 </pre>
 
 <p>
@@ -704,9 +881,9 @@ swap gates are used.
 </div>
 </div>
 
-<div id="outline-container-org0a2807d" class="outline-3">
-<h3 id="org0a2807d">Order Finding</h3>
-<div class="outline-text-3" id="text-org0a2807d">
+<div id="outline-container-orgad3175c" class="outline-3">
+<h3 id="orgad3175c">Order Finding</h3>
+<div class="outline-text-3" id="text-orgad3175c">
 <p>
 In this section I want to fill a (tiny) gap in the algorithm for order finding (section
 5.3.1).
@@ -727,9 +904,9 @@ why this is a non-trivial fact.
 </p>
 </div>
 
-<div id="outline-container-org400be56" class="outline-4">
-<h4 id="org400be56">What is the issue?</h4>
-<div class="outline-text-4" id="text-org400be56">
+<div id="outline-container-orgbe16f65" class="outline-4">
+<h4 id="orgbe16f65">What is the issue?</h4>
+<div class="outline-text-4" id="text-orgbe16f65">
 <p>
 To <i>illustrate</i> the problem assume that \(N\) is very large, say a number which needs
 \(L=100\) bits. Moreover assume that the order \(r\) is very small, say \(r=3\). Assume \(s=1\)
@@ -787,9 +964,9 @@ PASSED
 </div>
 </div>
 
-<div id="outline-container-orgd5543e5" class="outline-4">
-<h4 id="orgd5543e5">A lemma resolving the issue</h4>
-<div class="outline-text-4" id="text-orgd5543e5">
+<div id="outline-container-org26273f4" class="outline-4">
+<h4 id="org26273f4">A lemma resolving the issue</h4>
+<div class="outline-text-4" id="text-org26273f4">
 <p>
 Let us show that the correct convergent \(p_n/q_n\) is indeed the one with maximal \(q_n\)
 which still satisfies \(q_n < N\). First let us show an important Lemma:
@@ -813,7 +990,7 @@ larger than \(N\).
 <p>
 PROOF: That \(s/r\) is a convergent follows from the <a href="continued_fractions.html#6c146ca8-7130-4b91-9e06-983fcbf6143e">sufficient criterion</a> to be a convergent
 together with \(r < N\). Let us write \(s/r=p_n/q_n\) with coprime nominator and denominator. By
-the <a href="continued_fractions.html#orgb2c16e1">error formula</a> for convergents and the <a href="continued_fractions.html#orgd8236da">recursion formula</a> for \(p_n\) and \(q_n\) we have:
+the <a href="continued_fractions.html#orgea36529">error formula</a> for convergents and the <a href="continued_fractions.html#org39e4c5f">recursion formula</a> for \(p_n\) and \(q_n\) we have:
 </p>
 
 <p>
@@ -833,9 +1010,9 @@ bits. This implies that the premise of the lemma is satisfied. This shows the cl
 </div>
 </div>
 
-<div id="outline-container-orge6306be" class="outline-4">
-<h4 id="orge6306be">Implementation</h4>
-<div class="outline-text-4" id="text-orge6306be">
+<div id="outline-container-orgbca2cfc" class="outline-4">
+<h4 id="orgbca2cfc">Implementation</h4>
+<div class="outline-text-4" id="text-orgbca2cfc">
 <p>
 Next we implement phase estimation for order finding, following the book.
 </p>
@@ -866,7 +1043,7 @@ Next we implement phase estimation for order finding, following the book.
     qc.x(qreg_bot[0])
 
     <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(t):
-        <span class="org-variable-name">CUai</span> <span class="org-operator">=</span> make_UaN(<span class="org-builtin">pow</span>(a, 2<span class="org-operator">**</span>i, modulus), modulus, num_ctrls<span class="org-operator">=</span>1)
+        <span class="org-variable-name">CUai</span> <span class="org-operator">=</span> MCUaNGate(<span class="org-builtin">pow</span>(a, 2<span class="org-operator">**</span>i, modulus), modulus, num_ctrl_qubits<span class="org-operator">=</span>1)
         qc.append(CUai, [qreg_top[i]] <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_bot) <span class="org-operator">+</span> <span class="org-builtin">list</span>(qreg_anc))
         <span class="org-keyword">pass</span>
 
@@ -887,136 +1064,97 @@ parameters.
 
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-variable-name">qc</span> <span class="org-operator">=</span> make_order_finding_phase_estimation(3, 7, eps<span class="org-operator">=</span>0.5)
-qc.draw(fold<span class="org-operator">=</span>80)
+qc.draw(fold<span class="org-operator">=</span>90)
 </pre>
 </div>
 
-<pre class="example" id="org89bb3f5">
-     ┌───┐┌───────────────┐                                                   »
-t_0: ┤ H ├┤0              ├───────────────────────────────────────────────────»
-     ├───┤│               │┌───────────────┐                                  »
-t_1: ┤ H ├┤               ├┤0              ├──────────────────────────────────»
-     ├───┤│               ││               │┌───────────────┐                 »
-t_2: ┤ H ├┤               ├┤               ├┤0              ├─────────────────»
-     ├───┤│               ││               ││               │┌───────────────┐»
-t_3: ┤ H ├┤               ├┤               ├┤               ├┤0              ├»
-     ├───┤│               ││               ││               ││               │»
-t_4: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
-     ├───┤│               ││               ││               ││               │»
-t_5: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
-     ├───┤│               ││               ││               ││               │»
-t_6: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
-     ├───┤│               ││               ││               ││               │»
-t_7: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
-     ├───┤│               ││               ││               ││               │»
-t_8: ┤ H ├┤               ├┤               ├┤               ├┤               ├»
-     ├───┤│  c_(3x mod 7) ││               ││               ││               │»
-u_0: ┤ X ├┤1              ├┤1 c_(2x mod 7) ├┤1              ├┤1              ├»
-     └───┘│               ││               ││  c_(4x mod 7) ││               │»
-u_1: ─────┤2              ├┤2              ├┤2              ├┤2 c_(2x mod 7) ├»
-          │               ││               ││               ││               │»
-u_2: ─────┤3              ├┤3              ├┤3              ├┤3              ├»
-          │               ││               ││               ││               │»
-u_3: ─────┤4              ├┤4              ├┤4              ├┤4              ├»
-          │               ││               ││               ││               │»
-a_0: ─────┤5              ├┤5              ├┤5              ├┤5              ├»
-          │               ││               ││               ││               │»
-a_1: ─────┤6              ├┤6              ├┤6              ├┤6              ├»
-          │               ││               ││               ││               │»
-a_2: ─────┤7              ├┤7              ├┤7              ├┤7              ├»
-          │               ││               ││               ││               │»
-a_3: ─────┤8              ├┤8              ├┤8              ├┤8              ├»
-          │               ││               ││               ││               │»
-a_4: ─────┤9              ├┤9              ├┤9              ├┤9              ├»
-          └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
-c: 9/═════════════════════════════════════════════════════════════════════════»
-                                                                              »
-«                                                                         »
-«t_0: ────────────────────────────────────────────────────────────────────»
-«                                                                         »
-«t_1: ────────────────────────────────────────────────────────────────────»
-«                                                                         »
-«t_2: ────────────────────────────────────────────────────────────────────»
-«                                                                         »
-«t_3: ────────────────────────────────────────────────────────────────────»
-«     ┌───────────────┐                                                   »
-«t_4: ┤0              ├───────────────────────────────────────────────────»
-«     │               │┌───────────────┐                                  »
-«t_5: ┤               ├┤0              ├──────────────────────────────────»
-«     │               ││               │┌───────────────┐                 »
-«t_6: ┤               ├┤               ├┤0              ├─────────────────»
-«     │               ││               ││               │┌───────────────┐»
-«t_7: ┤               ├┤               ├┤               ├┤0              ├»
-«     │               ││               ││               ││               │»
-«t_8: ┤               ├┤               ├┤               ├┤               ├»
-«     │               ││               ││               ││               │»
-«u_0: ┤1              ├┤1              ├┤1              ├┤1              ├»
-«     │               ││               ││               ││               │»
-«u_1: ┤2              ├┤2              ├┤2              ├┤2              ├»
-«     │  c_(4x mod 7) ││               ││               ││               │»
-«u_2: ┤3              ├┤3 c_(2x mod 7) ├┤3              ├┤3              ├»
-«     │               ││               ││  c_(4x mod 7) ││               │»
-«u_3: ┤4              ├┤4              ├┤4              ├┤4 c_(2x mod 7) ├»
-«     │               ││               ││               ││               │»
-«a_0: ┤5              ├┤5              ├┤5              ├┤5              ├»
-«     │               ││               ││               ││               │»
-«a_1: ┤6              ├┤6              ├┤6              ├┤6              ├»
-«     │               ││               ││               ││               │»
-«a_2: ┤7              ├┤7              ├┤7              ├┤7              ├»
-«     │               ││               ││               ││               │»
-«a_3: ┤8              ├┤8              ├┤8              ├┤8              ├»
-«     │               ││               ││               ││               │»
-«a_4: ┤9              ├┤9              ├┤9              ├┤9              ├»
-«     └───────────────┘└───────────────┘└───────────────┘└───────────────┘»
-«c: 9/════════════════════════════════════════════════════════════════════»
-«                                                                         »
-«                      ┌────────┐┌─┐
-«t_0: ─────────────────┤0       ├┤M├────────────────────────
-«                      │        │└╥┘┌─┐
-«t_1: ─────────────────┤1       ├─╫─┤M├─────────────────────
-«                      │        │ ║ └╥┘┌─┐
-«t_2: ─────────────────┤2       ├─╫──╫─┤M├──────────────────
-«                      │        │ ║  ║ └╥┘┌─┐
-«t_3: ─────────────────┤3       ├─╫──╫──╫─┤M├───────────────
-«                      │        │ ║  ║  ║ └╥┘┌─┐
-«t_4: ─────────────────┤4 QFT^† ├─╫──╫──╫──╫─┤M├────────────
-«                      │        │ ║  ║  ║  ║ └╥┘┌─┐
-«t_5: ─────────────────┤5       ├─╫──╫──╫──╫──╫─┤M├─────────
-«                      │        │ ║  ║  ║  ║  ║ └╥┘┌─┐
-«t_6: ─────────────────┤6       ├─╫──╫──╫──╫──╫──╫─┤M├──────
-«                      │        │ ║  ║  ║  ║  ║  ║ └╥┘┌─┐
-«t_7: ─────────────────┤7       ├─╫──╫──╫──╫──╫──╫──╫─┤M├───
-«     ┌───────────────┐│        │ ║  ║  ║  ║  ║  ║  ║ └╥┘┌─┐
-«t_8: ┤0              ├┤8       ├─╫──╫──╫──╫──╫──╫──╫──╫─┤M├
-«     │               │└────────┘ ║  ║  ║  ║  ║  ║  ║  ║ └╥┘
-«u_0: ┤1              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«u_1: ┤2              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«u_2: ┤3              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«u_3: ┤4              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │  c_(4x mod 7) │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«a_0: ┤5              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«a_1: ┤6              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«a_2: ┤7              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«a_3: ┤8              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     │               │           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«a_4: ┤9              ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
-«     └───────────────┘           ║  ║  ║  ║  ║  ║  ║  ║  ║
-«c: 9/════════════════════════════╩══╩══╩══╩══╩══╩══╩══╩══╩═
-«                                 0  1  2  3  4  5  6  7  8
+<pre class="example" id="orgaa06b6b">
+     ┌───┐                                                                              »
+t_0: ┤ H ├──────■───────────────────────────────────────────────────────────────────────»
+     ├───┤      │                                                                       »
+t_1: ┤ H ├──────┼────────────■──────────────────────────────────────────────────────────»
+     ├───┤      │            │                                                          »
+t_2: ┤ H ├──────┼────────────┼────────────■─────────────────────────────────────────────»
+     ├───┤      │            │            │                                             »
+t_3: ┤ H ├──────┼────────────┼────────────┼────────────■────────────────────────────────»
+     ├───┤      │            │            │            │                                »
+t_4: ┤ H ├──────┼────────────┼────────────┼────────────┼────────────■───────────────────»
+     ├───┤      │            │            │            │            │                   »
+t_5: ┤ H ├──────┼────────────┼────────────┼────────────┼────────────┼────────────■──────»
+     ├───┤      │            │            │            │            │            │      »
+t_6: ┤ H ├──────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────»
+     ├───┤      │            │            │            │            │            │      »
+t_7: ┤ H ├──────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────»
+     ├───┤      │            │            │            │            │            │      »
+t_8: ┤ H ├──────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────»
+     ├───┤┌─────┴─────┐┌─────┴─────┐┌─────┴─────┐┌─────┴─────┐┌─────┴─────┐┌─────┴─────┐»
+u_0: ┤ X ├┤0          ├┤0          ├┤0          ├┤0          ├┤0          ├┤0          ├»
+     └───┘│           ││           ││           ││           ││           ││           │»
+u_1: ─────┤1          ├┤1          ├┤1          ├┤1          ├┤1          ├┤1          ├»
+          │           ││           ││           ││           ││           ││           │»
+u_2: ─────┤2          ├┤2          ├┤2          ├┤2          ├┤2          ├┤2          ├»
+          │           ││           ││           ││           ││           ││           │»
+u_3: ─────┤3          ├┤3          ├┤3          ├┤3          ├┤3          ├┤3          ├»
+          │           ││           ││           ││           ││           ││           │»
+a_0: ─────┤4 3x mod 7 ├┤4 2x mod 7 ├┤4 4x mod 7 ├┤4 2x mod 7 ├┤4 4x mod 7 ├┤4 2x mod 7 ├»
+          │           ││           ││           ││           ││           ││           │»
+a_1: ─────┤5          ├┤5          ├┤5          ├┤5          ├┤5          ├┤5          ├»
+          │           ││           ││           ││           ││           ││           │»
+a_2: ─────┤6          ├┤6          ├┤6          ├┤6          ├┤6          ├┤6          ├»
+          │           ││           ││           ││           ││           ││           │»
+a_3: ─────┤7          ├┤7          ├┤7          ├┤7          ├┤7          ├┤7          ├»
+          │           ││           ││           ││           ││           ││           │»
+a_4: ─────┤8          ├┤8          ├┤8          ├┤8          ├┤8          ├┤8          ├»
+          └───────────┘└───────────┘└───────────┘└───────────┘└───────────┘└───────────┘»
+c: 9/═══════════════════════════════════════════════════════════════════════════════════»
+                                                                                        »
+«                                            ┌────────┐┌─┐
+«t_0: ───────────────────────────────────────┤0       ├┤M├────────────────────────
+«                                            │        │└╥┘┌─┐
+«t_1: ───────────────────────────────────────┤1       ├─╫─┤M├─────────────────────
+«                                            │        │ ║ └╥┘┌─┐
+«t_2: ───────────────────────────────────────┤2       ├─╫──╫─┤M├──────────────────
+«                                            │        │ ║  ║ └╥┘┌─┐
+«t_3: ───────────────────────────────────────┤3       ├─╫──╫──╫─┤M├───────────────
+«                                            │        │ ║  ║  ║ └╥┘┌─┐
+«t_4: ───────────────────────────────────────┤4 QFT^† ├─╫──╫──╫──╫─┤M├────────────
+«                                            │        │ ║  ║  ║  ║ └╥┘┌─┐
+«t_5: ───────────────────────────────────────┤5       ├─╫──╫──╫──╫──╫─┤M├─────────
+«                                            │        │ ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_6: ──────■────────────────────────────────┤6       ├─╫──╫──╫──╫──╫──╫─┤M├──────
+«           │                                │        │ ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_7: ──────┼────────────■───────────────────┤7       ├─╫──╫──╫──╫──╫──╫──╫─┤M├───
+«           │            │                   │        │ ║  ║  ║  ║  ║  ║  ║ └╥┘┌─┐
+«t_8: ──────┼────────────┼────────────■──────┤8       ├─╫──╫──╫──╫──╫──╫──╫──╫─┤M├
+«     ┌─────┴─────┐┌─────┴─────┐┌─────┴─────┐└────────┘ ║  ║  ║  ║  ║  ║  ║  ║ └╥┘
+«u_0: ┤0          ├┤0          ├┤0          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_1: ┤1          ├┤1          ├┤1          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_2: ┤2          ├┤2          ├┤2          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«u_3: ┤3          ├┤3          ├┤3          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_0: ┤4 4x mod 7 ├┤4 2x mod 7 ├┤4 4x mod 7 ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_1: ┤5          ├┤5          ├┤5          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_2: ┤6          ├┤6          ├┤6          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_3: ┤7          ├┤7          ├┤7          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     │           ││           ││           │           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«a_4: ┤8          ├┤8          ├┤8          ├───────────╫──╫──╫──╫──╫──╫──╫──╫──╫─
+«     └───────────┘└───────────┘└───────────┘           ║  ║  ║  ║  ║  ║  ║  ║  ║
+«c: 9/══════════════════════════════════════════════════╩══╩══╩══╩══╩══╩══╩══╩══╩═
+«                                                       0  1  2  3  4  5  6  7  8
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbdbec95" class="outline-3">
-<h3 id="orgbdbec95">Factoring</h3>
-<div class="outline-text-3" id="text-orgbdbec95">
+<div id="outline-container-org645d003" class="outline-3">
+<h3 id="org645d003">Factoring</h3>
+<div class="outline-text-3" id="text-org645d003">
 <p>
 Recall that the factoring problem is to find a non-trivial factor of a given number
 \(N\). We may assume that the number is not a prime number (as satisfied when our task is to
@@ -1205,13 +1343,13 @@ factor <code>21</code> based on <code>a=19</code> took around 54 core-minutes on
 </div>
 </div>
 
-<div id="outline-container-orgfcde486" class="outline-2">
-<h2 id="orgfcde486"><span class="todo WIP">WIP</span> Exercises</h2>
-<div class="outline-text-2" id="text-orgfcde486">
+<div id="outline-container-orgca97846" class="outline-2">
+<h2 id="orgca97846"><span class="todo WIP">WIP</span> Exercises</h2>
+<div class="outline-text-2" id="text-orgca97846">
 </div>
-<div id="outline-container-org8bd8dd1" class="outline-3">
-<h3 id="org8bd8dd1">Exercise 5.1</h3>
-<div class="outline-text-3" id="text-org8bd8dd1">
+<div id="outline-container-org59450ba" class="outline-3">
+<h3 id="org59450ba">Exercise 5.1</h3>
+<div class="outline-text-3" id="text-org59450ba">
 <p>
 Give a direct proof that the linear transformation defined by Equation (5.2):
 </p>
@@ -1227,9 +1365,9 @@ is unitary.
 </p>
 </div>
 
-<div id="outline-container-orgff6155a" class="outline-4">
-<h4 id="orgff6155a">Proof</h4>
-<div class="outline-text-4" id="text-orgff6155a">
+<div id="outline-container-org4c85acb" class="outline-4">
+<h4 id="org4c85acb">Proof</h4>
+<div class="outline-text-4" id="text-org4c85acb">
 <p>
 An operator is unitary iff it maps one (arbitrarily chosen) orthonormal basis to an orthonormal
 basis. In other words, it suffices to show that
@@ -1262,17 +1400,17 @@ On the other hand, for \(n=m\) the summation over \(k\) in the above equality ch
 </div>
 </div>
 
-<div id="outline-container-orgc669114" class="outline-3">
-<h3 id="orgc669114">Exercise 5.2</h3>
-<div class="outline-text-3" id="text-orgc669114">
+<div id="outline-container-org7bee6a1" class="outline-3">
+<h3 id="org7bee6a1">Exercise 5.2</h3>
+<div class="outline-text-3" id="text-org7bee6a1">
 <p>
 Explicitly compute the Fourier transform of the \(n\) qubit state \(|00\ldots0\rangle\).
 </p>
 </div>
 
-<div id="outline-container-orgbca55af" class="outline-4">
-<h4 id="orgbca55af">Solution</h4>
-<div class="outline-text-4" id="text-orgbca55af">
+<div id="outline-container-orga608d40" class="outline-4">
+<h4 id="orga608d40">Solution</h4>
+<div class="outline-text-4" id="text-orga608d40">
 <p>
 We have
 </p>
@@ -1291,9 +1429,9 @@ usual).
 </div>
 </div>
 
-<div id="outline-container-orgdf1f4db" class="outline-3">
-<h3 id="orgdf1f4db">Exercise 5.3 (Classical fast Fourier transform)</h3>
-<div class="outline-text-3" id="text-orgdf1f4db">
+<div id="outline-container-orgdbe9f4e" class="outline-3">
+<h3 id="orgdbe9f4e">Exercise 5.3 (Classical fast Fourier transform)</h3>
+<div class="outline-text-3" id="text-orgdbe9f4e">
 <p>
 Suppose we wish to perform a Fourier transform of a vector containing \(2^n\) complex numbers on a
 classical computer. Verify that the straightforward method for performing the Fourier transform,
@@ -1303,9 +1441,9 @@ operations. Find a method for reducing this to \(\Theta(n2^n)\) operations, base
 </p>
 </div>
 
-<div id="outline-container-org361cb80" class="outline-4">
-<h4 id="org361cb80">Proof</h4>
-<div class="outline-text-4" id="text-org361cb80">
+<div id="outline-container-orgafd9bed" class="outline-4">
+<h4 id="orgafd9bed">Proof</h4>
+<div class="outline-text-4" id="text-orgafd9bed">
 <p>
 First we consider the standard formula:
 </p>
@@ -1500,17 +1638,17 @@ number of operations. QED.
 </div>
 </div>
 
-<div id="outline-container-org59c5b7b" class="outline-3">
-<h3 id="org59c5b7b">Exercise 5.4</h3>
-<div class="outline-text-3" id="text-org59c5b7b">
+<div id="outline-container-org292763c" class="outline-3">
+<h3 id="org292763c">Exercise 5.4</h3>
+<div class="outline-text-3" id="text-org292763c">
 <p>
 Give a decomposition of the controlled-\(R_k\) gate into single qubit and <code>CNOT</code> gates.
 </p>
 </div>
 
-<div id="outline-container-org1b9dd05" class="outline-4">
-<h4 id="org1b9dd05">Solution</h4>
-<div class="outline-text-4" id="text-org1b9dd05">
+<div id="outline-container-orgd908a8d" class="outline-4">
+<h4 id="orgd908a8d">Solution</h4>
+<div class="outline-text-4" id="text-orgd908a8d">
 <p>
 Let us abbreviat \(\theta_k=2\pi2^{-k}\). Note that \(R_k=e^{\ii\theta_{k+1}}R_z(\theta_k)\). It is easy
 to find a solution based on the ABC-construction from Figure 4.6 and the proof of Corollary 4.2.
@@ -1548,17 +1686,17 @@ follows from this together with \(R_k=R_{k+1}^2\). QED.
 </div>
 </div>
 
-<div id="outline-container-org8b46c8e" class="outline-3">
-<h3 id="org8b46c8e">Exercise 5.5</h3>
-<div class="outline-text-3" id="text-org8b46c8e">
+<div id="outline-container-org32aed51" class="outline-3">
+<h3 id="org32aed51">Exercise 5.5</h3>
+<div class="outline-text-3" id="text-org32aed51">
 <p>
 Give a quantum circuit to perform the inverse quantum Fourier transform.
 </p>
 </div>
 
-<div id="outline-container-orge9fd1b5" class="outline-4">
-<h4 id="orge9fd1b5">Solution</h4>
-<div class="outline-text-4" id="text-orge9fd1b5">
+<div id="outline-container-org98ddf36" class="outline-4">
+<h4 id="org98ddf36">Solution</h4>
+<div class="outline-text-4" id="text-org98ddf36">
 <p>
 The standard way to get the invere of some circuit is to just write down all the gates in revers
 order and conjugate them (replace \(R_k\) by \(R_k^\dagger\) in our case since <code>SWAP</code> and \(H\) are
@@ -1593,9 +1731,9 @@ when deriving the product formula for the <i>inverse</i> Fourier transform:
 </div>
 </div>
 
-<div id="outline-container-org22c9ffc" class="outline-3">
-<h3 id="org22c9ffc">Exercise 5.6 (Approximate quantum Fourier transform)</h3>
-<div class="outline-text-3" id="text-org22c9ffc">
+<div id="outline-container-org98751f4" class="outline-3">
+<h3 id="org98751f4">Exercise 5.6 (Approximate quantum Fourier transform)</h3>
+<div class="outline-text-3" id="text-org98751f4">
 <p>
 The quantum circuit construction of the quantum Fourier transform apparently requires gates of
 exponential precision in the number of qubits used. However, such precision is never required in any
@@ -1608,9 +1746,9 @@ state.
 </p>
 </div>
 
-<div id="outline-container-org657616d" class="outline-4">
-<h4 id="org657616d">Proof</h4>
-<div class="outline-text-4" id="text-org657616d">
+<div id="outline-container-org96e762e" class="outline-4">
+<h4 id="org96e762e">Proof</h4>
+<div class="outline-text-4" id="text-org96e762e">
 <p>
 This is actually a direct consequence of Box 4.1 and the fact that the implementation of the Fourier
 transform has \(m=\Theta(n^2)\) gates. In fact, writing \(U=\prod_{i=1}^mU_i\) as the product of its
@@ -1633,9 +1771,9 @@ The first inequality is the second statement in Box 4.1 (errors of products of u
 </div>
 </div>
 
-<div id="outline-container-org4d9ce55" class="outline-3">
-<h3 id="org4d9ce55">Exercise 5.7</h3>
-<div class="outline-text-3" id="text-org4d9ce55">
+<div id="outline-container-org2e7486b" class="outline-3">
+<h3 id="org2e7486b">Exercise 5.7</h3>
+<div class="outline-text-3" id="text-org2e7486b">
 <p>
 Additional insight into the circuit in Figure 5.2 may be obtained by showing, as you should now do,
 that the effect of the sequence of controlled-\(U\) operations like that in Figure 5.2 is to take the
@@ -1644,9 +1782,9 @@ state \(|j\rangle|u\rangle\) to \(|j\rangle\,U^j|u\rangle\) (Note that this does
 </p>
 </div>
 
-<div id="outline-container-orgba1bb23" class="outline-4">
-<h4 id="orgba1bb23">Proof</h4>
-<div class="outline-text-4" id="text-orgba1bb23">
+<div id="outline-container-orga4b7b67" class="outline-4">
+<h4 id="orga4b7b67">Proof</h4>
+<div class="outline-text-4" id="text-orga4b7b67">
 <p>
 This is more or less obvious but let us go at least a little bit into detail.
 </p>
@@ -1686,9 +1824,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org8c234fb" class="outline-3">
-<h3 id="org8c234fb">Exercise 5.8</h3>
-<div class="outline-text-3" id="text-org8c234fb">
+<div id="outline-container-orgf075a49" class="outline-3">
+<h3 id="orgf075a49">Exercise 5.8</h3>
+<div class="outline-text-3" id="text-orgf075a49">
 <p>
 Suppose the phase estimation algorithm takes the state \(|0\rangle|u\rangle\) to the state
 \(|\tilde{\varphi}_u\rangle|u\rangle\), so that given the input \(|0\rangle(\sum_uc_u|u\rangle)\), the
@@ -1698,9 +1836,9 @@ conclusion of the phase estimation algorithm is at least \(|c_u|^2(1-\varepsilon
 </p>
 </div>
 
-<div id="outline-container-org75bb9c5" class="outline-4">
-<h4 id="org75bb9c5">Proof</h4>
-<div class="outline-text-4" id="text-org75bb9c5">
+<div id="outline-container-org5e4e90a" class="outline-4">
+<h4 id="org5e4e90a">Proof</h4>
+<div class="outline-text-4" id="text-org5e4e90a">
 <p>
 The action of the phase estimation circuit is
 </p>
@@ -1748,9 +1886,9 @@ one of the \(b\) which approximate \(\varphi_v\) by at least \(n\) bits is at le
 </div>
 </div>
 
-<div id="outline-container-orgc394e76" class="outline-3">
-<h3 id="orgc394e76">Exercise 5.9</h3>
-<div class="outline-text-3" id="text-orgc394e76">
+<div id="outline-container-org8dd3ca7" class="outline-3">
+<h3 id="org8dd3ca7">Exercise 5.9</h3>
+<div class="outline-text-3" id="text-org8dd3ca7">
 <p>
 Let \(U\) be a unitary transform with eigenvalues \(\pm1\), which acts on a state \(|\psi\rangle\). Using
 the phase estimation procedure, construct a quantum circuit to collapse \(|\psi\rangle\) into one or
@@ -1759,9 +1897,9 @@ final state is in. Compare your result with Exercise 4.34.
 </p>
 </div>
 
-<div id="outline-container-org72d69f5" class="outline-4">
-<h4 id="org72d69f5">Solution</h4>
-<div class="outline-text-4" id="text-org72d69f5">
+<div id="outline-container-org5a00640" class="outline-4">
+<h4 id="org5a00640">Solution</h4>
+<div class="outline-text-4" id="text-org5a00640">
 <p>
 In this case the two phases are \(\varphi_+=0\) and \(\varphi_-=1/2\). Since these two numbers can be
 expressed <i>exactly</i>, utilizing just a single bit, it is sufficient to take the phase estimation
@@ -1778,17 +1916,17 @@ circuit. We also note that the Hadamard gate is the Fourier transform on a singl
 </div>
 </div>
 
-<div id="outline-container-orgc9e9129" class="outline-3">
-<h3 id="orgc9e9129">Exercise 5.10</h3>
-<div class="outline-text-3" id="text-orgc9e9129">
+<div id="outline-container-orga1d459b" class="outline-3">
+<h3 id="orga1d459b">Exercise 5.10</h3>
+<div class="outline-text-3" id="text-orga1d459b">
 <p>
 Show that the order of \(x=5\) modulo \(N=21\) is \(6\).
 </p>
 </div>
 
-<div id="outline-container-orgd5dd578" class="outline-4">
-<h4 id="orgd5dd578">Proof</h4>
-<div class="outline-text-4" id="text-orgd5dd578">
+<div id="outline-container-orgc414bc6" class="outline-4">
+<h4 id="orgc414bc6">Proof</h4>
+<div class="outline-text-4" id="text-orgc414bc6">
 <p>
 It is probably easiest to just make a table:
 </p>
@@ -1842,17 +1980,17 @@ rest after deviding by \(21\). QED.
 </div>
 </div>
 
-<div id="outline-container-org14e28bd" class="outline-3">
-<h3 id="org14e28bd">Exercise 5.11</h3>
-<div class="outline-text-3" id="text-org14e28bd">
+<div id="outline-container-org59f14c9" class="outline-3">
+<h3 id="org59f14c9">Exercise 5.11</h3>
+<div class="outline-text-3" id="text-org59f14c9">
 <p>
 Show that the order of \(x\) satisfies \(r\leq N\).
 </p>
 </div>
 
-<div id="outline-container-orgccb6231" class="outline-4">
-<h4 id="orgccb6231">Proof</h4>
-<div class="outline-text-4" id="text-orgccb6231">
+<div id="outline-container-orgabcb620" class="outline-4">
+<h4 id="orgabcb620">Proof</h4>
+<div class="outline-text-4" id="text-orgabcb620">
 <p>
 By the pigeonhole principle there are \(a,b\in\{1,2,\ldots,N+1\}\) with \(a < b\) such that
 \(x^a=x^b\). Since \(x\) and \(N\) are coprime we can divide this by \(x^a\) (see also Exercise A4.12) and
@@ -1872,18 +2010,18 @@ Hence \(r\leq b-a\leq N\). QED.
 </div>
 </div>
 
-<div id="outline-container-orgbea7891" class="outline-3">
-<h3 id="orgbea7891">Exercise 5.12</h3>
-<div class="outline-text-3" id="text-orgbea7891">
+<div id="outline-container-org5765c8c" class="outline-3">
+<h3 id="org5765c8c">Exercise 5.12</h3>
+<div class="outline-text-3" id="text-org5765c8c">
 <p>
 Show that \(U\) (see (5.36)) is unitary (Hint: \(x\) is co-prime to \(N\), and therefore has an inverse
 modulo \(N\)).
 </p>
 </div>
 
-<div id="outline-container-orgd6d99bc" class="outline-4">
-<h4 id="orgd6d99bc">Proof</h4>
-<div class="outline-text-4" id="text-orgd6d99bc">
+<div id="outline-container-org5c44e3e" class="outline-4">
+<h4 id="org5c44e3e">Proof</h4>
+<div class="outline-text-4" id="text-org5c44e3e">
 <p>
 Recall that \(U\) only acts non-trivially on basis states \(|i\rangle\) with \(i < N\). In that case
 </p>
@@ -1926,9 +2064,9 @@ since \(\pi\) is a permutation. This implies that \(U\) is unitary. QED.
 </div>
 </div>
 
-<div id="outline-container-orge5fbc61" class="outline-3">
-<h3 id="orge5fbc61">Exercise 5.13</h3>
-<div class="outline-text-3" id="text-orge5fbc61">
+<div id="outline-container-org50b1a1f" class="outline-3">
+<h3 id="org50b1a1f">Exercise 5.13</h3>
+<div class="outline-text-3" id="text-org50b1a1f">
 <p>
 Prove (5.44). (Hint: \(\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}\).) In fact, prove that
 </p>
@@ -1940,9 +2078,9 @@ Prove (5.44). (Hint: \(\sum_{s=0}^{r-1}\exp(-2\pi\ii sk/r)=r\delta_{k0}\).) In f
 </p>
 </div>
 
-<div id="outline-container-org426b118" class="outline-4">
-<h4 id="org426b118">Proof</h4>
-<div class="outline-text-4" id="text-org426b118">
+<div id="outline-container-org9bae0c0" class="outline-4">
+<h4 id="org9bae0c0">Proof</h4>
+<div class="outline-text-4" id="text-org9bae0c0">
 <p>
 Let us write \(x^k\) instead of \(x^k\mod N\) for short.
 </p>
@@ -1963,9 +2101,9 @@ The second equality uses the hint given in the formulation of the exercise. QED.
 </div>
 </div>
 
-<div id="outline-container-orgd0977be" class="outline-3">
-<h3 id="orgd0977be"><span class="todo TODO">TODO</span> Exercise 5.14</h3>
-<div class="outline-text-3" id="text-orgd0977be">
+<div id="outline-container-org5d804df" class="outline-3">
+<h3 id="org5d804df"><span class="todo TODO">TODO</span> Exercise 5.14</h3>
+<div class="outline-text-3" id="text-org5d804df">
 <p>
 The quantum state produced in the order-finding algorithm, before the inverse Fourier transform, is
 </p>
@@ -1994,9 +2132,9 @@ and start the second register in the state \(|0\rangle\). Also show how to const
 </p>
 </div>
 
-<div id="outline-container-org29bac76" class="outline-4">
-<h4 id="org29bac76">Proof</h4>
-<div class="outline-text-4" id="text-org29bac76">
+<div id="outline-container-orgc20a804" class="outline-4">
+<h4 id="orgc20a804">Proof</h4>
+<div class="outline-text-4" id="text-orgc20a804">
 <p>
 The first part of the claim, that we can replace the controlled \(U^j\) by \(V\) and \(|1\rangle\) by
 \(|0\rangle\) without changing the output of the algorithm is obvious. It remains to show the \(V\) can
@@ -2007,9 +2145,9 @@ be implemented by \(O(L^3)\) gates.
 </div>
 </div>
 
-<div id="outline-container-orgcae650b" class="outline-2">
-<h2 id="orgcae650b">References</h2>
-<div class="outline-text-2" id="text-orgcae650b">
+<div id="outline-container-orgd0b2a9a" class="outline-2">
+<h2 id="orgd0b2a9a">References</h2>
+<div class="outline-text-2" id="text-orgd0b2a9a">
 <p>
 Stephane Beauregard (2003). <i>Circuit for Shor's algorithm using 2n+3 qubits</i>.</p>
 
