@@ -28,4 +28,4 @@ pull-latest-simple-css:
 src/%.py: src/%.org
 	emacs --batch --script ./bin/build-site.el --eval "(org-babel-tangle-file \"$<\" \"$@\")"
 $(TANGLED_ZIP): $(TANGLED_PYFILES)
-	tar -czf $@ $(TANGLED_PYFILES)
+	tar -C src/ -czf $@ $(notdir $(TANGLED_PYFILES))
