@@ -372,13 +372,13 @@ reason why this worked is that - at the time of writing this - the =Gate.control
 recursively adds controls to each gate contained in the circuit. But this is not necessary
 for this circuit, instead it suffices to put the control at just the incrementer for $a$.
 
-
+#+name: modular-fourier-incrementer
 #+begin_src python :results replace :tangle no :cache yes
   finc_mod = make_modular_fourier_incrementer(3, 7)
   finc_mod.definition.draw(fold=80)
 #+end_src
 
-#+RESULTS[7aea9d90baf948838e6aee076dc5a30a349672cf]:
+#+RESULTS[7aea9d90baf948838e6aee076dc5a30a349672cf]: modular-fourier-incrementer
 #+begin_example
      ┌──────────┐┌─────────────┐┌────────┐     ┌──────┐┌──────────┐»
 q_0: ┤0         ├┤0            ├┤0       ├─────┤0     ├┤0         ├»
@@ -1557,9 +1557,80 @@ and start the second register in the state $|0\rangle$. Also show how to constru
 $O(L^3)$ gates.
 
 *** Proof
-The first part of the claim, that we can replace the controlled $U^j$ by $V$ and $|1\rangle$ by
-$|0\rangle$ without changing the output of the algorithm is obvious. It remains to show the $V$ can
-be implemented by $O(L^3)$ gates.
+Recall that the "original" algorithm $W$, using controlled $U^j$, acts like this:
+
+$$
+  W \ket{j,k} = \ket{j} U^j \ket{k} = \ket{j, k x^j \mod N} .
+$$
+
+Therefore the first claim directly follows from
+
+$$
+  V\ket{j}\ket{0} = W \ket{j}\ket{1} .
+$$
+
+It remains to show the $V$ can be implemented by $O(L^3)$ gates. We will reduce $V$ to
+$W$. Let $\mathrm{ADDMOD}_N$ be a gate which adds the first register to the second
+register modulo $N$:
+
+$$
+  \mathrm{ADDMOD}_N: \ket{a, b} \mapsto \ket{a, a + b \mod N} .
+$$
+
+Let us briefly argue that this operation needs $O(L)$ gates. The version without the
+modulus - plain =ADD= - needs $O(L)$ gates if implemented as a carry-adder (see
+e.g. Chapter 2 in [cite:@Draper2000]). The basic idea to make this into a modular adder is
+the same as in the [[modular-fourier-incrementer][modular fourier incrementer]]. It is even simpler now since we can drop
+the Fourier transforms, but we have to replace the (unary) fourier incrementer gates by
+(binary) (non-fourier) adders or (unary) incrementers. This construction can essentially
+be found in chapter 2.2 in [cite:@Beauregard2003].
+
+Enough words. This is a circuit implementing $\mathrm{ADDMOD_N}$ (it uses one ancilla):
+
+#+caption: Modular Adder
+#+name: modular-adder-circuit.svg
+#+attr_org: :width 600px
+#+attr_html: :style width: 100%
+[[./images/modular-adder-circuit.svg]]
+
+# Latex code to generate the above circuit (modular-adder-circuit.svg). Added as svg
+# because mathjax has no support for qcircuit.
+#+begin_src latex :exports none :tangle no
+\Qcircuit @C=1em @R=.7em {
+  \lstick{\ket{a}} & \multigate{1}{\mathrm{ADD}} & \qw                           & \qw      & \qw                   & \multigate{1}{\mathrm{ADD}^\dagger} & \qw      & \qw      & \qw      & \multigate{1}{\mathrm{ADD}} & \qw & \rstick{\ket{a}}   \\
+  \lstick{\ket{b}} & \ghost{\mathrm{ADD}}        & \gate{\mathrm{INC}_N^\dagger} & \ctrl{1} & \gate{\mathrm{INC}_N} & \ghost{\mathrm{ADD}^\dagger}        & \gate{X} & \ctrl{1} & \gate{X} & \ghost{\mathrm{ADD}}        & \qw & \rstick{\ket{a+b}} \\
+  \lstick{\ket{0}} & \qw                         & \qw                           & \targ    & \ctrl{-1}             & \qw                                 & \qw      & \targ    & \qw      & \qw                         & \qw & \rstick{\ket{0}}   \\
+}
+#+end_src
+
+Here
+
+$$
+  \mathrm{INC}_N: \ket{a} \mapsto \ket{a + N} .
+$$
+
+and
+
+$$
+  \mathrm{ADD}: \ket{a, b} \mapsto \ket{a, a + b} .
+$$
+
+The control of the two =CX= gates are at the most significant bit of $b$. This bit is
+responsible to detect underflow when subtracting $N$ with $\mathrm{INC}_N^\dagger$. In
+particular we require that the two register holding $a$ and $b$ do not need the most
+significant bit to represent $a$, $b$ and $N$.
+
+Having this we can implement $V$ utilizing one ancilla register initialized to $\ket{1}$
+(same size as the other two registers):
+
+$$
+  \ket{j,k,1} \stackrel{W(1,3)}{\mapsto} \ket{j,1,x^j \mod N}
+  \stackrel{\mathrm{ADDMOD}_N(3,2)}{\mapsto} \ket{j,k+x^j \mod N,x^j \mod N}
+  \stackrel{W(1,3)^\dagger}{\mapsto} \ket{j,k+x^j \mod N,1} .
+$$
+
+The numbers in e.g. $W(1,3)$ say on which registers the gate operates. Since $W$ can be
+implemented with $O(L^3)$ gates the same is true for $V$. QED.
 
 * References
 #+print_bibliography:
