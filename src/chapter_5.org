@@ -21,7 +21,7 @@ Tangled:
   import sympy as sp
   from qiskit import (AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister,
                       transpile)
-  from qiskit.circuit import Gate, ControlledGate
+  from qiskit.circuit import ControlledGate, Gate
   from qiskit.circuit.library import SwapGate
   from qiskit_aer import AerSimulator
   from sympy import I, exp, pi
@@ -33,6 +33,20 @@ Not tangled:
   from fractions import Fraction
   from qiskit.circuit import QuantumCircuit, Gate
 #+end_src
+
+NOTE: In this chapter I implement Shor's Algorithm using Qiskit. It works but it is not
+pretty. Do not expect it to factor anything larger than 15 or 21 (via simulation). I did
+not do any optimizations to reduce the number of qubits or gates required. My goal was to
+closely follow the presentation in the book and stay conceptually simple. For a simulation
+/probably/ the number of qubits is the critical measure.
+
+Also note that I tried to put the sub-circuits into didicated =Gate= and =ControlledGate=
+classes. Mainly to have nice drawings. For example the =ControlledGate= makes sure that
+you clearly see which qubits are the controls. Unfortunately this seem to come with a
+major performance bottleneck for big circuits (I did not investigate this deeper but it
+seems that a lot of stuff is copied around and work is repeated). Therefore sometimes had
+to do strange workarounds making the code less readable - sorry for that. This is my first
+time /really/ using Qiskit so do not expect too much from the code.
 
 ** Code from earlier Chapters
 #+begin_src python
@@ -110,7 +124,7 @@ $$
 
 Therefore having a way to implement $U_a$ for any $a$ already gives us the required
 powers. /This is important/ since implementing the powers of $U_a$ by just repeating the
-circuit for $U_a$ would result in an /exponantially/ deep circuit.
+circuit for $U_a$ would result in an /exponantially/ deep circuit for phase estimation.
 
 To implement $U_a$ we need to be able to perform basic arithmetic. We will implement the
 following operations:
@@ -132,7 +146,7 @@ $\ket{\phi(j)}=\FT\ket{j}$. This circuit implements $\ket{\phi(j)}\mapsto\ket{\p
 for a fixed integer $a$.
 
 #+begin_src python
-  def make_control_prefix(num_ctrls: int):  # TODO: not needed anymore?
+  def make_control_prefix(num_ctrls: int):
       return "" if num_ctrls == 0 else "c"*num_ctrls + "_"
 
 
@@ -177,7 +191,7 @@ Fourier transform:
       def _define(self):
           qc = QuantumCircuit(self._num_qubits)
           finc = FourierIncrementGate(self._num_qubits, self._increment)
-          qft = make_qft(self._num_qubits)  # TODO: use builtin?
+          qft = make_qft(self._num_qubits)
           qft_dg = make_qft_dg(self._num_qubits)
 
           qc.append(qft, range(self._num_qubits))
@@ -275,7 +289,7 @@ everything written to the ancilla.
       qc.append(cc_inc_a, qreg2)
 
       prefix = make_control_prefix(num_ctrls)
-      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")  # TODO
+      return qc.to_gate(label=f"{prefix}ϕinc({increment})mod({modulus})")
 
 
   class ModularFourierIncrementGate(Gate):
@@ -297,7 +311,6 @@ everything written to the ancilla.
           self._modulus = modulus
 
       def _define(self):
-          # TODO
           qc = make_modular_fourier_incrementer(self._increment, self._modulus).definition
           self.definition = qc
 
@@ -346,7 +359,7 @@ everything written to the ancilla.
 
       def _define(self):
           qc = make_modular_fourier_incrementer(
-              self._increment, self._modulus, self.num_ctrl_qubits).definition  # TODO
+              self._increment, self._modulus, self.num_ctrl_qubits).definition
           self.definition = qc
 #+end_src
 
@@ -673,7 +686,7 @@ we need to uncompute garbage, what can be done by $V(a^{-1},N)^\dagger$.
           self._modulus = modulus
 
       def _define(self):
-          qc = make_UaN(self._increment, self._modulus, num_ctrls=self.num_ctrl_qubits).definition  # TODO
+          qc = make_UaN(self._increment, self._modulus, num_ctrls=self.num_ctrl_qubits).definition
           self.definition = qc
 #+end_src
 
