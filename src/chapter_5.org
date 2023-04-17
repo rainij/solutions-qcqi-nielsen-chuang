@@ -787,25 +787,63 @@ which still satisfies $q_n < N$. First let us show an important Lemma:
 
 Let $s < r < N$ be non-negative integers and $\varphi\in[0,1)$ real. Assume
 
+<<phi-sr-bound>>
 $$
-  \abs{\varphi - \frac{s}{r}} < \frac{1}{2 N^2} .
+  \abs{\varphi - \frac{s}{r}} \leq \frac{1}{2 N^2} .
 $$
 
 Then $s/r$ is a convergent of $\varphi$ and the next convergent has a denominator which is
 larger than $N$.
 
-PROOF: That $s/r$ is a convergent follows from the [[file:continued_fractions.org::#6c146ca8-7130-4b91-9e06-983fcbf6143e][sufficient criterion]] to be a convergent
-together with $r < N$. Let us write $s/r=p_n/q_n$ with coprime nominator and denominator. By
-the [[file:continued_fractions.org::x-error][error formula]] for convergents and the [[file:continued_fractions.org::convergent-recursion][recursion formula]] for $p_n$ and $q_n$ we have:
+Once this is established recall that $N$ is an $L$ bit integer and $\varphi$ is precise up
+to $2L+1$ bits. This implies that the premise of the lemma is satisfied and shows the
+claim. It is left to prove the Lemma.
+
+- Remarks ::
+  - Originally I had only the second proof which occured to me naturally while diving (a
+    little bit) into the [[file:continued_fractions.org][theory of continued fractions]]. After a discussion with
+    [[https://github.com/jacobwatkins1][Jacob Watkins]], rooted in [[https://quantumcomputing.stackexchange.com/questions/16666/continued-fractions-with-shors-algorithm-which-convergent][this StackExchange question]] we found out that one can do a
+    very simple elementary proof if the fact that convergents strictly monotonically
+    decrease their distance to the their limit is taken for granted (so it is a black-box
+    proof in a sense 😄). Interestingly the latter can be proved by the methods used in
+    the second proof. For this reason I let the second proof stay here.
+  - The first proof also shows that $s/r$ is not only the last convergent. It is even the
+    last /best approximation/ of $\varphi$ with a denominator smaller than $N$. A /best
+    approximation/ (of some target number) is a rational $p/q$ for which no other
+    rational $p'/q'$ with $q'\leq q$ exists which is at least equally close to the target.
+    This justifies that src_python{Fraction(ϕ).limit_denominator(N)} can be used to find
+    $s/r$ in the phase estimation problem for order finding.
+  - That $s/r$ is a convergent follows from the [[file:continued_fractions.org::#6c146ca8-7130-4b91-9e06-983fcbf6143e][sufficient criterion]] to be a convergent
+    together with $r < N$. For this reason the proofs concentrate on the second part of
+    the theorem.
+
+PROOF 1: We will show that $r/s$ is the only rational number with a denominator smaller
+than $N$ which satisfies the [[phi-sr-bound][above inequality]]. Let $p/q$ be another such number with $q <
+N$. By the triangle inequality we have
 
 $$
-  q_n (q_{n+1} + q_n/z_{n+2}) = q_n (z_{n+1} q_n + q_{n-1}) > 2 N^2 .
+  \abs{\frac{p}{q} - \frac{s}{r}} \leq \frac{1}{N^2} .
+$$
+
+Since $r,q < N$, this implies
+
+$$
+  \abs{pr - sq} \leq \frac{rq}{N^2} < 1.
+$$
+
+Hence $pr=sq$. In other words $p/q=s/r$ (but not necessarily $p=s$ and $q=s$ which is only
+the case under coprimness assumption). Hence $s/r$ is the only rational [[phi-sr-bound][this close]] to
+$\varphi$ with denominator being smaller than $N$. Since each convergent is strictly
+closer to $\varphi$ than the previous one ([[file:continued_fractions.org::#error-estimate-section][see here]]) the claim is proved. QED.
+
+PROOF 2: Let us write $s/r=p_n/q_n$ with coprime nominator and denominator. By the [[file:continued_fractions.org::x-error][error
+formula]] for convergents and the [[file:continued_fractions.org::convergent-recursion][recursion formula]] for $p_n$ and $q_n$ we have:
+
+$$
+  q_n (q_{n+1} + q_n/z_{n+2}) = q_n (z_{n+1} q_n + q_{n-1}) \geq 2 N^2 .
 $$
 
 Since $q_n < N$, $q_n < q_{n+1}$, and $z_i\geq 1$ we deduce $q_{n+1}>N$. QED.
-
-Now recall (again) that $N$ is an $L$ bit integer and $\varphi$ is precise up to $2L+1$
-bits. This implies that the premise of the lemma is satisfied. This shows the claim.
 
 *** Implementation
 Next we implement phase estimation for order finding, following the book.
