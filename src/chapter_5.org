@@ -1589,7 +1589,7 @@ Enough words. This is a circuit implementing $\mathrm{ADDMOD_N}$ (it uses one an
 
 #+caption: Modular Adder
 #+name: modular-adder-circuit.svg
-#+attr_org: :width 600px
+#+attr_org: :width 700px
 #+attr_html: :style width: 100%
 [[./images/modular-adder-circuit.svg]]
 
@@ -1598,7 +1598,7 @@ Enough words. This is a circuit implementing $\mathrm{ADDMOD_N}$ (it uses one an
 #+begin_src latex :exports none :tangle no
 \Qcircuit @C=1em @R=.7em {
   \lstick{\ket{a}} & \multigate{1}{\mathrm{ADD}} & \qw                           & \qw      & \qw                   & \multigate{1}{\mathrm{ADD}^\dagger} & \qw      & \qw      & \qw      & \multigate{1}{\mathrm{ADD}} & \qw & \rstick{\ket{a}}   \\
-  \lstick{\ket{b}} & \ghost{\mathrm{ADD}}        & \gate{\mathrm{INC}_N^\dagger} & \ctrl{1} & \gate{\mathrm{INC}_N} & \ghost{\mathrm{ADD}^\dagger}        & \gate{X} & \ctrl{1} & \gate{X} & \ghost{\mathrm{ADD}}        & \qw & \rstick{\ket{a+b}} \\
+  \lstick{\ket{b}} & \ghost{\mathrm{ADD}}        & \gate{\mathrm{INC}_N^\dagger} & \ctrl{1} & \gate{\mathrm{INC}_N} & \ghost{\mathrm{ADD}^\dagger}        & \gate{X} & \ctrl{1} & \gate{X} & \ghost{\mathrm{ADD}}        & \qw & \rstick{\ket{a+b \mod N}} \\
   \lstick{\ket{0}} & \qw                         & \qw                           & \targ    & \ctrl{-1}             & \qw                                 & \qw      & \targ    & \qw      & \qw                         & \qw & \rstick{\ket{0}}   \\
 }
 #+end_src
