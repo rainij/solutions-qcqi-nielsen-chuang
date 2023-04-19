@@ -989,6 +989,7 @@ cases are easily solved classically. Below I give a very simple solution which i
 far from optimal but which already suffices to show that the corner case is efficiently
 solvable.
 
+#+name: shor-classical-aux-functions
 #+begin_src python
   def is_even(N: int) -> bool:
       return N % 2 == 0
@@ -1018,7 +1019,8 @@ solvable.
       # For each k <= k2 check if there is an x with x**k == N
       for k in range(2, k2 + 1):
           x = 0
-          # This loop attempts to construct the binary representation of x:
+          # This loop constructs the binary representation of the largest x with x**k <= N. Each
+          # iteration finds the next non-zero digit of x.
           while x**k < N:
               i = intlogx(N, 2, offset=x, exponent=k)
               x += 2**i
@@ -1669,36 +1671,188 @@ $$
 
 The numbers in e.g. $W(1,3)$ say on which registers the gate operates. Since $W$ can be
 implemented with $O(L^3)$ gates the same is true for $V$. QED.
-** TODO Exercise 5.15
+** Exercise 5.15
 Show that the least common multiple of positive integers $x$ and $y$ is $xy/\gcd(x,y)$,
 and thus may be computed in $O(L^2)$ operations if $x$ and $y$ are $L$ bit numbers.
 
-** TODO Exercise 5.16
-For all $x\geq2$ prove that $\int_x^{x+1} 1/y^2 dy \geq 2/3 x^2$. Show that
+*** Proof
+The claim that $xy/\gcd(x,y)$ is the least common multiple of $x$ and $y$ can be seen from
+the prime factorization of the two numbers (c.f. [[https://en.wikipedia.org/wiki/Fundamental_theorem_of_arithmetic][fundamental theorem of arithmetic]]). But
+be aware of the fact that operations like the $\gcd$ are a so fundamental concept in
+number theory that they might be involved in a proof of the fundamental theorem of
+arithmetic. Therefore we won't dive deeper into a proof of this statement. From a
+practical standpoint the complexity part of the exercise is more interesting
+anyway. Therefore let us look into that instead.
+
+The schoolbook method for multiplication and division yield algorithms with complexity
+$O(L^2)$ (see [[https://en.wikipedia.org/wiki/Computational_complexity_of_mathematical_operations][wikipedia]]). The interesting part is to show that the $\gcd$ can be
+calculated in quadratic time too.
+
+Recall that the $\gcd$ can be calculated by this recursion formula:
 
 $$
-  \sum_q \frac{1}{q^2} \leq \frac{3}{2} \int_2^\infty \frac{1}{y^2} dy = \frac{3}{4} ,
+  \gcd(a, b) = \begin{cases}
+    \gcd(b, a) & \text{if } b > a, \\
+    a & \text{if } b = 0, \\
+    \gcd(b, a \mod b) & \text{else.} \end{cases}
+$$
+
+If we unroll this recursion to a loop we need to perform the swap of the first case only
+once at the beginning (if at all).
+
+Let us show that the loop takes $O(L)$ iterations (where $L$ is the number of bits we use
+to represent the numbers). Without loss of generality assume $a>b$. Let $n-1$ be the
+number of iterations. More precisely, let $n-2$ count how often we hit the else case (plus
+one for hitting $b=0$ in the last iteration). Define:
+
+$$
+  a_n = a,\quad a_{n-1}=b, \quad a_{i-2} = a_i \mod a_{i-1} \text{ for } i\in \{2,\ldots,n\} .
+$$
+
+By definition of $n$ we have $a_0=0$ and $a_1\geq1$. Moreover
+$a_i\,\geq\,a_{i-1}+a_{i-2}$. Note that if the $\geq$ in the last two sentences were
+replaced by $=$ the sequence would be identical with the Fibonacci numbers. Hence, by
+mathematical induction one can show that the sequence of $a_i$ is bounded from below by
+the Fibonacci numbers. The latter grow exponentially fast and hence $(a_i)$ grows
+exponentially fast as well (which can also be seen directly of course). This implies that
+$n=O(\log(a))=O(L)$ as desired.
+
+Finally let us show that each iterations has complexity $O(L)$, leading to an overall
+complexity of $O(L^2)$ since we just showed that at most $O(L)$ iterations are necessary.
+
+In fact, this follows from the following observations:
+
+1. Comparisons like $a=b$ or $a>b$ have complexity $O(L)$.
+2. Swap $(a,b)\mapsto(b,a)$ has complexity $O(L)$.
+3. $a\mod b$ has complexity $O(L)$.
+
+The first two claims should be known already or at least plausible. The third claim
+follows implicitly from looking at [[modular-adder-circuit.svg][our construction of the modular adder]]. In fact,
+$a\,\mod\,b$ is modular addition without addition (the first of the three registers is not
+used and the =ADD= gates can be removed). QED.
+
+** Exercise 5.16
+For all $x\geq2$ prove that $\int_x^{x+1} 1/y^2 dy \geq 2/3 x^2$. Show that
+
+<<exercise-5.16-eq-1>>
+$$
+  \sum_{q=2}^{\infty} \frac{1}{q^2} \leq \frac{3}{2} \int_2^\infty \frac{1}{y^2} dy = \frac{3}{4} ,
 $$
 
 and thus that (5.58) holds.
 
-** TODO Exercise 5.17
+*** Proof
+An antiderivative of $1/y^2$ is $-1/y$. Hence
+
+$$
+  \int_x^{x+1} 1/y^2 dy = \left. -\frac{1}{y} \right|_{x}^{x+1}
+  = \frac{1}{x^2+x} \geq \frac{2}{3} \cdot \frac{1}{x^2} .
+$$
+
+The factor $2/3$ comes from the fact that
+
+$$
+  \frac{x^2}{x^2 + x} = \frac{1}{1 + 1/x} \geq \frac{2}{3} ,
+$$
+
+for $x\geq2$. Obtaining the [[exercise-5.16-eq-1][final claim]] is just an application of this result with
+$x=q$ using $\int_2^\infty y^{-2} dy = 1/2$. QED.
+
+** Exercise 5.17
 Suppose $N$ is $L$ bits long. The aim of this exercise is to ﬁnd an efficient classical
 algorithm to determine whether $N=a^b$ for some integers $a\geq1$ and $b\geq2$. Show that
-there exists an algorithm which uses $O(L^3)$ operations.
+there exists an algorithm having complexity $O(L^3)$.
 
 Remark: I altered the description a bit since, in my opinion, step two of the original
-formulation makes it really hard to find a /clean/ and /simple/ algorithm (if actually
-implementing it is the goal). I will explain why in the solution below.
+formulation makes it really hard to find a /simple/ algorithm. In fact $\log_2(N)$
+requires in general an arbitrary precision floating point datatype for the return
+value. Similarly the operation $x\mapsto2^x$ takes a float as input. I would like to stay
+in the integer realm - for conceptual simplicity - and hence I removed the solution
+guide.
 
-** TODO Exercise 5.18 (Factoring 91)
+*** Proof for complexity $O(L^4)$
+Let us solve a relaxed version of the exercise and search only for an algorithm with
+complexity $O(L^4)$.
+
+src_python{is_power} already implements a really simple algorithm solving the problem (see
+[[shor-classical-aux-functions][above]]). Let us /roughly/ estimate its complexity to show that it is indeed $O(L^4)$. First
+of all note that $k_2=O(L)$. The =while= loop inside =is_power= iterates at most $O(L/k)$
+times (once for each =1= in the binary representation of =x=) and contains =intlogx= as
+the most heavyweight operation.
+
+=intlogx= in turn contains a =while= loop which is executed $O(L/k)$ times and each loop
+contains an exponentiation as the most heavyweight operation which has complexity
+$O(L^2k^{-2}\log(k))$ assuming quadratic complexity for multiplication (and that our
+multiplication routine makes use of the fact that the numbers have size $O(L/k)$ meaning
+that not all $L$ bits are occupied). To understand the factor $O(\log(k))$ recall that
+a well known algorithm for exponentiation (repeated squaring) works like this:
+
+\begin{align*}
+  a^{1111} &= a\cdot a^{1110} = a\cdot (a^2)^{111} = a\cdot a^2 \cdot (a^2)^{110} \\
+  &= a^3 \cdot (a^2)^{110} = a^3 \cdot (a^4)^{11} = a^3 \cdot a^4 \cdot (a^4)^{10} \\
+  &= a^7 \cdot (a^4)^{10} = a^9 \cdot (a^8)^1 = a^{15} .
+\end{align*}
+
+This example should help to understand the following: To compute $a^k$ with =L=-bit number
+$a$ and =K=-bit exponent $k$ we need $O(K)$ multiplications and $O(L)$ space.
+
+Therefore, each iteration of the =for= loop in =is_power= has complexity
+$O(L^4k^{-3}\log(k))$. Summing this for $k$ in the range $2,\ldots,k_2=O(L)$ leads to an
+overall complexity of $O(L^4)$. QED.
+
+*** Proof for complexity $O(L^3)$
+Let us improve the implementation of =is_power= to loose one factor $L$. Recall that for
+each $k$ we compute the largest integer $x$ such that $x^k\leq N$. This takes
+$O(L^2k^{-2})$ steps since each $1$ in its binary expansion is responsible for $O(L/k)$
+steps and there can be up to $O(L/k)$ ones in the binary expansion. Just to illustrate
+this, if $x=1001101$ the algorithm successively computes:
+
+| step |       x |
+|------+---------|
+|    0 |       0 |
+|    1 | 1000000 |
+|    2 | 1001000 |
+|    3 | 1001100 |
+|    4 | 1001101 |
+
+To obtain e.g. the =1001000= in step two the algorithm looks at each of these numbers
+=1000001=, =1000010=, =1000100=, =1001000=, =1010000=, sees that the last one is too large
+and takes the second to last.
+
+One can do something cleverer. In fact, first search for the /smallest/ power of two $2^i$
+which satisfies $2^{ik} \geq N$ (complexity $(O(L/k))$). Then do a binary search to find
+$x\in\{1,\ldots,2^i\}$ (complexity $O(L/k)$). This saves us one factor $L/k$ as
+desired. QED.
+
+** Exercise 5.18 (Factoring 91)
 Suppose we wish to factor $N=91$. Conﬁrm that steps 1 and 2 are passed. For step 3,
 suppose we choose $x=4$, which is co-prime to $91$. Compute the order $r$ of $x$ with
-respect to $N$, and show that $x^{r/2} \mod 91 = 64 = − 1 \mod 91$, so the algorithm
-succeeds, giving $\gcd(64-1,19)=7$. It is unlikely that this is the most efficient method
+respect to $N$, and show that $x^{r/2} = 64 \neq -1 \mod 91$, so the algorithm
+succeeds, giving $\gcd(64-1,91)=7$. It is unlikely that this is the most efficient method
 you’ve seen for factoring $91$.  Indeed, if all computations had to be carried out on a
 classical computer, this reduction would not result in an efﬁcient factoring algorithm, as
 no efficient method is known for solving the order-ﬁnding problem on a classical computer.
+
+*** Solution
+Clearly $91$ is not even and it is also not hard to verify that it is not a power. Hence
+the order finding subroutine is applied.
+
+#+begin_src python :results replace :tangle no :cache yes
+  assert is_power(91) is None
+  "PASSED"
+#+end_src
+
+#+RESULTS[1178242b478508c3a4e530aef3a15fb9ee10f452]:
+: PASSED
+
+To compute the order of $x=4$ we make a table:
+
+| =i=         | 1 |  2 |  3 |  4 |  5 | 6 |
+|-------------+---+----+----+----+----+---|
+| =x^i mod N= | 4 | 16 | 64 | 74 | 23 | 1 |
+
+Hence the order is $r=6$ and $x^{r/2}=64\mod91$. This gives us $7=\gcd(63,91)$ as a factor
+of $91$. QED.
 
 ** Exercise 5.19
 Show that $N=15$ is the smallest number for which the order-ﬁnding subroutine is applied
