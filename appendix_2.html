@@ -1,0 +1,255 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Appendix 2 - Group Theory</title><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Appendix 2 - Group Theory</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\]
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org6d98f46">Exercises</a>
+<ul>
+<li><a href="#org8500fd6">Exercise A2.11 (Characters)</a></li>
+<li><a href="#org3538c31">Exercise A2.12 (Unitary matrix groups)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6d98f46" class="outline-2">
+<h2 id="org6d98f46">Exercises</h2>
+<div class="outline-text-2" id="text-org6d98f46">
+</div>
+<div id="outline-container-org8500fd6" class="outline-3">
+<h3 id="org8500fd6">Exercise A2.11 (Characters)</h3>
+<div class="outline-text-3" id="text-org8500fd6">
+<p>
+Prove the following properties of characters on a <i>finite</i> (and complex) matrix group:
+</p>
+
+<ol class="org-ol">
+<li>\(\chi(I)=n\),</li>
+<li>\(\abs{\chi(g)}\leq n\),</li>
+<li>\(\abs{\chi(g)} = n \Rightarrow g = e^{i\theta} I\),</li>
+<li>Characters are constant on conjugacy classes,</li>
+<li>\(\chi(g^{-1}) = \chi(g)^*\) (complex conjugate),</li>
+<li>\(\chi(g)\) is an algebraic number.</li>
+</ol>
+</div>
+
+<div id="outline-container-org13b5594" class="outline-4">
+<h4 id="org13b5594">Proof of (1)</h4>
+<div class="outline-text-4" id="text-org13b5594">
+<p>
+This should be clear since the identity matrix has exactly \(n\) ones on the diagonal.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1099f99" class="outline-4">
+<h4 id="org1099f99">Proof of (2)</h4>
+<div class="outline-text-4" id="text-org1099f99">
+<p>
+Recall that the trace is just the sum of all eigenvalues, counted with multiplicity
+(exactly \(n\) numbers). Let \(\lambda\) be one of the eigenvalues and consider a
+corresponding eigenvector \(v\). Then
+</p>
+
+<p>
+\[
+  g^a \ket{v} = \lambda^a \ket{v} .
+\]
+</p>
+
+<p>
+Each element of a finite group has finite order. Hence there is an integer \(r\) such that
+\(g^r=e\) and thus
+</p>
+
+<p>
+<a id="org1155ea3"></a>
+\[ \lambda^r=1 \]
+</p>
+
+<p>
+holds for any eigenvalue. In particular \(|\lambda|=1\). Hence, by the triangle inequality
+we get the claim. QED.
+</p>
+
+<p>
+<b>Remark:</b> The equation <a href="#org1155ea3">above</a> is a very interesting property. It shows that the <a href="https://en.wikipedia.org/wiki/Minimal_polynomial_(linear_algebra)">minimal
+polynomial</a> of an element of a <i>finite</i> matrix group has a very special form. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8c9ddc5" class="outline-4">
+<h4 id="org8c9ddc5">Proof of (3)</h4>
+<div class="outline-text-4" id="text-org8c9ddc5">
+<p>
+This follows from the <a href="#org1155ea3">special form</a> of the minimal polynomial too, together with the fact
+that the triangle inequality is strict iff all summands are colinear.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8be93d0" class="outline-4">
+<h4 id="org8be93d0">Proof of (4)</h4>
+<div class="outline-text-4" id="text-org8be93d0">
+<p>
+We have to show \(\chi(h^{-1}gh)=\chi(g)\). This follows from the cyclicity property of the trace:
+</p>
+
+<p>
+\[
+  \trace{ab} = \sum_{ij} a_{ij} b_{ji} = \sum_{ji} b_{ji} a_{ij} = \trace{ba} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc76002c" class="outline-4">
+<h4 id="orgc76002c">Proof of (5)</h4>
+<div class="outline-text-4" id="text-orgc76002c">
+<p>
+Since we work on vector spaces of <i>complex</i> numbers, the <a href="https://en.wikipedia.org/wiki/Characteristic_polynomial">characteristic polynomial</a> (not
+minimal polynomial this time) can be factored into <i>linear</i> polynomials:
+</p>
+
+<p>
+\[
+  \prod_{i=1}^n (\lambda_i - g) .
+\]
+</p>
+
+<p>
+This assumes that the eigenvalues (including multiplicities are \(\lambda_i\)). Multiplying
+this by \(g^{-n}\) shows that the eigenvalues of \(g^{-1}\) are \(\lambda_i^{-1}\) (including
+multiplicities). Again from the <a href="#org1155ea3">minimal polynomial</a> we get \(\lambda_i^{-1}=\lambda_i^*\)
+which implies the claim. QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf3565a1" class="outline-4">
+<h4 id="orgf3565a1">Proof of (6)</h4>
+<div class="outline-text-4" id="text-orgf3565a1">
+<p>
+Again by the minimal polynomial the character is just a sum of roots of unity. The latter
+are algebraic. According to <a href="https://en.wikipedia.org/wiki/Algebraic_number#Field">wikipedia</a> algebraic numbers form a field (in fact, they are the
+algebraic closure of the rational numbers). Hence sums of algebraic numbers are algebraic
+too. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3538c31" class="outline-3">
+<h3 id="org3538c31">Exercise A2.12 (Unitary matrix groups)</h3>
+<div class="outline-text-3" id="text-org3538c31">
+<p>
+A unitary matrix group is comprised solely of unitary matrices. Show that every finite
+matrix group is equivalent to a unitary matrix group. If a representation of a group
+consists entirely of unitary matrices, we may refer to it as being a <i>unitary
+representation</i>.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd><ul class="org-ul">
+<li>The solution of exercise A2.11 already shows that finite matrix groups are comprised
+of "very special" matrices which are "almost" unitary (in a sense). So it is nice to
+see an example of a non-unitary matrix group (see below).</li>
+</ul></dd>
+</dl>
+</div>
+
+<div id="outline-container-orgd2b8be1" class="outline-4">
+<h4 id="orgd2b8be1">Example for the remark</h4>
+<div class="outline-text-4" id="text-orgd2b8be1">
+<p>
+An example of a non-unitary matrix group is generated by
+</p>
+
+<p>
+\[
+  g = \begin{bmatrix} 1 & a \\ 0 & -1 \end{bmatrix} .
+\]
+</p>
+
+<p>
+Clearly \(\langle g \rangle = \{I, g\}\), since \(g^2=I\). Moreover \(g\) is not unitary for any
+\(a\neq0\). On the other hand \(g\) is diagonalizable (its eigenvalues are \(\pm1\)).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga69c563" class="outline-4">
+<h4 id="orga69c563">Proof</h4>
+<div class="outline-text-4" id="text-orga69c563">
+<p>
+Let us define the positive semi-definite operator
+</p>
+
+<p>
+\[
+  p = \sum_{h\in G} h^\dagger h .
+\]
+</p>
+
+<p>
+This operator is invertible since \(\bra{u}p\ket{u} > 0\) for any non-zero vector \(u\). By
+the functional calculus for hermitian matrices we can uniquely define a positive
+semi-definite operator \(\sqrt{p}\) whose square is \(p\) (if \(p\) is already diagonal just
+take the square roots of each entry and else apply the spectral theorem first to make it
+diagonal). The matrix \(\sqrt{p}\) is invertible too.
+</p>
+
+<p>
+Now define the mapping \(\phi\) as the conjugation with \(\sqrt{p}\):
+</p>
+
+<p>
+\[
+  \phi: g \mapsto \sqrt{p} g \sqrt{p}^{-1}.
+\]
+</p>
+
+<p>
+It is easy to see that this is an isomorphism of \(G\) to some other matrix group
+\(G'\). Moreover this matrix group is unitary since every \(g\in G\) acts as a permutation on
+\(G\) which implies:
+</p>
+
+<p>
+\[
+  \phi(g)^\dagger \phi(g) = \sqrt{p}^{-1} g^\dagger p g \sqrt{p}^{-1}
+  = \sqrt{p}^{-1} \sum_{h\in G} (hg)^\dagger hg \sqrt{p}^{-1}
+  = \sqrt{p}^{-1} p \sqrt{p}^{-1} = I .
+\]
+</p>
+
+<p>
+Since conjugation preserves the trace (exercise A2.11) we are done. QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.90 (<a href="https://orgmode.org">Org</a> mode 9.6.4)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
