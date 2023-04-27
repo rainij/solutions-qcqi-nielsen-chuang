@@ -5,17 +5,281 @@
 #+property: header-args:python :session *appendix-2* :tangle appendix_2.py
 
 #+toc: headlines 2
+* COMMENT TODOs
+- more complete version of Schur's lemma
+- Present the minimal polynomial (FIXME: it is not the /minimal/ polynomial) property
+  conclude that character values are sums of $d$ =r=-th roots of unity.
+- What about character tables?
+- Move the regular representation stuff from A2.17 here.
+- Define the scalar product (and refer to Thm A2.4, A2.5)
+
 * Setup
-- TODOs ::
-  - more complete version of Schur's lemma
-  - Present the minimal polynomial (FIXME: it is not the /minimal/ polynomial) property
-    conclude that character values are sums of $d$ =r=-th roots of unity.
-  - What about character tables?
-  - Move the regular representation stuff from A2.17 here.
-  - Define the scalar product (and refer to Thm A2.4, A2.5)
+For me /Character Theory/ was rather new when I accountered the appendix for the first
+time. I found it hard to learn it from this Appendix so I searched for alternative
+resources. I think Chapters 1 and 2 of [cite:@Fulton2004] constitutes a gentle
+introduction to the topic. I only skimmed over it, so I am not sure, but what I know is
+that this made the topic much clearer to me.
+
+In this section I briefly summarize /how I/ learned the /very basics/ of this nice
+theory. I refer to the exercises when appropriate. It duplicates a lot of things from the
+[cite:@ChuangNielsen2011]. But in my oppinion certain crucial things are missing from the
+book. To make it self contained I decided to repeat certain things.
+
+** Definitions
+Let $(G,\cdot,e)$ be a group. A *matrix representation* of $G$ is a homomorphism of groups
+$\rho:G\to M$ where $M$ is a group of matrices over some complex vector space $V$ (other
+ground fields then the complex numbers are possible but we do not care here). Homomorphism
+just means
+
+$$
+  \forall g,h: \rho(gh) = \rho(g)\rho(h) \; \text{ and } \; \rho(g\inv) = \rho(g)\inv
+  \; \text{ and } \; \rho(e) = I .
+$$
+
+A matrix representation is called *irreducible* if it has no non-trivial invariant
+subspaces $W$; non-trivial meaning $W\notin\{0,V\}$. Invariant means
+$\rho(g)W\,\subseteq\,W$ for all $g$.
+
+A matrix representation is called *indecomposable* if $\rho$ cannot be written as a direct
+sum $\rho_1\oplus\rho_2$ over non-trivial subspaces $V_1\oplus V_2=V$. It is clear that
+indecomposable matrix groups are also irreducible. The reverse direction also holds for
+finite groups. See [cite:@Fulton2004] Proposition 1.5.
+
+Let $\rho$ be a finite-dimensional matrix representation over $\CC$. The *character* of
+$\rho$ is $\chi_\rho:G\to\CC$ given by:
+
+$$
+  \chi_\rho(g) = \trace{\rho(g)} .
+$$
+
+The character is called *irreducible* if $\rho$ is irreducible. The *degree* of the
+character is the dimension of the vector space.
+
+Characters are a special case of the so called *class functions*, these are functions
+$\alpha:G\to\CC$ such that
+
+$$
+  \forall g,h: \; \alpha(h^{-1} g h) = \alpha(g) .
+$$
+
+For characters this holds due to $\trace{AB}=\trace{BA}$.
+
+Basic properties of characters are proved in [[#exercise-a2-11][exercise A2.11]]. The proof shows that for a
+finite group $\chi(g)$ is a sum of $r$​th roots of unity where $r$ is the order of $g$.
+
+Two representations are called *equivalent* if they are isomorphic and the isomorphism
+preserves the corresponding characters.
+
+** Unitary Representations
+:PROPERTIES:
+:CUSTOM_ID: unitary-representations
+:END:
+A matrix group is called /unitary/ if every matrix is unitary. In [[#exercise-a2-12][exercise A2.12]] it is
+shown that every representation of a finite group is equivalent to a unitary
+representation. The proof shows that the transformation is essentially a change of scalar
+product:
+
+$$
+  \rho(g) \mapsto \sqrt{p} \rho(g) \sqrt{p}\inv ,
+$$
+
+where $p$ is some suitably chosen positive definite matrix. The technique to obtain $p$
+via /averaging/ is standard in Character Theory.
+** Constructing new from old representations
+Assuming we have a representation on certain vector spaces $V$, $W$ we can construct new
+ones like in the following listing. Note that sometimes we write $gv$ instead of
+$\rho_V(g)v$ if we are not at risk of ambiguity. Just for this section we briefly allow a
+general ground field $\KK$ instead of $\CC$. I think this aids understanding the
+construction for dual spaces - in my opinion.
+
+Tensor products $V\otimes W$:
+
+$$ g(v\otimes w) := gv \otimes gw . $$
+
+Direct sums $V\oplus W$:
+
+$$ g(v\oplus w) := gv \oplus gw . $$
+
+Homomorphism spaces $\hom(V, W)$:
+
+$$
+  g\phi = g \circ \phi \circ g\inv
+$$
+
+Dual spaces $V^*$:
+
+$$
+  \rho_{V^*}(g) = \rho_V(g\inv)^\dagger .
+$$
+
+The definition for dual spaces is motivated by respecting the natural dual pairing
+
+$$ \langle gv^*, gv \rangle_{V^*,V} = \langle v^*, v \rangle_{V^*,V} . $$
+
+The formula for homomorphisms is motivated by $\hom(V,W)=V^*\otimes W$ and is consistent with
+$V^*=\hom(V,\KK)$. In fact, the action on $\KK$ is trivial (identity) and hence
+
+\begin{align*}
+  \langle v^*, g\inv v\rangle \cdot 1 = \langle (g\inv)^\dagger v^*, v \rangle \\
+  g(\langle v^*, \cdot \rangle w) = \langle gv^*, \cdot \rangle gw = \langle v^*, g\inv(\cdot) \rangle gw
+\end{align*}
+
+Moreover the dual representation behaves well on Hilbert spaces with the natural identification of
+the dual space with the Hilbert space itself: $\rho^*=\rho$ in this case.
+
+** Schur's Lemma
+Let $G$ be a group and $\rho_V$, $\rho_W$ two irreducible representations on non-trivial
+complex vector spaces $V$ and $W$. Let $S:V\to W$ be a =G=-linear map, the latter meaning:
+
+<<G-linearity>>
+$$
+  \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
+$$
+
+Then either
+
+1. $S=0$ or
+2. $S$ is an *isomorphism* of vector spaces.
+
+Moreover, if $\rho_V=\rho_W$ and the vector spaces are finite-dimensional, necessarily
+$S=\alpha I$ for some $\alpha\in\CC$. If $\rho_V\neq\rho_W$ are finite-dimensional and
+$S_1$, $S_2$ are two isomorphisms as above then each of them is a multiple of the other
+one.
+
+- Remarks ::
+  - One could weaken the assumptions by replacing $\rho_V(G)$ and $\rho_W(G)$ by any two matrix
+    groups $G$ and $H$ which have equal cardinality $I$ and replace the above [[G-linearity][relation]] by
+    $g_iS=Sh_i$ for $i\,\in\,I$. The proof below shows this implicitly. In the isomorphism case we
+    see that $H$ and $G$ are in fact /equivalent/.
+  - Some texts denote by $\hom(\rho^V,\rho^W)$ the subset of those homomorphisms between
+    $V$ and $W$ ($\hom(V,W)$) which are G-linear. This makes the class of representations
+    of $G$ into a [[https://en.wikipedia.org/wiki/Category_(mathematics)][category]]. Schur's Lemma essentially says that for irreducible
+    representations $\hom(\rho^V,\rho^W)$ is rather small.
+
+PROOF: Let $N\subseteq V$ and $R\subseteq W$ the kernel (null-space) and image (range) of
+$S$. Clearly those are invariant under the respective representations of $G$. By
+irreducibility we have:
+
+- $N \in \{0, V\}$,
+- $R \in \{0, W\}$.
+
+This leads to four cases two of which are impossible (both zero-space or both full-space) since $V$
+and $W$ are non-trivial. The other two cases are:
+
+- $N=\{0\}$ and $R=W$, meaning $S$ being an isomorphism,
+- $N=V$ and $R=\{0\}$, meaning $S=0$.
+
+This shows the first part. Now consider the second part where (among other things) $V=W$
+is assumed. Since $\CC$ is algebraically closed and the vector spaces are finite
+dimensional $S$ must have an eigenvalue $\alpha$. Clearly $S-\alpha$ satisfies the
+[[G-linearity][G-linearity]] in place of $S$ too. By the first part and since $S-\alpha$ is no isomorphism
+we must have $S=\alpha$.
+
+The final part follows from the second part by considering the G-linear mappings
+composed of G-linear mappings from $V$ to $W$ and back from $W$ to $V$. QED.
+
+** Decomposition of representations
+Let $V$ be a complex representation of a finite group $G$. Then the vector space $V$
+decomposes into irreducible sub-representations
+
+$$
+  V = V^{\oplus a_1}_1 \oplus \ldots \oplus V^{\oplus a_n}_n
+$$
+
+with distinct (irreducible) $V_i$. Moreover the $V_i$ and the $a_i$ are unique. If the
+representation is unitary the decomposition is orthogonal.
+
+- Remarks ::
+  - The statment probably holds on compact groups (use Haar measure in proof).
+  - What is not unique (in general) is the decomposition of the $V_i^{\oplus a_i}$ into $a_i$ copies
+    of $V_i$. In fact, look at the trivial group action of $\langle \mathrm{id}\rangle$ on
+    $\CC^2$. It decomposes into $V_1^{\oplus2}$ where $V_1$ are trivial too, but on $\CC$. The
+    /concrete/ decomposition amounts to a choice of a basis.
+
+I could not find a proof of the /complete/ statement which I could understand. So I give
+my own here.
+
+PROOF: We may assume that the representation is unitary (see [[#unitary-representations][above]]).
+
+If $V$ is not already reducible there must be a non-trivial invariant subspace $U$. Since the
+representation is unitary the orthogonal complement $U^\perp$ is invariant too. Hence we have the
+decomposition
+
+$$
+  V = U \oplus U^{\perp} .
+$$
+
+The existence now follows by induction on the dimension of $V$ and the fact that one-dimensional
+representations are always irreducible. This concludes the existence part of the proof.
+
+For the uniqueness consider another decomposition
+
+$$
+  V = W^{\oplus b_1}_1 \oplus \ldots \oplus W^{\oplus b_m}_m .
+$$
+
+Note that the identity induces an isomorphism
+
+$$
+  V^{\oplus a_1}_1 \oplus \ldots \oplus V^{\oplus a_n}_n
+  \to W^{\oplus b_1}_1 \oplus \ldots \oplus W^{\oplus b_m}_m .
+$$
+
+Let us denote by $\hom_G(V,W)$ the G-linear maps between $V$ and $W$. Note that
+
+$$
+  \hom_G(V, V) = \bigoplus_{i=1}^n \bigoplus_{j=1}^m
+  \hom_G(V_i, W_j)^{\oplus a_i b_j} .
+$$
+
+This holds also for $\hom_G$ replaced by $\hom$. Now suppose that for some $i$ the $V_i$
+is not equivalent to any of the $W_j$. Then this together with Schur's Lemma implies that
+the identity would map $V_i$ to zero - contradiction. By symmetry this implies that $n=m$
+and $V_i=W_{\pi(i)}$ for some permutation $\pi$. Without loss of generality
+$\pi=\mathrm{id}$.
+
+Again by Schur's lemma we thus have:
+
+$$
+  \hom_G(V, V) = \bigoplus_{i=1}^n
+  \hom_G(V_i, W_i)^{\oplus a_i b_i} .
+$$
+
+Hence the identity on $V$ induces a bijection between $V_i^{a_i}$ and $W_i^{b_i}$. Since the
+dimensions of $V_i$ and $W_i$ are the same (by equivalence) this implies $a_i=b_i$. QED.
+
+** Class Functions as a Hilbert Space
+Recall that the class functions are constant on all conjugacy classes
+
+$$
+  \mathrm{Cl}(a) = \{g a g\inv; g\in G \} .
+$$
+
+Hence for a finite group the space of class functions is a $k$ dimensional vector space
+where $k$ is the number of different conjugacy classes (the indicator functions of the
+single conjugacy classes form a basis).
+
+Using the following scalar product, the vector space turns into a Hilbert Space:
+
+$$
+  \langle \alpha, \beta \rangle =
+  \frac{1}{\abs{G}} \sum_{g\in G} \alpha(g)^* \beta(g) .
+$$
+
+It turns out that the irreducible characters are an orthonormal basis of this Hilbert
+Space. This should be shown in [[#exercise-a2-15][exercise A2.15]]. This exercise however bases the proof on a
+more difficult result so it does not really help to understand this nice result. For a
+direct proof have a look into [cite:@Fulton2004], Chapter 2.2. I recommend to read the
+proof, it is really nice.
+
+As a corollary of the above we see that the number of distinct irreducible characters is
+equal to the number of conjugacy classes.
 
 * Exercises
 ** Exercise A2.11 (Characters)
+:PROPERTIES:
+:CUSTOM_ID: exercise-a2-11
+:END:
 Prove the following properties of characters on a /finite/ (and complex) matrix group:
 
 1. $\chi(I)=n$,
@@ -82,6 +346,9 @@ algebraic closure of the rational numbers). Hence sums of algebraic numbers are 
 too. QED.
 
 ** Exercise A2.12 (Unitary matrix groups)
+:PROPERTIES:
+:CUSTOM_ID: exercise-a2-12
+:END:
 A unitary matrix group is comprised solely of unitary matrices. Show that every finite
 matrix group is equivalent to a unitary matrix group. If a representation of a group
 consists entirely of unitary matrices, we may refer to it as being a /unitary
@@ -169,6 +436,9 @@ Prove that if $\rho$ is an irreducible representation of $G$, then $|G|/d_\rho$ 
 integer.
 
 ** TODO Exercise A2.15
+:PROPERTIES:
+:CUSTOM_ID: exercise-a2-15
+:END:
 Using the Fundamental Theorem, prove that characters are orthogonal, that is:
 
 $$
@@ -302,3 +572,6 @@ $$
 
 The first equality follows from exercise A2.11(1), the second from A2.19 and the third
 again from A2.11(1). QED.
+
+* References
+#+print_bibliography:
