@@ -5,6 +5,14 @@
 #+property: header-args:python :session *appendix-2* :tangle appendix_2.py
 
 #+toc: headlines 2
+* Setup
+- TODOs ::
+  - more complete version of Schur's lemma
+  - Present the minimal polynomial (FIXME: it is not the /minimal/ polynomial) property
+    conclude that character values are sums of $d$ =r=-th roots of unity.
+  - What about character tables?
+  - Move the regular representation stuff from A2.17 here.
+  - Define the scalar product (and refer to Thm A2.4, A2.5)
 
 * Exercises
 ** Exercise A2.11 (Characters)
@@ -94,6 +102,17 @@ $$
 Clearly $\langle g \rangle = \{I, g\}$, since $g^2=I$. Moreover $g$ is not unitary for any
 $a\neq0$. On the other hand $g$ is diagonalizable (its eigenvalues are $\pm1$).
 
+On the other hand for $a\neq0$ the following is a generator for a representation of $\ZZ$
+which is /not/ diagonalizable (up to a factor the matrix is already in [[https://en.wikipedia.org/wiki/Jordan_normal_form][Jordan normal
+form]]):
+
+$$
+  g = \begin{bmatrix} 1 & a \\ 0 & 1 \end{bmatrix} .
+$$
+
+Hence a conjugation $g\mapsto hgh\inv$ (as in the proof below) won't make this into a
+unitary group.
+
 *** Proof
 Let us define the positive semi-definite operator
 
@@ -124,3 +143,162 @@ $$
 $$
 
 Since conjugation preserves the trace (exercise A2.11) we are done. QED.
+
+** Exercise A2.13
+Show that every irreducible Abelian matrix group is one dimensional.
+
+*** Proof
+First observe an addition to Schur's Lemma. If (in the notation of the book) $G=H$ and
+$h_i=g_i$ one can actually show that necessarily $S=\alpha I$ for some $\alpha\in\CC$. Let
+us prove this briefly. $S$ must have an eigenvalue $\alpha$. Clearly
+$g_i(S-\alpha)=(S-\alpha)h_i$. Since $S-\alpha$ is singular it must be zero by Schur's
+Lemma - concluding the proof of the addition to Schur's lemma.
+
+Let $s$ by an /arbitrary/ element of the abelian group. Since the group is abelian we have:
+
+$$
+  g s = s g
+$$
+
+for any element $g$. By Schur's Lemma we have $s=\alpha_s I$ for some complex number
+$\alpha_s$. Since $s$ was arbitrary we have that any element is of this form. A group of
+multiples of the identity can clearly only be irreducible if it is one dimensional. QED.
+
+** TODO Exercise A2.14
+Prove that if $\rho$ is an irreducible representation of $G$, then $|G|/d_\rho$ is an
+integer.
+
+** TODO Exercise A2.15
+Using the Fundamental Theorem, prove that characters are orthogonal, that is:
+
+$$
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q = \abs{G} \delta_{pq} \quad \text{and} \quad
+  \sum_{p=1}^r (\chi_i^p)^* \chi_j^p = \frac{\abs{G}}{r_i} \delta_{ij} ,
+$$
+
+where $p$, $q$, and $\delta_{pq}$ have the same meaning as in the theorem, and $\chi_i^p$
+is the value the character of the $p$​th irreducible representation takes on the $i$​th
+conjugacy class of $G$, and $r_i$ is the size of the $i$​th conjugacy class.
+
+** TODO Exercise A2.16
+$S_3$ is the group of permutations of three elements. Suppose we order these as mapping
+=123= to: =123=; =231=; =312=; =213=; =132=, and =321=, respectively. Show that
+
+there exist two one-dimensional irreducible representations of $S_3$, one of which is
+trivial, and the other of which is =1=, =1=, =1=, =-1=, =−1=, =−1=, corresponding in order
+to the six permutations given earlier. Also show that there exists a two-dimensional
+irreducible representation, with the matrices
+
+: TODO matrices here
+
+Verify that the representations are orthogonal.
+
+*** Solution
+
+# TODO
+#+begin_src python
+  arep = [
+      Matrix([[1, 0], [0, 1]]),
+      Matrix([[-1, -sqrt(3)], [sqrt(3), -1]]) / 2,
+      Matrix([[-1, sqrt(3)], [-sqrt(3), -1]]) / 2,
+      Matrix([[-1, 0], [0, 1]]),
+      Matrix([[1, sqrt(3)], [sqrt(3), -1]]) / 2,
+      Matrix([[1, -sqrt(3)], [-sqrt(3), -1]]) / 2
+  ]
+#+end_src
+
+** Exercise A2.17
+Prove that the regular representation is faithful.
+
+*** Proof
+This is more or less obvious. In fact, the regular representation $\rho^R$ can be
+/identified/ with the vector space $R=\CC^{\oplus G}$ made up of the following formal sums:
+
+$$
+  v = \sum_{h \in G} \lambda_h h ,
+$$
+
+where $\lambda_h\in\CC$ and $G$ is considered as a basis (so that the $\lambda_h$ are
+unique). See also the entry for [[https://en.wikipedia.org/wiki/Free_module][free module]] on wikipedia.  With this definition $\rho^R$
+is given by
+
+$$
+  \rho^R(g) v = \sum_{h \in G} \lambda_h (gh) .
+$$
+
+Clearly this is a homomorphism of groups. It is also an isomorphism since
+$\rho^R(g)=\rho^R(e)$ implies $\rho^R(g)e=\rho^R(e)e$ which in turn implies $ge=e$, hence
+$g=e$. QED.
+
+** Exercise A2.18
+Show that the character of the regular representation is zero except on the representation
+of the identity element, for which $\chi^R(I)=\abs{G}$.
+
+*** Proof
+We have
+
+$$
+  \rho^R(g)_{ij} = \begin{cases} 1 & \text{if } g g_i=g_j \\ 0 & \text{else.} \end{cases}
+$$
+
+$g g_i=g_i$ is equivalent to $g=e$. Hence $\rho^R(g)$ has /any/ non-zero entries on
+the diagonal iff $g=e$. QED.
+
+** Exercise A2.19
+Use Theorem A2.5 to show that the regular representation contains $d_{\rho^p}$ instances
+of each irreducible representation $\rho^p$. Thus, if $R$ denotes the regular
+representation, and $\hat{G}$ denotes the set of all inequivalent irreducible
+representations, then
+
+$$
+  \chi_i^R = \sum_{\rho \in \hat{G}} d_\rho \chi_i^\rho .
+$$
+
+*** Proof
+By Theorem A2.4 (the fundamental theorem) the irreducible representations are an
+orthonormal basis of the set of class functions. Hence
+
+$$
+  \chi^R = \sum_{\rho\in\hat{G}} c_\rho \chi^\rho
+$$
+
+for /some/ $c_\rho\in\CC$. Let us calclute the value of the coefficients:
+
+$$
+  c_\rho = \langle \chi^\rho, \chi^R \rangle = \abs{G}\inv \chi^\rho(e)^* \chi^R(e) = d_\rho .
+$$
+
+The second equality follows from exercise A2.18 and the third one from exercise
+A2.11(1). QED.
+
+** Exercise A2.20
+The character of the regular representation is zero except for the conjugacy class
+containing $e$ (which is $\{e\}$), the identity element in $G$ (see exercise A2.18). Show,
+therefore, that
+
+$$
+  \sum_{\rho \in \hat{G}} d_\rho \chi^\rho(g) = \abs{G} \delta_{ge} .
+$$
+
+*** Proof
+We have
+
+$$
+  \sum_{\rho \in \hat{G}} d_\rho \chi^\rho(g)
+  = \chi^R(g) = \abs{G} \delta_{ge} .
+$$
+
+The first equality follows from exercise A2.19. The second one from exercise A2.18. QED.
+
+** Exercise A2.21
+Show that $\sum_{\rho\in\hat{G}}d_\rho^2=\abs{G}$.
+
+*** Proof
+We have
+
+$$
+  \sum_{\rho\in\hat{G}} d_\rho^2 = \sum_{\rho\in\hat{G}} d_\rho \chi^\rho(e) = \chi^R(e) = \abs{G} .
+$$
+
+The first equality follows from exercise A2.11(1), the second from A2.19 and the third
+again from A2.11(1). QED.
