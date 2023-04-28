@@ -28,8 +28,7 @@ book. To make it self contained I decided to repeat certain things.
 ** Definitions
 Let $(G,\cdot,e)$ be a group. A *matrix representation* of $G$ is a homomorphism of groups
 $\rho:G\to M$ where $M$ is a group of matrices over some complex vector space $V$ (other
-ground fields then the complex numbers are possible but we do not care here). Homomorphism
-just means
+ground fields are possible but we do not care here). Homomorphism just means
 
 $$
   \forall g,h: \rho(gh) = \rho(g)\rho(h) \; \text{ and } \; \rho(g\inv) = \rho(g)\inv
@@ -42,8 +41,10 @@ $\rho(g)W\,\subseteq\,W$ for all $g$.
 
 A matrix representation is called *indecomposable* if $\rho$ cannot be written as a direct
 sum $\rho_1\oplus\rho_2$ over non-trivial subspaces $V_1\oplus V_2=V$. It is clear that
-indecomposable matrix groups are also irreducible. The reverse direction also holds for
-finite groups. See [cite:@Fulton2004] Proposition 1.5.
+irreducible matrix groups are also indecomposable. The reverse direction also holds for
+finite groups (see [cite:@Fulton2004] Proposition 1.5). The proof is not very difficult
+once the fact that representations of finite groups are [[#unitary-representations][equivalent to unitary groups]] is
+established.
 
 Let $\rho$ be a finite-dimensional matrix representation over $\CC$. The *character* of
 $\rho$ is $\chi_\rho:G\to\CC$ given by:
@@ -68,7 +69,22 @@ Basic properties of characters are proved in [[#exercise-a2-11][exercise A2.11]]
 finite group $\chi(g)$ is a sum of $r$​th roots of unity where $r$ is the order of $g$.
 
 Two representations are called *equivalent* if they are isomorphic and the isomorphism
-preserves the corresponding characters.
+preserves the corresponding characters. A linear map $S:V\to W\in\hom(V,W)$ is called
+*G-linear* if
+
+<<G-linear>>
+$$
+  \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
+$$
+
+Let us denote by $\hom(\rho^V,\rho^W)$, or $\hom_G(V,W)$ (G-homomorphisms), the subset of
+those homomorphisms between $V$ and $W$ ($\hom(V,W)$) which are G-linear. This makes the
+class of representations of $G$ into a [[https://en.wikipedia.org/wiki/Category_(mathematics)][category]].
+
+Clearly two representations are equivalent iff there exists a G-isomorphism between
+them. [[#schurs-lemma][Schur's Lemma]] will tell us that up to a scalar factor there is at most one non-zero
+G-homomorphisms between two irreducible finite dimensional representations, which is an
+isomorphism if it exists.
 
 ** Unitary Representations
 :PROPERTIES:
@@ -112,22 +128,38 @@ $$
   \rho_{V^*}(g) = \rho_V(g\inv)^\dagger .
 $$
 
-The definition for dual spaces is motivated by respecting the natural dual pairing
+The definition for dual spaces is natural since it is a consequence from the natural
+requirement to preserve the natural [[https://en.wikipedia.org/wiki/Dual_system][dual pairing]]:
 
 $$ \langle gv^*, gv \rangle_{V^*,V} = \langle v^*, v \rangle_{V^*,V} . $$
 
-The formula for homomorphisms is motivated by $\hom(V,W)=V^*\otimes W$ and is consistent with
-$V^*=\hom(V,\KK)$. In fact, the action on $\KK$ is trivial (identity) and hence
+The formula for homomorphisms is motivated by $\hom(V,W)=V^*\otimes W$
 
 \begin{align*}
-  \langle v^*, g\inv v\rangle \cdot 1 = \langle (g\inv)^\dagger v^*, v \rangle \\
-  g(\langle v^*, \cdot \rangle w) = \langle gv^*, \cdot \rangle gw = \langle v^*, g\inv(\cdot) \rangle gw
+  \rho_{V^*\otimes W}(g) \langle v^*, \cdot \rangle w
+    &= \langle \rho_{V^*}(g)v^*, \cdot \rangle \rho_W(g)w \\
+    &= \langle \rho_{V}(g\inv)^\dagger v^*, \cdot \rangle \rho_W(g)w \\
+    &= \langle v^*, \rho_V(g\inv)(\cdot) \rangle \rho_W(g)w \\
+    &= \rho_{\hom(V,W)}(g) \langle v^*, \cdot \rangle w .
 \end{align*}
 
-Moreover the dual representation behaves well on Hilbert spaces with the natural identification of
-the dual space with the Hilbert space itself: $\rho^*=\rho$ in this case.
+and is consistent with $V^*=\hom(V,\KK)$.
+
+\begin{align*}
+  \rho_{\hom(V,\KK)}(g) \langle v^*, \cdot\rangle
+    &= \rho_\KK(g) \langle v^*, \rho_V(g\inv)(\cdot)\rangle \\
+    &= \langle \rho_V(g\inv)^\dagger v^*, \cdot\rangle \\
+    &= \rho_{V^*}(g) \langle v^*, \cdot\rangle .
+\end{align*}
+
+Moreover the dual representation behaves well for unitary representations with the natural
+identification of the dual space with the Hilbert space itself: $\rho^*=\rho$ in this
+case.
 
 ** Schur's Lemma
+:PROPERTIES:
+:CUSTOM_ID: schurs-lemma
+:END:
 Let $G$ be a group and $\rho_V$, $\rho_W$ two irreducible representations on non-trivial
 complex vector spaces $V$ and $W$. Let $S:V\to W$ be a =G=-linear map, the latter meaning:
 
@@ -143,18 +175,17 @@ Then either
 
 Moreover, if $\rho_V=\rho_W$ and the vector spaces are finite-dimensional, necessarily
 $S=\alpha I$ for some $\alpha\in\CC$. If $\rho_V\neq\rho_W$ are finite-dimensional and
-$S_1$, $S_2$ are two isomorphisms as above then each of them is a multiple of the other
-one.
+$S_1$, $S_2$ are two isomorphisms as above then each of them is a scalar multiple of the
+other one.
 
 - Remarks ::
   - One could weaken the assumptions by replacing $\rho_V(G)$ and $\rho_W(G)$ by any two matrix
     groups $G$ and $H$ which have equal cardinality $I$ and replace the above [[G-linearity][relation]] by
     $g_iS=Sh_i$ for $i\,\in\,I$. The proof below shows this implicitly. In the isomorphism case we
     see that $H$ and $G$ are in fact /equivalent/.
-  - Some texts denote by $\hom(\rho^V,\rho^W)$ the subset of those homomorphisms between
-    $V$ and $W$ ($\hom(V,W)$) which are G-linear. This makes the class of representations
-    of $G$ into a [[https://en.wikipedia.org/wiki/Category_(mathematics)][category]]. Schur's Lemma essentially says that for irreducible
-    representations $\hom(\rho^V,\rho^W)$ is rather small.
+  - Schur's Lemma essentially says that for irreducible representations
+    $\hom(\rho^V,\rho^W)$ is zero or one-dimensional. In the latter case the non-zero
+    elements are (G-)isomorphisms.
 
 PROOF: Let $N\subseteq V$ and $R\subseteq W$ the kernel (null-space) and image (range) of
 $S$. Clearly those are invariant under the respective representations of $G$. By
@@ -191,10 +222,10 @@ representation is unitary the decomposition is orthogonal.
 
 - Remarks ::
   - The statment probably holds on compact groups (use Haar measure in proof).
-  - What is not unique (in general) is the decomposition of the $V_i^{\oplus a_i}$ into $a_i$ copies
-    of $V_i$. In fact, look at the trivial group action of $\langle \mathrm{id}\rangle$ on
-    $\CC^2$. It decomposes into $V_1^{\oplus2}$ where $V_1$ are trivial too, but on $\CC$. The
-    /concrete/ decomposition amounts to a choice of a basis.
+  - What is not unique (in general) is the decomposition of the $V_i^{\oplus a_i}$ into
+    $a_i$ copies of $V_i$. In fact, look at the trivial group action of
+    $\langle\,\mathrm{id}\rangle$ on $\CC^2$. The /concrete/ decomposition essentially
+    amounts to a choice of a basis.
 
 I could not find a proof of the /complete/ statement which I could understand. So I give
 my own here.
@@ -232,20 +263,23 @@ $$
   \hom_G(V_i, W_j)^{\oplus a_i b_j} .
 $$
 
-This holds also for $\hom_G$ replaced by $\hom$. Now suppose that for some $i$ the $V_i$
-is not equivalent to any of the $W_j$. Then this together with Schur's Lemma implies that
-the identity would map $V_i$ to zero - contradiction. By symmetry this implies that $n=m$
-and $V_i=W_{\pi(i)}$ for some permutation $\pi$. Without loss of generality
-$\pi=\mathrm{id}$.
+This holds also for $\hom_G$ replaced by $\hom$. In fact, this statement is analogous to
+the fact that linear maps between finite dimensional vector spaces can be represented by
+matrices.
 
-Again by Schur's lemma we thus have:
+Now suppose that for some $i$ the $V_i$ is not equivalent to any of the $W_j$. Then this
+together with Schur's Lemma implies that $\hom(V,V)=0$ - contradiction. By symmetry this
+implies that $n=m$ and $V_i=W_{\pi(i)}$ for some permutation $\pi$. Without loss of
+generality $\pi=\mathrm{id}$.
+
+Again by Schur's lemma we thus have $\hom(V_i,W_j)=0$ for $i\neq j$ and hence:
 
 $$
   \hom_G(V, V) = \bigoplus_{i=1}^n
   \hom_G(V_i, W_i)^{\oplus a_i b_i} .
 $$
 
-Hence the identity on $V$ induces a bijection between $V_i^{a_i}$ and $W_i^{b_i}$. Since the
+Hence the identity on $V$ induces a G-isomorphism between $V_i^{a_i}$ and $W_i^{b_i}$. Since the
 dimensions of $V_i$ and $W_i$ are the same (by equivalence) this implies $a_i=b_i$. QED.
 
 ** Class Functions as a Hilbert Space
@@ -270,7 +304,26 @@ It turns out that the irreducible characters are an orthonormal basis of this Hi
 Space. This should be shown in [[#exercise-a2-15][exercise A2.15]]. This exercise however bases the proof on a
 more difficult result so it does not really help to understand this nice result. For a
 direct proof have a look into [cite:@Fulton2004], Chapter 2.2. I recommend to read the
-proof, it is really nice.
+proof, it is really nice. You can also try to find it on your own based on the following
+hints:
+
+- The map
+
+  $$
+    p = \frac{1}{\abs{G}} \sum_{g\in G} g
+  $$
+
+  is a projection from $V$ to $V^G:=\{v\in V; \forall g: gv=v\}$.
+- Hence
+
+  $$
+    \dim V^G = \chi_V(p) = \frac{1}{\abs{G}} \sum_{g\in G} \chi_V(g) .
+  $$
+- We have $\hom_G(V,W)=\hom(V,W)^G$.
+- If $V$ and $W$ are irreducible by Schur's Lemma we have that $\dim(\hom_G(V,W))$ is
+  either $1$ or $0$ depending on whether $V$ and $W$ are isomorphic or not.
+- Finally use $\chi_{\hom(V,W)}(g)=\chi_{V^*}(g)\otimes\chi_W(g)=\chi_{V}(g)^*\otimes\chi_W(g)$ to
+  deduce the claim.
 
 As a corollary of the above we see that the number of distinct irreducible characters is
 equal to the number of conjugacy classes.
