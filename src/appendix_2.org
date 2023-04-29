@@ -25,6 +25,14 @@ theory. I refer to the exercises when appropriate. It duplicates a lot of things
 [cite:@ChuangNielsen2011]. But in my oppinion certain crucial things are missing from the
 book. To make it self contained I decided to repeat certain things.
 
+** Python Libraries
+#+begin_src python
+  from sympy import Matrix, sqrt, PermutationMatrix, det, eye
+  from sympy.combinatorics import Permutation
+
+  from chapter_2 import trace
+#+end_src
+
 ** Definitions
 Let $(G,\cdot,e)$ be a group. A *matrix representation* of $G$ is a homomorphism of groups
 $\rho:G\to M$ where $M$ is a group of matrices over some complex vector space $V$ (other
@@ -212,6 +220,9 @@ The final part follows from the second part by considering the G-linear mappings
 composed of G-linear mappings from $V$ to $W$ and back from $W$ to $V$. QED.
 
 ** Decomposition of representations
+:PROPERTIES:
+:CUSTOM_ID: decomposition-of-representations
+:END:
 Let $V$ be a complex representation of a finite group $G$. Then the vector space $V$
 decomposes into irreducible sub-representations
 
@@ -332,6 +343,18 @@ hints:
 
 As a corollary of the above we see that the number of distinct irreducible characters is
 equal to the number of conjugacy classes.
+
+With the notation of [[#decomposition-of-representations][decomposition of representations]] we see that a general character
+decomposes like this into irreducible characters:
+
+<<decomposition-of-characters>>
+$$
+  \chi_V = \sum_{i=1}^n a_n \chi_{V_i}
+$$
+
+<<irreducible-chars-norm-one>>
+In particular we deduce that a character is irreducible iff its norm is $1$ (all other
+characters have a larger norm).
 
 * Exercises
 ** Exercise A2.11 (Characters)
@@ -484,11 +507,11 @@ multiples of the identity can clearly only be irreducible if it is one dimension
 Prove that if $\rho$ is an irreducible representation of $G$, then $|G|/d_\rho$ is an
 integer.
 
-** TODO Exercise A2.15
+** Exercise A2.15
 :PROPERTIES:
 :CUSTOM_ID: exercise-a2-15
 :END:
-Using the Fundamental Theorem, prove that characters are orthogonal, that is:
+Using the Fundamental Theorem, prove that irreducible characters are orthogonal, that is:
 
 $$
   \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q = \abs{G} \delta_{pq} \quad \text{and} \quad
@@ -499,7 +522,43 @@ where $p$, $q$, and $\delta_{pq}$ have the same meaning as in the theorem, and $
 is the value the character of the $p$​th irreducible representation takes on the $i$​th
 conjugacy class of $G$, and $r_i$ is the size of the $i$​th conjugacy class.
 
-** TODO Exercise A2.16
+*** Proof
+Consider the first equality. We have
+
+$$
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q
+  = \sum_{g\in G} \chi^p(g)^* \chi^q(g) .
+$$
+
+Moreover $\chi^p(g)^*=\chi^p(g\inv)$ by [[#exercise-a2-11][exercise A2.11(5)]]. Hence
+
+$$
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q
+  = \sum_g \sum_{ij} \rho^p(g)\inv_{ii} \rho^q(g)_{jj} .
+$$
+
+By the fundamental theorem this is zero (as desired) if $p\neq q$. So let us assume $p=q$
+in the following:
+
+$$
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^p
+  = \sum_{ij} \sum_g \rho^p(g)\inv_{ii} \rho^p(g)_{jj}
+  = \sum_{ij} \abs{G} d_{\rho^p}\inv \delta_{ij} = \abs{G} .
+$$
+
+This proves the first formula. The second formula actually follows automatically from the
+first one as we will see now. Consider the square matrix $U\in\CC^{r\times r}$ given by:
+
+$$
+  U_{ip} = \chi_i^p \cdot \sqrt{\frac{r_i}{\abs{G}}} .
+$$
+
+Observe that the two statemtents from the exercise are equivalent to the assertion
+that $U$ has orthonormal columns or rows respectively (with respect to the standard scalar
+product on $\CC^r$). It is well known that either of these is equivalent to $U$ being
+unitary. Hence if one of them holds (as we just proved) the other one holds too. QED.
+
+** Exercise A2.16
 $S_3$ is the group of permutations of three elements. Suppose we order these as mapping
 =123= to: =123=; =231=; =312=; =213=; =132=, and =321=, respectively. Show that
 
@@ -508,22 +567,195 @@ trivial, and the other of which is =1=, =1=, =1=, =-1=, =−1=, =−1=, correspo
 to the six permutations given earlier. Also show that there exists a two-dimensional
 irreducible representation, with the matrices
 
-: TODO matrices here
+# latex created by code block create-latex-exercise-a2-16:
+$$
+\left[\begin{matrix}1 & 0\\0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}- \frac{1}{2} & - \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}- \frac{1}{2} & \frac{\sqrt{3}}{2}\\- \frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}-1 & 0\\0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}\frac{1}{2} & - \frac{\sqrt{3}}{2}\\- \frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}\frac{1}{2} & \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right]
+$$
 
 Verify that the representations are orthogonal.
 
-*** Solution
+- Remark ::
+  The original statement had a tiny error. The last two matrices were not in the right
+  order if we want a correspondence to the six permutations as ordered in the second
+  sentence.
 
-# TODO
+*** Solution
+It is convenient to work with =sympy=. First let us define the group $S_3$ and its
+representation $\rho_{\mathrm{perm}}$ as permutation matrices.
+
 #+begin_src python
-  arep = [
+  group_s3 = [[0, 1, 2], [1, 2, 0], [2, 0, 1], [1, 0, 2], [0, 2, 1], [2, 1, 0]]
+  group_s3 = [Permutation(g) for g in group_s3]
+
+  s3_perm = [PermutationMatrix(g).as_explicit() for g in group_s3]
+#+end_src
+
+# essentially created by code block create-latex-exercise-a2-16:
+$$
+\left[\begin{matrix}1 & 0 & 0\\0 & 1 & 0\\0 & 0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}0 & 1 & 0\\0 & 0 & 1\\1 & 0 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 0 & 1\\1 & 0 & 0\\0 & 1 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 1 & 0\\1 & 0 & 0\\0 & 0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}1 & 0 & 0\\0 & 0 & 1\\0 & 1 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 0 & 1\\0 & 1 & 0\\1 & 0 & 0\end{matrix}\right]
+$$
+
+Observe that $\rho_{\mathrm{perm}}$ is faithful. It is not irreducible: First of all, the
+character is given by:
+
+#+begin_src python :results replace verbatim :tangle no :cache yes
+  [trace(g) for g in s3_perm]
+#+end_src
+
+#+RESULTS[092364b78868df74e52d14deefac60d66187e662]:
+: [3, 0, 0, 1, 1, 1]
+
+The norm of this (see [[#class-functions-hilbert-space][Class Functions as a Hilbert Space]]) is bigger than $1$ hence it is
+not irreducible [[irreducible-chars-norm-one][since]] a character is irreducible iff its norm is $1$. We can also see this
+directly by observing that $V_{\mathrm{triv}}=\CC(1,1,1)$ is an invariant subspace.
+
+The trivial representation exists for every group:
+
+$$
+  \rho_{\mathrm{triv}}(g) = 1 \in \CC .
+$$
+
+The non-trivial one-dimensional representation can be defined via:
+
+$$
+  \rho_{\mathrm{sign}}(g) = \det(\rho_{\mathrm{perm}}(g)) \in \{-1, +1\} \subseteq \CC .
+$$
+
+It acts as desired:
+
+#+begin_src python :results replace verbatim :tangle no :cache yes
+  [det(g) for g in s3_perm]
+#+end_src
+
+#+RESULTS[10b418368758c4c260183e598a6c268d33949037]:
+: [1, 1, 1, -1, -1, -1]
+
+Let us briefly mention that this is related to the [[https://en.wikipedia.org/wiki/Parity_of_a_permutation][parity of permutations]], and can
+alternatively calculated by counting the number of binary swaps $(x \; y)$ in the cycle
+representation (odd count means $-1$, even count means $+1$).
+
+Let $V_{\mathrm{std}}=V_{\mathrm{triv}}^\perp$. By definition
+
+$$ \CC^3=V_{\mathrm{triv}}\oplus V_{\mathrm{std}} . $$
+
+We claim that $\rho_{\mathrm{perm}}$ restricted to $V_{\mathrm{std}}$ is the 2D
+representation $\rho_{\mathrm{std}}$ presented in the exercise statement (for a certain
+choice of basis in $V_{\mathrm{std}}$). But first let us observe that this restriction is
+indeed irreducible. In fact (c.f. [[decomposition-of-characters][decomposition of characters]]):
+
+$$
+  \chi_{\mathrm{std}} = \chi_{\mathrm{perm}} - \chi_{\mathrm{triv}}
+  = (2, -1, -1, 0, 0, 0) .
+$$
+
+The norm of this is $1$. Hence we know that it must be irreducible although we haven't
+calculated the representation yet! Let us show that
+
+#+begin_src python
+  s3_std = [
       Matrix([[1, 0], [0, 1]]),
       Matrix([[-1, -sqrt(3)], [sqrt(3), -1]]) / 2,
       Matrix([[-1, sqrt(3)], [-sqrt(3), -1]]) / 2,
       Matrix([[-1, 0], [0, 1]]),
+      Matrix([[1, -sqrt(3)], [-sqrt(3), -1]]) / 2,
       Matrix([[1, sqrt(3)], [sqrt(3), -1]]) / 2,
-      Matrix([[1, -sqrt(3)], [-sqrt(3), -1]]) / 2
   ]
+#+end_src
+
+is indeed the second summand in
+$\rho_{\mathrm{perm}}=\rho_{\mathrm{triv}}\oplus\rho_{\mathrm{std}}$. The following
+unitary matrix is the G-isomorphism which shows this:
+
+#+begin_src python
+  U_std = Matrix([
+      [sqrt(3)/3, -sqrt(2)/2,  sqrt(6)/6],
+      [sqrt(3)/3,  sqrt(2)/2,  sqrt(6)/6],
+      [sqrt(3)/3,          0, -sqrt(6)/3]
+  ])
+#+end_src
+
+How did we find it? It is clear that we have to choose a spanning vector of the invariant
+subspace $\CC(1,1,1)$ as the first column to obtain the trivial representation as the
+first summand. How to choose the other two columns is only important to obtain the
+/particular/ matrices given in the exercise. The second column is easily seen to be a
+multiple of $(1,1,0)$ when looking at the fourth matrix. The last column is essentially
+fixed by the unitarity constraint.
+
+A brief check that it does what we want:
+
+#+begin_src python :results replace :tangle no :cache yes
+  assert U_std.H * U_std == eye(3)
+
+  for i in range(6):
+      print(i)
+      G = U_std.H * s3_perm[i] * U_std
+      G.col_del(0)
+      G.row_del(0)
+
+      assert G == s3_std[i]
+
+  "PASSED"
+#+end_src
+
+#+RESULTS[e2133cde752b67eebdbc07889c379946bc2ba490]:
+: PASSED
+
+Orthogonality of the three irreducible representation already follows from the fact that
+they are irreducible, but can be easily check directly of course. QED.
+
+Another way to see that the 2D matrices form a (faithful) representation is the
+following. First observe that the second and the fourth element generate the group:
+
+#+begin_src python :results replace :tangle no :cache yes
+  a = group_s3[1]
+  b = group_s3[3]
+
+  assert a**3 == b**2 == group_s3[0]
+  assert a**(-1) == group_s3[2]
+  assert a**(-1) * b * a == group_s3[4]
+  assert a * b * a**(-1) == group_s3[5]
+
+  "PASSED"
+#+end_src
+
+#+RESULTS[9269d11b1de9da0095ab49ede772d9d3a371c225]:
+: PASSED
+
+From an algebraic perspective this describes the group completely. Hence we just have to
+show that the analogous formulas hold for $\rho_{\mathrm{std}}$ too:
+
+#+begin_src python :results replace :tangle no :cache yes
+  A = s3_std[1]
+  B = s3_std[3]
+
+  assert A**3 == B**2 == s3_std[0]
+  assert A**(-1) == s3_std[2]
+  assert A**(-1) * B * A == s3_std[4]
+  assert A * B * A**(-1) == s3_std[5]
+
+  "PASSED"
+#+end_src
+
+#+RESULTS[4b0f05ad7796fdd8b221441fcf96a2f6f8a084b5]:
+: PASSED
+
+# Some auxiliary code:
+
+#+name: create-latex-exercise-a2-16
+#+begin_src python :tangle no :exports none :eval no
+  # Use this code to create the latex formulas for the matrices of the standard representations for
+  # the exercise statement
+  print(", \\; \n".join([sp.latex(s) for s in s3_std]))
 #+end_src
 
 ** Exercise A2.17
