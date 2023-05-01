@@ -1,6 +1,7 @@
 .PHONY: clean default pull-latest-simple-css tangle test website
 
 TANGLED_PYFILES := $(addsuffix .py,$(basename $(wildcard src/chapter_*.org)))
+TANGLED_PYFILES += $(addsuffix .py,$(basename $(wildcard src/appendix_*.org)))
 TANGLED_PYFILES += src/continued_fractions.py src/utils.py
 TANGLED_ZIP := src/tangled.tar.gz
 
