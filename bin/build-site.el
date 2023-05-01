@@ -68,6 +68,8 @@
                    (meta ((name . "viewport") (content . "width=device-width, initial-scale=1.0")))
                    (meta ((name . "author") (content . "Reinhard Stahn")))
                    (title nil ,title)
+                   (link ((rel . "icon") (type . "image/x-icon") (sizes . "any")
+                          (href . "./favicon/favicon.ico")))
                    (raw-string "<!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css -->")
                    (link ((rel . "stylesheet") (href . "./css/simple.css")))
                    (link ((rel . "stylesheet") (href . "./css/style.css")))
@@ -116,7 +118,7 @@
        :with-toc nil) ; `nil' enables us to place the toc where we want it to be
       ("static"
        ,@rs/default-publish-params
-       :base-extension "css\\|js\\|svg\\|tar.gz"
+       :base-extension "css\\|js\\|svg\\|png\\|ico\\|txt\\|tar.gz"
        :publishing-function org-publish-attachment)
       ("all" :components ("pages" "static"))))
 
