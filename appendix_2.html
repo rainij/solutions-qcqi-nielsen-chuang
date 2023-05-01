@@ -1,11 +1,13 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Appendix 2 - Group Theory</title><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Appendix 2 - Group Theory</h1>\[
 \newcommand{\CC}{\mathbb{C}}
+\newcommand{\KK}{\mathbb{K}}
 \newcommand{\NN}{\mathbb{N}}
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\ZZ}{\mathbb{Z}}
 \newcommand{\ii}{\mathrm{i}}
 \newcommand{\FT}{\mathcal{F}} % Fourier Transform
 \newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\inv}{^{-1}}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\norm}[1]{\|#1\|}
 \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
@@ -19,23 +21,576 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6d98f46">Exercises</a>
+<li><a href="#orgaaeeaa4">Setup</a>
 <ul>
-<li><a href="#org8500fd6">Exercise A2.11 (Characters)</a></li>
-<li><a href="#org3538c31">Exercise A2.12 (Unitary matrix groups)</a></li>
+<li><a href="#org7fa363c">Python Libraries</a></li>
+<li><a href="#org4099945">Definitions</a></li>
+<li><a href="#unitary-representations">Unitary Representations</a></li>
+<li><a href="#org7de7338">Constructing new from old representations</a></li>
+<li><a href="#schurs-lemma">Schur's Lemma</a></li>
+<li><a href="#decomposition-of-representations">Decomposition of representations</a></li>
+<li><a href="#class-functions-hilbert-space">Class Functions as a Hilbert Space</a></li>
 </ul>
 </li>
+<li><a href="#org84b1663">Exercises</a>
+<ul>
+<li><a href="#exercise-a2-11">Exercise A2.11 (Characters)</a></li>
+<li><a href="#exercise-a2-12">Exercise A2.12 (Unitary matrix groups)</a></li>
+<li><a href="#org53ac5bb">Exercise A2.13</a></li>
+<li><a href="#orgc2720c6"><span class="todo TODO">TODO</span> Exercise A2.14</a></li>
+<li><a href="#exercise-a2-15">Exercise A2.15</a></li>
+<li><a href="#org2ada9d2">Exercise A2.16</a></li>
+<li><a href="#org0735204">Exercise A2.17</a></li>
+<li><a href="#org82a5cec">Exercise A2.18</a></li>
+<li><a href="#org90ca260">Exercise A2.19</a></li>
+<li><a href="#org20d1b98">Exercise A2.20</a></li>
+<li><a href="#orgb7d31ed">Exercise A2.21</a></li>
+</ul>
+</li>
+<li><a href="#orgf31485a">References</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org6d98f46" class="outline-2">
-<h2 id="org6d98f46">Exercises</h2>
-<div class="outline-text-2" id="text-org6d98f46">
+<div id="outline-container-orgaaeeaa4" class="outline-2">
+<h2 id="orgaaeeaa4">Setup</h2>
+<div class="outline-text-2" id="text-orgaaeeaa4">
+<p>
+For me <i>Character Theory</i> was rather new when I accountered the appendix for the first
+time. I found it hard to learn it from this Appendix so I searched for alternative
+resources. I think Chapters 1 and 2 of (William Fulton and Joe Harris, 2004) constitutes a gentle
+introduction to the topic. I only skimmed over it, so I am not sure, but what I know is
+that this made the topic much clearer to me.
+</p>
+
+<p>
+In this section I briefly summarize <i>how I</i> learned the <i>very basics</i> of this nice
+theory. I refer to the exercises when appropriate. It duplicates a lot of things from the
+(Nielsen, Michael A. and Chuang, Isaac L., 2011). But in my oppinion certain crucial things are missing in the
+book. To make it self contained I decided to repeat certain things.
+</p>
 </div>
-<div id="outline-container-org8500fd6" class="outline-3">
-<h3 id="org8500fd6">Exercise A2.11 (Characters)</h3>
-<div class="outline-text-3" id="text-org8500fd6">
+
+<div id="outline-container-org7fa363c" class="outline-3">
+<h3 id="org7fa363c">Python Libraries</h3>
+<div class="outline-text-3" id="text-org7fa363c">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> Matrix, sqrt, PermutationMatrix, det, eye
+<span class="org-keyword">from</span> sympy.combinatorics <span class="org-keyword">import</span> Permutation
+
+<span class="org-keyword">from</span> chapter_2 <span class="org-keyword">import</span> trace
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4099945" class="outline-3">
+<h3 id="org4099945">Definitions</h3>
+<div class="outline-text-3" id="text-org4099945">
+<p>
+Let \((G,\cdot,e)\) be a group. A <b>matrix representation</b> of \(G\) is a homomorphism of groups
+\(\rho:G\to M\) where \(M\) is a group of matrices over some complex vector space \(V\) (other
+ground fields are possible but we do not care here). Homomorphism just means
+</p>
+
+<p>
+\[
+  \forall g,h: \rho(gh) = \rho(g)\rho(h) \; \text{ and } \; \rho(g\inv) = \rho(g)\inv
+  \; \text{ and } \; \rho(e) = I .
+\]
+</p>
+
+<p>
+A matrix representation is called <b>irreducible</b> if it has no non-trivial invariant
+subspaces \(W\); non-trivial meaning \(W\notin\{0,V\}\). Invariant means
+\(\rho(g)W\,\subseteq\,W\) for all \(g\).
+</p>
+
+<p>
+A matrix representation is called <b>indecomposable</b> if \(\rho\) cannot be written as a direct
+sum \(\rho_1\oplus\rho_2\) over non-trivial subspaces \(V_1\oplus V_2=V\). It is clear that
+irreducible matrix groups are also indecomposable. The reverse direction also holds for
+finite groups (see (William Fulton and Joe Harris, 2004) Proposition 1.5). The proof is not very difficult
+once the fact that representations of finite groups are <a href="#unitary-representations">equivalent to unitary groups</a> is
+established.
+</p>
+
+<p>
+Let \(\rho\) be a finite-dimensional matrix representation over \(\CC\). The <b>character</b> of
+\(\rho\) is \(\chi_\rho:G\to\CC\) given by:
+</p>
+
+<p>
+\[
+  \chi_\rho(g) = \trace{\rho(g)} .
+\]
+</p>
+
+<p>
+The character is called <b>irreducible</b> if \(\rho\) is irreducible. The <b>degree</b> of the
+character is the dimension of the vector space.
+</p>
+
+<p>
+Characters are a special case of the so called <b>class functions</b>, these are functions
+\(\alpha:G\to\CC\) such that
+</p>
+
+<p>
+\[
+  \forall g,h: \; \alpha(h^{-1} g h) = \alpha(g) .
+\]
+</p>
+
+<p>
+For characters this holds due to \(\trace{AB}=\trace{BA}\).
+</p>
+
+<p>
+Basic properties of characters are proved in <a href="#exercise-a2-11">exercise A2.11</a>. The proof shows that for a
+finite group \(\chi(g)\) is a sum of \(r\)​th roots of unity where \(r\) is the order of \(g\).
+</p>
+
+<p>
+Two representations are called <b>equivalent</b> if they are isomorphic and the isomorphism
+preserves the corresponding characters. A linear map \(S:V\to W\in\hom(V,W)\) is called
+<b>G-linear</b> if
+</p>
+
+<p>
+<a id="orgc6e0d6f"></a>
+\[
+  \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
+\]
+</p>
+
+<p>
+Let us denote by \(\hom(\rho^V,\rho^W)\), or \(\hom_G(V,W)\) (G-homomorphisms), the subset of
+those homomorphisms between \(V\) and \(W\) (\(\hom(V,W)\)) which are G-linear. This makes the
+class of representations of \(G\) into a <a href="https://en.wikipedia.org/wiki/Category_(mathematics)">category</a>.
+</p>
+
+<p>
+<a id="org382660b"></a>
+Clearly two representations are equivalent iff there exists a G-isomorphism between them.
+</p>
+
+<p>
+<a href="#schurs-lemma">Schur's Lemma</a> will tell us that up to a scalar factor there is at most one non-zero
+G-homomorphisms between two irreducible finite dimensional representations, which is an
+isomorphism if it exists.
+</p>
+</div>
+</div>
+
+<div id="outline-container-unitary-representations" class="outline-3">
+<h3 id="unitary-representations">Unitary Representations</h3>
+<div class="outline-text-3" id="text-unitary-representations">
+<p>
+A matrix group is called <i>unitary</i> if every matrix is unitary. In <a href="#exercise-a2-12">exercise A2.12</a> it is
+shown that every representation of a finite group is equivalent to a unitary
+representation. The proof shows that the transformation is essentially a change of scalar
+product:
+</p>
+
+<p>
+\[
+  \rho(g) \mapsto \sqrt{p} \rho(g) \sqrt{p}\inv ,
+\]
+</p>
+
+<p>
+where \(p\) is some suitably chosen positive definite matrix. The technique to obtain \(p\)
+via <i>averaging</i> is standard in Character Theory.
+</p>
+</div>
+</div>
+<div id="outline-container-org7de7338" class="outline-3">
+<h3 id="org7de7338">Constructing new from old representations</h3>
+<div class="outline-text-3" id="text-org7de7338">
+<p>
+Assuming we have a representation on certain vector spaces \(V\), \(W\) we can construct new
+ones like in the following listing. Note that sometimes we write \(gv\) instead of
+\(\rho_V(g)v\) if we are not at risk of ambiguity. Just for this section we briefly allow a
+general ground field \(\KK\) instead of \(\CC\). I think this aids understanding the
+construction for dual spaces - in my opinion.
+</p>
+
+<p>
+Tensor products \(V\otimes W\):
+</p>
+
+<p>
+\[ g(v\otimes w) := gv \otimes gw . \]
+</p>
+
+<p>
+Direct sums \(V\oplus W\):
+</p>
+
+<p>
+\[ g(v\oplus w) := gv \oplus gw . \]
+</p>
+
+<p>
+Homomorphism spaces \(\hom(V, W)\):
+</p>
+
+<p>
+\[
+  g\phi = g \circ \phi \circ g\inv
+\]
+</p>
+
+<p>
+Dual spaces \(V^*\):
+</p>
+
+<p>
+\[
+  \rho_{V^*}(g) = \rho_V(g\inv)^\dagger .
+\]
+</p>
+
+<p>
+The definition for dual spaces is natural since it is a consequence from the natural
+requirement to preserve the natural <a href="https://en.wikipedia.org/wiki/Dual_system">dual pairing</a>:
+</p>
+
+<p>
+\[ \langle gv^*, gv \rangle_{V^*,V} = \langle v^*, v \rangle_{V^*,V} . \]
+</p>
+
+<p>
+The formula for homomorphisms is motivated by \(\hom(V,W)=V^*\otimes W\)
+</p>
+
+\begin{align*}
+  \rho_{V^*\otimes W}(g) \langle v^*, \cdot \rangle w
+    &= \langle \rho_{V^*}(g)v^*, \cdot \rangle \rho_W(g)w \\
+    &= \langle \rho_{V}(g\inv)^\dagger v^*, \cdot \rangle \rho_W(g)w \\
+    &= \langle v^*, \rho_V(g\inv)(\cdot) \rangle \rho_W(g)w \\
+    &= \rho_{\hom(V,W)}(g) \langle v^*, \cdot \rangle w .
+\end{align*}
+
+<p>
+and is consistent with \(V^*=\hom(V,\KK)\).
+</p>
+
+\begin{align*}
+  \rho_{\hom(V,\KK)}(g) \langle v^*, \cdot\rangle
+    &= \rho_\KK(g) \langle v^*, \rho_V(g\inv)(\cdot)\rangle \\
+    &= \langle \rho_V(g\inv)^\dagger v^*, \cdot\rangle \\
+    &= \rho_{V^*}(g) \langle v^*, \cdot\rangle .
+\end{align*}
+
+<p>
+Moreover the dual representation behaves well for unitary representations with the natural
+identification of the dual space with the Hilbert space itself: \(\rho^*=\rho\) in this
+case.
+</p>
+</div>
+</div>
+
+<div id="outline-container-schurs-lemma" class="outline-3">
+<h3 id="schurs-lemma">Schur's Lemma</h3>
+<div class="outline-text-3" id="text-schurs-lemma">
+<p>
+Let \(G\) be a group and \(\rho_V\), \(\rho_W\) two irreducible representations on non-trivial
+complex vector spaces \(V\) and \(W\). Let \(S:V\to W\) be a <code>G</code>-linear map, the latter meaning:
+</p>
+
+<p>
+<a id="org8dd146f"></a>
+\[
+  \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
+\]
+</p>
+
+<p>
+Then either
+</p>
+
+<ol class="org-ol">
+<li>\(S=0\) or</li>
+<li>\(S\) is an <b>isomorphism</b> of vector spaces.</li>
+</ol>
+
+<p>
+Moreover, if \(\rho_V=\rho_W\) and the vector spaces are finite-dimensional, necessarily
+\(S=\alpha I\) for some \(\alpha\in\CC\). If \(\rho_V\neq\rho_W\) are finite-dimensional and
+\(S_1\), \(S_2\) are two isomorphisms as above then each of them is a scalar multiple of the
+other one.
+</p>
+
+<dl class="org-dl">
+<dt>Remarks</dt><dd><ul class="org-ul">
+<li>One could weaken the assumptions by replacing \(\rho_V(G)\) and \(\rho_W(G)\) by any two matrix
+groups \(G\) and \(H\) which have equal cardinality \(I\) and replace the above <a href="#org8dd146f">relation</a> by
+\(g_iS=Sh_i\) for \(i\,\in\,I\). The proof below shows this implicitly. In the isomorphism case we
+see that \(H\) and \(G\) are in fact <i>equivalent</i>.</li>
+<li>Schur's Lemma essentially says that for irreducible representations
+\(\hom(\rho^V,\rho^W)\) is zero or one-dimensional. In the latter case the non-zero
+elements are (G-)isomorphisms.</li>
+</ul></dd>
+</dl>
+
+<p>
+PROOF: Let \(N\subseteq V\) and \(R\subseteq W\) the kernel (null-space) and image (range) of
+\(S\). Clearly those are invariant under the respective representations of \(G\). By
+irreducibility we have:
+</p>
+
+<ul class="org-ul">
+<li>\(N \in \{0, V\}\),</li>
+<li>\(R \in \{0, W\}\).</li>
+</ul>
+
+<p>
+This leads to four cases two of which are impossible (both zero-space or both full-space) since \(V\)
+and \(W\) are non-trivial. The other two cases are:
+</p>
+
+<ul class="org-ul">
+<li>\(N=\{0\}\) and \(R=W\), meaning \(S\) being an isomorphism,</li>
+<li>\(N=V\) and \(R=\{0\}\), meaning \(S=0\).</li>
+</ul>
+
+<p>
+This shows the first part. Now consider the second part where (among other things) \(V=W\)
+is assumed. Since \(\CC\) is algebraically closed and the vector spaces are finite
+dimensional \(S\) must have an eigenvalue \(\alpha\). Clearly \(S-\alpha\) satisfies the
+<a href="#org8dd146f">G-linearity</a> in place of \(S\) too. By the first part and since \(S-\alpha\) is no isomorphism
+we must have \(S=\alpha\).
+</p>
+
+<p>
+The final part follows from the second part by considering the G-linear mappings
+composed of G-linear mappings from \(V\) to \(W\) and back from \(W\) to \(V\). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-decomposition-of-representations" class="outline-3">
+<h3 id="decomposition-of-representations">Decomposition of representations</h3>
+<div class="outline-text-3" id="text-decomposition-of-representations">
+<p>
+Let \(V\) be a complex representation of a finite group \(G\). Then the vector space \(V\)
+decomposes into irreducible sub-representations
+</p>
+
+<p>
+\[
+  V = V^{\oplus a_1}_1 \oplus \ldots \oplus V^{\oplus a_n}_n
+\]
+</p>
+
+<p>
+with distinct (irreducible) \(V_i\). Moreover the \(V_i\) and the \(a_i\) are unique. If the
+representation is unitary the decomposition is orthogonal.
+</p>
+
+<dl class="org-dl">
+<dt>Remarks</dt><dd><ul class="org-ul">
+<li>The statment probably holds on compact groups (use Haar measure in proof).</li>
+<li>What is not unique (in general) is the decomposition of the \(V_i^{\oplus a_i}\) into
+\(a_i\) copies of \(V_i\). In fact, look at the trivial group action of
+\(\langle\,\mathrm{id}\rangle\) on \(\CC^2\). The <i>concrete</i> decomposition essentially
+amounts to a choice of a basis.</li>
+</ul></dd>
+</dl>
+
+<p>
+I could not find a proof of the <i>complete</i> statement which I could understand. So I give
+my own here.
+</p>
+
+<p>
+PROOF: We may assume that the representation is unitary (see <a href="#unitary-representations">above</a>).
+</p>
+
+<p>
+If \(V\) is not already reducible there must be a non-trivial invariant subspace \(U\). Since the
+representation is unitary the orthogonal complement \(U^\perp\) is invariant too. Hence we have the
+decomposition
+</p>
+
+<p>
+\[
+  V = U \oplus U^{\perp} .
+\]
+</p>
+
+<p>
+The existence now follows by induction on the dimension of \(V\) and the fact that one-dimensional
+representations are always irreducible. This concludes the existence part of the proof.
+</p>
+
+<p>
+For the uniqueness consider another decomposition
+</p>
+
+<p>
+\[
+  V = W^{\oplus b_1}_1 \oplus \ldots \oplus W^{\oplus b_m}_m .
+\]
+</p>
+
+<p>
+Note that the identity induces an isomorphism
+</p>
+
+<p>
+\[
+  V^{\oplus a_1}_1 \oplus \ldots \oplus V^{\oplus a_n}_n
+  \to W^{\oplus b_1}_1 \oplus \ldots \oplus W^{\oplus b_m}_m .
+\]
+</p>
+
+<p>
+Let us denote by \(\hom_G(V,W)\) the G-linear maps between \(V\) and \(W\). Note that
+</p>
+
+<p>
+\[
+  \hom_G(V, V) = \bigoplus_{i=1}^n \bigoplus_{j=1}^m
+  \hom_G(V_i, W_j)^{\oplus a_i b_j} .
+\]
+</p>
+
+<p>
+This holds also for \(\hom_G\) replaced by \(\hom\). In fact, this statement is analogous to
+the fact that linear maps between finite dimensional vector spaces can be represented by
+matrices.
+</p>
+
+<p>
+Now suppose that for some \(i\) the \(V_i\) is not equivalent to any of the \(W_j\). Then this
+together with Schur's Lemma implies that \(V_i\) is mapped to \(0\) by the identity map -
+contradiction. By symmetry this implies that \(n=m\) and \(V_i=W_{\pi(i)}\) for some
+permutation \(\pi\). Without loss of generality \(\pi=\mathrm{id}\).
+</p>
+
+<p>
+Again by Schur's lemma we thus have \(\hom(V_i,W_j)=0\) for \(i\neq j\) and hence:
+</p>
+
+<p>
+\[
+  \hom_G(V, V) = \bigoplus_{i=1}^n
+  \hom_G(V_i, W_i)^{\oplus a_i b_i} .
+\]
+</p>
+
+<p>
+Hence the identity on \(V\) induces a G-isomorphism between \(V_i^{a_i}\) and \(W_i^{b_i}\). Since the
+dimensions of \(V_i\) and \(W_i\) are the same (by equivalence) this implies \(a_i=b_i\). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-class-functions-hilbert-space" class="outline-3">
+<h3 id="class-functions-hilbert-space">Class Functions as a Hilbert Space</h3>
+<div class="outline-text-3" id="text-class-functions-hilbert-space">
+<p>
+Recall that the class functions are constant on all conjugacy classes
+</p>
+
+<p>
+\[
+  \mathrm{Cl}(a) = \{g a g\inv; g\in G \} .
+\]
+</p>
+
+<p>
+Hence for a finite group the space of class functions is a \(k\) dimensional vector space
+where \(k\) is the number of different conjugacy classes (the indicator functions of the
+single conjugacy classes form a basis).
+</p>
+
+<p>
+Using the following scalar product, the vector space turns into a Hilbert Space:
+</p>
+
+<p>
+\[
+  \langle \alpha, \beta \rangle =
+  \frac{1}{\abs{G}} \sum_{g\in G} \alpha(g)^* \beta(g) .
+\]
+</p>
+
+<p>
+It turns out that the irreducible characters are an orthonormal basis of this Hilbert
+Space. This should be shown in <a href="#exercise-a2-15">exercise A2.15</a>. This exercise however bases the proof on a
+more difficult result so it does not really help to understand this nice result. For a
+direct proof have a look into (William Fulton and Joe Harris, 2004), Chapter 2.2. I recommend to read the
+proof, it is really nice. You can also try to find it on your own based on the following
+hints:
+</p>
+
+<ul class="org-ul">
+<li><p>
+The map
+</p>
+
+<p>
+\[
+    p = \frac{1}{\abs{G}} \sum_{g\in G} g
+  \]
+</p>
+
+<p>
+is a projection from \(V\) to \(V^G:=\{v\in V; \forall g: gv=v\}\).
+</p></li>
+<li><p>
+Hence
+</p>
+
+<p>
+\[
+    \dim V^G = \chi_V(p) = \frac{1}{\abs{G}} \sum_{g\in G} \chi_V(g) .
+  \]
+</p></li>
+<li>We have \(\hom_G(V,W)=\hom(V,W)^G\).</li>
+<li>If \(V\) and \(W\) are irreducible by Schur's Lemma we have that \(\dim(\hom_G(V,W))\) is
+either \(1\) or \(0\) depending on whether \(V\) and \(W\) are isomorphic or not.</li>
+<li>Finally use \(\chi_{\hom(V,W)}(g)=\chi_{V^*}(g)\otimes\chi_W(g)=\chi_{V}(g)^*\otimes\chi_W(g)\) to
+deduce the claim.</li>
+</ul>
+
+<p>
+As a corollary of the above we see that the number of distinct irreducible characters is
+equal to the number of conjugacy classes.
+</p>
+
+<p>
+With the notation of <a href="#decomposition-of-representations">decomposition of representations</a> we see that a general character
+decomposes like this into irreducible characters:
+</p>
+
+<p>
+<a id="org1bd9583"></a>
+\[
+  \chi_V = \sum_{i=1}^n a_n \chi_{V_i}
+\]
+</p>
+
+<p>
+<a id="org007a06d"></a>
+In particular we deduce that a character is irreducible iff its norm is \(1\) (all other
+characters have a larger norm).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org84b1663" class="outline-2">
+<h2 id="org84b1663">Exercises</h2>
+<div class="outline-text-2" id="text-org84b1663">
+</div>
+<div id="outline-container-exercise-a2-11" class="outline-3">
+<h3 id="exercise-a2-11">Exercise A2.11 (Characters)</h3>
+<div class="outline-text-3" id="text-exercise-a2-11">
 <p>
 Prove the following properties of characters on a <i>finite</i> (and complex) matrix group:
 </p>
@@ -50,18 +605,18 @@ Prove the following properties of characters on a <i>finite</i> (and complex) ma
 </ol>
 </div>
 
-<div id="outline-container-org13b5594" class="outline-4">
-<h4 id="org13b5594">Proof of (1)</h4>
-<div class="outline-text-4" id="text-org13b5594">
+<div id="outline-container-org8352261" class="outline-4">
+<h4 id="org8352261">Proof of (1)</h4>
+<div class="outline-text-4" id="text-org8352261">
 <p>
 This should be clear since the identity matrix has exactly \(n\) ones on the diagonal.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org1099f99" class="outline-4">
-<h4 id="org1099f99">Proof of (2)</h4>
-<div class="outline-text-4" id="text-org1099f99">
+<div id="outline-container-org80a3f0d" class="outline-4">
+<h4 id="org80a3f0d">Proof of (2)</h4>
+<div class="outline-text-4" id="text-org80a3f0d">
 <p>
 Recall that the trace is just the sum of all eigenvalues, counted with multiplicity
 (exactly \(n\) numbers). Let \(\lambda\) be one of the eigenvalues and consider a
@@ -80,7 +635,7 @@ Each element of a finite group has finite order. Hence there is an integer \(r\)
 </p>
 
 <p>
-<a id="org1155ea3"></a>
+<a id="orgb0584ce"></a>
 \[ \lambda^r=1 \]
 </p>
 
@@ -88,27 +643,22 @@ Each element of a finite group has finite order. Hence there is an integer \(r\)
 holds for any eigenvalue. In particular \(|\lambda|=1\). Hence, by the triangle inequality
 we get the claim. QED.
 </p>
+</div>
+</div>
 
+<div id="outline-container-orgfdf0a2f" class="outline-4">
+<h4 id="orgfdf0a2f">Proof of (3)</h4>
+<div class="outline-text-4" id="text-orgfdf0a2f">
 <p>
-<b>Remark:</b> The equation <a href="#org1155ea3">above</a> is a very interesting property. It shows that the <a href="https://en.wikipedia.org/wiki/Minimal_polynomial_(linear_algebra)">minimal
-polynomial</a> of an element of a <i>finite</i> matrix group has a very special form. QED.
+This follows from the <a href="#orgb0584ce">special form</a> of the eigenvalues, together with the fact that the
+triangle inequality is strict iff all summands are colinear.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org8c9ddc5" class="outline-4">
-<h4 id="org8c9ddc5">Proof of (3)</h4>
-<div class="outline-text-4" id="text-org8c9ddc5">
-<p>
-This follows from the <a href="#org1155ea3">special form</a> of the minimal polynomial too, together with the fact
-that the triangle inequality is strict iff all summands are colinear.
-</p>
-</div>
-</div>
-
-<div id="outline-container-org8be93d0" class="outline-4">
-<h4 id="org8be93d0">Proof of (4)</h4>
-<div class="outline-text-4" id="text-org8be93d0">
+<div id="outline-container-org396206a" class="outline-4">
+<h4 id="org396206a">Proof of (4)</h4>
+<div class="outline-text-4" id="text-org396206a">
 <p>
 We have to show \(\chi(h^{-1}gh)=\chi(g)\). This follows from the cyclicity property of the trace:
 </p>
@@ -125,12 +675,12 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgc76002c" class="outline-4">
-<h4 id="orgc76002c">Proof of (5)</h4>
-<div class="outline-text-4" id="text-orgc76002c">
+<div id="outline-container-org3a503f3" class="outline-4">
+<h4 id="org3a503f3">Proof of (5)</h4>
+<div class="outline-text-4" id="text-org3a503f3">
 <p>
-Since we work on vector spaces of <i>complex</i> numbers, the <a href="https://en.wikipedia.org/wiki/Characteristic_polynomial">characteristic polynomial</a> (not
-minimal polynomial this time) can be factored into <i>linear</i> polynomials:
+Since we work on vector spaces of <i>complex</i> numbers, the <a href="https://en.wikipedia.org/wiki/Characteristic_polynomial">characteristic polynomial</a> can be
+factored into <i>linear</i> polynomials:
 </p>
 
 <p>
@@ -140,49 +690,41 @@ minimal polynomial this time) can be factored into <i>linear</i> polynomials:
 </p>
 
 <p>
-This assumes that the eigenvalues (including multiplicities are \(\lambda_i\)). Multiplying
+This assumes that the eigenvalues (including multiplicities) are \(\lambda_i\). Multiplying
 this by \(g^{-n}\) shows that the eigenvalues of \(g^{-1}\) are \(\lambda_i^{-1}\) (including
-multiplicities). Again from the <a href="#org1155ea3">minimal polynomial</a> we get \(\lambda_i^{-1}=\lambda_i^*\)
-which implies the claim. QED.
+multiplicities). From the <a href="#orgb0584ce">special form</a> of the eigenvalues we get
+\(\lambda_i^{-1}=\lambda_i^*\) which implies the claim. QED.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgf3565a1" class="outline-4">
-<h4 id="orgf3565a1">Proof of (6)</h4>
-<div class="outline-text-4" id="text-orgf3565a1">
+<div id="outline-container-org640019e" class="outline-4">
+<h4 id="org640019e">Proof of (6)</h4>
+<div class="outline-text-4" id="text-org640019e">
 <p>
-Again by the minimal polynomial the character is just a sum of roots of unity. The latter
-are algebraic. According to <a href="https://en.wikipedia.org/wiki/Algebraic_number#Field">wikipedia</a> algebraic numbers form a field (in fact, they are the
-algebraic closure of the rational numbers). Hence sums of algebraic numbers are algebraic
-too. QED.
+Again by the <a href="#orgb0584ce">special form</a> of the eigenvalues the character is just a sum of roots of
+unity. The latter are algebraic. According to <a href="https://en.wikipedia.org/wiki/Algebraic_number#Field">wikipedia</a> algebraic numbers form a field (in
+fact, they are the algebraic closure of the rational numbers). Hence sums of algebraic
+numbers are algebraic too. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3538c31" class="outline-3">
-<h3 id="org3538c31">Exercise A2.12 (Unitary matrix groups)</h3>
-<div class="outline-text-3" id="text-org3538c31">
+<div id="outline-container-exercise-a2-12" class="outline-3">
+<h3 id="exercise-a2-12">Exercise A2.12 (Unitary matrix groups)</h3>
+<div class="outline-text-3" id="text-exercise-a2-12">
 <p>
 A unitary matrix group is comprised solely of unitary matrices. Show that every finite
 matrix group is equivalent to a unitary matrix group. If a representation of a group
 consists entirely of unitary matrices, we may refer to it as being a <i>unitary
 representation</i>.
 </p>
-
-<dl class="org-dl">
-<dt>Remark</dt><dd><ul class="org-ul">
-<li>The solution of exercise A2.11 already shows that finite matrix groups are comprised
-of "very special" matrices which are "almost" unitary (in a sense). So it is nice to
-see an example of a non-unitary matrix group (see below).</li>
-</ul></dd>
-</dl>
 </div>
 
-<div id="outline-container-orgd2b8be1" class="outline-4">
-<h4 id="orgd2b8be1">Example for the remark</h4>
-<div class="outline-text-4" id="text-orgd2b8be1">
+<div id="outline-container-org66eb5cc" class="outline-4">
+<h4 id="org66eb5cc">Example of a non-unitary matrix group</h4>
+<div class="outline-text-4" id="text-org66eb5cc">
 <p>
 An example of a non-unitary matrix group is generated by
 </p>
@@ -195,16 +737,38 @@ An example of a non-unitary matrix group is generated by
 
 <p>
 Clearly \(\langle g \rangle = \{I, g\}\), since \(g^2=I\). Moreover \(g\) is not unitary for any
-\(a\neq0\). On the other hand \(g\) is diagonalizable (its eigenvalues are \(\pm1\)).
+\(a\neq0\). On the other hand \(g\) is diagonalizable (its eigenvalues are \(\pm1\)). Note that
+the claim of the exercise implies diagonalizability for <i>any</i> representation of a finite
+group! In fact, equivalence to a unitary group <a href="#org382660b">means</a> that there is a G-isomorphism \(h\)
+such that \(hgh\inv\) is unitary and hence diagonalizable. But if \(hgh\inv\) is
+diagonalizable the same is true for \(g\).
+</p>
+
+<p>
+On the other hand for \(a\neq0\) the following is a generator for a faithful representation
+of \(\ZZ\) which is <i>not</i> diagonalizable (up to a factor the matrix is already in <a href="https://en.wikipedia.org/wiki/Jordan_normal_form">Jordan
+normal form</a>):
+</p>
+
+<p>
+\[
+  g = \begin{bmatrix} 1 & a \\ 0 & 1 \end{bmatrix} .
+\]
+</p>
+
+<p>
+Thus a conjugation \(g\mapsto hgh\inv\) won't make this into a unitary group. Hence <i>this</i>
+representation is not equivalent to a unitary representation.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orga69c563" class="outline-4">
-<h4 id="orga69c563">Proof</h4>
-<div class="outline-text-4" id="text-orga69c563">
+<div id="outline-container-org73088d8" class="outline-4">
+<h4 id="org73088d8">Proof</h4>
+<div class="outline-text-4" id="text-org73088d8">
 <p>
-Let us define the positive semi-definite operator
+Let us define the positive semi-definite operator (identifying group elements with their
+matrix representation)
 </p>
 
 <p>
@@ -250,6 +814,590 @@ Since conjugation preserves the trace (exercise A2.11) we are done. QED.
 </p>
 </div>
 </div>
+</div>
+
+<div id="outline-container-org53ac5bb" class="outline-3">
+<h3 id="org53ac5bb">Exercise A2.13</h3>
+<div class="outline-text-3" id="text-org53ac5bb">
+<p>
+Show that every irreducible Abelian matrix group is one dimensional.
+</p>
+</div>
+
+<div id="outline-container-orgb1a846a" class="outline-4">
+<h4 id="orgb1a846a">Proof</h4>
+<div class="outline-text-4" id="text-orgb1a846a">
+<p>
+Let \(s\) by an <i>arbitrary</i> element of the group. Since the group is abelian we have:
+</p>
+
+<p>
+\[
+  g s = s g
+\]
+</p>
+
+<p>
+for any element \(g\). By <a href="#schurs-lemma">Schur's Lemma</a> we have \(s=\alpha_s I\) for some complex number
+\(\alpha_s\). Since \(s\) was arbitrary we have that any element is of this form. A group of
+multiples of the identity can clearly only be irreducible if it is one dimensional. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc2720c6" class="outline-3">
+<h3 id="orgc2720c6"><span class="todo TODO">TODO</span> Exercise A2.14</h3>
+<div class="outline-text-3" id="text-orgc2720c6">
+<p>
+Prove that if \(\rho\) is an irreducible representation of \(G\), then \(|G|/d_\rho\) is an
+integer.
+</p>
+</div>
+</div>
+
+<div id="outline-container-exercise-a2-15" class="outline-3">
+<h3 id="exercise-a2-15">Exercise A2.15</h3>
+<div class="outline-text-3" id="text-exercise-a2-15">
+<p>
+Using the Fundamental Theorem, prove that irreducible characters are orthogonal, that is:
+</p>
+
+<p>
+\[
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q = \abs{G} \delta_{pq} \quad \text{and} \quad
+  \sum_{p=1}^r (\chi_i^p)^* \chi_j^p = \frac{\abs{G}}{r_i} \delta_{ij} ,
+\]
+</p>
+
+<p>
+where \(p\), \(q\), and \(\delta_{pq}\) have the same meaning as in the theorem, and \(\chi_i^p\)
+is the value the character of the \(p\)​th irreducible representation takes on the \(i\)​th
+conjugacy class of \(G\), and \(r_i\) is the size of the \(i\)​th conjugacy class.
+</p>
+</div>
+
+<div id="outline-container-orgebae311" class="outline-4">
+<h4 id="orgebae311">Proof</h4>
+<div class="outline-text-4" id="text-orgebae311">
+<p>
+Consider the first equality. We have
+</p>
+
+<p>
+\[
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q
+  = \sum_{g\in G} \chi^p(g)^* \chi^q(g) .
+\]
+</p>
+
+<p>
+Moreover \(\chi^p(g)^*=\chi^p(g\inv)\) by <a href="#exercise-a2-11">exercise A2.11(5)</a>. Hence
+</p>
+
+<p>
+\[
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^q
+  = \sum_g \sum_{ij} \rho^p(g)\inv_{ii} \rho^q(g)_{jj} .
+\]
+</p>
+
+<p>
+By the fundamental theorem this is zero (as desired) if \(p\neq q\). So let us assume \(p=q\)
+in the following:
+</p>
+
+<p>
+\[
+  \sum_{i=1}^r r_i (\chi_i^p)^* \chi_i^p
+  = \sum_{ij} \sum_g \rho^p(g)\inv_{ii} \rho^p(g)_{jj}
+  = \sum_{ij} \abs{G} d_{\rho^p}\inv \delta_{ij} = \abs{G} .
+\]
+</p>
+
+<p>
+This proves the first formula. The second formula actually follows automatically from the
+first one as we will see now. Consider the square matrix \(U\in\CC^{r\times r}\) given by:
+</p>
+
+<p>
+\[
+  U_{ip} = \chi_i^p \cdot \sqrt{\frac{r_i}{\abs{G}}} .
+\]
+</p>
+
+<p>
+Observe that the two statemtents from the exercise are equivalent to the assertion
+that \(U\) has orthonormal columns or rows respectively (with respect to the standard scalar
+product on \(\CC^r\)). It is well known that either of these is equivalent to \(U\) being
+unitary. Hence if one of them holds (as we just proved) the other one holds too. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2ada9d2" class="outline-3">
+<h3 id="org2ada9d2">Exercise A2.16</h3>
+<div class="outline-text-3" id="text-org2ada9d2">
+<p>
+\(S_3\) is the group of permutations of three elements. Suppose we order these as mapping
+<code>123</code> to: <code>123</code>; <code>231</code>; <code>312</code>; <code>213</code>; <code>132</code>, and <code>321</code>, respectively. Show that
+</p>
+
+<p>
+there exist two one-dimensional irreducible representations of \(S_3\), one of which is
+trivial, and the other of which is <code>1</code>, <code>1</code>, <code>1</code>, <code>-1</code>, <code>−1</code>, <code>−1</code>, corresponding in order
+to the six permutations given earlier. Also show that there exists a two-dimensional
+irreducible representation, with the matrices
+</p>
+
+<p>
+\[
+\left[\begin{matrix}1 & 0\\0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}- \frac{1}{2} & - \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}- \frac{1}{2} & \frac{\sqrt{3}}{2}\\- \frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}-1 & 0\\0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}\frac{1}{2} & - \frac{\sqrt{3}}{2}\\- \frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right], \;
+\left[\begin{matrix}\frac{1}{2} & \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2} & - \frac{1}{2}\end{matrix}\right]
+\]
+</p>
+
+<p>
+Verify that the representations are orthogonal.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The original statement had a tiny error. The last two matrices were not in the right
+order if we want a correspondence to the six permutations as ordered in the second
+sentence.</dd>
+</dl>
+</div>
+
+<div id="outline-container-orgfac4fac" class="outline-4">
+<h4 id="orgfac4fac">Solution</h4>
+<div class="outline-text-4" id="text-orgfac4fac">
+<p>
+It is convenient to work with <code>sympy</code>. First let us define the group \(S_3\) and its
+representation \(\rho_{\mathrm{perm}}\) as permutation matrices.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">group_s3</span> <span class="org-operator">=</span> [[0, 1, 2], [1, 2, 0], [2, 0, 1], [1, 0, 2], [0, 2, 1], [2, 1, 0]]
+<span class="org-variable-name">group_s3</span> <span class="org-operator">=</span> [Permutation(g) <span class="org-keyword">for</span> g <span class="org-keyword">in</span> group_s3]
+
+<span class="org-variable-name">s3_perm</span> <span class="org-operator">=</span> [PermutationMatrix(g).as_explicit() <span class="org-keyword">for</span> g <span class="org-keyword">in</span> group_s3]
+</pre>
+</div>
+
+<p>
+\[
+\left[\begin{matrix}1 & 0 & 0\\0 & 1 & 0\\0 & 0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}0 & 1 & 0\\0 & 0 & 1\\1 & 0 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 0 & 1\\1 & 0 & 0\\0 & 1 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 1 & 0\\1 & 0 & 0\\0 & 0 & 1\end{matrix}\right], \;
+\left[\begin{matrix}1 & 0 & 0\\0 & 0 & 1\\0 & 1 & 0\end{matrix}\right], \;
+\left[\begin{matrix}0 & 0 & 1\\0 & 1 & 0\\1 & 0 & 0\end{matrix}\right]
+\]
+</p>
+
+<p>
+Observe that \(\rho_{\mathrm{perm}}\) is faithful. It is not irreducible: First of all, the
+character is given by:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">[trace(g) <span class="org-keyword">for</span> g <span class="org-keyword">in</span> s3_perm]
+</pre>
+</div>
+
+<pre class="example">
+[3, 0, 0, 1, 1, 1]
+</pre>
+
+
+<p>
+The norm of this (see <a href="#class-functions-hilbert-space">Class Functions as a Hilbert Space</a>) is bigger than \(1\) hence it is
+not irreducible <a href="#org007a06d">since</a> a character is irreducible iff its norm is \(1\). We can also see this
+directly by observing that \(V_{\mathrm{triv}}=\CC(1,1,1)\) is an invariant subspace.
+</p>
+
+<p>
+The trivial representation exists for every group:
+</p>
+
+<p>
+\[
+  \rho_{\mathrm{triv}}(g) = 1 \in \CC .
+\]
+</p>
+
+<p>
+The non-trivial one-dimensional representation can be defined via:
+</p>
+
+<p>
+\[
+  \rho_{\mathrm{sign}}(g) = \det(\rho_{\mathrm{perm}}(g)) \in \{-1, +1\} \subseteq \CC .
+\]
+</p>
+
+<p>
+It acts as desired:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">[det(g) <span class="org-keyword">for</span> g <span class="org-keyword">in</span> s3_perm]
+</pre>
+</div>
+
+<pre class="example">
+[1, 1, 1, -1, -1, -1]
+</pre>
+
+
+<p>
+Let us briefly mention that this is related to the <a href="https://en.wikipedia.org/wiki/Parity_of_a_permutation">parity of permutations</a>, and can
+alternatively calculated by counting the number of binary swaps \((x \; y)\) in the cycle
+representation (odd count means \(-1\), even count means \(+1\)).
+</p>
+
+<p>
+Let \(V_{\mathrm{std}}=V_{\mathrm{triv}}^\perp\). By definition
+</p>
+
+<p>
+\[ \CC^3=V_{\mathrm{triv}}\oplus V_{\mathrm{std}} . \]
+</p>
+
+<p>
+We claim that \(\rho_{\mathrm{perm}}\) restricted to \(V_{\mathrm{std}}\) is the 2D
+representation \(\rho_{\mathrm{std}}\) presented in the exercise statement (for a certain
+choice of basis in \(V_{\mathrm{std}}\)). But first let us observe that this restriction is
+indeed irreducible. In fact (c.f. <a href="#org1bd9583">decomposition of characters</a>):
+</p>
+
+<p>
+\[
+  \chi_{\mathrm{std}} = \chi_{\mathrm{perm}} - \chi_{\mathrm{triv}}
+  = (2, -1, -1, 0, 0, 0) .
+\]
+</p>
+
+<p>
+The norm of this is \(1\). Hence we know that it must be irreducible although we haven't
+calculated the representation yet! Let us show that
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">s3_std</span> <span class="org-operator">=</span> [
+    Matrix([[1, 0], [0, 1]]),
+    Matrix([[<span class="org-operator">-</span>1, <span class="org-operator">-</span>sqrt(3)], [sqrt(3), <span class="org-operator">-</span>1]]) <span class="org-operator">/</span> 2,
+    Matrix([[<span class="org-operator">-</span>1, sqrt(3)], [<span class="org-operator">-</span>sqrt(3), <span class="org-operator">-</span>1]]) <span class="org-operator">/</span> 2,
+    Matrix([[<span class="org-operator">-</span>1, 0], [0, 1]]),
+    Matrix([[1, <span class="org-operator">-</span>sqrt(3)], [<span class="org-operator">-</span>sqrt(3), <span class="org-operator">-</span>1]]) <span class="org-operator">/</span> 2,
+    Matrix([[1, sqrt(3)], [sqrt(3), <span class="org-operator">-</span>1]]) <span class="org-operator">/</span> 2,
+]
+</pre>
+</div>
+
+<p>
+is indeed the second summand in
+\(\rho_{\mathrm{perm}}=\rho_{\mathrm{triv}}\oplus\rho_{\mathrm{std}}\). The following
+unitary matrix is the G-isomorphism which shows this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">U_std</span> <span class="org-operator">=</span> Matrix([
+    [sqrt(3)<span class="org-operator">/</span>3, <span class="org-operator">-</span>sqrt(2)<span class="org-operator">/</span>2,  sqrt(6)<span class="org-operator">/</span>6],
+    [sqrt(3)<span class="org-operator">/</span>3,  sqrt(2)<span class="org-operator">/</span>2,  sqrt(6)<span class="org-operator">/</span>6],
+    [sqrt(3)<span class="org-operator">/</span>3,          0, <span class="org-operator">-</span>sqrt(6)<span class="org-operator">/</span>3]
+])
+</pre>
+</div>
+
+<p>
+How did we find it? It is clear that we have to choose a spanning vector of the invariant
+subspace \(\CC(1,1,1)\) as the first column to obtain the trivial representation as the
+first summand. How to choose the other two columns is only important to obtain the
+<i>particular</i> matrices given in the exercise. The second column is easily seen to be a
+multiple of \((1,1,0)\) when looking at the fourth matrix. The last column is essentially
+fixed by the unitarity constraint.
+</p>
+
+<p>
+A brief check that it does what we want:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">assert</span> U_std.H <span class="org-operator">*</span> U_std <span class="org-operator">==</span> eye(3)
+
+<span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(6):
+    <span class="org-builtin">print</span>(i)
+    <span class="org-variable-name">G</span> <span class="org-operator">=</span> U_std.H <span class="org-operator">*</span> s3_perm[i] <span class="org-operator">*</span> U_std
+    G.col_del(0)
+    G.row_del(0)
+
+    <span class="org-keyword">assert</span> G <span class="org-operator">==</span> s3_std[i]
+
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+PASSED
+</pre>
+
+
+<p>
+Orthogonality of the three irreducible representation already follows from the fact that
+they are irreducible, but can be easily check directly of course. QED.
+</p>
+
+<p>
+Another way to see that the 2D matrices form a (faithful) representation is the
+following. First observe that the second and the fourth element generate the group:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">a</span> <span class="org-operator">=</span> group_s3[1]
+<span class="org-variable-name">b</span> <span class="org-operator">=</span> group_s3[3]
+
+<span class="org-keyword">assert</span> a<span class="org-operator">**</span>3 <span class="org-operator">==</span> b<span class="org-operator">**</span>2 <span class="org-operator">==</span> group_s3[0]
+<span class="org-keyword">assert</span> a<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">==</span> group_s3[2]
+<span class="org-keyword">assert</span> a<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">*</span> b <span class="org-operator">*</span> a <span class="org-operator">==</span> group_s3[4]
+<span class="org-keyword">assert</span> a <span class="org-operator">*</span> b <span class="org-operator">*</span> a<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">==</span> group_s3[5]
+
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+PASSED
+</pre>
+
+
+<p>
+From an algebraic perspective this describes the group completely. Hence we just have to
+show that the analogous formulas hold for \(\rho_{\mathrm{std}}\) too:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">A</span> <span class="org-operator">=</span> s3_std[1]
+<span class="org-variable-name">B</span> <span class="org-operator">=</span> s3_std[3]
+
+<span class="org-keyword">assert</span> A<span class="org-operator">**</span>3 <span class="org-operator">==</span> B<span class="org-operator">**</span>2 <span class="org-operator">==</span> s3_std[0]
+<span class="org-keyword">assert</span> A<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">==</span> s3_std[2]
+<span class="org-keyword">assert</span> A<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">*</span> B <span class="org-operator">*</span> A <span class="org-operator">==</span> s3_std[4]
+<span class="org-keyword">assert</span> A <span class="org-operator">*</span> B <span class="org-operator">*</span> A<span class="org-operator">**</span>(<span class="org-operator">-</span>1) <span class="org-operator">==</span> s3_std[5]
+
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+PASSED
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0735204" class="outline-3">
+<h3 id="org0735204">Exercise A2.17</h3>
+<div class="outline-text-3" id="text-org0735204">
+<p>
+Prove that the regular representation is faithful.
+</p>
+</div>
+
+<div id="outline-container-orgeec16b7" class="outline-4">
+<h4 id="orgeec16b7">Proof</h4>
+<div class="outline-text-4" id="text-orgeec16b7">
+<p>
+This is more or less obvious. In fact, the regular representation \(\rho^R\) can be
+<i>identified</i> with the vector space \(R=\CC^{\oplus G}\) made up of the following formal sums:
+</p>
+
+<p>
+\[
+  v = \sum_{h \in G} \lambda_h h ,
+\]
+</p>
+
+<p>
+where \(\lambda_h\in\CC\) and \(G\) is acts as a basis (so that the \(\lambda_h\) are
+unique). See also the entry for <a href="https://en.wikipedia.org/wiki/Free_module">free module</a> on wikipedia.  With this definition \(\rho^R\)
+is given by
+</p>
+
+<p>
+\[
+  \rho^R(g) v = \sum_{h \in G} \lambda_h (gh) .
+\]
+</p>
+
+<p>
+Clearly this is a homomorphism of groups. It is also an isomorphism since
+\(\rho^R(g)=\rho^R(e)\) implies \(\rho^R(g)e=\rho^R(e)e\) which in turn implies \(ge=e\), hence
+\(g=e\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org82a5cec" class="outline-3">
+<h3 id="org82a5cec">Exercise A2.18</h3>
+<div class="outline-text-3" id="text-org82a5cec">
+<p>
+Show that the character of the regular representation is zero except on the representation
+of the identity element, for which \(\chi^R(I)=\abs{G}\).
+</p>
+</div>
+
+<div id="outline-container-org955d91c" class="outline-4">
+<h4 id="org955d91c">Proof</h4>
+<div class="outline-text-4" id="text-org955d91c">
+<p>
+We have
+</p>
+
+<p>
+\[
+  \rho^R(g)_{ij} = \begin{cases} 1 & \text{if } g g_i=g_j \\ 0 & \text{else.} \end{cases}
+\]
+</p>
+
+<p>
+\(g g_i=g_i\) is equivalent to \(g=e\). Hence \(\rho^R(g)\) has <i>any</i> non-zero entries on
+the diagonal iff \(g=e\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org90ca260" class="outline-3">
+<h3 id="org90ca260">Exercise A2.19</h3>
+<div class="outline-text-3" id="text-org90ca260">
+<p>
+Use Theorem A2.5 to show that the regular representation contains \(d_{\rho^p}\) instances
+of each irreducible representation \(\rho^p\). Thus, if \(R\) denotes the regular
+representation, and \(\hat{G}\) denotes the set of all inequivalent irreducible
+representations, then
+</p>
+
+<p>
+\[
+  \chi_i^R = \sum_{\rho \in \hat{G}} d_\rho \chi_i^\rho .
+\]
+</p>
+</div>
+
+<div id="outline-container-org37e4703" class="outline-4">
+<h4 id="org37e4703">Proof</h4>
+<div class="outline-text-4" id="text-org37e4703">
+<p>
+By Theorem A2.4 (the fundamental theorem) the irreducible representations are an
+orthonormal basis of the Hilbert Space of class functions (see <a href="#class-functions-hilbert-space">here</a> too). Hence
+</p>
+
+<p>
+\[
+  \chi^R = \sum_{\rho\in\hat{G}} c_\rho \chi^\rho
+\]
+</p>
+
+<p>
+for <i>some</i> \(c_\rho\in\CC\). Let us calclute the value of the coefficients:
+</p>
+
+<p>
+\[
+  c_\rho = \langle \chi^\rho, \chi^R \rangle = \abs{G}\inv \chi^\rho(e)^* \chi^R(e) = d_\rho .
+\]
+</p>
+
+<p>
+The second equality follows from exercise A2.18 and the third one from exercise
+A2.11(1). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org20d1b98" class="outline-3">
+<h3 id="org20d1b98">Exercise A2.20</h3>
+<div class="outline-text-3" id="text-org20d1b98">
+<p>
+The character of the regular representation is zero except for the conjugacy class
+containing \(e\) (which is \(\{e\}\)), the identity element in \(G\) (see exercise A2.18). Show,
+therefore, that
+</p>
+
+<p>
+\[
+  \sum_{\rho \in \hat{G}} d_\rho \chi^\rho(g) = \abs{G} \delta_{ge} .
+\]
+</p>
+</div>
+
+<div id="outline-container-org791f7c7" class="outline-4">
+<h4 id="org791f7c7">Proof</h4>
+<div class="outline-text-4" id="text-org791f7c7">
+<p>
+We have
+</p>
+
+<p>
+\[
+  \sum_{\rho \in \hat{G}} d_\rho \chi^\rho(g)
+  = \chi^R(g) = \abs{G} \delta_{ge} .
+\]
+</p>
+
+<p>
+The first equality follows from exercise A2.19. The second one from exercise A2.18. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb7d31ed" class="outline-3">
+<h3 id="orgb7d31ed">Exercise A2.21</h3>
+<div class="outline-text-3" id="text-orgb7d31ed">
+<p>
+Show that \(\sum_{\rho\in\hat{G}}d_\rho^2=\abs{G}\).
+</p>
+</div>
+
+<div id="outline-container-org9072e1a" class="outline-4">
+<h4 id="org9072e1a">Proof</h4>
+<div class="outline-text-4" id="text-org9072e1a">
+<p>
+We have
+</p>
+
+<p>
+\[
+  \sum_{\rho\in\hat{G}} d_\rho^2 = \sum_{\rho\in\hat{G}} d_\rho \chi^\rho(e) = \chi^R(e) = \abs{G} .
+\]
+</p>
+
+<p>
+The first equality follows from exercise A2.11(1), the second from A2.19 and the third
+again from A2.11(1). QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf31485a" class="outline-2">
+<h2 id="orgf31485a">References</h2>
+<div class="outline-text-2" id="text-orgf31485a">
+<p>
+Nielsen, Michael A. and Chuang, Isaac L. (2011). <i>Quantum Computation and Quantum Information: 10th Anniversary Edition</i>, Cambridge University Press.</p>
+
+<p>
+William Fulton and Joe Harris (2004). <i>Representation theory</i>, Springer.</p>
 </div>
 </div>
 <footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.90 (<a href="https://orgmode.org">Org</a> mode 9.6.4)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
