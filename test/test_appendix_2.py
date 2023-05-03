@@ -1,8 +1,7 @@
 import pytest
+from sympy import I, Matrix, exp, eye, pi, sqrt
 
-from sympy import eye, Matrix, exp, I, pi, sqrt
-
-from appendix_2 import U_std, s3_perm, s3_std, get_fourier_matrix, s3_triv, s3_sign
+from appendix_2 import U_std, get_fourier_matrix, s3_perm, s3_sign, s3_std, s3_triv
 from chapter_4 import H, tprod
 
 
