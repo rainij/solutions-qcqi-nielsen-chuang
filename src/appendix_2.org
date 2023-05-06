@@ -520,16 +520,19 @@ Let us now restrict $\rho^F$ to $\ZZ[G]$. That is, we only use integer coefficie
 of the corresponding linear maps are /algebraic integers/. This will be useful in
 [[#exercise-a2-14][exercise A2.14]].
 
+<<def-algebraic-integers-and-numbers>>
 The *algebraic numbers* are defined as all complex numbers which are a root of some
 polynomial with /rational/ coefficients. Likewise *algebraic integers* are defined as all
 complex numbers which are a root of some polynomial with /integer/ coefficients and whose
 leading coefficient is $1$ (this is called a *monic* polynomial).
 
+<<basics-algebraic-integers>>
 Clearly rational numbers are algebraic numbers. Similarly integers are algebraic
 integers. It is also not hard to see that a rational number which is an algebraic integer
 is already an integer (consider $p/q$ with coprime $p$, $q$ and look what the highest
 monomial does to the denominator).
 
+<<theorm-algebraic-integers-ring>>
 THEOREM: Algebraic integers are a ring and algebraic numbers are a field.
 
 PROOF: We have to show that $a+b$, $ab$, and $-a$ are algebraic integers/numbers if $a$
@@ -544,6 +547,7 @@ eigenvalues $a$ and $b$ respectively. Let $u$, $v$ be the corresponding eigenvec
 $A\otimes B$ and $A\otimes I+I\otimes B$ have eigenvalues $ab$ and $a+b$ respectively. The
 corresponding eigenvectors are $u\,\otimes\,v$ both times. QED.
 
+<<theorem-zg-integral-elements>>
 THEOREM: Each element in $\\Z[G]$ satisfies a monic polynomial with integer coefficients
 ("satisfies" means $p(\alpha)=0$). In particular the eigenvalues of the matrices in
 $\rho^F(\ZZ[G])$ are algebraic integers.
@@ -610,6 +614,7 @@ Let $n(\rho,i,j)\in\{1,\ldots,N\}$ be index in the vector $\hat{f}$ according to
 ordering of the irreducible representation $\rho$ and the matrix indices
 $i,j\in{1,\ldots,d_\rho}$. Then:
 
+<<fourier-trafo-coordinate-form>>
 $$
   \hat{f}(n(\rho,i,j)) = \sqrt{\frac{d_\rho}{N}} \sum_{g\in G} f(g) \, \rho(g)_{ij} .
 $$
@@ -647,8 +652,11 @@ $$
 yields $\FT\inv$.
 
 ** Fourier transform on Abelian groups
+:PROPERTIES:
+:CUSTOM_ID: section-fourier-abelian-groups
+:END:
 In the Abelian case the notational burden simplifies heavily. As always let $G$ be a
-finite group, $N=\abs{N}$. Note that the set $\hat{G}$ of irreducible representations is
+finite group, $N=\abs{G}$. Note that the set $\hat{G}$ of irreducible representations is
 the same as the set of irreducible characters since all irreducible representations of an
 Abelian group are one-dimensional (see [[#exercise-a2-23][exercise A2.23]]).
 
@@ -670,14 +678,16 @@ said. Equality can be shown from the (non-trivial) fact that finite Abelian grou
 isomorphic to a [[https://en.wikipedia.org/wiki/Abelian_group#Finite_abelian_groups][direct sum of cyclic groups]].
 
 Cyclic groups in turn are (easily seen to be) isomorphic to $\ZZ_n$ for which it is easy
-to see that $\hom(\ZZ_n,S^1)$ has /exactly/ $n$ elements. In fact, we already know that
-the values of $\chi$ are $n$​th roots of unity. From this and the functional equation
+to see that $\hom(\ZZ_n,S^1)$ has /exactly/ $n$ elements. In fact, it is easy to see that
+the values of a $\chi\in\hom(G,S^1)$ must be $n$​th roots of unity. From this and the
+functional equation
 
 $$
   \chi(a+b) = \chi(a)\chi(b) \in S^1 \subseteq \CC
 $$
 
-we see that these $n$ functions are the only possible elements of $\hom(\ZZ_n,S^1)$:
+we see that the $n$ irreducible characters of $\ZZ_n$ are the only possible elements of
+$\hom(\ZZ_n,S^1)$:
 
 $$
   \chi_k(j) = e^{-2\pi kj/n} .
@@ -832,12 +842,63 @@ for any element $g$. By [[*Schur's Lemma][Schur's Lemma]] we have $s=\alpha_s I$
 $\alpha_s$. Since $s$ was arbitrary we have that any element is of this form. A group of
 multiples of the identity can clearly only be irreducible if it is one dimensional. QED.
 
-** TODO Exercise A2.14
+** Exercise A2.14
 :PROPERTIES:
 :CUSTOM_ID: exercise-a2-14
 :END:
 Prove that if $\rho$ is an irreducible representation of $G$, then $|G|/d_\rho$ is an
 integer.
+
+*** Proof
+Let $\mathcal{C}$ be the set of all (different) conjugacy classes of $G$. Let
+$C\in\mathcal{C}$. Consider
+
+$$
+  p = \sum_{g\in C} \rho(g) .
+$$
+
+We will only consider the representation $\rho$ so let us omit it and write briefly:
+
+$$
+  p = \sum_{g\in C} g .
+$$
+
+Note that this map is G-linear, since $C$ is a conjugacy class (which implies $C=hCh\inv$):
+
+$$
+  ph = \sum_{g\in C} gh = \sum_{g\in C} (hgh\inv)h = hp .
+$$
+
+By [[#schurs-lemma][Schur's Lemma]] there is a $\lambda_C\in\CC$ such that $p=\lambda_C I$. Taking the trace we
+get
+
+<<ex-2-14-lambda-C>>
+$$
+  \lambda_C = \frac{\abs{C}}{d_\rho}\chi(C) .
+$$
+
+Here $\chi$ is the character of $\rho$ and $\chi(C)$ is the (only) value $\chi$ assumes on
+$C$ (recall that characters are constant on conjugacy classes, see [[#exercise-a2-11][exercise A2.11(4)]]).
+
+Now comes the crucial part. Observe that $p\in\ZZ[G]$. Each element of $\ZZ[G]$ [[theorem-zg-integral-elements][satisfies]]
+a monic polynomial with integer coefficients (/monic/ means that the leading coefficient
+is $1$). Hence $\lambda_C$ (which satisfies the same polynomial) is an [[def-algebraic-integers-and-numbers][algebraic integer]].
+
+Consider
+
+$$
+  \sum_{C\in\mathcal{C}} \lambda_C \chi(C)^*
+  = \sum_{C\in\mathcal{C}} \frac{\abs{C}}{d_\rho} \abs{\chi(C)}^2
+  = \frac{N}{d_\rho} \in \QQ
+$$
+
+The first equality follows from the [[ex-2-14-lambda-C][formula for]] $\lambda_C$. The second one from the
+[[irreducible-chars-norm-one][orthonormality]] of irreducible characters. The left-hand side is an algebraic integer since
+$\lambda_C$ is an algebraic integer (as we have just seen), $\chi(C)^*$ too (as a root of
+unity), and algebraic integers [[theorm-algebraic-integers-ring][are a ring]].
+
+Hence $N/d_\rho$ is an algebraic integer. Clearly it is a rational too. But the only
+rationals which are algebraic integers are the [[basics-algebraic-integers][integers themselves]]. QED.
 
 ** Exercise A2.15
 :PROPERTIES:
@@ -1188,8 +1249,24 @@ $$
 The first equality follows from exercise A2.11(1), the second from A2.19 and the third
 again from A2.11(1). QED.
 
-** TODO Exercise A2.22
+** Exercise A2.22
 Substitute (A2.10) into (A2.9) and prove that $\hat{f}(\rho)$ is obtained.
+
+*** Solution
+Let us fix an irreducible representation $\rho$ and indices $i,j$. Let $n=n(\rho,i,j)$
+where we use the same notation as in the [[fourier-trafo-coordinate-form][coordinate formulation]] of the Fourier transform.
+
+\begin{align*}
+  &\sqrt{\frac{d_\rho}{N}} \sum_g f(g) \rho(g)_{ij} \\
+  &= \frac{1}{N} \sum_g \sum_\sigma \sqrt{d_\rho d_\sigma} \trace{\hat{f}(\sigma)\sigma(g\inv)} \rho(g)_{ij} \\
+  &= \frac{1}{N} \sum_g \sum_\sigma \sqrt{d_\rho d_\sigma} \sum_{kl} \hat{f}(\sigma)_{kl}\sigma(g\inv)_{lk} \rho(g)_{ij} \\
+  &= \frac{1}{N} \sum_{\sigma} \sum_{kl} \sqrt{d_\rho d_\sigma} \hat{f}(\sigma)_{kl} \sum_g \sigma(g\inv)_{lk} \rho(g)_{ij} \\
+  &= \sum_{\sigma} \sum_{kl} \sqrt{\frac{d_\sigma}{d_\rho}} \hat{f}(\sigma)_{kl} \delta_{lj} \delta_{ki} \delta_{\sigma \rho} \\
+  &= \hat{f}(\rho)_{ij} \\
+  &= \hat{f}(n) .
+\end{align*}
+
+In the fourth equality we used the [[fundamental-formula][fundamental formula]].
 
 ** Exercise A2.23
 :PROPERTIES:
@@ -1207,18 +1284,17 @@ $$
 $$
 
 *** Solution
-This is really just plugging stuff into the formulas. One notable thing is maybe the
-following: $g\inv$ is to be translated to $-g$ since the group operation is $+$, hence
-negation is the proper inversion operator. That the $\rho_g$ are representations is easy
-to verify. To see that they are irreducible first observe that $\rho_g$ is equal to its
-character and hence irreducibility follows from
+Let us first note that $g\inv$ is to be translated to $-g$ since the group operation is
+$+$. That the $\rho_g$ are representations is easy to verify. To see that they are
+irreducible first observe that $\rho_g$ is equal to its character $\chi_g$ and hence
+irreducibility follows from
 
 $$
   \norm{\chi_g}^2 = \frac{1}{N} \sum_h \chi_g(h)^* \chi_g(h) = \frac{1}{N} \sum_h 1 = 1 ,
 $$
 
-which characterizes irreducible characters as can be directly seen from the result about
-[[#decomposition-of-representations][decomposition of representations]].
+which [[irreducible-chars-norm-one][characterizes]] irreducible characters. The rest is pluggin stuff into formulas. See
+also the section on the [[#section-fourier-abelian-groups][Fourier transform on Abelian groups]].
 
 ** Exercise A2.24
 Using the results of [[#exercise-a2-16][Exercise A2.16]], construct the Fourier transform over $S_3$ and
