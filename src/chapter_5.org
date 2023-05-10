@@ -1894,5 +1894,260 @@ properties is required as a precondition of the quantum part of Shor's algorithm
   forever. It just means that based on the Theorems showed in the book nothing can be
   guaranteed.
 
+** Exercise 5.20
+Suppose $f(x+r)=f(x)$, and $0\leq x < N$ , for $N$ an integer multiple of $r$. Compute the
+Fourier transform on $\ZZ_N$:
+
+$$
+  \hat{f}(l) = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} e^{-2\pi\ii lx/N} f(x) ,
+$$
+
+and relate the result to the Fourier transform on $\ZZ_r$ (5.63).
+
+*** Solution
+By assumption $N=nr$ for some integer $n$. Moreover, let us write $x=yr+z$ where
+$0\leq\,z\,<\,r$. Then
+
+\begin{align*}
+  \FT_N f(l) &= \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} e^{-2\pi\ii lx/N} f(x) \\
+  &= \frac{1}{\sqrt{N}} \sum_{y=0}^{n-1} \sum_{z=0}^{r-1} e^{-2\pi\ii ly/n} e^{-2\pi\ii lz/N} f(z) .
+\end{align*}
+
+In the second equality we used the fact hat $f$ is $r$​-periodic, and hence $f(x)=f(z)$.
+
+Recall that $\sum_{y=0}^{n-1}\exp(-2\pi\ii ly/n)$ is $n$ if $l=nl'$ for some $l'$ and $0$
+otherwise (this follows directly from the formula for [[https://en.wikipedia.org/wiki/Geometric_series#Sum][geometric sums]], or abstractly from
+the [[file:appendix_2.org::paragraph-orthogonality-irrep-characters][orthogonality relations]] of the irreducible characters).
+
+Hence the summation over $y$ directly yields $\FT_Nf(l)=0$ if $l$ is not a multiple of
+$n$. Hence in the following we assume that $l=nl'$ for some $l'$.
+
+\begin{align*}
+  \FT_N f(nl') &= \frac{n}{\sqrt{N}} \sum_{z=0}^{r-1} e^{-2\pi\ii l' z/r} f(x)
+  = \sqrt{n} \FT_r f(l') .
+\end{align*}
+
+Let us summarize this. For $l=nl'+m$ where $0\leq m < n$ we have:
+
+<<exercise-5-20-result>>
+$$
+  \FT_Nf(nl'+m) = \begin{cases} \sqrt{n} \FT_rf(l') & \text{if } m=0 \\ 0 & \text{otherwise.} \end{cases}
+$$
+
+Note that the prefactor $\sqrt{n}$ is nothing fundamental here. It depends on certain
+conventions. For example it could be $n$ if we would define the Fourier transform without
+the $1/\sqrt{N}$.
+
+*** Discussion
+This result could easily be obtained without calculation. In fact, we know that the characters
+
+$$
+  \chi_l^N(x) = e^{-2\pi\ii lx/N} \text{ for } l \in \ZZ_N
+$$
+
+form an [[file:appendix_2.org::paragraph-orthogonality-irrep-characters][orthonormal basis]] of the class functions on $\ZZ_N$. Since the group is Abelian,
+every function $\ZZ_N\to\CC$ is a class function (the conjugacy classes only contain
+single elements in that case). If a function is $r$​-periodic this means that it is
+actually a function on $\ZZ_r$ and can be written as a sum of the irreducible characters
+of $\ZZ_r$. If $N=nr$ is a multiple of $r$ the characters of $\ZZ_r$ are contained in the
+characters of $\ZZ_N$:
+
+$$
+  \chi_{l'}^r = \chi_{nl'}^N .
+$$
+
+This /essentially/ explains [[exercise-5-20-result][the relation]] between $\FT_N$ and $\FT_r$. The prefactor
+$\sqrt{n}$ can be explained by observing that the scalar products also have a prefactor
+which is chosen in a way such that the characters have norm $1$:
+
+$$
+  \langle \chi_l^r, \chi_k^r \rangle = \frac{1}{\sqrt{r}} \sum_{j\in\ZZ_r} \chi_l^r(j)^* \chi_k^r(j)
+  = \delta_{lk} .
+$$
+
+Hence a scaling is necessary. Observe that this particular choice of scalar product with
+the particular prefactor of the Fourier transform make the Fourier transform unitary.
+
+** Exercise 5.21
+Suppose you are given a unitary operator $U_y$ which performs the transformation
+$U_y\ket{f(x)}=\ket{f(x+y)}$, for the periodic function described above.
+
+1. Show that the eigenvectors of $U_y$ are $\ket{\hat{f}(l)}$, and calculate their
+   eigenvalues.
+2. Show that given $\ket{f(x_0)}$ for some $x_0$, $U_y$ can be used to realize a black box
+   which is as useful as $U$ in solving the period-ﬁnding problem.
+
+
+- Remark :: It seems to me that $U_y$ is intended to be a shift operator. But the
+  definition is a bit weird since $f(x)$ can only take two values. For that reason the
+  formula $U_y\ket{f(x)}=\ket{f(x+y)}$ does not make sense to me. So instead of giving a
+  solution (which I cannot) I explain in detail what I think is weird about this exercise.
+
+*** Why I think the exercise is weird
+The formula $U_y\ket{f(x)}=\ket{f(x+y)}$ looks odd to me. Note that $f(x)$ is a function
+which only takes two values $0$ and $1$. So for most functions $f$ the formula cannot be
+satisfied by any $U_y$. For example, take the function defined on $\{0,1,2,3,4\}$ which
+maps these values to $0,1,0,0,1$ in that order. The formula for $y=1$ requires:
+
+$$
+  U_1\ket{0} = U_1 \ket{f(0)} = \ket{f(1)} = \ket{1} ,
+$$
+
+and on the other hand
+
+$$
+  U_1\ket{0} = U_1 \ket{f(2)} = \ket{f(3)} = \ket{0} ,
+$$
+
+which contradicts the first equation.
+
+As I understand it $U_y$ should be a shift operator. Which I would define like that
+$(S_yf)(x)=f(x+y)$ (I call it $S$ to make it possible to distinguish this from the
+original definition). Note that I emphasize that $S_y$ acts on the function $f$ not on its
+value $f(x)$. So the contradiction above does not appear.
+
+With $S_y$ task (1) could be interpreted in a way which makes sense. But note that my
+definition of $S_y$ is /essentially/ identical to the one given for $U_k$ in Box 5.5 and
+my interpretation of part (1) would lead to the shift-invariance property there. So I am
+not sure if this is what was meant.
+
+Task (2) makes even less sense to me. Let us set $x_0=0$ for simplicity. The state
+$\ket{f(0)}$ does not contain any information on $f(x)$ except for $x=0$ (the function
+could be completely random). So $U_y$ must contain the full information on $f(x)$ for any
+$x$ with the possible exception of $x=0$. So it makes sense to define it not only on the
+second register, but also on the first one - like $U$.
+
+** Exercise 5.22
+:PROPERTIES:
+:CUSTOM_ID: exercise-5-22
+:END:
+Let $f(x_1,x_2)=a^{sx_1+x_2}\mod N$ and let $r$ be the order of $a$ with respect to
+$N$ (i.e. in the group $\ZZ_N$). Show that
+
+<<exercise-5-22-to-show>>
+$$
+  \ket{\hat{f}(l_1,l_2)} = \frac{1}{r} \sum_{x_1=0}^{r-1} \sum_{x_2=0}^{r-1}
+    e^{-2\pi\ii(l_1x_1+l_2x_2)/r} \ket{f(x_1,x_2)}
+  = \sum_{j=0}^{r-1} e^{-2\pi\ii l_2 j/r} \ket{f(0,j)} .
+$$
+
+for $l_1=sl_2\mod r$ and $\ket{\hat{f}(l_1,l_2)}=0$ otherwise.
+
+- Remarks ::
+  - We corrected wrong factors in front of the sums and cleaned up the formulation.
+  - I do not know if it is just me but I regularly get confused by the notation. Therefore
+    let me note a subtle thing about it - for those who feel the same. What do
+    $\ket{f(x)}$ and $\ket{\hat{f}(l)}$ mean? For the former this is easy. In fact, if
+    e.g. $f(x)=5$ then $\ket{f(x)}$ is $\ket{5}$. In other words it is $\ket{101}$ in a
+    register with three qubits with respect to the standard basis.
+
+    For the latter the interpretation is different! In fact, $\hat{f}$ a priori does not
+    even make sense without the ket. In particular it is /not/ the Fourier transform of
+    $f$. Note that $f:G\to\ZZ_r$ for some group $G$, while we only ever calculate the
+    Fourier transform of functions $G\to\CC$ (or $G\to\CC^k$ for some $k$ by
+    component-wise application of $k$ Fourier transforms). Instead the /whole thing/
+    really is defined by this:
+
+    $$
+      \ket{\hat{f}(l)} := \frac{1}{\sqrt{r}} \sum_{j\in \ZZ_r} e^{-2\pi\ii lj/r} \ket{f(j)}
+      = \FT_{\ZZ_r} [j \mapsto\ket{f(j)}](l) ,
+    $$
+
+    for the Group $G=\ZZ_r$ and similarly for other Abelian groups like
+    $\ZZ_{r_1}\times\ZZ_{r_2}$.
+
+*** Proof
+As a first step we change the summation indices; replacing $x_2$ by $j=sx_1+x_2\mod r$
+(/change of variables/ - as it would be called in integration theory):
+
+$$
+  \ket{\hat{f}(l_1,l_2)} = \frac{1}{r} \sum_{x_1=0}^{r-1} \sum_{j=0}^{r-1}
+    e^{-2\pi\ii(l_2 j + (l_1-sl_2)x_1)/r} \ket{f(0,j)}
+$$
+
+Note that the summation over $x_1$ [[file:appendix_2.org::orthogonality-characters-Z_N][leads to]] $\ket{\hat{f}(l_1,l_2)}=0$ if $l_1\neq sl_1$. For
+$l_1=sl_2$ we get
+
+<<exercise-5-22-result>>
+$$
+  \ket{\hat{f}(sl_2,l_2)} = \sum_{j=0}^{r-1} e^{-2\pi\ii l_2 j/r} \ket{f(0,j)} .
+$$
+
+QED.
+
+- Remark ::
+  $K=\{(x_1, x_2) \in \ZZ_N\otimes \ZZ_N; sx_1 + x_2 = 0\}$ is a subgroup on which $f$ is
+  invariant. Note how the [[exercise-5-22-result][result]] resembles a [[file:appendix_2.org::fourier-and-invariant-subspaces][formula]] obtained in the appendix.
+
+** Exercise 5.23
+Assume that $f$ is as in [[#exercise-5-22][exercise 5.22]]. Compute
+
+<<exercise-5-23-to-show>>
+$$
+  \frac{1}{r} \sum_{l_1=0}^{r-1} \sum_{l_2=0}^{r-1} e^{2\pi\ii(l_1x_1+l_2x_2)/r} \ket{\hat{f}(l_1,l_2)}
+$$
+
+and show that the result is $\ket{f(x_1,x_2)}$.
+
+- Remarks ::
+  - We corrected a sign error in the formula [[exercise-5-23-to-show][above]]. The error probably arised because the
+    book is a bit incosistent on whether the Fourier transform goes with
+    $\exp(+2\pi\ii\ldots)$ or $\exp(-2\pi\ii\ldots)$. But $\hat{f}$ was defined with a
+    minus sign (in this case) hence we need a plus sign here.
+  - Moreover, we corrected that the result is $\ket{f(x_1,x_2)}$ not $f(x_1,x_2)$. The
+    former is a function $\ZZ_r\otimes\ZZ_r\to\CC^{2^n}$ while the latter is a function
+    $\ZZ_r\otimes\ZZ_r\to\ZZ_N$. Here $n$ is just size of the third register in the
+    discrete-logarithm algorithm (large enough to enable arithmetic modulo $N$).
+
+*** Proof 1
+In this part we only assume that $\ket{\hat{f}}$ is the Fourier transform of /some/
+function $\ket{f}:\ZZ_r\times\ZZ_r\to\CC^k$ (some $k$). In fact, this is easier than in
+the [[#exercise-5-23-proof-2][second proof]] where we assume more about $f$.
+
+Let us write $x\cdot l = \sum_i x_i l_i$. Then
+
+$$
+  \frac{1}{r} \sum_l e^{2\pi\ii l\cdot x/r} \ket{\hat{f}(l)}
+  = \frac{1}{r^2} \sum_{l,y} e^{2\pi\ii l\cdot (x-y)/r} \ket{f(y)} .
+$$
+
+If $x\neq y$ then the summation over $l_1$ or the summation over $l_2$ (or both) leads to
+zero (by the [[file:appendix_2.org::orthogonality-characters-Z_N][orthonormality relation]]). Hence we obtain
+
+$$
+  \frac{1}{r} \sum_{y} \delta_{x,y} \ket{f(y)} = \ket{f(x)} .
+$$
+
+QED.
+
+*** Proof 2
+:PROPERTIES:
+:CUSTOM_ID: exercise-5-23-proof-2
+:END:
+Let us directly verify the result using the RHS of the [[exercise-5-22-to-show][formula]] from [[#exercise-5-22][exercise 5.22]]. The
+main benefit of doing this is to provide a little bit more confidence into the (IMO) slightly
+unintuitive pre-factor in the RHS of said formula.
+
+\begin{align*}
+  \frac{1}{r} \sum_l e^{2\pi\ii l\cdot x/r} \ket{\hat{f}(l)}
+  &= \frac{1}{r} \sum_{l_2} e^{2\pi\ii x\cdot(sl_2,l_2)/r} \ket{\hat{f}(sl_2,l_2)} \\
+  &= \frac{1}{r} \sum_{l_2,j} e^{2\pi\ii l_2(sx_1+x_2-j)/r} \ket{f(0,j)} \\
+  &= \sum_{j} \delta_{j,sx_1+x_2} \ket{f(0,j)} \\
+  &= f(x_1,x_2) .
+\end{align*}
+
+In the first equality we use that $\ket{\hat{f}}$ non-zero only at $(sl_2,l_2)$. In the
+third equality we used the [[file:appendix_2.org::orthogonality-characters-Z_N][orthonormality relation]]. QED.
+
+** TODO Exercise 5.24
+Construct the generalized continued fractions algorithm needed in step 6 of the discrete
+logarithm algorithm to determine $s$ from estimates of $sl_2/r$ and $l_2/r$.
+
+** TODO Exercise 5.25
+Construct a quantum circuit for the black box $U$ used in the quantum discrete logarithm
+algorithm, which takes $a$ and $b$ as parameters, and performs the unitary transform
+$\ket{x_1,x_2,y}\mapsto\ket{x_1,x_2,y\,\oplus\,b^{x_1}a^{x_2}}$. How many elementary
+operations are required?
+
 * References
 #+print_bibliography:
