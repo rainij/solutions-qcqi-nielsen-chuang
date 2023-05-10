@@ -308,11 +308,13 @@ single conjugacy classes form a basis).
 
 Using the following scalar product, the vector space turns into a Hilbert Space:
 
+<<scalar-product-on-finit-group>>
 $$
   \langle \alpha, \beta \rangle =
   \frac{1}{\abs{G}} \sum_{g\in G} \alpha(g)^* \beta(g) .
 $$
 
+<<paragraph-orthogonality-irrep-characters>>
 It turns out that the irreducible characters are an orthonormal basis of this Hilbert
 Space. This should be shown in [[#exercise-a2-15][exercise A2.15]]. This exercise however bases the proof on a
 more difficult result so it does not really help to understand this nice result. For a
@@ -352,6 +354,18 @@ $$
 <<irreducible-chars-norm-one>>
 In particular we deduce that a character is irreducible iff its norm is $1$ (all other
 characters have a larger norm).
+
+As special case consider the characters $\chi_p(j)=\exp(2\pi\ii jp/N)$ of the Abelian group
+$\ZZ_N$. The general theory shows that these functions are a basis of $\CC^N$. This basis
+is orthogonal if we scale the scalar product on $\CC^N$ by $1/\sqrt{N}$ (as in the [[scalar-product-on-finit-group][formula]]
+for general groups). Note that the [[paragraph-orthogonality-irrep-characters][orthonormality relation]] is equivalent to the well known
+
+<<orthogonality-characters-Z_N>>
+$$
+  \sum_{j=0}^{N-1} e^{2\pi\ii jp/N} = \begin{cases} N & \text{if } p=0 \\ 0 & \text{otherwise.} \end{cases}
+$$
+
+Of course the latter can also be seen from the formula for geometric sums.
 
 * Fourier transform on groups
 ** Fundamental formula
@@ -694,6 +708,55 @@ $$
 $$
 
 Compare this with [[*Exercise A2.23][exercise A2.23]].
+
+** Tensor products and invariant subspaces
+Let $G=H\otimes K$ be a tensor product of two finite /Abelian/ groups. It is not hard to see
+that products of the irreducible characters of $H$ and $K$ are the irreducible characters of $G$:
+
+$$
+  \chi_G^{ij}(h, k) = (\chi_H^i \otimes \chi_K^j)(h,k) = \chi_H^i(h) \chi_K^j(k) .
+$$
+
+Let $f:G\to\CC$ be a product:
+
+$$
+  f(h,k) = f_1(h) f_2(k) .
+$$
+
+By [[#section-fourier-abelian-groups][definition]] of the Fourier transform on Abelian groups we have:
+
+$$
+  \FT_G f(\chi_G^{ij}) = \frac{1}{\sqrt{\abs{G}}} \sum_{h,k} f(h,k) \chi_H^i(h) \chi_K^j(k) .
+$$
+
+Since $f$ is a product, the sum factors into a sum over $h$ and a sum over $k$. Hence the
+Fourier transform *commutes with tensor products* in the following sense
+
+$$
+  \FT_G (f_1 \otimes f_2) = (\FT_H f_1) \otimes (\FT_K f_2) .
+$$
+
+Now, let $f:G\to\CC$ be a function which is invariant with respect to $K$, that is:
+
+$$
+  f(h, k) = f(h, 0) .
+$$
+
+This is clearly a special case of a product with second factor being just the constant
+function $1$. By the [[paragraph-orthogonality-irrep-characters][orthonormality relation]] for irreducible characters we have
+
+$$
+  \FT_K (k\mapsto 1)(\chi_K^j) = \sqrt{\abs{K}} .
+$$
+
+Hence for $K$​-invariant functions $f$ we have
+
+<<fourier-and-invariant-subspaces>>
+$$
+  \FT_Gf(\chi_G^{ij}) = \begin{cases}
+    \sqrt{\frac{\abs{K}}{\abs{H}}} (\FT_H f(\cdot,0))(\chi_H^i) & \text{if } j=0 \\
+    0 & \text{otherwise.} \end{cases}
+$$
 
 * Exercises
 ** Exercise A2.11 (Characters)
