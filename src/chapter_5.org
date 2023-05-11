@@ -2080,6 +2080,9 @@ QED.
   invariant. Note how the [[exercise-5-22-result][result]] resembles a [[file:appendix_2.org::fourier-and-invariant-subspaces][formula]] obtained in the appendix.
 
 ** Exercise 5.23
+:PROPERTIES:
+:CUSTOM_ID: exercise-5-23
+:END:
 Assume that $f$ is as in [[#exercise-5-22][exercise 5.22]]. Compute
 
 <<exercise-5-23-to-show>>
@@ -2139,15 +2142,145 @@ unintuitive pre-factor in the RHS of said formula.
 In the first equality we use that $\ket{\hat{f}}$ non-zero only at $(sl_2,l_2)$. In the
 third equality we used the [[file:appendix_2.org::orthogonality-characters-Z_N][orthonormality relation]]. QED.
 
-** TODO Exercise 5.24
+** Exercise 5.24
 Construct the generalized continued fractions algorithm needed in step 6 of the discrete
 logarithm algorithm to determine $s$ from estimates of $sl_2/r$ and $l_2/r$.
 
-** TODO Exercise 5.25
+*** Solution
+First of all, I am not sure what is meant by "generalized continued fraction algorithm" in
+/this/ context. We do not need any clever idea here. In fact, the basic idea is this:
+
+<<exercise-5-24-s>>
+$$
+  s \approx \tilde{s} = \frac{\widetilde{sl_2/r}}{\widetilde{l_2/r}} ,
+$$
+
+where the tilde stands for the fact that we merely have an approximation of the underlying
+value available. It remains to formulate conditions under which this approximation is
+close enough to $s$ so that rounding to the nearest integer yields the correct value for $s$.
+
+Let us discuss where the error comes in. First of all let us note that the $\approx$ in
+step 3 of the algorithm is actually an equality ($=$). In fact, this is proved by
+exercises [[#exercise-5-22][5.22]] and [[#exercise-5-23][5.23]]. The error actually happens when doing the inverse Fourier
+transform in step 4. In section 5.2.1 it was shown that with probability of at least
+$1-\varepsilon$ the two approximations are exact up the $t$​th bit. To keep things simple we
+assume that the quotient on the RHS of the [[exercise-5-24-s][approximation]] of $s$ can be calculated
+exactly. This is actually possible using rational arithmetic (use =fractions.Fraction= in
+python).
+
+Let $\varphi_1=sl_2/r$, $\varphi_2=l_2/r$ and define
+
+\begin{align*}
+  \varphi_1 + \delta_1 &:= \tilde{\varphi_1}, \\
+  \varphi_2 + \delta_2 &:= \tilde{\varphi_2} .
+\end{align*}
+
+Let us note that
+
+$$
+  s, l_2 \leq r .
+$$
+
+Moreover it is reasonable to assume
+
+<<reasonable-assumptions>>
+$$
+  s, l_2 \neq 0, \quad r \geq 8 .
+$$
+
+The conditions on $s$ and $r$ are justified since $s=0$ means $b=1$ and trying all $s\,<\,r$
+is also doable classically if $r$ is small. The case $l_2=0$ has a low probability; in
+fact, all $r$ possible values for $l_2$ have equal probability by
+$\norm{\ket{\hat{f}(sl_2,l_2)}}=\sqrt{r}$ which in turn can by seen from [[exercise-5-22-to-show][the formula]] for
+$\ket{\hat{f}(l_1,l_2)}$ in exercise 5.22.
+
+By chapter 5.2.1 we have $\delta_i\leq2^{-t}$. Moreover let us choose $t=\log_2(r^c)$ for
+some yet to determine constant $c$ (note that this satisfies $t=O(\log(r))$ consistent
+with the runtime requirements). Hence
+
+$$
+  \abs{\delta_i} \leq 2^{-t} = r^{-c} .
+$$
+
+Using this and the [[reasonable-assumptions][reasonable assumptions]] we deduce
+
+$$
+  \delta := \max{\frac{\abs{\delta_1}}{\varphi_i}} \leq 2 r^{1-c} .
+$$
+
+if we *assume* $c\geq2$, because then $\delta_i\leq1/2r\leq\varphi_i/2$. Using this we get:
+
+$$
+  \abs{s - \tilde{s}} = s \abs{1 - (1+\delta_1/\varphi_1)(1+\delta_2/\varphi_2)\inv}
+  \leq s((1 - \delta)^{-2} - 1)
+  \leq 4r \delta
+  \leq 8r^{2-c} .
+$$
+
+Here we also used that $(1-\delta)^{-2}\leq1+4\delta$ which is true if (for example)
+$\delta\leq1/4$ which in turn holds for $r\geq8$ if $c\geq2$.
+
+We want that $\abs{s-\tilde{s}}\leq1/4$. This is satisfied if
+
+$$
+  8 r^{2-c} \leq \frac{1}{4} ,
+$$
+
+Which in turn is equivalent to
+
+$$
+  c \geq 2 + \frac{5}{\log_2(r)} .
+$$
+
+Let us just take $c$ equal to the RHS. We have just showed that then the [[exercise-5-24-s][approximation]] for
+$s$ is good enough.
+
+*Summary:* Choosing $t=2\ceil{\log_2(r)}+5$ is sufficient for the algorithm to work with high
+probability under [[reasonable-assumptions][reasonable assumptions]].
+
+** Exercise 5.25
 Construct a quantum circuit for the black box $U$ used in the quantum discrete logarithm
 algorithm, which takes $a$ and $b$ as parameters, and performs the unitary transform
 $\ket{x_1,x_2,y}\mapsto\ket{x_1,x_2,y\,\oplus\,b^{x_1}a^{x_2}}$. How many elementary
 operations are required?
+
+*** Solution
+Recall that in the chapter on order finding we have seen that there is a circuit using
+$O(L^3)$ gates which performs:
+
+$$
+  V_a: \ket{x,y} \mapsto \ket{a^x y \mod N} .
+$$
+
+Here $L=O(\log(N))$ is the register size. Using $V_a$ it is not hard to construct a
+circuit performing
+
+$$
+  W_{b,a}: \ket{x_1,x_2,y} \mapsto \ket{x_1,x_2, b^{x_1} a^{x_2} y \mod N} .
+$$
+
+In fact:
+
+$$
+  \ket{x_1,x_2,y}
+  \stackrel{V_a(2,3)}{\mapsto} \ket{x_1,x_2, a^{x_2} y \mod N} .
+  \stackrel{V_b(1,3)}{\mapsto} \ket{x_1,x_2, b^{x_1} a^{x_2} y \mod N} .
+$$
+
+Note that this operation is already sufficient for the discrete-logarithm algorithm if the
+third register is initialized to $\ket{1}$ and not to $\ket{0}$.
+
+Using $W_{b,a}$ and one ancilla register we can implement the desired operation.
+
+\begin{align*}
+  \ket{x_1,x_2,y,1}
+  &\stackrel{W_{b,a}(1,2,4)}{\mapsto} \ket{x_1,x_2, y, b^{x_1} a^{x_2} \mod N} \\
+  &\stackrel{\mathrm{XOR}(4,3)}{\mapsto} \ket{x_1,x_2, y \oplus b^{x_1} a^{x_2}, b^{x_1} a^{x_2} \mod N} \\
+  &\stackrel{W_{b,a}(1,2,4)^\dagger}{\mapsto} \ket{x_1,x_2, y \oplus b^{x_1} a^{x_2}, 1} .
+\end{align*}
+
+The last operation just uncomputes the value in the ancilla register. The =XOR= can be
+easily implemented using $L$ controlled =NOT= gates.
 
 * References
 #+print_bibliography:
