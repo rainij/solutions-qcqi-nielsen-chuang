@@ -2299,5 +2299,121 @@ Using $W_{b,a}$ and one ancilla register we can implement the desired operation.
 The last operation just uncomputes the value in the ancilla register. The =XOR= can be
 easily implemented using $L$ controlled =NOT= gates.
 
+** TODO Exercise 5.26
+Since $K$ is a subgroup of $G$, when we decompose $G$ into a product of cyclic groups of
+prime power order, this also decomposes $K$. Re-express (5.77) to show that determining
+$l'_i$ allows one to sample from the corresponding cyclic subgroup $K_{p_i}$ of $K$.
+
+** TODO Exercise 5.27
+Of course, the decomposition of a general ﬁnite Abelian group $G$ into a product of cyclic
+groups of prime power order is usually a difficult problem (at least as hard as factoring
+integers, for example). Here, quantum algorithms come to the rescue again: explain how the
+algorithms in this chapter can be used to efficiently decompose $G$ as desired.
+
+** TODO Exercise 5.28
+Write out a detailed specification of the quantum algorithm to solve the hidden subgroup
+problem, complete with runtime and success probability estimates, for ﬁnite Abelian
+groups.
+
+*** Algorithm (hidden subgroup)
+In the following $f:G\to Y$ is a function from a finite abelian group $G$ to a (finite)
+set $Y$. Let $K$ be a subgroup of $G$ and assume that the restrictions of $f$ to any of
+the cosets of $K$ are constant. Hence the function can be regarded as defined on the
+quotient group $G/K$. Moreover we assume that $f:G/K\to Y$ is injective.
+
+We assume that $G$ is already represented as a decomposition:
+
+$$
+  G = \bigoplus_{i=1}^n \ZZ_{r_i} .
+$$
+
+We do /not/ require that the $r_i$ are powers of primes. This decomposition also fixes an
+[[file:appendix_2.org::isomorphism-ghat-g][isomorphism]] $G\to\hat{G},\;l\mapsto\chi_l$,
+
+$$
+  \chi_l(g) = e^{2\pi\ii \sum_{j=1}^n g_jl_j/r_j} .
+$$
+
+Finally we assume that there is a binary operation $\oplus$ on $Y$ with a left-neutral
+element $0\in Y$, i.e. $0\oplus y=y$ for all $y$.
+
+- Algorithm (for the hidden subgroup problem) ::
+  - Inputs ::
+    1. $n$ register of differing sizes $t_i=O(m_j+\log(n/\varepsilon))$ with
+       $m_j=O(\log(r_j))$. One register of size $N$ for the function evaluation (probably
+       $N=O(\log(\abs{Y}))$, but this naturally depends on the black box $U$ mentioned
+       below). Let $t=\sum_it_i$.
+    2. A black box $U$ which performs the operation
+       $$
+       \bigotimes_{i=1}^n \ket{x_i} \otimes \ket{y}
+       \mapsto \bigotimes_{i=1}^n \ket{x_i} \otimes \ket{y \oplus f(x)} ,
+       $$
+  - Outputs ::
+    A generating set for the hidden subgroup $K$.
+  - Runtime ::
+    TODO
+  - Procedure ::
+    1. Initialization to $\ket{0}$ (all registers).
+
+    2. Perform a Hadamard transform $H^{\otimes t}$ on the first $n$ registers to obtain:
+       $$
+       \rightarrow \frac{1}{\sqrt{2^t}} \sum_{x\in\{0,1\}^t} \ket{x} \ket{0}
+       $$
+
+    3. Apply $U$:
+
+       \begin{align*}
+         \rightarrow \frac{1}{\sqrt{2^t}} \sum_x \ket{x} \ket{f(x)}
+         &= \frac{1}{\sqrt{2^t}} \sum_x \ket{x} \frac{1}{\sqrt{\abs{G}}}  \sum_{l\in G} \chi_l(-x) \ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \left(\frac{1}{\sqrt{2^t}}\sum_{x} \chi_l(-x) \ket{x} \right) \ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \bigotimes_{j=1}^n \left(\frac{1}{\sqrt{2^{t_j}}}\sum_{x_j=0}^{2^{t_j}-1} e^{-2\pi\ii x_jl_j/r_j} \ket{x_j} \right) \ket{\hat{f}(l)}
+       \end{align*}
+
+    4. Apply the inverse Fourier transform of $\bigoplus_{i=1}^n\ZZ_{2^{t_i}}$ (/not/ $G$) to the
+       first $n$ registers:
+
+       $$
+       \rightarrow \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \bigotimes_{j=1}^n \ket{\widetilde{l_j/r_j}} \ket{\hat{f}(l)}
+       $$
+
+       [[file:appendix_2.org::fourier-product-formula-abelian][That is]], we apply the standard inverse Fourier transform on each
+       register. According to chapter 5.2.1 for a given $l$ the $\widetilde{l_j/r_j}$ are
+       $m_j$ bit approximations of $l_j/r_j$ with probability $1-O(\varepsilon/n)$
+       (each). Hence all of them are good approximations /simultaneously/ with probability
+       $1-O(\varepsilon)$.
+
+    5. Measure the first $n$ registers, and recover $l$ from the
+       $\widetilde{l_j/r_j}$. This works with certainty (provided step 4 worked out as
+       desired) if $m_j=O(\log(r_j))$ is large enough. In fact, recall that we already
+       know $r_j$. Hence we just need $2^{-m_j}\leq\,r_j/2$ to make that work.
+
+    6. Repeat steps 1 to 5 to obtain $J=O(???)$ samples $l^{(1)},\ldots,l^{(J)}$ for $l$.
+
+    7. Let $r=\mathrm{lcd}(r_1,\ldots,r_n)$, $s_i=r/r_i$ and find solutions
+       $k^{(1)},\ldots,k^{(n_0)}$ of
+
+       $$
+         \sum_{i=1}^n s_i l_i^{(j)} k_i = 0 \mod r \text{ for } j \in \{1,\ldots,J\} .
+       $$
+
+       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. These solutions are a generating set (with a
+       probability as specified in the runtime section).
+
+Let us justify why this works.
+
+
+
+
+
+
+
+
+       Here $H$ is some subgroup [[file:appendix_2.org::fourier-vs-quotients][such that]] $G=H\oplus K$. In the equality we use that $f$
+       is constant on cosets, [[file:appendix_2.org::fourier-and-invariant-subspaces][which implies that]] $\hat{f}(k)=\hat{f}(0+k)=0$.
+
+** TODO Exercise 5.29
+Give quantum algorithms to solve the Deutsch and Simon problems listed in Figure 5.5,
+using the framework of the hidden subgroup problem.
+
 * References
 #+print_bibliography:
