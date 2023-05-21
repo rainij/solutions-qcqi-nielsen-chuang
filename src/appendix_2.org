@@ -611,7 +611,7 @@ polynomial (that is, $p(A)=0$).
 The regular representation (which /essentially/ maps $\alpha$ to $A$) is faithful. Hence
 $p(\alpha)=0$ too. QED.
 
-** Fourier transform
+** Fourier transform - Definition
 The /Fourier transformation/ is already defined [[fourier-trafo-repr][here]]. But let us re-introduce it with
 slightly enhanced notation which is closer to what we know from the standard case. For
 $f\in\CC^G$ let
@@ -665,7 +665,8 @@ $$
 
 yields $\FT\inv$.
 
-** Fourier transform on abelian groups (part 1)
+* Fourier transform on abelian groups
+** Definition for abelian groups
 :PROPERTIES:
 :CUSTOM_ID: section-fourier-abelian-groups
 :END:
@@ -684,6 +685,10 @@ $$
   f(g) = \frac{1}{\sqrt{N}} \sum_{\chi\in\hat{G}} \hat{f}(\chi) \chi(g\inv) \text{ where } g \in G .
 $$
 
+** Pontryagin duality
+:PROPERTIES:
+:CUSTOM_ID: pontryagin-duality
+:END:
 Using [[#exercise-a2-11][Exercise A2.11(5)]] or more precisely the fact that $\chi(g)$ is a [[root-of-unity-property][root of unity]]
 (whose order divides $N$) we can show that $\hat{G}$ can be identified with the Abelian
 group $\hom(G,S^1)$ (group homomorphisms from $G$ to the unit circle
@@ -710,7 +715,7 @@ $$
 
 Compare this with [[*Exercise A2.23][exercise A2.23]].
 
-** Direct sums of abelian groups and invariant subspaces
+** On direct sums
 :PROPERTIES:
 :CUSTOM_ID: direct-sums-invariant-subspaces
 :END:
@@ -763,7 +768,7 @@ $$
     0 & \text{otherwise.} \end{cases}
 $$
 
-** Fourier transform on abelian groups (part 2)
+** Product formula and the isomorphism $G\cong\hat{G}$
 Recall that abelian groups are direct sums of cyclic groups:
 
 <<decompose-abelian-groups>>
@@ -803,56 +808,94 @@ isomorphism is /not/ canonical. First of all the [[decompose-abelian-groups][dec
 unique. Moreover there are at least two competing conventions whether to put a sign in
 front of $2\pi$ in the formula for $\chi_l(g)$ or not.
 
-There is also an interesting relation between Fourier transforms and [[https://en.wikipedia.org/wiki/Quotient_group][quotient groups]]
-(Notation: $G/K$).
+** Character dual of subgroups
+There is an interesting relation between Fourier transforms (or irreducible characters)
+and [[https://en.wikipedia.org/wiki/Quotient_group][quotient groups]] (Notation: $G/K$).
 
-<<fourier-vs-quotients>>
-THEOREM: Let $K$ be a subgroup of the finite abelian group $G$.
+- Definition :: Let $K$ be a subgroup of a finite abelian group $G$. The /character dual/
+  of $K$ is
 
-  1. There exists a subgroup $H$ such that $G=H\oplus K$ (implying $H\cong G/K$).
+  $$
+    K^\perp = \{ g \in G | \forall k\in K: \; \chi_g(k) = 1 \} .
+  $$
 
-  2. Moreover:
+  - Remark :: I did not find a good name for this in the internet (I use /character dual/
+    because of a lack thereof). Some people call this /orthogonal complement/ and use the
+    above notation. However, I try to avoid that because it does not have the properties I
+    associate with orthogonal complements in (complex) Hilbert spaces. For example, let
+    $G=\ZZ_4$ and $K=2\ZZ_4$, then $K^\perp=K$.
+- Theorem :: Let $K$ be a subgroup of the finite abelian group $G$. Then
+  1. The character dual is isomorphic to the quotient group:
+
+     $$ K^\perp \cong G/K $$
+  2. This property is the reason I call it /dual/:
+
+     $$ (K^\perp)^\perp = K $$
+  3. We have
 
      $$
-  K = \{k\in G |\; \forall h\in H: \chi_h(k) = 1 \} .
-$$
+       \sum_{k\in K} \chi_l(k) = \begin{cases}
+         \abs{K} & \text{if } l \in K^\perp \\
+         0 & \text{otherwise.} \end{cases}
+     $$
+  4. Let $f\in\CC^G$ be a function which is constant on cosets of $K$. Then
 
-PROOF of (1): If $K=G$ choose $H=0$. Otherwise generate a sequence $h_i\in G$ such that
+     $$
+     \langle f, \chi_l \rangle = 0 \text{ if } l\notin K^\perp .
+     $$
 
-$$
-  h_{i+1} \in G \backslash \langle h_i, h_{i-1}, \ldots, h_1, K \rangle .
-$$
+     In other words (by the [[*Class functions as a Hilbert Space][orthonormality]] property of irreducible characters), $f$ can be
+     represented as a linear combination of the characters corresponding to $K^\perp$.
+- Proof of 1 ::
+  We show the isomorphism $K^\perp\cong\widehat{(G/K)}$. This is sufficient since the
+  characters of an /abelian/ group are isomorphic to the group itself ($g\mapsto\chi_g$ is
+  the isomorphism).
 
-Stop the sequence at $i=n$ if the $h_i$ together with $K$ generate $G$. Here we use that
-$G$ is finite (abelian is not important here). Set
-$H=\langle\,h_1,\ldots,h_n\rangle$. Clearly $H+K=G$ (here we use that $G$ is abelian,
-alternatively $K$ being normal would suffice in the non-abelian case). It is easy to see
-that $H\cap K=0$ which establishes the claim. QED.
+  The isomorphism $K^\perp\cong\widehat{(G/K)}$ is given by
 
-PROOF of (2): Without loss of generality we may assume that the [[decompose-abelian-groups][decomposition]] of $G$,
-which is used to define the [[isomorphism-ghat-g][/particular/ isomorphism]] $G\to\hat{G}$, is just the sum of
-decompositions of $H$ and $K$. Hence we have the following consistency between $H,K$ and
-$G$:
+  <<def-iso-kdual-g/k>>
+  $$ h\mapsto(\chi_h^{G/K}:g+K\mapsto\chi_h(g)) $$
 
-$$
-  \forall h,h'\in H; k,k'\in K: \; \chi_{h+k}^G(h'+k') = \chi_h^H(h') \chi_k^K(k') .
-$$
+  This mapping is well-defined precisely because $h\in K^\perp$. To see that the
+  $\chi_h^{G/K}$ are indeed irreducible characters it suffices to note that they are group
+  homomorphisms from $G/K$ to $S^1$ (c.f. [[#pontryagin-duality][Pontryagin duality]]). This shows
+  $K^\perp\subseteq\widehat{G/K}$.
 
-The inclusion $K\subseteq\ldots$ now directly follows from this consistency:
+  The other direction can be seen from the fact that any $\chi\in\widehat{G/K}$ give rise
+  to a $\tilde{\chi}\in\hat{G}$ satisfying $\tilde{\chi}(k)=1$ for all $K$. In fact, just set
 
-$$
-  \chi_h(k) = \chi_{h+0}(0+k) = \chi^H_h(0) \chi^K_0(k) = 1\cdot 1 = 1 .
-$$
+  $$ \tilde{\chi}(g) := \chi(g+K) $$
 
-For the other direction let $g\in G\backslash K$ be arbitrary. We have $h$, $k$ from $H$,
-$K$ respectively such that $g=h+k$ and $h\neq0$. There is some index $i$ such that
-$h_i\neq0$. Take $l$ with $l_j=\delta_{ij}$. Clearly $l\in H$ and $\chi_l(g)=\chi_l(h)=e^{2\pi\ii
-h_i/r_i}\neq1$. QED.
+  Clearly this is the reverse of the [[def-iso-kdual-g/k][above mapping]]. QED.
+- Proof of 2 ::
+  We have to show that
+
+  $$
+    K = \{ g\in G| \forall h\in K^\perp: \; \chi_g(h) = 1 \} .
+  $$
+
+  By the symmetry $\chi_g(h)=\chi_h(g)$ the inclusion $K\subseteq(K^\perp)^\perp$ is
+  clear. But by the first part of the Theorem we must have equality due to cardinality
+  reasons. QED.
+- Proof of 3 and 4 ::
+  Let $1_K\in\CC^G$ be the function which maps any element of $K$ to $1$ and any other
+  element to $0$. Up to the factor $\abs{K}$ the LHS of what is to prove in part is just the
+  scalar product $\langle1_K,\chi_l\rangle$.
+
+  The fact that $\langle1_K,\chi_l\rangle=1$ if $l\in K^\perp$ should be clear.
+
+  Now consider the subspace $S\subseteq\CC^G$ of functions which are constant on cosets of
+  $K$. Observe that $f,1_K\in S$. Clearly $S\cong\CC^{G/K}$ by an isomorphism consistent
+  (in a sense) with the one from the proof of part 1. Hence, $\{\chi_h|h\in\,K^\perp\}$,
+  which is isomorphic to $\widetilde{G/K}$ by part 1, is an orthormal basis which
+  [[#class-functions-hilbert-space][precisely spans]] $S$. Hence, again by orthonormality
+  of all characters of $G$ the other ones must have zero scalar product with any element
+  of $S$ (in particular with $1_K$). QED.
 
 The theorem is important for the hidden subgroup problem. The goal of the problem is to
 find a generating set for some subgroup $K$ (related to some function $f$) of $G$. The
 quantum part of the algorithm solving the problem does /not directly/ yield a generating
-set for $K$. Instead a generating set $l^{(1)},\ldots,l^{(J)}$ for a quotient $H$ as in the
+set for $K$. Instead a generating set $l^{(1)},\ldots,l^{(J)}$ for $K^\perp$ as in the
 theorem is produced (with high probability).
 
 <<find-generating-set-for-K>>
@@ -889,9 +932,10 @@ $$
   Dk' = 0 \mod r .
 $$
 
-In fact, a generating set is just the $n_0$ values $k'^{(i)}$ with
-$k'^{(i)}_j=\delta_{ij}r/d_i$. Let $k^{(i)}=Tk'^{(i)}$ and interpret each $j$​th entry
-modulo $r_j$. This yields a generating set for $K$.
+In fact, if $n_0=n$, a generating set is just the $n_0$ values $k'^{(i)}$ with
+$k'^{(i)}_j=\delta_{ij}r/d_i$. If $n_0 < n$ we have to add some $k'_j^{(i)}=\delta_{ij}$ for
+$i>n_0$. Let $k^{(i)}=Tk'^{(i)}$ and interpret each $j$​th entry modulo $r_j$. This yields
+a generating set for $K$.
 
 * Exercises
 ** Exercise A2.11 (Characters)
