@@ -2310,12 +2310,12 @@ groups of prime power order is usually a difficult problem (at least as hard as 
 integers, for example). Here, quantum algorithms come to the rescue again: explain how the
 algorithms in this chapter can be used to efficiently decompose $G$ as desired.
 
-** TODO Exercise 5.28
+** Exercise 5.28
 Write out a detailed specification of the quantum algorithm to solve the hidden subgroup
 problem, complete with runtime and success probability estimates, for ﬁnite Abelian
 groups.
 
-*** Algorithm (hidden subgroup)
+*** Solution
 In the following $f:G\to Y$ is a function from a finite abelian group $G$ to a (finite)
 set $Y$. Let $K$ be a subgroup of $G$ and assume that the restrictions of $f$ to any of
 the cosets of $K$ are constant. Hence the function can be regarded as defined on the
@@ -2349,9 +2349,17 @@ element $0\in Y$, i.e. $0\oplus y=y$ for all $y$.
        \mapsto \bigotimes_{i=1}^n \ket{x_i} \otimes \ket{y \oplus f(x)} ,
        $$
   - Outputs ::
-    A generating set for the hidden subgroup $K$.
+    A generating set for the hidden subgroup $K$ with probability $1-\varepsilon$.
   - Runtime ::
-    TODO
+    Overall
+
+    $$ J = O(\log(\abs{G})(\log(\log(\abs{G}))+\log(1/\varepsilon))) $$
+
+    uses of the black box $U$ and for each repetition $O(\sum_i t_i^2)$ quantum gates for
+    other quantum operations (mostly Fourier transforms). Among the classical post
+    processing the smith decomposition is probably the most heavyweight which probably
+    needs $O(J^3)$ operations (I did not check this, but I would be surprised if it is not
+    true).
   - Procedure ::
     1. Initialization to $\ket{0}$ (all registers).
 
@@ -2368,6 +2376,10 @@ element $0\in Y$, i.e. $0\oplus y=y$ for all $y$.
          &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \left(\frac{1}{\sqrt{2^t}}\sum_{x} \chi_l(-x) \ket{x} \right) \ket{\hat{f}(l)} \\
          &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \bigotimes_{j=1}^n \left(\frac{1}{\sqrt{2^{t_j}}}\sum_{x_j=0}^{2^{t_j}-1} e^{-2\pi\ii x_jl_j/r_j} \ket{x_j} \right) \ket{\hat{f}(l)}
        \end{align*}
+
+       In the first equality we use the [[file:appendix_2.org::#section-fourier-abelian-groups][Fourier representation]] of the function
+       $x\mapsto\ket{f(x)}$. This makes sense because we can interpret $x$ as an element
+       of $G$ by identifying $x_i$ with $x_i\mod r_i$.
 
     4. Apply the inverse Fourier transform of $\bigoplus_{i=1}^n\ZZ_{2^{t_i}}$ (/not/ $G$) to the
        first $n$ registers:
@@ -2387,29 +2399,102 @@ element $0\in Y$, i.e. $0\oplus y=y$ for all $y$.
        desired) if $m_j=O(\log(r_j))$ is large enough. In fact, recall that we already
        know $r_j$. Hence we just need $2^{-m_j}\leq\,r_j/2$ to make that work.
 
-    6. Repeat steps 1 to 5 to obtain $J=O(???)$ samples $l^{(1)},\ldots,l^{(J)}$ for $l$.
+    6. Repeat steps 1 to 5 to obtain
+
+       $$ J = O(\log(\abs{G})(\log(\log(\abs{G}))+\log(1/\varepsilon))) $$
+
+       samples $l^{(1)},\ldots,l^{(J)}$ for $l$.
 
     7. Let $r=\mathrm{lcd}(r_1,\ldots,r_n)$, $s_i=r/r_i$ and find solutions
-       $k^{(1)},\ldots,k^{(n_0)}$ of
+       $k^{(1)},\ldots,k^{(n)}$ of
 
        $$
          \sum_{i=1}^n s_i l_i^{(j)} k_i = 0 \mod r \text{ for } j \in \{1,\ldots,J\} .
        $$
 
-       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. These solutions are a generating set (with a
-       probability as specified in the runtime section).
+       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. These solutions are a (not necessarily minimal)
+       generating set (with a probability as specified in the runtime section).
 
 Let us justify why this works.
 
+The $l$ which we obtain in step 5 are not arbitrary. Recall that the Fourier transform
+looks like this:
 
+$$
+  \ket{\hat{f}(l)} = \frac{1}{\sqrt{\abs{G}}} \sum_{g\in G} \chi_l(g) \ket{f(g)} .
+$$
 
+From the [[file:appendix_2.org::thm-basics-dual-subgroup][basic theorem]] on dual subgroups (appendix 2) we see that $\ket{\hat{f}(l)}$ is
+zero for $l\notin\,K^\perp$. But we can show more! In fact, $f$ is not only constant on
+cosets of $K$ it is even injective. This implies that the $\ket{f(g)}$ for $g\in G$ form an
+orthonormal set. To put this into use, let us assume that $h\in\,K^\perp$ and use that
+then $\chi_h$ is constant on cosets too.
 
+$$
+  \ket{\hat{f}(h)} = \frac{1}{\sqrt{\abs{G}}} \sum_{q\in G/K} \sum_{k\in K} \chi_h(q) \ket{f(q)}
+  = \frac{\abs{K}}{\sqrt{\abs{G}}} \sum_{q\in G/K} \chi_h(q) \ket{f(q)}.
+$$
 
+Note that this is (up to a factor) just the Fourier transform on $G/K$. We did not use
+injectivity so far. But injectivity implies that $\norm{\ket{\hat{f}(l)}}^2=\abs{K}$. To summarize:
 
+$$
+  \norm{\ket{\hat{f}(l)}}^2 = \begin{cases}
+    \abs{K} & \text{if } l \in K^\perp \\
+    0 & \text{otherwise.} \end{cases}
+$$
 
+This implies that in step 5 we sample $l$ from $K^\perp$ with /uniform/ probability
+distribution (uniformity is important as we will see later on).
 
-       Here $H$ is some subgroup [[file:appendix_2.org::fourier-vs-quotients][such that]] $G=H\oplus K$. In the equality we use that $f$
-       is constant on cosets, [[file:appendix_2.org::fourier-and-invariant-subspaces][which implies that]] $\hat{f}(k)=\hat{f}(0+k)=0$.
+In [[file:appendix_2.org::find-generating-set-for-K][appendix 2]] we proved that step 7 indeed yields a generating set for $K$ *if* the
+$l^{(j)}$ generate $K^\perp$. Thus the final question is with what probability this
+happens. Let us first prove a Lemma.
+
+Recall that any finite abelian group $G$ can be decomposed as
+$\bigoplus_{i=1}^n\ZZ_{p_{i}^{r_i}}$ with prime numbers $p_i$ (not necessarily all
+distinct). We define $\kappa(G):=n$. Note that $\kappa(G)=O(\log(\abs{G}))$.
+
+- Lemma :: Let $G$ be a finite abelian group and let $n=\kappa(G)$. The probability that
+  $mn$ elements of $G$ which are chosen /uniformly/ at random are a generating set is at
+  least $1-O(n/2^m)$ if $m=\Omega(\log(n))$.
+- Proof ::
+  Let us define $P(G,j)$ as the probability that $j+\kappa(G)$ randomly chosen elements
+  generate $G$. We have
+
+  $$
+    P(\ZZ_{p^r}\oplus G, j + m) \geq (1 - 1/p^m) P(G, j) .
+  $$
+
+  Let us justify this. We sample the first $j+\kappa(G)$ elements and hope that it,
+  projected to $G$, generates $G$ (probability $P(G,j)$). Then we take $m$
+  additional elements and hope that their projection to $\ZZ_{p^r}$ hits an number,
+  which is not divisible by $p$, at least once (probability at least $1-1/p^m$). If both
+  happens we get a generating set for $\ZZ_{p^r}\oplus G$.
+
+  As a special case of the above reasoning we get
+
+  $$
+    P(\ZZ_{p^r}, m) \geq 1 - 1/p^m .
+  $$
+
+  Induction on $n=\kappa(G)$, using that $2$ is the smallest prime, yields
+
+  $$
+    P(G,mn)\geq (1 - 1/2^m)^n .
+  $$
+
+  The claim now follows from $(1-x)^n=1-nx+O(x^2)$ for real $x=O(1/n)$. QED.
+
+To have a success probability of $1-O(\varepsilon)$ in the context of the lemma we thus
+need to set
+
+$$
+  m = O(\log(n)+\log(1/\varepsilon)) = O(\log(\log(\abs{G}))+\log(1/\varepsilon))
+$$
+
+This explains the choice of $J$ in step 6 and concludes the justification that the
+algorithm works as specified.
 
 ** TODO Exercise 5.29
 Give quantum algorithms to solve the Deutsch and Simon problems listed in Figure 5.5,
