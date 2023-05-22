@@ -2453,11 +2453,13 @@ happens. Let us first prove a Lemma.
 
 Recall that any finite abelian group $G$ can be decomposed as
 $\bigoplus_{i=1}^n\ZZ_{p_{i}^{r_i}}$ with prime numbers $p_i$ (not necessarily all
-distinct). We define $\kappa(G):=n$. Note that $\kappa(G)=O(\log(\abs{G}))$.
+distinct). The primes and their exponents are unique. Hence $\kappa(G):=n$ is
+well-defined. Note that $\kappa(G)=O(\log(\abs{G}))$.
 
+<<lemma-probability-random-generating-set>>
 - Lemma :: Let $G$ be a finite abelian group and let $n=\kappa(G)$. The probability that
   $mn$ elements of $G$ which are chosen /uniformly/ at random are a generating set is at
-  least $1-O(n/2^m)$ if $m=\Omega(\log(n))$.
+  least $1-n2^{-m}$.
 - Proof ::
   Let us define $P(G,j)$ as the probability that $j+\kappa(G)$ randomly chosen elements
   generate $G$. We have
@@ -2467,10 +2469,11 @@ distinct). We define $\kappa(G):=n$. Note that $\kappa(G)=O(\log(\abs{G}))$.
   $$
 
   Let us justify this. We sample the first $j+\kappa(G)$ elements and hope that it,
-  projected to $G$, generates $G$ (probability $P(G,j)$). Then we take $m$
-  additional elements and hope that their projection to $\ZZ_{p^r}$ hits an number,
-  which is not divisible by $p$, at least once (probability at least $1-1/p^m$). If both
-  happens we get a generating set for $\ZZ_{p^r}\oplus G$.
+  projected to $G$, generates $G$ (probability $P(G,j)$). Then we take $m$ additional
+  elements and hope that their projection to $\ZZ_{p^r}$ hits a number, which is not
+  divisible by $p$, at least once (probability at least $1-1/p^m$). If both happens we get
+  a generating set for $\ZZ_{p^r}\oplus G$. This appears to be a terrible way to estimate
+  the probabilities but it serves the purpose 👍.
 
   As a special case of the above reasoning we get
 
@@ -2484,7 +2487,8 @@ distinct). We define $\kappa(G):=n$. Note that $\kappa(G)=O(\log(\abs{G}))$.
     P(G,mn)\geq (1 - 1/2^m)^n .
   $$
 
-  The claim now follows from $(1-x)^n=1-nx+O(x^2)$ for real $x=O(1/n)$. QED.
+  The claim now follows from $(1-x)^n\geq1-nx$ (use mathematical induction to see
+  this simple inequality). QED.
 
 To have a success probability of $1-O(\varepsilon)$ in the context of the lemma we thus
 need to set
@@ -2496,9 +2500,150 @@ $$
 This explains the choice of $J$ in step 6 and concludes the justification that the
 algorithm works as specified.
 
-** TODO Exercise 5.29
+** Exercise 5.29
 Give quantum algorithms to solve the Deutsch and Simon problems listed in Figure 5.5,
 using the framework of the hidden subgroup problem.
+
+*** Solution for Deutsch's problem
+Let us briefly recall Deutsch's problem.
+
+Let $G=\ZZ_2$ and consider a function $f:G\to X=\ZZ_2$. There are two cases
+
+- Constant :: $f\equiv\mathrm{const}$ (hidden subgroup $K=G$).
+- Balanced :: $f(0)\neq f(1)$ (hidden subgroup $K=0$).
+
+The task is to find out to which case a given $f$ belongs. Of course this problem is
+really boring (there are only four possible functions $f$), but the more general
+Deutsch-Josza problem does /not apriori/ fit into the hidden-subgroup framework. But
+please also read the [[exercise-5.29-remark][remarks]] at the end.
+
+- Algorithm (for Deutsch's problem) ::
+  - Inputs ::
+    1. Two register, each with one qubit.
+    2. A black box $U$ performing $\ket{x,y}\mapsto\ket{x,y\oplus f(x)}$.
+  - Outputs :: The case (/constant/ or /balanced/) to which $f$ belongs.
+  - Runtime :: One application of $U$ (per repetition). The constant case is always correctly
+    inferred. The balanced case is correctly inferred with probability $1/2$. Repeating the algorithm
+    $n$ times increases the success probability in the balanced case to $1-2^{-n}$ since measuring
+    $m=1$ once in step 5 already ensures certainty.
+  - Procedure ::
+    1. Initialize both register to zero: $\ket{0}\ket{0}$.
+    2. Perform the Hadamard gate $H$ on the first register
+
+       $$ \rightarrow \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x}\ket{0} $$
+    3. Apply $U$:
+
+       \begin{align*}
+       \rightarrow \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x}\ket{f(x)}
+       &= \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x} \frac{1}{\sqrt{2}} \sum_{l=0}^1 (-1)^{xl} \ket{\hat{f}(l)} \\
+       &= \frac{1}{\sqrt{2}} \sum_{l=0}^1 \left(\frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{xl} \ket{x} \right) \ket{\hat{f}(l)} \\
+       &= \frac{1}{\sqrt{2}} \sum_{l=0}^1 H\ket{l} \ket{\hat{f}(l)} .
+       \end{align*}
+    4. Apply the Hadamard gate $H$ to the first register (again):
+       $$ \rightarrow \frac{1}{\sqrt{2}} \sum_{l=0}^1 \ket{l} \ket{\hat{f}(l)} $$
+    5. Measure the first register and obtain $m=0$ or $m=1$.
+    6. Upon $m=0$ return "constant" otherwise return "balanced". If we repeat steps 1 to 5 $n$
+       times then upon measuring $0$ all the time we return "constant", otherwise "balanced".
+
+Why does it work? The Hadamard transform of $x\mapsto\ket{f(x)}$ is
+
+$$
+  \ket{\hat{f}(l)} = \frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{xl} \ket{f(x)} .
+$$
+
+If $f$ is constant we have the wave function concentrated at $l=0$ which means that we measure $0$
+in step 5 with certainty. If $f$ is balanced we have a $50\%$ chance of measuring either $0$ or $1$
+(hence only a $50\%$ chance for the correct output).
+
+- Remarks <<exercise-5.29-remark>> ::
+  - By "accident" the algorithm directly generalizes to the Deutsch-Josza problem. We only
+    have to replace $G$ by $\ZZ_2^n$, $H$ by $H^{\otimes n}$, $xl$ by $\sum_ix_il_i$ and
+    the first register has to hold $n$ qubits. Moreover in step 6 we return "constant" if we
+    measure all-zeros and "balanced" otherwise. But we cannot naturally assign a hidden
+    subgroup in general.
+
+    Let us sketch why this works. If $f$ is constant again $l=0$ (vector of bits in this
+    case) is the only non-zero Fourier coefficient. In the balanced case it is easy to see
+    that $l=0$ concentrates /exactly/ $50\%$ of the probability. The rest is more or less
+    arbitrarily distributed among the other bit-strings.
+  - This algorithm is different then the algorithm given for Deutsch or Deutsch-Josza in
+    section 1.4.3 or 1.4.4. Those algorithms are better in the sense that one application
+    suffices to get a correct return value /with certainty/.
+
+    There are two differences. The better algorithm starts with $\ket{0}\ket{1}$ and it
+    applies a another Hadamard gate to the second register in step 2. This leads to the
+    following state in step 3:
+
+    $$
+    \left( \frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{f(x)}\ket{x} \right) \ket{-} .
+    $$
+
+    In particular the first register contains $\pm\ket{+}$ for a constant function and
+    $\pm\ket{-}$ for a balanced function. This leads to $100\%$ correctness in step 6.
+
+*** Solution for Simon's problem
+Let us briefly recall Simon's problem.
+
+Let $G=\ZZ_2^n$ and consider a function $f:G\to X$ for some set $X$ (we assume that there
+is a binary operation $\oplus$ on $X$ which has a left-neutral element $0\in X$). Assume
+that there exists some $s\in\ZZ_2^n$ (the secret) such that $f$ satisfies
+
+$$
+  f(y) = f(x) \quad \Longleftrightarrow \quad y = x \text{ or } y = x \oplus s .
+$$
+
+The problem is to determine the value of the secret.
+
+Here the hidden subgroup is the two-element subgroup $K=\{0,s\}$. The direction
+$\Leftarrow$ in the condition on $f$ means that $f$ is constant on cosets of $K$. The
+other direction means that $f$ has a different value on each coset.
+
+The "canonical" set of such functions is given by all $f:G\to G/K$ with $f(x):=x+K$. All
+other examples arise from these by composing with an arbitrary injective function
+$G/K\,\to\,X$.
+
+- Algorithm (for Simon's problem) ::
+  - Inputs ::
+    1. Two register, the first with $n$ qubits, the second large enough for the operations
+       on $X$.
+    2. A black box $U$ performing $\ket{x}\ket{y}\mapsto\ket{x}\ket{y\oplus f(x)}$.
+  - Outputs :: The secret $s$.
+  - Runtime :: $J=nm$ calls to $U$ and $O(n^2)$ quantum operations in each run (mostly
+    quantum Fourier transform). Finally some classical overhead solving a linear system of
+    $J$ equation in $n$ variables (roughly $O(J^3)$ operations). The success probability
+    is at least $1-n2^{-m}$.
+  - Procedure ::
+    1. Initialize the state $\ket{0}\ket{0}$.
+    2. Apply $H^{\otimes n}$ to the first register:
+
+       $$
+         \rightarrow \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{0}
+       $$
+    3. Apply $U$:
+
+       \begin{align*}
+         \rightarrow \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{f(x)}
+         &= \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{f(x)} \frac{1}{\sqrt{2^n}} \sum_{l=0}^{2^n-1} (-1)^{l\cdot x}\ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{2^n}} \sum_{l=0}^{2^n-1} \left( \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} (-1)^{l\cdot x} \ket{x} \right) \ket{\hat{f}(l)}
+       \end{align*}
+    4. Measure the first register to obtain some $l$.
+    5. Repeat steps 1 to 4 $J=mn$ times to get $l^{(1)},\ldots,l^{(J)}$.
+    6. Find a solution $s$ of
+
+       $$
+         s \cdot l^{(j)} = 0 \mod 2 \text{ for } j=1,\ldots,J .
+       $$
+
+       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. Return this solution.
+
+Why does this work? First of all from the general theory of hidden subgroup framework we
+know that the $l$ measured in step 4 is an element of $K^\perp$. The thing which is
+special here is that the probability is indeed /exactly/ $1$ here since the quantum
+Fourier transform likes it if the number of qubits is a power of $2$ (see the beginning of
+section 5.2).
+
+The choice of $J$ leads to the success probability asserted in the runtime section because
+of [[lemma-probability-random-generating-set][a simple lemma]] on random generators of groups.
 
 * References
 #+print_bibliography:
