@@ -2304,11 +2304,49 @@ Since $K$ is a subgroup of $G$, when we decompose $G$ into a product of cyclic g
 prime power order, this also decomposes $K$. Re-express (5.77) to show that determining
 $l'_i$ allows one to sample from the corresponding cyclic subgroup $K_{p_i}$ of $K$.
 
-** TODO Exercise 5.27
+** WIP Exercise 5.27
 Of course, the decomposition of a general ﬁnite Abelian group $G$ into a product of cyclic
 groups of prime power order is usually a difficult problem (at least as hard as factoring
 integers, for example). Here, quantum algorithms come to the rescue again: explain how the
 algorithms in this chapter can be used to efficiently decompose $G$ as desired.
+
+*** Some thoughts
+First of all, the [[#exercise-5.28-solution][solution of exercise 5.28]] shows that we do not really need to have a
+decomposition into groups of prime power order. It is sufficient to have a decomposition
+
+<<exercise-5.27-decomposition-g>>
+$$
+  G = \bigoplus_{i=1}^n \ZZ_{r_i} ,
+$$
+
+with /some/ numbers $r_i$.
+
+On the other hand, if we really want to have prime powers (for whatever reason) Shor's
+algorithm is sufficient to efficiently find such a decomposition - provided we already
+have a decomposition into cyclic groups as [[exercise-5.27-decomposition-g][above]]. Let us briefly justify why. Because of
+$\ZZ_{mn}\cong\ZZ_m\oplus\ZZ_n$ for /coprime/ $m$ and $n$ (and the fact that this isomorphism
+can be efficiently computed in either direction) it is sufficient to find all prime
+factors of all the $r_i$.
+
+To find all prime factors of $r_i$ do the following. Apply the factoring algorithm to
+$r_i$. This yields a non-trivial factor $f_i$. Hence we obtain a decomposition into
+$r_i=f_i\cdot(r_i/f_i)$. Now recursively apply the factoring algorithm to each factor
+(probabilities are discussed in the next paragraph). We stop if the no non-trivial factor
+could be returned. Overall we need at most $2\log_2(r_i)$ applications of the factoring
+algorithm since each $r_i$ has at most $\log_2(r_i)$ factors.
+
+We have to ensure that for some small $\varepsilon>0$ the factoring algorithm succeeds
+with probability $1-\varepsilon$. Luckily this is possible for any $\varepsilon$ (the
+algorithm in section 5.3.2 only needs to be repeated a number of times which only depends
+on $\varepsilon$). The overall success probability for a single $r_i$ is at least
+$1-2\varepsilon\log_2(r_i)$. For all $r_i$ simultaneously the probability is at least
+$1-2\varepsilon\log_2(r)$ (use $(1-x)(1-y)\geq1-x-y$ to see this).
+
+- Remark ::
+  In general a group might not be represented as a direct sum of cyclic
+  groups. Unfortunately I do not know what representations occur in the wild (and are
+  interesting at the same time). So I have to leave open the discussion of those
+  representations for now.
 
 ** Exercise 5.28
 Write out a detailed specification of the quantum algorithm to solve the hidden subgroup
@@ -2316,6 +2354,9 @@ problem, complete with runtime and success probability estimates, for ﬁnite Ab
 groups.
 
 *** Solution
+:PROPERTIES:
+:CUSTOM_ID: exercise-5.28-solution
+:END:
 In the following $f:G\to Y$ is a function from a finite abelian group $G$ to a (finite)
 set $Y$. Let $K$ be a subgroup of $G$ and assume that the restrictions of $f$ to any of
 the cosets of $K$ are constant. Hence the function can be regarded as defined on the
