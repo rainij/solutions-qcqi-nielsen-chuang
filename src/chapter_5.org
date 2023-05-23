@@ -2299,5 +2299,418 @@ Using $W_{b,a}$ and one ancilla register we can implement the desired operation.
 The last operation just uncomputes the value in the ancilla register. The =XOR= can be
 easily implemented using $L$ controlled =NOT= gates.
 
+** Exercise 5.26
+Since $K$ is a subgroup of $G$, when we decompose $G$ into a product of cyclic groups of
+prime power order, this also decomposes $K$. Re-express (5.77) to show that determining
+$l'_i$ allows one to sample from the corresponding cyclic subgroup $K_{p_i}$ of $K$.
+
+- Remark :: I am not sure if I correctly understand the exercise but I think it is wrong.
+
+*** Justification of the remark
+In general just looking at an /individual/ $l_i$ does not necessarily contain any useful
+information. Let us consider a simple example.
+
+Let $n > 1$, $G=\ZZ_2^n$ and let $e=(1,1,\ldots,1)\in G$ be the all ones bit-string. Let
+$K=\langle\,e\,\rangle$. Clearly $K\cong\ZZ_2$, so we already see that the decomposition
+of $K$ does not correspond "component-wise" to the decomposition of $G$. Moreover we have:
+
+$$
+  K^\perp = \{ l\in G| \sum_i l_ie_i = 0 \mod 2 \} = \{l| l \text{ has an even number of ones}\} .
+$$
+
+The notion of the [[file:appendix_2.org::#section-dual-subgroup][dual subgroup]] was introduced in appendix 2 (from /this/ website) and
+also used in the [[#exercise-5.28-solution][solution of exercise 5.28]]. It contains the non-zero Fourier coefficients
+of the functions $f$ appearing in the hidden subgroup problem. It is also shown that each
+$l\in\,K^\perp$ is measured with the same probability (this follows from the fact that $f$
+is different on each coset).
+
+Note that the characterization of $l\in K^\perp$ is a /global/ property. For a fixed $i$
+the $l_i$ can take any possible value, $0$ or $1$. In case of even $n$ the probability is
+exactly $1/2$ for each possibility. To understand that this is /really/ not useful observe
+that for $K=0$ (implying $K^\perp=G$) we get the /exact/ same statistical behavior (for
+even $n$) if we just look at individual $l_i$ in isolation.
+
+** WIP Exercise 5.27
+Of course, the decomposition of a general ﬁnite Abelian group $G$ into a product of cyclic
+groups of prime power order is usually a difficult problem (at least as hard as factoring
+integers, for example). Here, quantum algorithms come to the rescue again: explain how the
+algorithms in this chapter can be used to efficiently decompose $G$ as desired.
+
+*** Some thoughts
+First of all, the [[#exercise-5.28-solution][solution of exercise 5.28]] shows that we do not really need to have a
+decomposition into groups of prime power order. It is sufficient to have a decomposition
+
+<<exercise-5.27-decomposition-g>>
+$$
+  G = \bigoplus_{i=1}^n \ZZ_{r_i} ,
+$$
+
+with /some/ numbers $r_i$.
+
+On the other hand, if we really want to have prime powers (for whatever reason) Shor's
+algorithm is sufficient to efficiently find such a decomposition - provided we already
+have a decomposition into cyclic groups as [[exercise-5.27-decomposition-g][above]]. Let us briefly justify why. Because of
+$\ZZ_{mn}\cong\ZZ_m\oplus\ZZ_n$ for /coprime/ $m$ and $n$ (and the fact that this isomorphism
+can be efficiently computed in either direction) it is sufficient to find all prime
+factors of all the $r_i$.
+
+To find all prime factors of $r_i$ do the following. Apply the factoring algorithm to
+$r_i$. This yields a non-trivial factor $f_i$. Hence we obtain a decomposition into
+$r_i=f_i\cdot(r_i/f_i)$. Now recursively apply the factoring algorithm to each factor
+(probabilities are discussed in the next paragraph). We stop if the no non-trivial factor
+could be returned. Overall we need at most $2\log_2(r_i)$ applications of the factoring
+algorithm since each $r_i$ has at most $\log_2(r_i)$ factors.
+
+We have to ensure that for some small $\varepsilon>0$ the factoring algorithm succeeds
+with probability $1-\varepsilon$. Luckily this is possible for any $\varepsilon$ (the
+algorithm in section 5.3.2 only needs to be repeated a number of times which only depends
+on $\varepsilon$). The overall success probability for a single $r_i$ is at least
+$1-2\varepsilon\log_2(r_i)$. For all $r_i$ simultaneously the probability is at least
+$1-2\varepsilon\log_2(r)$ (use $(1-x)(1-y)\geq1-x-y$ to see this).
+
+- Remark ::
+  In general a group might not be represented as a direct sum of cyclic
+  groups. Unfortunately I do not know what representations occur in the wild (and are
+  interesting at the same time). So I have to leave open the discussion of those
+  representations for now.
+
+** Exercise 5.28
+Write out a detailed specification of the quantum algorithm to solve the hidden subgroup
+problem, complete with runtime and success probability estimates, for ﬁnite Abelian
+groups.
+
+*** Solution
+:PROPERTIES:
+:CUSTOM_ID: exercise-5.28-solution
+:END:
+In the following $f:G\to Y$ is a function from a finite abelian group $G$ to a (finite)
+set $Y$. Let $K$ be a subgroup of $G$ and assume that the restrictions of $f$ to any of
+the cosets of $K$ are constant. Hence the function can be regarded as defined on the
+quotient group $G/K$. Moreover we assume that $f:G/K\to Y$ is injective.
+
+We assume that $G$ is already represented as a decomposition:
+
+$$
+  G = \bigoplus_{i=1}^n \ZZ_{r_i} .
+$$
+
+We do /not/ require that the $r_i$ are powers of primes. This decomposition also fixes an
+[[file:appendix_2.org::isomorphism-ghat-g][isomorphism]] $G\to\hat{G},\;l\mapsto\chi_l$,
+
+$$
+  \chi_l(g) = e^{2\pi\ii \sum_{j=1}^n g_jl_j/r_j} .
+$$
+
+Finally we assume that there is a binary operation $\oplus$ on $Y$ with a left-neutral
+element $0\in Y$, i.e. $0\oplus y=y$ for all $y$.
+
+- Algorithm (for the hidden subgroup problem) ::
+  - Inputs ::
+    1. $n$ register of differing sizes $t_i=O(m_j+\log(n/\varepsilon))$ with
+       $m_j=O(\log(r_j))$. One register of size $N$ for the function evaluation (probably
+       $N=O(\log(\abs{Y}))$, but this naturally depends on the black box $U$ mentioned
+       below). Let $t=\sum_it_i$.
+    2. A black box $U$ which performs the operation
+       $$
+       \bigotimes_{i=1}^n \ket{x_i} \otimes \ket{y}
+       \mapsto \bigotimes_{i=1}^n \ket{x_i} \otimes \ket{y \oplus f(x)} ,
+       $$
+  - Outputs ::
+    A generating set for the hidden subgroup $K$ with probability $1-\varepsilon$.
+  - Runtime ::
+    Overall
+
+    $$ J = O(\log(\abs{G})(\log(\log(\abs{G}))+\log(1/\varepsilon))) $$
+
+    uses of the black box $U$ and for each repetition $O(\sum_i t_i^2)$ quantum gates for
+    other quantum operations (mostly Fourier transforms). Among the classical post
+    processing the smith decomposition is probably the most heavyweight which probably
+    needs $O(J^3)$ operations (I did not check this, but I would be surprised if it is not
+    true).
+  - Procedure ::
+    1. Initialization to $\ket{0}$ (all registers).
+
+    2. Perform a Hadamard transform $H^{\otimes t}$ on the first $n$ registers to obtain:
+       $$
+       \rightarrow \frac{1}{\sqrt{2^t}} \sum_{x\in\{0,1\}^t} \ket{x} \ket{0}
+       $$
+
+    3. Apply $U$:
+
+       \begin{align*}
+         \rightarrow \frac{1}{\sqrt{2^t}} \sum_x \ket{x} \ket{f(x)}
+         &= \frac{1}{\sqrt{2^t}} \sum_x \ket{x} \frac{1}{\sqrt{\abs{G}}}  \sum_{l\in G} \chi_l(-x) \ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \left(\frac{1}{\sqrt{2^t}}\sum_{x} \chi_l(-x) \ket{x} \right) \ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \bigotimes_{j=1}^n \left(\frac{1}{\sqrt{2^{t_j}}}\sum_{x_j=0}^{2^{t_j}-1} e^{-2\pi\ii x_jl_j/r_j} \ket{x_j} \right) \ket{\hat{f}(l)}
+       \end{align*}
+
+       In the first equality we use the [[file:appendix_2.org::#section-fourier-abelian-groups][Fourier representation]] of the function
+       $x\mapsto\ket{f(x)}$. This makes sense because we can interpret $x$ as an element
+       of $G$ by identifying $x_i$ with $x_i\mod r_i$.
+
+    4. Apply the inverse Fourier transform of $\bigoplus_{i=1}^n\ZZ_{2^{t_i}}$ (/not/ $G$) to the
+       first $n$ registers:
+
+       $$
+       \rightarrow \frac{1}{\sqrt{\abs{G}}} \sum_{l\in G} \bigotimes_{j=1}^n \ket{\widetilde{l_j/r_j}} \ket{\hat{f}(l)}
+       $$
+
+       [[file:appendix_2.org::fourier-product-formula-abelian][That is]], we apply the standard inverse Fourier transform on each
+       register. According to chapter 5.2.1 for a given $l$ the $\widetilde{l_j/r_j}$ are
+       $m_j$ bit approximations of $l_j/r_j$ with probability $1-O(\varepsilon/n)$
+       (each). Hence all of them are good approximations /simultaneously/ with probability
+       $1-O(\varepsilon)$.
+
+    5. Measure the first $n$ registers, and recover $l$ from the
+       $\widetilde{l_j/r_j}$. This works with certainty (provided step 4 worked out as
+       desired) if $m_j=O(\log(r_j))$ is large enough. In fact, recall that we already
+       know $r_j$. Hence we just need $2^{-m_j}\leq\,r_j/2$ to make that work.
+
+    6. Repeat steps 1 to 5 to obtain
+
+       $$ J = O(\log(\abs{G})(\log(\log(\abs{G}))+\log(1/\varepsilon))) $$
+
+       samples $l^{(1)},\ldots,l^{(J)}$ for $l$.
+
+    7. Let $r=\mathrm{lcd}(r_1,\ldots,r_n)$, $s_i=r/r_i$ and find solutions
+       $k^{(1)},\ldots,k^{(n)}$ of
+
+       $$
+         \sum_{i=1}^n s_i l_i^{(j)} k_i = 0 \mod r \text{ for } j \in \{1,\ldots,J\} .
+       $$
+
+       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. These solutions are a (not necessarily minimal)
+       generating set (with a probability as specified in the runtime section).
+
+Let us justify why this works.
+
+The $l$ which we obtain in step 5 are not arbitrary. Recall that the Fourier transform
+looks like this:
+
+$$
+  \ket{\hat{f}(l)} = \frac{1}{\sqrt{\abs{G}}} \sum_{g\in G} \chi_l(g) \ket{f(g)} .
+$$
+
+From the [[file:appendix_2.org::thm-basics-dual-subgroup][basic theorem]] on dual subgroups (appendix 2) we see that $\ket{\hat{f}(l)}$ is
+zero for $l\notin\,K^\perp$. But we can show more! In fact, $f$ is not only constant on
+cosets of $K$ it is even injective. This implies that the $\ket{f(g)}$ for $g\in G$ form an
+orthonormal set. To put this into use, let us assume that $h\in\,K^\perp$ and use that
+then $\chi_h$ is constant on cosets too.
+
+$$
+  \ket{\hat{f}(h)} = \frac{1}{\sqrt{\abs{G}}} \sum_{q\in G/K} \sum_{k\in K} \chi_h(q) \ket{f(q)}
+  = \frac{\abs{K}}{\sqrt{\abs{G}}} \sum_{q\in G/K} \chi_h(q) \ket{f(q)}.
+$$
+
+Note that this is (up to a factor) just the Fourier transform on $G/K$. We did not use
+injectivity so far. But injectivity implies that $\norm{\ket{\hat{f}(l)}}^2=\abs{K}$. To summarize:
+
+$$
+  \norm{\ket{\hat{f}(l)}}^2 = \begin{cases}
+    \abs{K} & \text{if } l \in K^\perp \\
+    0 & \text{otherwise.} \end{cases}
+$$
+
+This implies that in step 5 we sample $l$ from $K^\perp$ with /uniform/ probability
+distribution (uniformity is important as we will see later on).
+
+In [[file:appendix_2.org::find-generating-set-for-K][appendix 2]] we proved that step 7 indeed yields a generating set for $K$ *if* the
+$l^{(j)}$ generate $K^\perp$. Thus the final question is with what probability this
+happens. Let us first prove a Lemma.
+
+Recall that any finite abelian group $G$ can be decomposed as
+$\bigoplus_{i=1}^n\ZZ_{p_{i}^{r_i}}$ with prime numbers $p_i$ (not necessarily all
+distinct). The primes and their exponents are unique. Hence $\kappa(G):=n$ is
+well-defined. Note that $\kappa(G)=O(\log(\abs{G}))$.
+
+<<lemma-probability-random-generating-set>>
+- Lemma :: Let $G$ be a finite abelian group and let $n=\kappa(G)$. The probability that
+  $mn$ elements of $G$ which are chosen /uniformly/ at random are a generating set is at
+  least $1-n2^{-m}$.
+- Proof ::
+  Let us define $P(G,j)$ as the probability that $j+\kappa(G)$ randomly chosen elements
+  generate $G$. We have
+
+  $$
+    P(\ZZ_{p^r}\oplus G, j + m) \geq (1 - 1/p^m) P(G, j) .
+  $$
+
+  Let us justify this. We sample the first $j+\kappa(G)$ elements and hope that it,
+  projected to $G$, generates $G$ (probability $P(G,j)$). Then we take $m$ additional
+  elements and hope that their projection to $\ZZ_{p^r}$ hits a number, which is not
+  divisible by $p$, at least once (probability at least $1-1/p^m$). If both happens we get
+  a generating set for $\ZZ_{p^r}\oplus G$. This appears to be a terrible way to estimate
+  the probabilities but it serves the purpose 👍.
+
+  As a special case of the above reasoning we get
+
+  $$
+    P(\ZZ_{p^r}, m) \geq 1 - 1/p^m .
+  $$
+
+  Induction on $n=\kappa(G)$, using that $2$ is the smallest prime, yields
+
+  $$
+    P(G,mn)\geq (1 - 1/2^m)^n .
+  $$
+
+  The claim now follows from $(1-x)^n\geq1-nx$ (use mathematical induction to see
+  this simple inequality). QED.
+
+To have a success probability of $1-O(\varepsilon)$ in the context of the lemma we thus
+need to set
+
+$$
+  m = O(\log(n)+\log(1/\varepsilon)) = O(\log(\log(\abs{G}))+\log(1/\varepsilon))
+$$
+
+This explains the choice of $J$ in step 6 and concludes the justification that the
+algorithm works as specified.
+
+** Exercise 5.29
+Give quantum algorithms to solve the Deutsch and Simon problems listed in Figure 5.5,
+using the framework of the hidden subgroup problem.
+
+*** Solution for Deutsch's problem
+Let us briefly recall Deutsch's problem.
+
+Let $G=\ZZ_2$ and consider a function $f:G\to X=\ZZ_2$. There are two cases
+
+- Constant :: $f\equiv\mathrm{const}$ (hidden subgroup $K=G$).
+- Balanced :: $f(0)\neq f(1)$ (hidden subgroup $K=0$).
+
+The task is to find out to which case a given $f$ belongs. Of course this problem is
+really boring (there are only four possible functions $f$), but the more general
+Deutsch-Josza problem does /not apriori/ fit into the hidden-subgroup framework. But
+please also read the [[exercise-5.29-remark][remarks]] at the end.
+
+- Algorithm (for Deutsch's problem) ::
+  - Inputs ::
+    1. Two register, each with one qubit.
+    2. A black box $U$ performing $\ket{x,y}\mapsto\ket{x,y\oplus f(x)}$.
+  - Outputs :: The case (/constant/ or /balanced/) to which $f$ belongs.
+  - Runtime :: One application of $U$ (per repetition). The constant case is always correctly
+    inferred. The balanced case is correctly inferred with probability $1/2$. Repeating the algorithm
+    $n$ times increases the success probability in the balanced case to $1-2^{-n}$ since measuring
+    $m=1$ once in step 5 already ensures certainty.
+  - Procedure ::
+    1. Initialize both register to zero: $\ket{0}\ket{0}$.
+    2. Perform the Hadamard gate $H$ on the first register
+
+       $$ \rightarrow \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x}\ket{0} $$
+    3. Apply $U$:
+
+       \begin{align*}
+       \rightarrow \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x}\ket{f(x)}
+       &= \frac{1}{\sqrt{2}} \sum_{x=0}^1 \ket{x} \frac{1}{\sqrt{2}} \sum_{l=0}^1 (-1)^{xl} \ket{\hat{f}(l)} \\
+       &= \frac{1}{\sqrt{2}} \sum_{l=0}^1 \left(\frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{xl} \ket{x} \right) \ket{\hat{f}(l)} \\
+       &= \frac{1}{\sqrt{2}} \sum_{l=0}^1 H\ket{l} \ket{\hat{f}(l)} .
+       \end{align*}
+    4. Apply the Hadamard gate $H$ to the first register (again):
+       $$ \rightarrow \frac{1}{\sqrt{2}} \sum_{l=0}^1 \ket{l} \ket{\hat{f}(l)} $$
+    5. Measure the first register and obtain $m=0$ or $m=1$.
+    6. Upon $m=0$ return "constant" otherwise return "balanced". If we repeat steps 1 to 5 $n$
+       times then upon measuring $0$ all the time we return "constant", otherwise "balanced".
+
+Why does it work? The Hadamard transform of $x\mapsto\ket{f(x)}$ is
+
+$$
+  \ket{\hat{f}(l)} = \frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{xl} \ket{f(x)} .
+$$
+
+If $f$ is constant we have the wave function concentrated at $l=0$ which means that we measure $0$
+in step 5 with certainty. If $f$ is balanced we have a $50\%$ chance of measuring either $0$ or $1$
+(hence only a $50\%$ chance for the correct output).
+
+- Remarks <<exercise-5.29-remark>> ::
+  - By "accident" the algorithm directly generalizes to the Deutsch-Josza problem. We only
+    have to replace $G$ by $\ZZ_2^n$, $H$ by $H^{\otimes n}$, $xl$ by $\sum_ix_il_i$ and
+    the first register has to hold $n$ qubits. Moreover in step 6 we return "constant" if we
+    measure all-zeros and "balanced" otherwise. But we cannot naturally assign a hidden
+    subgroup in general.
+
+    Let us sketch why this works. If $f$ is constant again $l=0$ (vector of bits in this
+    case) is the only non-zero Fourier coefficient. In the balanced case it is easy to see
+    that $l=0$ concentrates /exactly/ $50\%$ of the probability. The rest is more or less
+    arbitrarily distributed among the other bit-strings.
+  - This algorithm is different then the algorithm given for Deutsch or Deutsch-Josza in
+    section 1.4.3 or 1.4.4. Those algorithms are better in the sense that one application
+    suffices to get a correct return value /with certainty/.
+
+    There are two differences. The better algorithm starts with $\ket{0}\ket{1}$ and it
+    applies a another Hadamard gate to the second register in step 2. This leads to the
+    following state in step 3:
+
+    $$
+    \left( \frac{1}{\sqrt{2}} \sum_{x=0}^1 (-1)^{f(x)}\ket{x} \right) \ket{-} .
+    $$
+
+    In particular the first register contains $\pm\ket{+}$ for a constant function and
+    $\pm\ket{-}$ for a balanced function. This leads to $100\%$ correctness in step 6.
+
+*** Solution for Simon's problem
+Let us briefly recall Simon's problem.
+
+Let $G=\ZZ_2^n$ and consider a function $f:G\to X$ for some set $X$ (we assume that there
+is a binary operation $\oplus$ on $X$ which has a left-neutral element $0\in X$). Assume
+that there exists some $s\in\ZZ_2^n$ (the secret) such that $f$ satisfies
+
+$$
+  f(y) = f(x) \quad \Longleftrightarrow \quad y = x \text{ or } y = x \oplus s .
+$$
+
+The problem is to determine the value of the secret.
+
+Here the hidden subgroup is the two-element subgroup $K=\{0,s\}$. The direction
+$\Leftarrow$ in the condition on $f$ means that $f$ is constant on cosets of $K$. The
+other direction means that $f$ has a different value on each coset.
+
+The "canonical" set of such functions is given by all $f:G\to G/K$ with $f(x):=x+K$. All
+other examples arise from these by composing with an arbitrary injective function
+$G/K\,\to\,X$.
+
+- Algorithm (for Simon's problem) ::
+  - Inputs ::
+    1. Two register, the first with $n$ qubits, the second large enough for the operations
+       on $X$.
+    2. A black box $U$ performing $\ket{x}\ket{y}\mapsto\ket{x}\ket{y\oplus f(x)}$.
+  - Outputs :: The secret $s$.
+  - Runtime :: $J=nm$ calls to $U$ and $O(n^2)$ quantum operations in each run (mostly
+    quantum Fourier transform). Finally some classical overhead solving a linear system of
+    $J$ equation in $n$ variables (roughly $O(J^3)$ operations). The success probability
+    is at least $1-n2^{-m}$.
+  - Procedure ::
+    1. Initialize the state $\ket{0}\ket{0}$.
+    2. Apply $H^{\otimes n}$ to the first register:
+
+       $$
+         \rightarrow \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{0}
+       $$
+    3. Apply $U$:
+
+       \begin{align*}
+         \rightarrow \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{f(x)}
+         &= \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} \ket{x}\ket{f(x)} \frac{1}{\sqrt{2^n}} \sum_{l=0}^{2^n-1} (-1)^{l\cdot x}\ket{\hat{f}(l)} \\
+         &= \frac{1}{\sqrt{2^n}} \sum_{l=0}^{2^n-1} \left( \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n-1} (-1)^{l\cdot x} \ket{x} \right) \ket{\hat{f}(l)}
+       \end{align*}
+    4. Measure the first register to obtain some $l$.
+    5. Repeat steps 1 to 4 $J=mn$ times to get $l^{(1)},\ldots,l^{(J)}$.
+    6. Find a solution $s$ of
+
+       $$
+         s \cdot l^{(j)} = 0 \mod 2 \text{ for } j=1,\ldots,J .
+       $$
+
+       as described in [[file:appendix_2.org::find-generating-set-for-K][appendix 2]]. Return this solution.
+
+Why does this work? First of all from the general theory of hidden subgroup framework we
+know that the $l$ measured in step 4 is an element of $K^\perp$. The thing which is
+special here is that the probability is indeed /exactly/ $1$ here since the quantum
+Fourier transform likes it if the number of qubits is a power of $2$ (see the beginning of
+section 5.2).
+
+The choice of $J$ leads to the success probability asserted in the runtime section because
+of [[lemma-probability-random-generating-set][a simple lemma]] on random generators of groups.
+
 * References
 #+print_bibliography:

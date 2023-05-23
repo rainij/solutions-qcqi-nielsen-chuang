@@ -7,7 +7,7 @@
 #+toc: headlines 2
 
 * Setup
-** Python Libraries
+** Python libraries
 #+begin_src python
   from numbers import Number
 
@@ -17,7 +17,7 @@
   from chapter_2 import trace
 #+end_src
 
-* Character Theory
+* Character theory
 For me /Character Theory/ was rather new when I accountered the appendix for the first
 time. I found it hard to learn it from this Appendix so I searched for alternative
 resources. I think Chapters 1 and 2 of [cite:@Fulton2004] constitutes a gentle
@@ -292,7 +292,7 @@ $$
 Hence the identity on $V$ induces a G-isomorphism between $V_i^{a_i}$ and $W_i^{b_i}$. Since the
 dimensions of $V_i$ and $W_i$ are the same (by equivalence) this implies $a_i=b_i$. QED.
 
-** Class Functions as a Hilbert Space
+** Class functions as a Hilbert Space
 :PROPERTIES:
 :CUSTOM_ID: class-functions-hilbert-space
 :END:
@@ -611,7 +611,7 @@ polynomial (that is, $p(A)=0$).
 The regular representation (which /essentially/ maps $\alpha$ to $A$) is faithful. Hence
 $p(\alpha)=0$ too. QED.
 
-** Fourier transform
+** Fourier transform - Definition
 The /Fourier transformation/ is already defined [[fourier-trafo-repr][here]]. But let us re-introduce it with
 slightly enhanced notation which is closer to what we know from the standard case. For
 $f\in\CC^G$ let
@@ -620,7 +620,7 @@ $$
   \hat{f} := \rho^F\left( \sum_{g\in G} f(g) \, g \right) := \sum_{g\in G} f(g) \, \rho^F(g) .
 $$
 
-By chapter on the [[ordering-fourier-transform][fundamental formula]] we can identify $\hat{f}$ with a vector $\CC^N$,
+By the chapter on the [[ordering-fourier-transform][fundamental formula]] we can identify $\hat{f}$ with a vector $\CC^N$,
 which is the set of functions from $\{1,2,\ldots,N\}$ to $\CC$. By the same chapter the
 mapping $\FT:f\mapsto\hat{f}$ is *unitary*.
 
@@ -665,7 +665,8 @@ $$
 
 yields $\FT\inv$.
 
-** Fourier transform on Abelian groups
+* Fourier transform on abelian groups
+** Definition for abelian groups
 :PROPERTIES:
 :CUSTOM_ID: section-fourier-abelian-groups
 :END:
@@ -684,12 +685,17 @@ $$
   f(g) = \frac{1}{\sqrt{N}} \sum_{\chi\in\hat{G}} \hat{f}(\chi) \chi(g\inv) \text{ where } g \in G .
 $$
 
+** Pontryagin duality
+:PROPERTIES:
+:CUSTOM_ID: pontryagin-duality
+:END:
 Using [[#exercise-a2-11][Exercise A2.11(5)]] or more precisely the fact that $\chi(g)$ is a [[root-of-unity-property][root of unity]]
 (whose order divides $N$) we can show that $\hat{G}$ can be identified with the Abelian
 group $\hom(G,S^1)$ (group homomorphisms from $G$ to the unit circle
-$S^1\subseteq\CC$). That $\hat{G}$ is a /sub/-group should be clear from what was already
-said. Equality can be shown from the (non-trivial) fact that finite Abelian groups are
-isomorphic to a [[https://en.wikipedia.org/wiki/Abelian_group#Finite_abelian_groups][direct sum of cyclic groups]].
+$S^1\subseteq\CC$). See also [[https://en.wikipedia.org/wiki/Pontryagin_duality][Pontryagin duality]] at wikipedia. That $\hat{G}$ is a
+/sub/-group should be clear from what was already said. Equality can be shown from the
+(non-trivial) fact that finite Abelian groups are isomorphic to a [[https://en.wikipedia.org/wiki/Abelian_group#Finite_abelian_groups][direct sum of cyclic
+groups]] (for a proof see [[https://math.libretexts.org/Bookshelves/Abstract_and_Geometric_Algebra/Abstract_Algebra%3A_Theory_and_Applications_(Judson)/13%3A_The_Structure_of_Groups/13.01%3A_Finite_Abelian_Groups][libretexts.org]]).
 
 Cyclic groups in turn are (easily seen to be) isomorphic to $\ZZ_n$ for which it is easy
 to see that $\hom(\ZZ_n,S^1)$ has /exactly/ $n$ elements. In fact, it is easy to see that
@@ -709,9 +715,13 @@ $$
 
 Compare this with [[*Exercise A2.23][exercise A2.23]].
 
-** Tensor products and invariant subspaces
-Let $G=H\otimes K$ be a tensor product of two finite /Abelian/ groups. It is not hard to see
-that products of the irreducible characters of $H$ and $K$ are the irreducible characters of $G$:
+** On direct sums
+:PROPERTIES:
+:CUSTOM_ID: direct-sums-invariant-subspaces
+:END:
+Let $G=H\oplus K$ be a direct sum of two finite /Abelian/ groups. It is not hard to see
+that products of the irreducible characters of $H$ and $K$ are the irreducible characters
+of $G$:
 
 $$
   \chi_G^{ij}(h, k) = (\chi_H^i \otimes \chi_K^j)(h,k) = \chi_H^i(h) \chi_K^j(k) .
@@ -757,6 +767,179 @@ $$
     \sqrt{\frac{\abs{K}}{\abs{H}}} (\FT_H f(\cdot,0))(\chi_H^i) & \text{if } j=0 \\
     0 & \text{otherwise.} \end{cases}
 $$
+
+** Product formula and the isomorphism $G\cong\hat{G}$
+Recall that abelian groups are direct sums of cyclic groups:
+
+<<decompose-abelian-groups>>
+$$
+  G = \bigoplus_{i=1}^n \ZZ_{r_i} .
+$$
+
+In fact, one can acutally choose the $r_i$ to be prime powers (see [[https://math.libretexts.org/Bookshelves/Abstract_and_Geometric_Algebra/Abstract_Algebra%3A_Theory_and_Applications_(Judson)/13%3A_The_Structure_of_Groups/13.01%3A_Finite_Abelian_Groups][libretexts.org]]). The
+decomposition is unique in the sense that the /multi/-set of the $r_i$ is unique /if/ we
+require them to be prime-powers. It is useful to know that $\ZZ_n\oplus\ZZ_m\cong\ZZ_{nm}$
+/if/ $n$ and $m$ are coprime.
+
+It is /very/ important to note that some of the $r_i$ can be equal. For example, there are
+two /non-isomorphic/ abelian groups of order 4: $\ZZ_4$ and $\ZZ_2\oplus\ZZ_2$. Also note
+that the Fourier transform on $\ZZ_4$ is the "standard" discrete Fourier transform while
+the Fourier transform on $\ZZ_2\oplus\ZZ_2$ is the Hadamard transform $H^{\otimes 2}$.
+
+From a [[#direct-sums-invariant-subspaces][previous section]] we see that
+
+<<fourier-product-formula-abelian>>
+$$
+  \FT_G = \bigotimes_{i=1}^n \FT_{\ZZ_{r_i}} .
+$$
+
+That is, the Fourier transform on an abelian group is just a product of standard Fourier
+transforms. Equivalently one can say that the set of irreducible characters on $G$ are
+given by:
+
+<<isomorphism-ghat-g>>
+$$
+  \chi_l(g) = \exp\left( 2\pi\ii \sum_{i=1}^n l_i g_i / r_i \right) \text{ for } l\in G .
+$$
+
+Note that $\chi_{l+h}(g)=\chi_l(g)\chi_h(g)$ and $\chi_{-l}(g)=\chi_l(g)^\dagger$. In
+particular $\hat{G} \cong G$. I.e. both groups are isomorphic. Also note that this
+isomorphism is /not/ canonical. First of all the [[decompose-abelian-groups][decomposition]] of $G$ is not completely
+unique. Moreover there are at least two competing conventions whether to put a sign in
+front of $2\pi$ in the formula for $\chi_l(g)$ or not.
+
+** Character dual of subgroups
+:PROPERTIES:
+:CUSTOM_ID: section-dual-subgroup
+:END:
+There is an interesting relation between Fourier transforms (or irreducible characters)
+and [[https://en.wikipedia.org/wiki/Quotient_group][quotient groups]] (Notation: $G/K$).
+
+- Definition :: Let $K$ be a subgroup of a finite abelian group $G$. The /character dual/
+  of $K$ is
+
+  $$
+    K^\perp = \{ g \in G | \forall k\in K: \; \chi_g(k) = 1 \} .
+  $$
+
+  - Remark :: I did not find a good name for this in the internet (I use /character dual/
+    because of a lack thereof). Some people call this /orthogonal complement/ and use the
+    above notation. However, I try to avoid that because it does not have the properties I
+    associate with orthogonal complements in (complex) Hilbert spaces. For example, let
+    $G=\ZZ_4$ and $K=2\ZZ_4$, then $K^\perp=K$.
+- Theorem <<thm-basics-dual-subgroup>> :: Let $K$ be a subgroup of the finite abelian
+  group $G$. Then
+  1. The character dual is isomorphic to the quotient group:
+
+     $$ K^\perp \cong G/K $$
+  2. This property is the reason I call it /dual/:
+
+     $$ (K^\perp)^\perp = K $$
+  3. We have
+
+     $$
+       \sum_{k\in K} \chi_l(k) = \begin{cases}
+         \abs{K} & \text{if } l \in K^\perp \\
+         0 & \text{otherwise.} \end{cases}
+     $$
+  4. Let $f\in\CC^G$ be a function which is constant on cosets of $K$. Then
+
+     $$
+     \langle f, \chi_l \rangle = 0 \text{ if } l\notin K^\perp .
+     $$
+
+     In other words (by the [[*Class functions as a Hilbert Space][orthonormality]] property of irreducible characters), $f$ can be
+     represented as a linear combination of the characters corresponding to $K^\perp$.
+- Proof of 1 ::
+  We show the isomorphism $K^\perp\cong\widehat{(G/K)}$. This is sufficient since the
+  characters of an /abelian/ group are isomorphic to the group itself ($g\mapsto\chi_g$ is
+  the isomorphism).
+
+  The isomorphism $K^\perp\cong\widehat{(G/K)}$ is given by
+
+  <<def-iso-kdual-g/k>>
+  $$ h\mapsto(\chi_h^{G/K}:g+K\mapsto\chi_h(g)) $$
+
+  This mapping is well-defined precisely because $h\in K^\perp$. To see that the
+  $\chi_h^{G/K}$ are indeed irreducible characters it suffices to note that they are group
+  homomorphisms from $G/K$ to $S^1$ (c.f. [[#pontryagin-duality][Pontryagin duality]]). This shows
+  $K^\perp\subseteq\widehat{G/K}$.
+
+  The other direction can be seen from the fact that any $\chi\in\widehat{G/K}$ give rise
+  to a $\tilde{\chi}\in\hat{G}$ satisfying $\tilde{\chi}(k)=1$ for all $K$. In fact, just set
+
+  $$ \tilde{\chi}(g) := \chi(g+K) $$
+
+  Clearly this is the reverse of the [[def-iso-kdual-g/k][above mapping]]. QED.
+- Proof of 2 ::
+  We have to show that
+
+  $$
+    K = \{ g\in G| \forall h\in K^\perp: \; \chi_g(h) = 1 \} .
+  $$
+
+  By the symmetry $\chi_g(h)=\chi_h(g)$ the inclusion $K\subseteq(K^\perp)^\perp$ is
+  clear. But by the first part of the Theorem we must have equality due to cardinality
+  reasons. QED.
+- Proof of 3 and 4 ::
+  Let $1_K\in\CC^G$ be the function which maps any element of $K$ to $1$ and any other
+  element to $0$. Up to the factor $\abs{K}$ the LHS of what is to prove in part is just the
+  scalar product $\langle1_K,\chi_l\rangle$.
+
+  The fact that $\langle1_K,\chi_l\rangle=1$ if $l\in K^\perp$ should be clear.
+
+  Now consider the subspace $S\subseteq\CC^G$ of functions which are constant on cosets of
+  $K$. Observe that $f,1_K\in S$. Clearly $S\cong\CC^{G/K}$ by an isomorphism consistent
+  (in a sense) with the one from the proof of part 1. Hence, $\{\chi_h|h\in\,K^\perp\}$,
+  which is isomorphic to $\widetilde{G/K}$ by part 1, is an orthormal basis which
+  [[#class-functions-hilbert-space][precisely spans]] $S$. Hence, again by orthonormality
+  of all characters of $G$ the other ones must have zero scalar product with any element
+  of $S$ (in particular with $1_K$). QED.
+
+The theorem is important for the hidden subgroup problem. The goal of the problem is to
+find a generating set for some subgroup $K$ (related to some function $f$) of $G$. The
+quantum part of the algorithm solving the problem does /not directly/ yield a generating
+set for $K$. Instead a generating set $l^{(1)},\ldots,l^{(J)}$ for $K^\perp$ as in the
+theorem is produced (with high probability).
+
+<<find-generating-set-for-K>>
+How do we find a generating set for
+
+$$
+  K = \{ k\in G| \; \forall i: \, \chi_{l^{(i)}}(k) = 1 \}
+$$
+
+? First let us define $r=\mathrm{lcd}(r_1,\ldots,r_n)$, $s_i=r/r_i$ and note that $K$ is
+characterized by the system of equations with integer coefficients
+
+$$
+  \sum_{i=1}^n s_i l_i^{(j)} k_i = 0 \mod r \text{ for } j \in \{1,\ldots,J\} .
+$$
+
+Defining the matrix $A=(s_il_i^{(j)})\in\ZZ^{J\times n}$ this can be written as
+
+$$
+  Ak = 0 \mod r .
+$$
+
+Let us note one subtle thing here. We silently interpreted $k_i,l_i$ as elements of
+$\ZZ_r$ although they are elements of $\ZZ_{r_i}$ (and $r=\prod_ir_i$). But this is not a
+problem since $s_i=r/r_i$ ensures that this does not change the set of solutions.
+
+By the [[https://en.wikipedia.org/wiki/Smith_normal_form][Smith normal form]] there are invertible matrices $S\in\ZZ^{J\,\times\,J}$ and
+$T\in\ZZ^{n\,\times\,n}$ such that $D=SAT$ is a diagonal ($J\,\times\,n$) matrix. The
+multi-set of numbers on the diagonal is unique. Without loss of generality we may assume
+that $d_i=D_{ii}$ for $i=1,\ldots,n_0$ are the only non-zero entries. It is easy to find the
+solutions of
+
+$$
+  Dk' = 0 \mod r .
+$$
+
+In fact, if $n_0=n$, a generating set is just the $n_0$ values $k'^{(i)}$ with
+$k'^{(i)}_j=\delta_{ij}r/d_i$. If $n_0 < n$ we have to add some $k'^{(i)}_j=\delta_{ij}$ for
+$i>n_0$. Let $k^{(i)}=Tk'^{(i)}$ and interpret each $j$​th entry modulo $r_j$. This yields
+a (not necessarily minimal) generating set for $K$.
 
 * Exercises
 ** Exercise A2.11 (Characters)
@@ -901,7 +1084,7 @@ $$
   g s = s g
 $$
 
-for any element $g$. By [[*Schur's Lemma][Schur's Lemma]] we have $s=\alpha_s I$ for some complex number
+for any element $g$. By [[*Schur's Lemma][Schur's Lemma]] we have $\rho(s)=\alpha_s I$ for some complex number
 $\alpha_s$. Since $s$ was arbitrary we have that any element is of this form. A group of
 multiples of the identity can clearly only be irreducible if it is one dimensional. QED.
 
