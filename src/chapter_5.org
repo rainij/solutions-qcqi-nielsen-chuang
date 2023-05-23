@@ -2299,10 +2299,36 @@ Using $W_{b,a}$ and one ancilla register we can implement the desired operation.
 The last operation just uncomputes the value in the ancilla register. The =XOR= can be
 easily implemented using $L$ controlled =NOT= gates.
 
-** TODO Exercise 5.26
+** Exercise 5.26
 Since $K$ is a subgroup of $G$, when we decompose $G$ into a product of cyclic groups of
 prime power order, this also decomposes $K$. Re-express (5.77) to show that determining
 $l'_i$ allows one to sample from the corresponding cyclic subgroup $K_{p_i}$ of $K$.
+
+- Remark :: I am not sure if I correctly understand the exercise but I think it is wrong.
+
+*** Justification of the remark
+In general just looking at an /individual/ $l_i$ does not necessarily contain any useful
+information. Let us consider a simple example.
+
+Let $n > 1$, $G=\ZZ_2^n$ and let $e=(1,1,\ldots,1)\in G$ be the all ones bit-string. Let
+$K=\langle\,e\,\rangle$. Clearly $K\cong\ZZ_2$, so we already see that the decomposition
+of $K$ does not correspond "component-wise" to the decomposition of $G$. Moreover we have:
+
+$$
+  K^\perp = \{ l\in G| \sum_i l_ie_i = 0 \mod 2 \} = \{l| l \text{ has an even number of ones}\} .
+$$
+
+The notion of the [[file:appendix_2.org::#section-dual-subgroup][dual subgroup]] was introduced in appendix 2 (from /this/ website) and
+also used in the [[#exercise-5.28-solution][solution of exercise 5.28]]. It contains the non-zero Fourier coefficients
+of the functions $f$ appearing in the hidden subgroup problem. It is also shown that each
+$l\in\,K^\perp$ is measured with the same probability (this follows from the fact that $f$
+is different on each coset).
+
+Note that the characterization of $l\in K^\perp$ is a /global/ property. For a fixed $i$
+the $l_i$ can take any possible value, $0$ or $1$. In case of even $n$ the probability is
+exactly $1/2$ for each possibility. To understand that this is /really/ not useful observe
+that for $K=0$ (implying $K^\perp=G$) we get the /exact/ same statistical behavior (for
+even $n$) if we just look at individual $l_i$ in isolation.
 
 ** WIP Exercise 5.27
 Of course, the decomposition of a general ﬁnite Abelian group $G$ into a product of cyclic
