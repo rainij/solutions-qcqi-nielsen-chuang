@@ -1,0 +1,155 @@
+#+title:  Chapter 6
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:python :session *chapter-6* :tangle chapter_6.py
+
+#+toc: headlines 2
+
+* Setup
+#+name: chapter-6-python-imports
+#+begin_src python
+  import sympy as sp
+
+  from chapter_4 import Ry, theta, Z
+#+end_src
+
+* Exercises
+** Exercise 6.1
+Show that the unitary operator corresponding to the phase shift in the Grover iteration is
+$2\ket{0}\bra{0}-I$.
+
+*** Proof
+Recall that the phase shift operator in Grover's algorithm does the following to the
+standard basis states:
+
+$$
+  \ket{x} \mapsto \begin{cases} \ket{0} & \text{if } x=0 \\ -\ket{x} & \text{otherwise.} \end{cases}
+$$
+
+Since $\sprod{0}{x}=\delta_{x,0}$ this is the same as what $2\ket{0}\bra{0}-I$ does. QED.
+
+** Exercise 6.2
+Let $\ket{\psi}=N^{-1/2}\sum_{i=0}^{N-1}\ket{k}=H^{\otimes n}\ket{0}$. Show that the operation
+$2\ket{\psi}\bra{\psi}-I$ applied to a general state $\sum_k\alpha_k\ket{k}$ produces
+
+$$
+  \sum_k \left[ -\alpha_k + 2\mean{\alpha} \right] \ket{k} ,
+$$
+
+where $\mean{\alpha}=\sum_k\alpha_k/N$ is the mean value of the $\alpha_k$. For this
+reason, $2\ket{\psi}\bra{\psi}-I$ is sometimes referred to as the /inversion about mean/
+operation.
+
+*** Proof
+First of all we note that
+
+$$
+  \ket{\psi}\bra{\psi} = \frac{1}{N} \sum_{ij} \ket{i}\bra{j} .
+$$
+
+Hence
+
+\begin{align*}
+  (2\ket{\psi}\bra{\psi}-I) \sum_k \alpha_k \ket{k}
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{ijk} \frac{\alpha_k}{N} \ket{i}\sprod{j}{k} \\
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{ik} \frac{\alpha_k}{N} \ket{i} \\
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{i} \mean{\alpha} \ket{i} \\
+  &= \sum_k (-\alpha_k + 2\mean{\alpha}) \ket{k} .
+\end{align*}
+
+QED.
+
+** Exercise 6.3
+Show that in the $\ket{\alpha}$, $\ket{\beta}$ basis, we may write the Grover iteration as a rotation
+
+$$
+  G = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} ,
+$$
+
+where $\theta$ is a real number in the range $0$ to $\pi/2$ (assuming for simplicity that
+$M\leq N/2$; this limitation will be lifted shortly), chosen so that
+
+$$
+  \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
+$$
+
+*** Proof
+Recall that $M$ is the number of solutions of $f(x)=1$ and that
+
+$$
+  \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
+  \quad \text{and} \quad
+  \ket{\beta} = \frac{1}{\sqrt{M}} \sum_{f(x)=1} \ket{x} .
+$$
+
+Moreover
+
+$$
+  \ket{\psi} = H^{\otimes n} \ket{0}
+  = \underbrace{\sqrt{\frac{N-M}{N}}}_{=:\cos(\theta/2)} \ket{\alpha} +
+    \underbrace{\sqrt{\frac{M}{N}}}_{=:\sin(\theta/2)} \ket{\beta} .
+$$
+
+This is consistent with the formula for $\theta$ from the exercise statement, which can be
+seen by the trigonometric identity $\sin(2x)=2\sin(x)\cos(x)$. The Grover iteration $G$ is
+the product of the inversion about $\psi$, and the oracle $\orac$ (inversion about
+$\alpha$). We ignore the workspace here.
+
+$$
+  G = \mathrm{inv}(\psi) \cdot \orac
+$$
+
+By definition of $\alpha$ and $\beta$ we have
+
+$$
+  \orac = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} .
+$$
+
+Note that this is the Pauli-Z matrix. Let
+
+$$
+  U(\theta) = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} .
+$$
+
+Note that $U(\theta/2)=R_y(\theta)$ (Pauli-Y rotation) and that $U(\theta/2)(1,0)$ is the
+coordinate representation of $\ket{\psi}$. Hence
+
+$$
+  \mathrm{inv}(\psi) = U(\theta/2)
+  \cdot \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}
+  \cdot U(-\theta/2) .
+$$
+
+To show the claim only a short calculation is left. Let us do it with the help of =sympy=:
+
+#+begin_src python :results replace :tangle no :cache yes
+  Inv_psi = sp.simplify(Ry * Z * Ry.H)  # Ry = Ry(theta)
+  Orac = Z
+
+  assert Ry.subs(theta, 2*theta) == Inv_psi * Orac
+  "PASSED"
+#+end_src
+
+#+RESULTS[7fc9e8c408bb5616efe02c18297e41d392a585d4]:
+: PASSED
+
+Another way to see this (without much calculation) is to note that
+$ZU(-\phi)Z=U(\phi)$. QED.
+
+** TODO Exercise 6.4
+Give explicit steps for the quantum search algorithm, as above, but for the case of
+multiple solutions ($1 < M < N/2$).
+
+** TODO Exercise 6.5
+Show that the augmented oracle $\orac'$ may be constructed using one
+application of $\orac$, and elementary quantum gates, using the extra qubit $\ket{q}$.
+
+- What strikes me is the fact that it is possible to do this with just /one/ application
+  of the oracle! We will see that it is not possible to do this /classically/ in a
+  reversible way.
+
+** TODO Exercise 6.6
+Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
+conditional phase shift operation $2\ket{00}\bra{00}-I$, up to an unimportant global phase
+factor.
