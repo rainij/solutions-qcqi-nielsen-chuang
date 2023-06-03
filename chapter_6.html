@@ -1,0 +1,303 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 6</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 6</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\inv}{^{-1}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\sprod}[2]{\langle#1|#2\rangle} % scalar product
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\orac}{\mathrm{Orac}}
+\]
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org79bfb56">Setup</a></li>
+<li><a href="#org1686a54">Exercises</a>
+<ul>
+<li><a href="#org2f9201b">Exercise 6.1</a></li>
+<li><a href="#org344bcf9">Exercise 6.2</a></li>
+<li><a href="#org80a0487">Exercise 6.3</a></li>
+<li><a href="#org28e41f5"><span class="todo TODO">TODO</span> Exercise 6.4</a></li>
+<li><a href="#org18c72f4"><span class="todo TODO">TODO</span> Exercise 6.5</a></li>
+<li><a href="#orgf9e7fcc"><span class="todo TODO">TODO</span> Exercise 6.6</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org79bfb56" class="outline-2">
+<h2 id="org79bfb56">Setup</h2>
+<div class="outline-text-2" id="text-org79bfb56">
+<div class="org-src-container">
+<pre class="src src-python" id="org8431405"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+
+<span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Ry, theta, Z
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1686a54" class="outline-2">
+<h2 id="org1686a54">Exercises</h2>
+<div class="outline-text-2" id="text-org1686a54">
+</div>
+<div id="outline-container-org2f9201b" class="outline-3">
+<h3 id="org2f9201b">Exercise 6.1</h3>
+<div class="outline-text-3" id="text-org2f9201b">
+<p>
+Show that the unitary operator corresponding to the phase shift in the Grover iteration is
+\(2\ket{0}\bra{0}-I\).
+</p>
+</div>
+
+<div id="outline-container-org3054b3f" class="outline-4">
+<h4 id="org3054b3f">Proof</h4>
+<div class="outline-text-4" id="text-org3054b3f">
+<p>
+Recall that the phase shift operator in Grover's algorithm does the following to the
+standard basis states:
+</p>
+
+<p>
+\[
+  \ket{x} \mapsto \begin{cases} \ket{0} & \text{if } x=0 \\ -\ket{x} & \text{otherwise.} \end{cases}
+\]
+</p>
+
+<p>
+Since \(\sprod{0}{x}=\delta_{x,0}\) this is the same as what \(2\ket{0}\bra{0}-I\) does. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org344bcf9" class="outline-3">
+<h3 id="org344bcf9">Exercise 6.2</h3>
+<div class="outline-text-3" id="text-org344bcf9">
+<p>
+Let \(\ket{\psi}=N^{-1/2}\sum_{i=0}^{N-1}\ket{k}=H^{\otimes n}\ket{0}\). Show that the operation
+\(2\ket{\psi}\bra{\psi}-I\) applied to a general state \(\sum_k\alpha_k\ket{k}\) produces
+</p>
+
+<p>
+\[
+  \sum_k \left[ -\alpha_k + 2\mean{\alpha} \right] \ket{k} ,
+\]
+</p>
+
+<p>
+where \(\mean{\alpha}=\sum_k\alpha_k/N\) is the mean value of the \(\alpha_k\). For this
+reason, \(2\ket{\psi}\bra{\psi}-I\) is sometimes referred to as the <i>inversion about mean</i>
+operation.
+</p>
+</div>
+
+<div id="outline-container-orged1f77f" class="outline-4">
+<h4 id="orged1f77f">Proof</h4>
+<div class="outline-text-4" id="text-orged1f77f">
+<p>
+First of all we note that
+</p>
+
+<p>
+\[
+  \ket{\psi}\bra{\psi} = \frac{1}{N} \sum_{ij} \ket{i}\bra{j} .
+\]
+</p>
+
+<p>
+Hence
+</p>
+
+\begin{align*}
+  (2\ket{\psi}\bra{\psi}-I) \sum_k \alpha_k \ket{k}
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{ijk} \frac{\alpha_k}{N} \ket{i}\sprod{j}{k} \\
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{ik} \frac{\alpha_k}{N} \ket{i} \\
+  &= \sum_k -\alpha_k \ket{k} + 2\sum_{i} \mean{\alpha} \ket{i} \\
+  &= \sum_k (-\alpha_k + 2\mean{\alpha}) \ket{k} .
+\end{align*}
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org80a0487" class="outline-3">
+<h3 id="org80a0487">Exercise 6.3</h3>
+<div class="outline-text-3" id="text-org80a0487">
+<p>
+Show that in the \(\ket{\alpha}\), \(\ket{\beta}\) basis, we may write the Grover iteration as a rotation
+</p>
+
+<p>
+\[
+  G = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} ,
+\]
+</p>
+
+<p>
+where \(\theta\) is a real number in the range \(0\) to \(\pi/2\) (assuming for simplicity that
+\(M\leq N/2\); this limitation will be lifted shortly), chosen so that
+</p>
+
+<p>
+\[
+  \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
+\]
+</p>
+</div>
+
+<div id="outline-container-orgc235a58" class="outline-4">
+<h4 id="orgc235a58">Proof</h4>
+<div class="outline-text-4" id="text-orgc235a58">
+<p>
+Recall that \(M\) is the number of solutions of \(f(x)=1\) and that
+</p>
+
+<p>
+\[
+  \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
+  \quad \text{and} \quad
+  \ket{\beta} = \frac{1}{\sqrt{M}} \sum_{f(x)=1} \ket{x} .
+\]
+</p>
+
+<p>
+Moreover
+</p>
+
+<p>
+\[
+  \ket{\psi} = H^{\otimes n} \ket{0}
+  = \underbrace{\sqrt{\frac{N-M}{N}}}_{=:\cos(\theta/2)} \ket{\alpha} +
+    \underbrace{\sqrt{\frac{M}{N}}}_{=:\sin(\theta/2)} \ket{\beta} .
+\]
+</p>
+
+<p>
+This is consistent with the formula for \(\theta\) from the exercise statement, which can be
+seen by the trigonometric identity \(\sin(2x)=2\sin(x)\cos(x)\). The Grover iteration \(G\) is
+the product of the inversion about \(\psi\), and the oracle \(\orac\) (inversion about
+\(\alpha\)). We ignore the workspace here.
+</p>
+
+<p>
+\[
+  G = \mathrm{inv}(\psi) \cdot \orac
+\]
+</p>
+
+<p>
+By definition of \(\alpha\) and \(\beta\) we have
+</p>
+
+<p>
+\[
+  \orac = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} .
+\]
+</p>
+
+<p>
+Note that this is the Pauli-Z matrix. Let
+</p>
+
+<p>
+\[
+  U(\theta) = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} .
+\]
+</p>
+
+<p>
+Note that \(U(\theta/2)=R_y(\theta)\) (Pauli-Y rotation) and that \(U(\theta/2)(1,0)\) is the
+coordinate representation of \(\ket{\psi}\). Hence
+</p>
+
+<p>
+\[
+  \mathrm{inv}(\psi) = U(\theta/2)
+  \cdot \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}
+  \cdot U(-\theta/2) .
+\]
+</p>
+
+<p>
+To show the claim only a short calculation is left. Let us do it with the help of <code>sympy</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">Inv_psi</span> <span class="org-operator">=</span> sp.simplify(Ry <span class="org-operator">*</span> Z <span class="org-operator">*</span> Ry.H)  <span class="org-comment-delimiter"># </span><span class="org-comment">Ry = Ry(theta)</span>
+<span class="org-variable-name">Orac</span> <span class="org-operator">=</span> Z
+
+<span class="org-keyword">assert</span> Ry.subs(theta, 2<span class="org-operator">*</span>theta) <span class="org-operator">==</span> Inv_psi <span class="org-operator">*</span> Orac
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+PASSED
+</pre>
+
+
+<p>
+Another way to see this (without much calculation) is to note that
+\(ZU(-\phi)Z=U(\phi)\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org28e41f5" class="outline-3">
+<h3 id="org28e41f5"><span class="todo TODO">TODO</span> Exercise 6.4</h3>
+<div class="outline-text-3" id="text-org28e41f5">
+<p>
+Give explicit steps for the quantum search algorithm, as above, but for the case of
+multiple solutions (\(1 < M < N/2\)).
+</p>
+</div>
+</div>
+
+<div id="outline-container-org18c72f4" class="outline-3">
+<h3 id="org18c72f4"><span class="todo TODO">TODO</span> Exercise 6.5</h3>
+<div class="outline-text-3" id="text-org18c72f4">
+<p>
+Show that the augmented oracle \(\orac'\) may be constructed using one
+application of \(\orac\), and elementary quantum gates, using the extra qubit \(\ket{q}\).
+</p>
+
+<ul class="org-ul">
+<li>What strikes me is the fact that it is possible to do this with just <i>one</i> application
+of the oracle! We will see that it is not possible to do this <i>classically</i> in a
+reversible way.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf9e7fcc" class="outline-3">
+<h3 id="orgf9e7fcc"><span class="todo TODO">TODO</span> Exercise 6.6</h3>
+<div class="outline-text-3" id="text-orgf9e7fcc">
+<p>
+Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
+conditional phase shift operation \(2\ket{00}\bra{00}-I\), up to an unimportant global phase
+factor.
+</p>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
