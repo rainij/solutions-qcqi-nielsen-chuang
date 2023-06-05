@@ -70,6 +70,7 @@ $$
 where $\theta$ is a real number in the range $0$ to $\pi/2$ (assuming for simplicity that
 $M\leq N/2$; this limitation will be lifted shortly), chosen so that
 
+<<exercise-6.3-sin-theta>>
 $$
   \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
 $$
@@ -77,6 +78,7 @@ $$
 *** Proof
 Recall that $M$ is the number of solutions of $f(x)=1$ and that
 
+<<exercise-6.3-alpha-beta>>
 $$
   \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
   \quad \text{and} \quad
@@ -91,7 +93,7 @@ $$
     \underbrace{\sqrt{\frac{M}{N}}}_{=:\sin(\theta/2)} \ket{\beta} .
 $$
 
-This is consistent with the formula for $\theta$ from the exercise statement, which can be
+This is consistent with the [[exercise-6.3-sin-theta][formula for $\theta$]] from the exercise statement, which can be
 seen by the trigonometric identity $\sin(2x)=2\sin(x)\cos(x)$. The Grover iteration $G$ is
 the product of the inversion about $\psi$, and the oracle $\orac$ (inversion about
 $\alpha$). We ignore the workspace here.
@@ -137,19 +139,231 @@ To show the claim only a short calculation is left. Let us do it with the help o
 Another way to see this (without much calculation) is to note that
 $ZU(-\phi)Z=U(\phi)$. QED.
 
-** TODO Exercise 6.4
-Give explicit steps for the quantum search algorithm, as above, but for the case of
-multiple solutions ($1 < M < N/2$).
+** Exercise 6.4
+Give explicit steps for the quantum search algorithm, for the case of multiple solutions
+($1 < M \leq N/2$).
 
-** TODO Exercise 6.5
-Show that the augmented oracle $\orac'$ may be constructed using one
-application of $\orac$, and elementary quantum gates, using the extra qubit $\ket{q}$.
+*** Solution
+The difference to the special case $M=1$ is essentially the number of repetitions of the
+Grover iteration. Also note that $M$ has an influence on the success probability.
+
+We assume that $N=2^n$, $f:\{0,1\}^n\to\{0,1\}$, and that $M$ is the number of solutions
+of $f(x)=1$, as in the book. Moreover let (recall that we assume $M\leq N/2$)
+
+$$
+  \theta = \arcsin\left(\frac{2\sqrt{M(N-M)}}{N}\right)
+$$
+
+This formula comes from [[exercise-6.3-sin-theta][exercise 6.3]]. In the solution of that exercise we showed that
+
+$$
+  \ket{\psi} := H^{\otimes n} \ket{0} = \cos(\theta/2) \ket{\alpha} + \sin(\theta/2) \ket{\beta} .
+$$
+
+Here $\alpha$ and $\beta$ are as in the [[exercise-6.3-alpha-beta][solution of exercise 6.3]]. Let us write
+
+$$
+  \ket{\varphi} := \cos(\varphi) \ket{\alpha} + \sin(\varphi) \ket{\beta} .
+$$
+
+Hence $\ket{\psi}=\ket{\theta/2}$, $\beta=\ket{\pi/2}$ and $G$ acts as
+$\ket{\varphi}\mapsto\ket{\varphi+\theta}$. In particular, since we aim to rotate
+$\ket{\psi}$ to $\ket{\beta}$ (approximately), the number of repetitions for the Grover
+algorithm is:
+
+$$
+  R = \mathrm{round}\left( \frac{\pi}{2\theta} - \frac{1}{2} \right) = O \left( \sqrt{\frac{N}{M}} \right) ,
+$$
+
+(for $M\leq N/2$).
+
+- Algorithm (Quantum Search (Grover) for $0 < M \leq N/2$) ::
+  - Inputs ::
+    - An $n$ bit register and a one bit register.
+    - A black box oracle $U_f$ which performs the transformation $U_f\ket{x,q}=\ket{x,q\oplus f(x)}$.
+  - Outputs ::
+    A solution $x_0$ of $f(x_0)=1$ with probability at least
+    $1-\sin(\theta/2)^2=1-M/N\geq1/2$ (since the Grover iterations miss $\pi/2$ by at most
+    $\theta/2$). Every solution has the same chance to get "chosen".
+  - Runtime :: $R=O(\sqrt{N/M})$ calls to the oracle and to $(2\ket{\psi}\bra{\psi}-I)$,
+    and $O(n)$ gates/operations for other things.
+  - Procedure ::
+    1. Initialize registers to $\ket{0}\ket{0}$.
+    2. Apply $H^{\otimes n}\otimes HX$:
+
+       $$
+       \rightarrow \frac{1}{2^{n/2}} \sum_{x=0}^{2^n-1} \ket{x} \ket{-}
+       = \ket{\psi}\ket{-}
+       = \ket{\theta/2}\ket{-}
+       $$
+    3. Apply $R$ repetitions of $(2\ket{\psi}\bra{\psi}-I)U_f$:
+
+       $$
+       \rightarrow \ket{(2R+1)\theta/2}\ket{-}
+       \approx \ket{\beta}\ket{-}
+       $$
+    4. Measure the first register to obtain some $x_0$. Return $x_0$.
+
+** Exercise 6.5
+Show that the augmented oracle $U_f'$ may be constructed using one application of the
+original oracle $U_f$, and elementary quantum gates, using the extra qubit $\ket{q}$.
 
 - What strikes me is the fact that it is possible to do this with just /one/ application
   of the oracle! We will see that it is not possible to do this /classically/ in a
   reversible way.
 
-** TODO Exercise 6.6
+*** Proof
+According to the book we have to implement $U_f'$ as a /controlled/ (by $q$) version of
+$U_f$ which acts like this:
+
+$$
+  \ket{q,x,y} \mapsto \ket{q,x,y\oplus \overline{q}f(x)} .
+$$
+
+Recall that the techniques of chapter 4 require to decompose $U_f$ into elementary gates
+and recursively add controls. We do /not/ do this for the following reasons:
+
+- $U_f$ is a black box. So we are not supposed to assume anything about its internal
+  workings. In particular it might /not/ be implemented by the "usual" elementary gates.
+- Even if it was (and we get access to the circuit during execution of the algorithm) the
+  generic standard recursive procedure produces a relatively complicated circuit (in
+  general).
+- There is a simple way to get $U'_f$ using $U_f$ as a black box!
+
+The key to see this is the fact that the oracle $U_f$ leaves $\ket{x}\ket{+​}$ fixed. Let us introduce
+a fourth (auxiliary) register holding one qubit, initialized to $\ket{+}$. We want to
+implement $U'_f$ as:
+
+$$
+  \ket{q,x,y,+} \mapsto \ket{q,x,y\oplus \overline{q}f(x),+} .
+$$
+
+It is not hard to see that
+
+$$ U'_f=\mathrm{CSWAP}(1,3,4)\cdot U_f \cdot \mathrm{CSWAP}(1,3,4) $$
+
+accomplishes exactly that. Here $\mathrm{CSWAP}(1,3,4)$ is the controlled swap gate
+exchanging registers three and four conditioned on register one. QED.
+
+*** Proof of the remark
+In the framework of (classical) reversible computation as sketched in chapter 3.2.5 in the
+book we need at least two applications of the oracle.
+
+Before we prove this let us first show a classical reversible algorithm which uses two
+applications of the oracle:
+
+\begin{align*}
+  \ket{q,x,y,0}
+  &\stackrel{U_f(2,4)}{\longmapsto} &\ket{q,x,y,f(x)} \\
+  &\stackrel{X(1)}{\longmapsto}     &\ket{\overline{q},x,y,f(x)} \\
+  &\stackrel{\mathrm{Toff}(1,4,3)}{\longmapsto} &\ket{\overline{q},x,y\oplus\overline{q}f(x),f(x)} \\
+  &\stackrel{X(1)}{\longmapsto}     &\ket{q,x,y\oplus\overline{q}f(x),f(x)} \\
+  &\stackrel{U_f(2,4)}{\longmapsto} &\ket{q,x,y\oplus\overline{q}f(x),0}
+\end{align*}
+
+The second application of the oracle is needed to uncompute the garbage from the auxiliary
+register. An intuitive way to see the necessity of the second application is to look at
+the information present in the registers. In case of $q=1$ the final state does /not/
+contain a single bit of information about $f$. On the other hand, if we apply the oracle
+just once it leaves one bit of information about $f$ (the value of $f$ at some input, but
+not necessarily at $x$). So the computation after the application of the oracle would have
+to /erase/ the information which is not possible with reversible computation (without
+using the oracle, and hence some information about $f$, again).
+
+Let us give a (hopefully) more rigorous proof. Assume to the contrary that it was possible
+with just one application of the oracle and an additional $m$ qubit auxiliary register
+(initialized to $0$). The circuit (which is just a sequence of reversible gates) can be
+divided into three parts. The part $A$ before the oracle, the application of the oracle
+$U_f$, and the part $B$ after the oracle:
+
+\begin{align*}
+  \ket{q,x,y,0}
+  &\stackrel{A}{\longmapsto} \ket{a_1, a_2, a_3, a_4} \\
+  &\stackrel{U_f(p)}{\longmapsto} \ket{a'_1, a'_2, a'_3, a'_4} \\
+  &\stackrel{B}{\longmapsto} \ket{q,x,y\oplus\overline{q}f(x),0}
+\end{align*}
+
+In the second step the $p$ "signifies" our choice to what $n+1$ qubits to apply the
+oracle. Let us merge the $a_i$ into a single vector $z$ (just for notational
+simplicity). Same for $z'$ vs the $a_i$.
+
+After the oracle step for a certain $j_0$ we have
+$z'_{j_0}=z_{j_0}\oplus\,f(\tilde{x})$. Here the $\tilde{x}=\tilde{x}(q,x,A,p)$ only
+depends on $q$, $x$, the first part $A$, and the places $p$ to which the oracle is
+applied. Note that for $q=0$ clearly $\tilde{x}=x$ (otherwise, there is no way to obtain
+$f(x)$), but for $q=1$ (the interesting case) we cannot conclude this.
+
+Now let us simulate the above circuit on a larger circuit with four /zones/. A /zone/ is
+just a group of registers. The first zone is a read-only zone containing $q,x,y$ all the
+time. The second and third zone contains the same four registers (each) as the above
+circuit. The last zone contains only a one-qubit circuit.
+
+Let us denote by $\mathrm{Sim}(A,i)$ for $i\in\{2,3\}$ the circuit which executes $A$ at
+zone $i$. The simulations of $U_f$ and $B$ are defined similarly.
+
+Consider the circuit which acts as follows:
+
+1. Start
+   $$ \ket{q,x,y;0;0;0} $$
+2. Copy $q,x,y$ to zone $2$:
+   $$ \ket{q,x,y;q,x,y,0;0;0} $$
+3. Apply $\mathrm{Sim}(A,2)$:
+   $$ \rightarrow \ket{q,x,y;z;0;0} $$
+4. Apply $\mathrm{Sim}(U_f(p),2)$:
+   $$ \rightarrow \ket{q,x,y;z';0;0} $$
+5. Apply $\mathrm{Sim}(B,2)$:
+   $$ \rightarrow \ket{q,x,y;q,x,y\oplus \overline{q}f(x),0;0;0} $$
+
+Now let us see how we can extract $f(\tilde{x})$ from the final state (without using the
+oracle). The possibility of being able to do this is a contradiction since clearly no
+traces of $f$ are left in the final state for $q=1$.
+
+6. [@6] Uncompute $\mathrm{Sim}(B,2)$:
+   $$ \rightarrow \ket{q,x,y;z';0;0} $$
+7. Copy $q,x,y$ to zone $3$:
+   $$ \rightarrow \ket{q,x,y;z';q,x,y,0;0} $$
+8. Apply $\mathrm{Sim}(A,3)$:
+   $$ \rightarrow \ket{q,x,y;z';z;0} $$
+9. Add zone three to zone two:
+
+   $$ \ket{q,x,y;z'';z;0} $$
+
+   Note that $z''$ contains just one non-trivial bit $z''_{j_0}=f(\tilde{x})$ (the others
+   are trivially zero).
+10. Copy $z''_{j_0}=f(\tilde{x})$ to the fourth zone and erase it from zone two (by a =CNOT= controlled
+    by the fourth zone):
+    $$ \rightarrow \ket{q,x,y;0;z;f(\tilde{x})} $$
+11. Uncompute $\mathrm{Sim}(A,3)$ (not important, just for reasons of feng shui):
+    $$ \rightarrow \ket{q,x,y;0;0;f(\tilde{x})} $$
+
+We have managed to extract a bit of information about $f$ no matter the value of $q$. This
+is a contradiction as already explained above. QED.
+
+** Exercise 6.6
 Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
 conditional phase shift operation $2\ket{00}\bra{00}-I$, up to an unimportant global phase
 factor.
+
+*** Proof
+The circuit in the dotted region implements the following operator
+
+$$
+  X \otimes X \cdot \underbrace{I\otimes H \cdot C(X) \cdot I\otimes H}_{C(Z)} \cdot X \otimes X
+$$
+
+Recall that the controlled =Z=-gate acts as follows on the standard basis:
+
+$$
+  C(Z) \ket{x} = \begin{cases} -\ket{11} & \text{for } x=11 \\
+  \ket{x} & \text{otherwise.} \end{cases}
+$$
+
+The =X=-gate just exchanges the roles of $0$ and $1$:
+
+$$
+  X \otimes X \cdot C(Z) \cdot X \otimes X \cdot  \ket{x}
+  = \begin{cases} -\ket{00} & \text{for } x=00 \\ \ket{x} & \text{otherwise.} \end{cases}
+$$
+
+Up to a factor of $-1$ (the global phase factor) this is precisely what
+$2\ket{00}\bra{00}-I$ does. QED.
