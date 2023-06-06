@@ -306,7 +306,7 @@ Consider the circuit which acts as follows:
 1. Start
    $$ \ket{q,x,y;0;0;0} $$
 2. Copy $q,x,y$ to zone $2$:
-   $$ \ket{q,x,y;q,x,y,0;0;0} $$
+   $$ \rightarrow \ket{q,x,y;q,x,y,0;0;0} $$
 3. Apply $\mathrm{Sim}(A,2)$:
    $$ \rightarrow \ket{q,x,y;z;0;0} $$
 4. Apply $\mathrm{Sim}(U_f(p),2)$:
@@ -324,9 +324,9 @@ traces of $f$ are left in the final state for $q=1$.
    $$ \rightarrow \ket{q,x,y;z';q,x,y,0;0} $$
 8. Apply $\mathrm{Sim}(A,3)$:
    $$ \rightarrow \ket{q,x,y;z';z;0} $$
-9. Add zone three to zone two:
+9. Add zone three to zone two (using bit-wise addition):
 
-   $$ \ket{q,x,y;z'';z;0} $$
+   $$ \rightarrow \ket{q,x,y;z'';z;0} $$
 
    Note that $z''$ contains just one non-trivial bit $z''_{j_0}=f(\tilde{x})$ (the others
    are trivially zero).
