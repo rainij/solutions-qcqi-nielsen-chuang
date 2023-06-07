@@ -367,3 +367,127 @@ $$
 
 Up to a factor of $-1$ (the global phase factor) this is precisely what
 $2\ket{00}\bra{00}-I$ does. QED.
+** Exercise 6.7
+Verify that the circuits shown in Figures 6.4 and 6.5 implement the operations
+$\exp(-\ii\ket{x}\bra{x}\Delta t)$ and $\exp(-\ii\ket{\psi}\bra{\psi}\Delta t)$,
+respectively, with $\ket{\psi}=H^{\otimes n}\ket{0}$.
+
+- Remark ::
+  There is a typo in the rotation matrix. The matrix should be
+
+  $$ \begin{bmatrix} 1 & 0 \\ 0 & e^{-\ii\Delta t} \end{bmatrix} $$
+
+  The minus-sign is missing in the figures of the circuits.
+
+*** Proof for the first circuit
+Since $\proj{x}$ is a projection (that is, an operator for which $P^2=P$) the series
+expansion of the exponential function implies
+
+$$
+  e^{-\ii\proj{x}\Delta t} = e^{-\ii\Delta t} \proj{x} + (I - \proj{x})
+$$
+
+Hence
+
+$$
+  e^{-\ii\proj{x}\Delta t} \ket{y} = \begin{cases} \ket{y} & \text{if } y\neq x \\
+    e^{-\ii\Delta t} \ket{x} & \text{if } y=x \end{cases} \;
+  = e^{-\ii\Delta t f(y)} \ket{y} .
+$$
+
+On the other hand this is exactly what the circuit
+($U_f\mathrm{diag}(1,\exp(-\ii\,\Delta\,t))U_f$) does.
+
+\begin{align*}
+  \ket{y,0}
+  &\stackrel{U_f}{\longmapsto} \ket{y,f(y)} \\
+  &\stackrel{[\ldots]}{\longmapsto} e^{-\ii\Delta t f(y)} \ket{y,f(y)} \\
+  &\stackrel{U_f}{\longmapsto} e^{-\ii\Delta t f(y)} \ket{y,0}
+\end{align*}
+
+QED.
+
+*** Proof for the second circuit
+In the same way as in the first part we see that
+
+$$
+  e^{-\ii\proj{\psi}\Delta t} \ket{\varphi} = \begin{cases} \ket{\varphi} & \text{if } \ket{\varphi}\perp \ket{\psi} \\
+    e^{-\ii\Delta t} \ket{\psi} & \text{if } \ket{\varphi}=\ket{\psi} \end{cases}
+$$
+
+Again this is exactly what the circuit does. Let us first consider the case
+$\ket{\varphi}=\ket{\psi}$:
+
+\begin{align*}
+  \ket{\psi,0}
+  &\stackrel{H^{\otimes n}}{\longmapsto} \ket{0,0} \\
+  &\stackrel{C_0^n(X)}{\longmapsto} \ket{0,1} \\
+  &\stackrel{[\ldots]}{\longmapsto} e^{-\ii\Delta t} \ket{0,1} \\
+  &\stackrel{C_0^n(X)}{\longmapsto} e^{-\ii\Delta t} \ket{0,0} \\
+  &\stackrel{H^{\otimes n}}{\longmapsto} e^{-\ii\Delta t} \ket{\psi,0} .
+\end{align*}
+
+For the case $\ket{\varphi}\perp\ket{\psi}$ we only have to note that
+$H^{\otimes\,n}\ket{\varphi}$ is orthogonal to $\ket{0}$ and hence the controlled $X$ gate
+does nothing. QED.
+
+** Exercise 6.8
+Suppose the simulation step is performed to an accuracy $O(\Delta t^r)$. Show that the
+number of oracle calls required to simulate $H$ to reasonable accuracy is
+$O(N^{-r/2(r-1)})$. Note that as $r$ becomes large the exponent of $N$ approaches $1/2$.
+
+*** Proof
+From equation (6.23) we know that the simulation time is $t=\pi/2\alpha=O(\sqrt{N})$. Hence
+the number of steps is $t/\Delta t = O(\Delta t\inv \sqrt{N})$. Since the error of a product
+of /unitary/ operators scales linearly we see that the overall error is
+
+$$
+  O(\Delta t^{r-1} \sqrt{N})
+$$
+
+This must be $O(1)$ and hence we must choose $\Delta t = O(N^{-1/2(r-1)})$. To minimize
+the number of steps we set $\Delta t \approx N^{-1/2(r-1)}$ and obtain the claim. QED.
+
+** Exercise 6.9
+Verify Equation (6.25): Let $c=\cos(\Delta t/2)$, $s=\sin(\Delta t/2)$:
+
+$$
+  U(\Delta t) = \left( c^2 - s^2 \, \vec{\psi}\cdot\hat{z} \right) I -
+  \ii s \left(c \, (\vec{\psi}+\hat{z}) + s \, \vec{\psi}\times\hat{z} \right) \cdot \vec{\sigma} .
+$$
+
+(Hint: see [[file:chapter_4.org::#exercise-4-15][Exercise 4.15]].)
+
+*** Proof
+Let $\hat{z}=(0,0,1)$ and $\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)$. From the
+paragraph above equation (6.25) we deduce
+
+$$
+  U(\Delta t) = e^{-\ii \proj{\psi} \Delta t} \cdot e^{-\ii \proj{x} \Delta t}
+  = e^{-\ii \Delta t}
+    \cdot e^{-\ii \vec{\psi}\cdot\vec{\sigma} \Delta t/2}
+    \cdot e^{-\ii \hat{z}\cdot\vec{\sigma} \Delta t/2} .
+$$
+
+The first of the three terms is the unimportant global phase. The second and the third are
+rotations around $\vec{\psi}$ and $\hat{z}$ and angle $\Delta t$ (both). Hence we are
+indeed in the setting of exercise 4.15. From that exercise we deduce that $U(\Delta t)$ is
+a rotation around an axis $\vec{n}$ by an angle $\theta$
+
+$$
+  U(\Delta t) = e^{-\ii \Delta t} \left( \cos(\theta/2) I + \sin(\theta/2) \vec{n}\cdot\vec{\sigma} \right)
+$$
+
+such that:
+
+$$
+  \cos(\theta/2) = c^2 - s^2 \, \vec{\psi}\cdot\hat{z}
+$$
+
+and
+
+$$
+  \sin(\theta/2) \vec{n} = sc \, (\vec{\psi}+\hat{z}) + s^2 \, \vec{\psi}\times\hat{z} .
+$$
+
+QED.
