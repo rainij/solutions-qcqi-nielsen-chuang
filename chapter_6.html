@@ -18,6 +18,7 @@
 \newcommand{\ceil}[1]{\lceil#1\rceil}
 \newcommand{\bra}[1]{\langle#1|}
 \newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\proj}[1]{\ket{#1}\bra{#1}}
 \newcommand{\mean}[1]{\langle#1\rangle}
 \newcommand{\orac}{\mathrm{Orac}}
 \]
@@ -25,26 +26,29 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org29bc885">Setup</a></li>
-<li><a href="#org2ad7502">Exercises</a>
+<li><a href="#org9ca3364">Setup</a></li>
+<li><a href="#org99f0483">Exercises</a>
 <ul>
-<li><a href="#org2777432">Exercise 6.1</a></li>
-<li><a href="#orgf477c0d">Exercise 6.2</a></li>
-<li><a href="#org64242ab">Exercise 6.3</a></li>
-<li><a href="#orga2bfbc9">Exercise 6.4</a></li>
-<li><a href="#org8fcc19a">Exercise 6.5</a></li>
-<li><a href="#org6749cbb">Exercise 6.6</a></li>
+<li><a href="#orgf9a1ccb">Exercise 6.1</a></li>
+<li><a href="#orgb287751">Exercise 6.2</a></li>
+<li><a href="#org3e8f01d">Exercise 6.3</a></li>
+<li><a href="#org1d11939">Exercise 6.4</a></li>
+<li><a href="#org7ea618f">Exercise 6.5</a></li>
+<li><a href="#org3048be4">Exercise 6.6</a></li>
+<li><a href="#orgebe6807">Exercise 6.7</a></li>
+<li><a href="#orgde1dfb3">Exercise 6.8</a></li>
+<li><a href="#org13ae278">Exercise 6.9</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org29bc885" class="outline-2">
-<h2 id="org29bc885">Setup</h2>
-<div class="outline-text-2" id="text-org29bc885">
+<div id="outline-container-org9ca3364" class="outline-2">
+<h2 id="org9ca3364">Setup</h2>
+<div class="outline-text-2" id="text-org9ca3364">
 <div class="org-src-container">
-<pre class="src src-python" id="org953bbff"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<pre class="src src-python" id="orgbe51d99"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
 
 <span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Ry, theta, Z
 </pre>
@@ -52,22 +56,22 @@
 </div>
 </div>
 
-<div id="outline-container-org2ad7502" class="outline-2">
-<h2 id="org2ad7502">Exercises</h2>
-<div class="outline-text-2" id="text-org2ad7502">
+<div id="outline-container-org99f0483" class="outline-2">
+<h2 id="org99f0483">Exercises</h2>
+<div class="outline-text-2" id="text-org99f0483">
 </div>
-<div id="outline-container-org2777432" class="outline-3">
-<h3 id="org2777432">Exercise 6.1</h3>
-<div class="outline-text-3" id="text-org2777432">
+<div id="outline-container-orgf9a1ccb" class="outline-3">
+<h3 id="orgf9a1ccb">Exercise 6.1</h3>
+<div class="outline-text-3" id="text-orgf9a1ccb">
 <p>
 Show that the unitary operator corresponding to the phase shift in the Grover iteration is
 \(2\ket{0}\bra{0}-I\).
 </p>
 </div>
 
-<div id="outline-container-org30d8910" class="outline-4">
-<h4 id="org30d8910">Proof</h4>
-<div class="outline-text-4" id="text-org30d8910">
+<div id="outline-container-org9da1985" class="outline-4">
+<h4 id="org9da1985">Proof</h4>
+<div class="outline-text-4" id="text-org9da1985">
 <p>
 Recall that the phase shift operator in Grover's algorithm does the following to the
 standard basis states:
@@ -86,9 +90,9 @@ Since \(\sprod{0}{x}=\delta_{x,0}\) this is the same as what \(2\ket{0}\bra{0}-I
 </div>
 </div>
 
-<div id="outline-container-orgf477c0d" class="outline-3">
-<h3 id="orgf477c0d">Exercise 6.2</h3>
-<div class="outline-text-3" id="text-orgf477c0d">
+<div id="outline-container-orgb287751" class="outline-3">
+<h3 id="orgb287751">Exercise 6.2</h3>
+<div class="outline-text-3" id="text-orgb287751">
 <p>
 Let \(\ket{\psi}=N^{-1/2}\sum_{i=0}^{N-1}\ket{k}=H^{\otimes n}\ket{0}\). Show that the operation
 \(2\ket{\psi}\bra{\psi}-I\) applied to a general state \(\sum_k\alpha_k\ket{k}\) produces
@@ -107,9 +111,9 @@ operation.
 </p>
 </div>
 
-<div id="outline-container-org6d82014" class="outline-4">
-<h4 id="org6d82014">Proof</h4>
-<div class="outline-text-4" id="text-org6d82014">
+<div id="outline-container-org6d1ac8b" class="outline-4">
+<h4 id="org6d1ac8b">Proof</h4>
+<div class="outline-text-4" id="text-org6d1ac8b">
 <p>
 First of all we note that
 </p>
@@ -139,9 +143,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org64242ab" class="outline-3">
-<h3 id="org64242ab">Exercise 6.3</h3>
-<div class="outline-text-3" id="text-org64242ab">
+<div id="outline-container-org3e8f01d" class="outline-3">
+<h3 id="org3e8f01d">Exercise 6.3</h3>
+<div class="outline-text-3" id="text-org3e8f01d">
 <p>
 Show that in the \(\ket{\alpha}\), \(\ket{\beta}\) basis, we may write the Grover iteration as a rotation
 </p>
@@ -158,22 +162,22 @@ where \(\theta\) is a real number in the range \(0\) to \(\pi/2\) (assuming for 
 </p>
 
 <p>
-<a id="orgb6aacc0"></a>
+<a id="orga52b4e8"></a>
 \[
   \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
 \]
 </p>
 </div>
 
-<div id="outline-container-org4bc8172" class="outline-4">
-<h4 id="org4bc8172">Proof</h4>
-<div class="outline-text-4" id="text-org4bc8172">
+<div id="outline-container-orgdaeeb16" class="outline-4">
+<h4 id="orgdaeeb16">Proof</h4>
+<div class="outline-text-4" id="text-orgdaeeb16">
 <p>
 Recall that \(M\) is the number of solutions of \(f(x)=1\) and that
 </p>
 
 <p>
-<a id="orgeb80431"></a>
+<a id="org836265c"></a>
 \[
   \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
   \quad \text{and} \quad
@@ -194,7 +198,7 @@ Moreover
 </p>
 
 <p>
-This is consistent with the <a href="#orgb6aacc0">formula for \(\theta\)</a> from the exercise statement, which can be
+This is consistent with the <a href="#orga52b4e8">formula for \(\theta\)</a> from the exercise statement, which can be
 seen by the trigonometric identity \(\sin(2x)=2\sin(x)\cos(x)\). The Grover iteration \(G\) is
 the product of the inversion about \(\psi\), and the oracle \(\orac\) (inversion about
 \(\alpha\)). We ignore the workspace here.
@@ -265,18 +269,18 @@ Another way to see this (without much calculation) is to note that
 </div>
 </div>
 
-<div id="outline-container-orga2bfbc9" class="outline-3">
-<h3 id="orga2bfbc9">Exercise 6.4</h3>
-<div class="outline-text-3" id="text-orga2bfbc9">
+<div id="outline-container-org1d11939" class="outline-3">
+<h3 id="org1d11939">Exercise 6.4</h3>
+<div class="outline-text-3" id="text-org1d11939">
 <p>
 Give explicit steps for the quantum search algorithm, for the case of multiple solutions
 (\(1 < M \leq N/2\)).
 </p>
 </div>
 
-<div id="outline-container-orgf52f9c8" class="outline-4">
-<h4 id="orgf52f9c8">Solution</h4>
-<div class="outline-text-4" id="text-orgf52f9c8">
+<div id="outline-container-org698a3f1" class="outline-4">
+<h4 id="org698a3f1">Solution</h4>
+<div class="outline-text-4" id="text-org698a3f1">
 <p>
 The difference to the special case \(M=1\) is essentially the number of repetitions of the
 Grover iteration. Also note that \(M\) has an influence on the success probability.
@@ -294,7 +298,7 @@ of \(f(x)=1\), as in the book. Moreover let (recall that we assume \(M\leq N/2\)
 </p>
 
 <p>
-This formula comes from <a href="#orgb6aacc0">exercise 6.3</a>. In the solution of that exercise we showed that
+This formula comes from <a href="#orga52b4e8">exercise 6.3</a>. In the solution of that exercise we showed that
 </p>
 
 <p>
@@ -304,7 +308,7 @@ This formula comes from <a href="#orgb6aacc0">exercise 6.3</a>. In the solution 
 </p>
 
 <p>
-Here \(\alpha\) and \(\beta\) are as in the <a href="#orgeb80431">solution of exercise 6.3</a>. Let us write
+Here \(\alpha\) and \(\beta\) are as in the <a href="#org836265c">solution of exercise 6.3</a>. Let us write
 </p>
 
 <p>
@@ -372,9 +376,9 @@ Apply \(R\) repetitions of \((2\ket{\psi}\bra{\psi}-I)U_f\):
 </div>
 </div>
 
-<div id="outline-container-org8fcc19a" class="outline-3">
-<h3 id="org8fcc19a">Exercise 6.5</h3>
-<div class="outline-text-3" id="text-org8fcc19a">
+<div id="outline-container-org7ea618f" class="outline-3">
+<h3 id="org7ea618f">Exercise 6.5</h3>
+<div class="outline-text-3" id="text-org7ea618f">
 <p>
 Show that the augmented oracle \(U_f'\) may be constructed using one application of the
 original oracle \(U_f\), and elementary quantum gates, using the extra qubit \(\ket{q}\).
@@ -387,9 +391,9 @@ reversible way.</li>
 </ul>
 </div>
 
-<div id="outline-container-orgf4deebe" class="outline-4">
-<h4 id="orgf4deebe">Proof</h4>
-<div class="outline-text-4" id="text-orgf4deebe">
+<div id="outline-container-org831706a" class="outline-4">
+<h4 id="org831706a">Proof</h4>
+<div class="outline-text-4" id="text-org831706a">
 <p>
 According to the book we have to implement \(U_f'\) as a <i>controlled</i> (by \(q\)) version of
 \(U_f\) which acts like this:
@@ -442,9 +446,9 @@ exchanging registers three and four conditioned on register one. QED.
 </div>
 </div>
 
-<div id="outline-container-org5c43cd0" class="outline-4">
-<h4 id="org5c43cd0">Proof of the remark</h4>
-<div class="outline-text-4" id="text-org5c43cd0">
+<div id="outline-container-org15c3381" class="outline-4">
+<h4 id="org15c3381">Proof of the remark</h4>
+<div class="outline-text-4" id="text-org15c3381">
 <p>
 In the framework of (classical) reversible computation as sketched in chapter 3.2.5 in the
 book we need at least two applications of the oracle.
@@ -573,9 +577,9 @@ is a contradiction as already explained above. QED.
 </div>
 </div>
 
-<div id="outline-container-org6749cbb" class="outline-3">
-<h3 id="org6749cbb">Exercise 6.6</h3>
-<div class="outline-text-3" id="text-org6749cbb">
+<div id="outline-container-org3048be4" class="outline-3">
+<h3 id="org3048be4">Exercise 6.6</h3>
+<div class="outline-text-3" id="text-org3048be4">
 <p>
 Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
 conditional phase shift operation \(2\ket{00}\bra{00}-I\), up to an unimportant global phase
@@ -583,9 +587,9 @@ factor.
 </p>
 </div>
 
-<div id="outline-container-org64782f4" class="outline-4">
-<h4 id="org64782f4">Proof</h4>
-<div class="outline-text-4" id="text-org64782f4">
+<div id="outline-container-org72d2cc0" class="outline-4">
+<h4 id="org72d2cc0">Proof</h4>
+<div class="outline-text-4" id="text-org72d2cc0">
 <p>
 The circuit in the dotted region implements the following operator
 </p>
@@ -621,6 +625,219 @@ The <code>X</code>-gate just exchanges the roles of \(0\) and \(1\):
 <p>
 Up to a factor of \(-1\) (the global phase factor) this is precisely what
 \(2\ket{00}\bra{00}-I\) does. QED.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgebe6807" class="outline-3">
+<h3 id="orgebe6807">Exercise 6.7</h3>
+<div class="outline-text-3" id="text-orgebe6807">
+<p>
+Verify that the circuits shown in Figures 6.4 and 6.5 implement the operations
+\(\exp(-\ii\ket{x}\bra{x}\Delta t)\) and \(\exp(-\ii\ket{\psi}\bra{\psi}\Delta t)\),
+respectively, with \(\ket{\psi}=H^{\otimes n}\ket{0}\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd><p>
+There is a typo in the rotation matrix. The matrix should be
+</p>
+
+<p>
+\[ \begin{bmatrix} 1 & 0 \\ 0 & e^{-\ii\Delta t} \end{bmatrix} \]
+</p>
+
+<p>
+The minus-sign is missing in the figures of the circuits.
+</p></dd>
+</dl>
+</div>
+
+<div id="outline-container-orga7cdd7e" class="outline-4">
+<h4 id="orga7cdd7e">Proof for the first circuit</h4>
+<div class="outline-text-4" id="text-orga7cdd7e">
+<p>
+Since \(\proj{x}\) is a projection (that is, an operator for which \(P^2=P\)) the series
+expansion of the exponential function implies
+</p>
+
+<p>
+\[
+  e^{-\ii\proj{x}\Delta t} = e^{-\ii\Delta t} \proj{x} + (I - \proj{x})
+\]
+</p>
+
+<p>
+Hence
+</p>
+
+<p>
+\[
+  e^{-\ii\proj{x}\Delta t} \ket{y} = \begin{cases} \ket{y} & \text{if } y\neq x \\
+    e^{-\ii\Delta t} \ket{x} & \text{if } y=x \end{cases} \;
+  = e^{-\ii\Delta t f(y)} \ket{y} .
+\]
+</p>
+
+<p>
+On the other hand this is exactly what the circuit
+(\(U_f\mathrm{diag}(1,\exp(-\ii\,\Delta\,t))U_f\)) does.
+</p>
+
+\begin{align*}
+  \ket{y,0}
+  &\stackrel{U_f}{\longmapsto} \ket{y,f(y)} \\
+  &\stackrel{[\ldots]}{\longmapsto} e^{-\ii\Delta t f(y)} \ket{y,f(y)} \\
+  &\stackrel{U_f}{\longmapsto} e^{-\ii\Delta t f(y)} \ket{y,0}
+\end{align*}
+
+<p>
+QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2de8405" class="outline-4">
+<h4 id="org2de8405">Proof for the second circuit</h4>
+<div class="outline-text-4" id="text-org2de8405">
+<p>
+In the same way as in the first part we see that
+</p>
+
+<p>
+\[
+  e^{-\ii\proj{\psi}\Delta t} \ket{\varphi} = \begin{cases} \ket{\varphi} & \text{if } \ket{\varphi}\perp \ket{\psi} \\
+    e^{-\ii\Delta t} \ket{\psi} & \text{if } \ket{\varphi}=\ket{\psi} \end{cases}
+\]
+</p>
+
+<p>
+Again this is exactly what the circuit does. Let us first consider the case
+\(\ket{\varphi}=\ket{\psi}\):
+</p>
+
+\begin{align*}
+  \ket{\psi,0}
+  &\stackrel{H^{\otimes n}}{\longmapsto} \ket{0,0} \\
+  &\stackrel{C_0^n(X)}{\longmapsto} \ket{0,1} \\
+  &\stackrel{[\ldots]}{\longmapsto} e^{-\ii\Delta t} \ket{0,1} \\
+  &\stackrel{C_0^n(X)}{\longmapsto} e^{-\ii\Delta t} \ket{0,0} \\
+  &\stackrel{H^{\otimes n}}{\longmapsto} e^{-\ii\Delta t} \ket{\psi,0} .
+\end{align*}
+
+<p>
+For the case \(\ket{\varphi}\perp\ket{\psi}\) we only have to note that
+\(H^{\otimes\,n}\ket{\varphi}\) is orthogonal to \(\ket{0}\) and hence the controlled \(X\) gate
+does nothing. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgde1dfb3" class="outline-3">
+<h3 id="orgde1dfb3">Exercise 6.8</h3>
+<div class="outline-text-3" id="text-orgde1dfb3">
+<p>
+Suppose the simulation step is performed to an accuracy \(O(\Delta t^r)\). Show that the
+number of oracle calls required to simulate \(H\) to reasonable accuracy is
+\(O(N^{-r/2(r-1)})\). Note that as \(r\) becomes large the exponent of \(N\) approaches \(1/2\).
+</p>
+</div>
+
+<div id="outline-container-org1729ff5" class="outline-4">
+<h4 id="org1729ff5">Proof</h4>
+<div class="outline-text-4" id="text-org1729ff5">
+<p>
+From equation (6.23) we know that the simulation time is \(t=\pi/2\alpha=O(\sqrt{N})\). Hence
+the number of steps is \(t/\Delta t = O(\Delta t\inv \sqrt{N})\). Since the error of a product
+of <i>unitary</i> operators scales linearly we see that the overall error is
+</p>
+
+<p>
+\[
+  O(\Delta t^{r-1} \sqrt{N})
+\]
+</p>
+
+<p>
+This must be \(O(1)\) and hence we must choose \(\Delta t = O(N^{-1/2(r-1)})\). To minimize
+the number of steps we set \(\Delta t \approx N^{-1/2(r-1)}\) and obtain the claim. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org13ae278" class="outline-3">
+<h3 id="org13ae278">Exercise 6.9</h3>
+<div class="outline-text-3" id="text-org13ae278">
+<p>
+Verify Equation (6.25): Let \(c=\cos(\Delta t/2)\), \(s=\sin(\Delta t/2)\):
+</p>
+
+<p>
+\[
+  U(\Delta t) = \left( c^2 - s^2 \, \vec{\psi}\cdot\hat{z} \right) I -
+  \ii s \left(c \, (\vec{\psi}+\hat{z}) + s \, \vec{\psi}\times\hat{z} \right) \cdot \vec{\sigma} .
+\]
+</p>
+
+<p>
+(Hint: see <a href="chapter_4.html#exercise-4-15">Exercise 4.15</a>.)
+</p>
+</div>
+
+<div id="outline-container-org86db8b9" class="outline-4">
+<h4 id="org86db8b9">Proof</h4>
+<div class="outline-text-4" id="text-org86db8b9">
+<p>
+Let \(\hat{z}=(0,0,1)\) and \(\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)\). From the
+paragraph above equation (6.25) we deduce
+</p>
+
+<p>
+\[
+  U(\Delta t) = e^{-\ii \proj{\psi} \Delta t} \cdot e^{-\ii \proj{x} \Delta t}
+  = e^{-\ii \Delta t}
+    \cdot e^{-\ii \vec{\psi}\cdot\vec{\sigma} \Delta t/2}
+    \cdot e^{-\ii \hat{z}\cdot\vec{\sigma} \Delta t/2} .
+\]
+</p>
+
+<p>
+The first of the three terms is the unimportant global phase. The second and the third are
+rotations around \(\vec{\psi}\) and \(\hat{z}\) and angle \(\Delta t\) (both). Hence we are
+indeed in the setting of exercise 4.15. From that exercise we deduce that \(U(\Delta t)\) is
+a rotation around an axis \(\vec{n}\) by an angle \(\theta\)
+</p>
+
+<p>
+\[
+  U(\Delta t) = e^{-\ii \Delta t} \left( \cos(\theta/2) I + \sin(\theta/2) \vec{n}\cdot\vec{\sigma} \right)
+\]
+</p>
+
+<p>
+such that:
+</p>
+
+<p>
+\[
+  \cos(\theta/2) = c^2 - s^2 \, \vec{\psi}\cdot\hat{z}
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  \sin(\theta/2) \vec{n} = sc \, (\vec{\psi}+\hat{z}) + s^2 \, \vec{\psi}\times\hat{z} .
+\]
+</p>
+
+<p>
+QED.
 </p>
 </div>
 </div>
