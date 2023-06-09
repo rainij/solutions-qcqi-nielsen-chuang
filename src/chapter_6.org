@@ -10,8 +10,16 @@
 #+name: chapter-6-python-imports
 #+begin_src python
   import sympy as sp
+  from sympy.vector import CoordSys3D
 
   from chapter_4 import Ry, theta, Z
+#+end_src
+
+Set up some variables:
+
+#+begin_src python
+  a, b = sp.symbols('a b', real=True)  # usage for a,b or alpha,beta in the book
+  c, s = sp.symbols('c s', real=True)  # usage for cosine and sine
 #+end_src
 
 * Exercises
@@ -449,6 +457,9 @@ This must be $O(1)$ and hence we must choose $\Delta t = O(N^{-1/2(r-1)})$. To m
 the number of steps we set $\Delta t \approx N^{-1/2(r-1)}$ and obtain the claim. QED.
 
 ** Exercise 6.9
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.9
+:END:
 Verify Equation (6.25): Let $c=\cos(\Delta t/2)$, $s=\sin(\Delta t/2)$:
 
 $$
@@ -491,3 +502,126 @@ $$
 $$
 
 QED.
+** Exercise 6.10
+Show that by choosing $\Delta t$ appropriately we can obtain a quantum search algorithm
+which uses $O(\sqrt{N})$ queries, and for which the ﬁnal state is $\ket{x}$ exactly, that
+is, the algorithm works with probability $1$, rather than with some smaller probability.
+
+*** Proof
+To not obscure the proof by too much technicalities I only prove the result for /large
+enough/ $N$. Let $c=\cos(\Delta t/2)$ and $s=\sin(\Delta t/2)$.
+
+From the proof of [[#exercise-6.9][exercise 6.9]] we know that $U(\Delta t)$ is a rotation of angle $\theta$
+about $\vec{r}$ where:
+
+<<exercise-6.10-theta-formula>>
+$$
+  \cos(\theta/2) = c^2 - s^2 \, \vec{\psi}\cdot\hat{z}
+$$
+
+and
+
+<<exercise-6.10-axis-formula>>
+$$
+  \sin(\theta/2) \vec{r} = sc \, (\vec{\psi}+\hat{z}) + s^2 \, \vec{\psi}\times\hat{z} .
+$$
+
+Also recall that $\hat{z}=(0,0,1)$ and $\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)$
+where $\alpha=1/\sqrt{N}$ and $\beta=\sqrt{(N-1)/N}$. Let us further elaborate on
+$\theta$. Using one of the [[exercise-6.10-theta-formula][above formulas]] we get
+
+$$
+  \cos(\theta/2) = 1 - \frac{2s}{N} .
+$$
+
+From the Taylor expansion $\cos(x)=1-x^2/2+O(x^4)$ of the cosine function we obtain
+
+<<exercise-6.10-theta-asymptotic>>
+$$
+  \theta = 4 \sqrt{\frac{s}{N}} + O(sN\inv) .
+$$
+
+Now consider the axis of rotation. Below with $\sim$ we mean that the LHS is equal to the
+RHS up to a real factor. Using the [[exercise-6.10-axis-formula][axis-formula]] a [[exercise-6.10-check-r][short calculation]] yields
+
+<<exercise-6.10-r-scaled>>
+$$
+  \vec{r} \sim (\beta c, -\beta s, \alpha c) .
+$$
+
+The squared norm of the RHS is $1-\alpha^2s^2$. Hence
+
+<<exercise-6.10-axis-asymptotic>>
+$$
+  \vec{r} = (\beta c, -\beta s, \alpha c) / \sqrt{1-\alpha^2s^2} = (\beta c, -\beta s, \alpha c) + O(s^2N\inv) .
+$$
+
+From the [[exercise-6.10-axis-formula][original formula]] for $\vec{r}$ we see that
+$\vec{r}\cdot\hat{z}=\vec{r}\cdot\vec{\psi}\approx\alpha\,c=O(N^{-1/2})$. This implies
+that $\hat{z}$ indeed lies on the same orbit as $\psi$. Let $\omega$ be the angle of the
+rotation about $\vec{r}$ which is needed to rotate $\vec{\psi}$ into $\hat{z}$. Let
+
+$$
+  \hat{z}' = \hat{z} - (\hat{z}\cdot\vec{r}) \; \vec{r}
+  = \hat{z} - \frac{\alpha c}{\sqrt{1-\alpha^2 c^2}} \; \vec{r}
+  = \hat{z} + O(N^{-1/2}) \; \vec{r}
+$$
+
+and
+
+$$
+  \vec{\psi}' = \vec{\psi} - (\vec{\psi}\cdot\vec{r}) \; \vec{r}
+  = \vec{\psi} - \frac{\alpha c}{\sqrt{1-\alpha^2 c^2}} \; \vec{r}
+  = \vec{\psi} + O(N^{-1/2}) \; \vec{r} .
+$$
+
+Hence
+
+$$
+  \cos(\omega) = \vec{\psi}' \cdot \hat{z}'
+  = \vec{\psi} \cdot \hat{z} + O(N\inv)
+  = \alpha^2 - \beta^2 + O(N\inv)
+  = -1 + O(N\inv) ,
+$$
+
+and therefore $\omega=\pi+O(N^{-1/2})$. Using this and the [[exercise-6.10-theta-asymptotic][formula]] for $\theta$ we see
+that the number of required $\theta$ rotations is
+
+$$
+  \frac{\omega}{\theta} = \frac{\pi}{4\sqrt{s}} \sqrt{N} + O(1) .
+$$
+
+To enable a 100% probability this number must be an integer. The standard case with
+$\Delta t=\pi$ means $s=1$. By the [[https://en.wikipedia.org/wiki/Intermediate_value_theorem][intermediate value theorem]] (the expression is
+continuous) there is an $s\in[1-cN^{-1/2},1]$ (for some constant $c>0$ depending on the
+constant in the $O(1)$ above) such that this is true. Clearly $\omega/\theta=O(\sqrt{N})$
+for such $s$. QED.
+
+*** Appendix
+Let us use =sympy= to do the boring calculations. First let us define $\hat{z}$ and
+$\vec{\psi}$ in a 3D cartesian coordinate system. Moreover we set up our slightly [[exercise-6.10-r-scaled][scaled
+version]] =r1= of $\vec{r}$.
+
+#+begin_src python :tangle no
+  N = CoordSys3D('N')
+
+  z = N.k
+  psi = 2*a*b*N.i + (a**2 - b**2)*N.k
+
+  r_formula_rhs = s*c*(psi + z) + s**2 * psi.cross(z)
+  r1 = b*c*N.i - b*s*N.j + a*c*N.k
+#+end_src
+
+<<exercise-6.10-check-r>>
+Here we check that our [[exercise-6.10-axis-asymptotic][formula]] for $\vec{r}$ is valid:
+
+#+begin_src python :tangle no :results replace :cache yes
+  norm2_r1 = r1.dot(r1).subs(b**2, 1 - a**2).subs(c**2, 1 - s**2)
+
+  assert r_formula_rhs.subs(b**2, 1 - a**2) == 2*a*s * r1
+  assert sp.simplify(norm2_r1) == 1 - a**2 * s**2
+  "PASSED"
+#+end_src
+
+#+RESULTS[ed5a7b70f53829461dcae6921213b4d1f25fd960]:
+: PASSED
