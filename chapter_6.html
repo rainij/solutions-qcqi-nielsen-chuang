@@ -26,52 +26,64 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9ca3364">Setup</a></li>
-<li><a href="#org99f0483">Exercises</a>
+<li><a href="#org9bb2d8a">Setup</a></li>
+<li><a href="#org859c974">Exercises</a>
 <ul>
-<li><a href="#orgf9a1ccb">Exercise 6.1</a></li>
-<li><a href="#orgb287751">Exercise 6.2</a></li>
-<li><a href="#org3e8f01d">Exercise 6.3</a></li>
-<li><a href="#org1d11939">Exercise 6.4</a></li>
-<li><a href="#org7ea618f">Exercise 6.5</a></li>
-<li><a href="#org3048be4">Exercise 6.6</a></li>
-<li><a href="#orgebe6807">Exercise 6.7</a></li>
-<li><a href="#orgde1dfb3">Exercise 6.8</a></li>
-<li><a href="#org13ae278">Exercise 6.9</a></li>
+<li><a href="#org3b75f61">Exercise 6.1</a></li>
+<li><a href="#org976c246">Exercise 6.2</a></li>
+<li><a href="#org43bfd6e">Exercise 6.3</a></li>
+<li><a href="#org7a6e0c7">Exercise 6.4</a></li>
+<li><a href="#org77e266c">Exercise 6.5</a></li>
+<li><a href="#orgb311855">Exercise 6.6</a></li>
+<li><a href="#orgbd90154">Exercise 6.7</a></li>
+<li><a href="#org21b3a19">Exercise 6.8</a></li>
+<li><a href="#exercise-6.9">Exercise 6.9</a></li>
+<li><a href="#org57b57f9">Exercise 6.10</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9ca3364" class="outline-2">
-<h2 id="org9ca3364">Setup</h2>
-<div class="outline-text-2" id="text-org9ca3364">
+<div id="outline-container-org9bb2d8a" class="outline-2">
+<h2 id="org9bb2d8a">Setup</h2>
+<div class="outline-text-2" id="text-org9bb2d8a">
 <div class="org-src-container">
-<pre class="src src-python" id="orgbe51d99"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<pre class="src src-python" id="orgeb88dae"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<span class="org-keyword">from</span> sympy.vector <span class="org-keyword">import</span> CoordSys3D
 
 <span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Ry, theta, Z
+</pre>
+</div>
+
+<p>
+Set up some variables:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">a</span>, <span class="org-variable-name">b</span> <span class="org-operator">=</span> sp.symbols(<span class="org-string">'a b'</span>, real<span class="org-operator">=</span><span class="org-constant">True</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">usage for a,b or alpha,beta in the book</span>
+<span class="org-variable-name">c</span>, <span class="org-variable-name">s</span> <span class="org-operator">=</span> sp.symbols(<span class="org-string">'c s'</span>, real<span class="org-operator">=</span><span class="org-constant">True</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">usage for cosine and sine</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org99f0483" class="outline-2">
-<h2 id="org99f0483">Exercises</h2>
-<div class="outline-text-2" id="text-org99f0483">
+<div id="outline-container-org859c974" class="outline-2">
+<h2 id="org859c974">Exercises</h2>
+<div class="outline-text-2" id="text-org859c974">
 </div>
-<div id="outline-container-orgf9a1ccb" class="outline-3">
-<h3 id="orgf9a1ccb">Exercise 6.1</h3>
-<div class="outline-text-3" id="text-orgf9a1ccb">
+<div id="outline-container-org3b75f61" class="outline-3">
+<h3 id="org3b75f61">Exercise 6.1</h3>
+<div class="outline-text-3" id="text-org3b75f61">
 <p>
 Show that the unitary operator corresponding to the phase shift in the Grover iteration is
 \(2\ket{0}\bra{0}-I\).
 </p>
 </div>
 
-<div id="outline-container-org9da1985" class="outline-4">
-<h4 id="org9da1985">Proof</h4>
-<div class="outline-text-4" id="text-org9da1985">
+<div id="outline-container-orgcd2643d" class="outline-4">
+<h4 id="orgcd2643d">Proof</h4>
+<div class="outline-text-4" id="text-orgcd2643d">
 <p>
 Recall that the phase shift operator in Grover's algorithm does the following to the
 standard basis states:
@@ -90,9 +102,9 @@ Since \(\sprod{0}{x}=\delta_{x,0}\) this is the same as what \(2\ket{0}\bra{0}-I
 </div>
 </div>
 
-<div id="outline-container-orgb287751" class="outline-3">
-<h3 id="orgb287751">Exercise 6.2</h3>
-<div class="outline-text-3" id="text-orgb287751">
+<div id="outline-container-org976c246" class="outline-3">
+<h3 id="org976c246">Exercise 6.2</h3>
+<div class="outline-text-3" id="text-org976c246">
 <p>
 Let \(\ket{\psi}=N^{-1/2}\sum_{i=0}^{N-1}\ket{k}=H^{\otimes n}\ket{0}\). Show that the operation
 \(2\ket{\psi}\bra{\psi}-I\) applied to a general state \(\sum_k\alpha_k\ket{k}\) produces
@@ -111,9 +123,9 @@ operation.
 </p>
 </div>
 
-<div id="outline-container-org6d1ac8b" class="outline-4">
-<h4 id="org6d1ac8b">Proof</h4>
-<div class="outline-text-4" id="text-org6d1ac8b">
+<div id="outline-container-org11923a5" class="outline-4">
+<h4 id="org11923a5">Proof</h4>
+<div class="outline-text-4" id="text-org11923a5">
 <p>
 First of all we note that
 </p>
@@ -143,9 +155,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org3e8f01d" class="outline-3">
-<h3 id="org3e8f01d">Exercise 6.3</h3>
-<div class="outline-text-3" id="text-org3e8f01d">
+<div id="outline-container-org43bfd6e" class="outline-3">
+<h3 id="org43bfd6e">Exercise 6.3</h3>
+<div class="outline-text-3" id="text-org43bfd6e">
 <p>
 Show that in the \(\ket{\alpha}\), \(\ket{\beta}\) basis, we may write the Grover iteration as a rotation
 </p>
@@ -162,22 +174,22 @@ where \(\theta\) is a real number in the range \(0\) to \(\pi/2\) (assuming for 
 </p>
 
 <p>
-<a id="orga52b4e8"></a>
+<a id="org2a36e21"></a>
 \[
   \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
 \]
 </p>
 </div>
 
-<div id="outline-container-orgdaeeb16" class="outline-4">
-<h4 id="orgdaeeb16">Proof</h4>
-<div class="outline-text-4" id="text-orgdaeeb16">
+<div id="outline-container-org5fadd60" class="outline-4">
+<h4 id="org5fadd60">Proof</h4>
+<div class="outline-text-4" id="text-org5fadd60">
 <p>
 Recall that \(M\) is the number of solutions of \(f(x)=1\) and that
 </p>
 
 <p>
-<a id="org836265c"></a>
+<a id="orgdc956ef"></a>
 \[
   \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
   \quad \text{and} \quad
@@ -198,7 +210,7 @@ Moreover
 </p>
 
 <p>
-This is consistent with the <a href="#orga52b4e8">formula for \(\theta\)</a> from the exercise statement, which can be
+This is consistent with the <a href="#org2a36e21">formula for \(\theta\)</a> from the exercise statement, which can be
 seen by the trigonometric identity \(\sin(2x)=2\sin(x)\cos(x)\). The Grover iteration \(G\) is
 the product of the inversion about \(\psi\), and the oracle \(\orac\) (inversion about
 \(\alpha\)). We ignore the workspace here.
@@ -269,18 +281,18 @@ Another way to see this (without much calculation) is to note that
 </div>
 </div>
 
-<div id="outline-container-org1d11939" class="outline-3">
-<h3 id="org1d11939">Exercise 6.4</h3>
-<div class="outline-text-3" id="text-org1d11939">
+<div id="outline-container-org7a6e0c7" class="outline-3">
+<h3 id="org7a6e0c7">Exercise 6.4</h3>
+<div class="outline-text-3" id="text-org7a6e0c7">
 <p>
 Give explicit steps for the quantum search algorithm, for the case of multiple solutions
 (\(1 < M \leq N/2\)).
 </p>
 </div>
 
-<div id="outline-container-org698a3f1" class="outline-4">
-<h4 id="org698a3f1">Solution</h4>
-<div class="outline-text-4" id="text-org698a3f1">
+<div id="outline-container-org1b96854" class="outline-4">
+<h4 id="org1b96854">Solution</h4>
+<div class="outline-text-4" id="text-org1b96854">
 <p>
 The difference to the special case \(M=1\) is essentially the number of repetitions of the
 Grover iteration. Also note that \(M\) has an influence on the success probability.
@@ -298,7 +310,7 @@ of \(f(x)=1\), as in the book. Moreover let (recall that we assume \(M\leq N/2\)
 </p>
 
 <p>
-This formula comes from <a href="#orga52b4e8">exercise 6.3</a>. In the solution of that exercise we showed that
+This formula comes from <a href="#org2a36e21">exercise 6.3</a>. In the solution of that exercise we showed that
 </p>
 
 <p>
@@ -308,7 +320,7 @@ This formula comes from <a href="#orga52b4e8">exercise 6.3</a>. In the solution 
 </p>
 
 <p>
-Here \(\alpha\) and \(\beta\) are as in the <a href="#org836265c">solution of exercise 6.3</a>. Let us write
+Here \(\alpha\) and \(\beta\) are as in the <a href="#orgdc956ef">solution of exercise 6.3</a>. Let us write
 </p>
 
 <p>
@@ -376,9 +388,9 @@ Apply \(R\) repetitions of \((2\ket{\psi}\bra{\psi}-I)U_f\):
 </div>
 </div>
 
-<div id="outline-container-org7ea618f" class="outline-3">
-<h3 id="org7ea618f">Exercise 6.5</h3>
-<div class="outline-text-3" id="text-org7ea618f">
+<div id="outline-container-org77e266c" class="outline-3">
+<h3 id="org77e266c">Exercise 6.5</h3>
+<div class="outline-text-3" id="text-org77e266c">
 <p>
 Show that the augmented oracle \(U_f'\) may be constructed using one application of the
 original oracle \(U_f\), and elementary quantum gates, using the extra qubit \(\ket{q}\).
@@ -391,9 +403,9 @@ reversible way.</li>
 </ul>
 </div>
 
-<div id="outline-container-org831706a" class="outline-4">
-<h4 id="org831706a">Proof</h4>
-<div class="outline-text-4" id="text-org831706a">
+<div id="outline-container-org0b4cbb3" class="outline-4">
+<h4 id="org0b4cbb3">Proof</h4>
+<div class="outline-text-4" id="text-org0b4cbb3">
 <p>
 According to the book we have to implement \(U_f'\) as a <i>controlled</i> (by \(q\)) version of
 \(U_f\) which acts like this:
@@ -446,9 +458,9 @@ exchanging registers three and four conditioned on register one. QED.
 </div>
 </div>
 
-<div id="outline-container-org15c3381" class="outline-4">
-<h4 id="org15c3381">Proof of the remark</h4>
-<div class="outline-text-4" id="text-org15c3381">
+<div id="outline-container-org7dbab80" class="outline-4">
+<h4 id="org7dbab80">Proof of the remark</h4>
+<div class="outline-text-4" id="text-org7dbab80">
 <p>
 In the framework of (classical) reversible computation as sketched in chapter 3.2.5 in the
 book we need at least two applications of the oracle.
@@ -577,9 +589,9 @@ is a contradiction as already explained above. QED.
 </div>
 </div>
 
-<div id="outline-container-org3048be4" class="outline-3">
-<h3 id="org3048be4">Exercise 6.6</h3>
-<div class="outline-text-3" id="text-org3048be4">
+<div id="outline-container-orgb311855" class="outline-3">
+<h3 id="orgb311855">Exercise 6.6</h3>
+<div class="outline-text-3" id="text-orgb311855">
 <p>
 Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
 conditional phase shift operation \(2\ket{00}\bra{00}-I\), up to an unimportant global phase
@@ -587,9 +599,9 @@ factor.
 </p>
 </div>
 
-<div id="outline-container-org72d2cc0" class="outline-4">
-<h4 id="org72d2cc0">Proof</h4>
-<div class="outline-text-4" id="text-org72d2cc0">
+<div id="outline-container-orgcf7e029" class="outline-4">
+<h4 id="orgcf7e029">Proof</h4>
+<div class="outline-text-4" id="text-orgcf7e029">
 <p>
 The circuit in the dotted region implements the following operator
 </p>
@@ -629,9 +641,9 @@ Up to a factor of \(-1\) (the global phase factor) this is precisely what
 </div>
 </div>
 </div>
-<div id="outline-container-orgebe6807" class="outline-3">
-<h3 id="orgebe6807">Exercise 6.7</h3>
-<div class="outline-text-3" id="text-orgebe6807">
+<div id="outline-container-orgbd90154" class="outline-3">
+<h3 id="orgbd90154">Exercise 6.7</h3>
+<div class="outline-text-3" id="text-orgbd90154">
 <p>
 Verify that the circuits shown in Figures 6.4 and 6.5 implement the operations
 \(\exp(-\ii\ket{x}\bra{x}\Delta t)\) and \(\exp(-\ii\ket{\psi}\bra{\psi}\Delta t)\),
@@ -653,9 +665,9 @@ The minus-sign is missing in the figures of the circuits.
 </dl>
 </div>
 
-<div id="outline-container-orga7cdd7e" class="outline-4">
-<h4 id="orga7cdd7e">Proof for the first circuit</h4>
-<div class="outline-text-4" id="text-orga7cdd7e">
+<div id="outline-container-orgfd50184" class="outline-4">
+<h4 id="orgfd50184">Proof for the first circuit</h4>
+<div class="outline-text-4" id="text-orgfd50184">
 <p>
 Since \(\proj{x}\) is a projection (that is, an operator for which \(P^2=P\)) the series
 expansion of the exponential function implies
@@ -697,9 +709,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org2de8405" class="outline-4">
-<h4 id="org2de8405">Proof for the second circuit</h4>
-<div class="outline-text-4" id="text-org2de8405">
+<div id="outline-container-org2e2150e" class="outline-4">
+<h4 id="org2e2150e">Proof for the second circuit</h4>
+<div class="outline-text-4" id="text-org2e2150e">
 <p>
 In the same way as in the first part we see that
 </p>
@@ -734,9 +746,9 @@ does nothing. QED.
 </div>
 </div>
 
-<div id="outline-container-orgde1dfb3" class="outline-3">
-<h3 id="orgde1dfb3">Exercise 6.8</h3>
-<div class="outline-text-3" id="text-orgde1dfb3">
+<div id="outline-container-org21b3a19" class="outline-3">
+<h3 id="org21b3a19">Exercise 6.8</h3>
+<div class="outline-text-3" id="text-org21b3a19">
 <p>
 Suppose the simulation step is performed to an accuracy \(O(\Delta t^r)\). Show that the
 number of oracle calls required to simulate \(H\) to reasonable accuracy is
@@ -744,9 +756,9 @@ number of oracle calls required to simulate \(H\) to reasonable accuracy is
 </p>
 </div>
 
-<div id="outline-container-org1729ff5" class="outline-4">
-<h4 id="org1729ff5">Proof</h4>
-<div class="outline-text-4" id="text-org1729ff5">
+<div id="outline-container-orgc5bfc63" class="outline-4">
+<h4 id="orgc5bfc63">Proof</h4>
+<div class="outline-text-4" id="text-orgc5bfc63">
 <p>
 From equation (6.23) we know that the simulation time is \(t=\pi/2\alpha=O(\sqrt{N})\). Hence
 the number of steps is \(t/\Delta t = O(\Delta t\inv \sqrt{N})\). Since the error of a product
@@ -767,9 +779,9 @@ the number of steps we set \(\Delta t \approx N^{-1/2(r-1)}\) and obtain the cla
 </div>
 </div>
 
-<div id="outline-container-org13ae278" class="outline-3">
-<h3 id="org13ae278">Exercise 6.9</h3>
-<div class="outline-text-3" id="text-org13ae278">
+<div id="outline-container-exercise-6.9" class="outline-3">
+<h3 id="exercise-6.9">Exercise 6.9</h3>
+<div class="outline-text-3" id="text-exercise-6.9">
 <p>
 Verify Equation (6.25): Let \(c=\cos(\Delta t/2)\), \(s=\sin(\Delta t/2)\):
 </p>
@@ -786,9 +798,9 @@ Verify Equation (6.25): Let \(c=\cos(\Delta t/2)\), \(s=\sin(\Delta t/2)\):
 </p>
 </div>
 
-<div id="outline-container-org86db8b9" class="outline-4">
-<h4 id="org86db8b9">Proof</h4>
-<div class="outline-text-4" id="text-org86db8b9">
+<div id="outline-container-orgeda87e1" class="outline-4">
+<h4 id="orgeda87e1">Proof</h4>
+<div class="outline-text-4" id="text-orgeda87e1">
 <p>
 Let \(\hat{z}=(0,0,1)\) and \(\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)\). From the
 paragraph above equation (6.25) we deduce
@@ -839,6 +851,194 @@ and
 <p>
 QED.
 </p>
+</div>
+</div>
+</div>
+<div id="outline-container-org57b57f9" class="outline-3">
+<h3 id="org57b57f9">Exercise 6.10</h3>
+<div class="outline-text-3" id="text-org57b57f9">
+<p>
+Show that by choosing \(\Delta t\) appropriately we can obtain a quantum search algorithm
+which uses \(O(\sqrt{N})\) queries, and for which the ﬁnal state is \(\ket{x}\) exactly, that
+is, the algorithm works with probability \(1\), rather than with some smaller probability.
+</p>
+</div>
+
+<div id="outline-container-org355267e" class="outline-4">
+<h4 id="org355267e">Proof</h4>
+<div class="outline-text-4" id="text-org355267e">
+<p>
+To not obscure the proof by too much technicalities I only prove the result for <i>large
+enough</i> \(N\). Let \(c=\cos(\Delta t/2)\) and \(s=\sin(\Delta t/2)\).
+</p>
+
+<p>
+From the proof of <a href="#exercise-6.9">exercise 6.9</a> we know that \(U(\Delta t)\) is a rotation of angle \(\theta\)
+about \(\vec{r}\) where:
+</p>
+
+<p>
+<a id="org8466634"></a>
+\[
+  \cos(\theta/2) = c^2 - s^2 \, \vec{\psi}\cdot\hat{z}
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+<a id="orgf1c019a"></a>
+\[
+  \sin(\theta/2) \vec{r} = sc \, (\vec{\psi}+\hat{z}) + s^2 \, \vec{\psi}\times\hat{z} .
+\]
+</p>
+
+<p>
+Also recall that \(\hat{z}=(0,0,1)\) and \(\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)\)
+where \(\alpha=1/\sqrt{N}\) and \(\beta=\sqrt{(N-1)/N}\). Let us further elaborate on
+\(\theta\). Using one of the <a href="#org8466634">above formulas</a> we get
+</p>
+
+<p>
+\[
+  \cos(\theta/2) = 1 - \frac{2s}{N} .
+\]
+</p>
+
+<p>
+From the Taylor expansion \(\cos(x)=1-x^2/2+O(x^4)\) of the cosine function we obtain
+</p>
+
+<p>
+<a id="org4d711d9"></a>
+\[
+  \theta = 4 \sqrt{\frac{s}{N}} + O(sN\inv) .
+\]
+</p>
+
+<p>
+Now consider the axis of rotation. Below with \(\sim\) we mean that the LHS is equal to the
+RHS up to a real factor. Using the <a href="#orgf1c019a">axis-formula</a> a <a href="#org1762369">short calculation</a> yields
+</p>
+
+<p>
+<a id="orgca89983"></a>
+\[
+  \vec{r} \sim (\beta c, -\beta s, \alpha c) .
+\]
+</p>
+
+<p>
+The squared norm of the RHS is \(1-\alpha^2s^2\). Hence
+</p>
+
+<p>
+<a id="org942ad22"></a>
+\[
+  \vec{r} = (\beta c, -\beta s, \alpha c) / \sqrt{1-\alpha^2s^2} = (\beta c, -\beta s, \alpha c) + O(s^2N\inv) .
+\]
+</p>
+
+<p>
+From the <a href="#orgf1c019a">original formula</a> for \(\vec{r}\) we see that
+\(\vec{r}\cdot\hat{z}=\vec{r}\cdot\vec{\psi}\approx\alpha\,c=O(N^{-1/2})\). This implies
+that \(\hat{z}\) indeed lies on the same orbit as \(\psi\). Let \(\omega\) be the angle of the
+rotation about \(\vec{r}\) which is needed to rotate \(\vec{\psi}\) into \(\hat{z}\). Let
+</p>
+
+<p>
+\[
+  \hat{z}' = \hat{z} - (\hat{z}\cdot\vec{r}) \; \vec{r}
+  = \hat{z} - \frac{\alpha c}{\sqrt{1-\alpha^2 c^2}} \; \vec{r}
+  = \hat{z} + O(N^{-1/2}) \; \vec{r}
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  \vec{\psi}' = \vec{\psi} - (\vec{\psi}\cdot\vec{r}) \; \vec{r}
+  = \vec{\psi} - \frac{\alpha c}{\sqrt{1-\alpha^2 c^2}} \; \vec{r}
+  = \vec{\psi} + O(N^{-1/2}) \; \vec{r} .
+\]
+</p>
+
+<p>
+Hence
+</p>
+
+<p>
+\[
+  \cos(\omega) = \vec{\psi}' \cdot \hat{z}'
+  = \vec{\psi} \cdot \hat{z} + O(N\inv)
+  = \alpha^2 - \beta^2 + O(N\inv)
+  = -1 + O(N\inv) ,
+\]
+</p>
+
+<p>
+and therefore \(\omega=\pi+O(N^{-1/2})\). Using this and the <a href="#org4d711d9">formula</a> for \(\theta\) we see
+that the number of required \(\theta\) rotations is
+</p>
+
+<p>
+\[
+  \frac{\omega}{\theta} = \frac{\pi}{4\sqrt{s}} \sqrt{N} + O(1) .
+\]
+</p>
+
+<p>
+To enable a 100% probability this number must be an integer. The standard case with
+\(\Delta t=\pi\) means \(s=1\). By the <a href="https://en.wikipedia.org/wiki/Intermediate_value_theorem">intermediate value theorem</a> (the expression is
+continuous) there is an \(s\in[1-cN^{-1/2},1]\) (for some constant \(c>0\) depending on the
+constant in the \(O(1)\) above) such that this is true. Clearly \(\omega/\theta=O(\sqrt{N})\)
+for such \(s\). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org07b2165" class="outline-4">
+<h4 id="org07b2165">Appendix</h4>
+<div class="outline-text-4" id="text-org07b2165">
+<p>
+Let us use <code>sympy</code> to do the boring calculations. First let us define \(\hat{z}\) and
+\(\vec{\psi}\) in a 3D cartesian coordinate system. Moreover we set up our slightly <a href="#orgca89983">scaled
+version</a> <code>r1</code> of \(\vec{r}\).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">N</span> <span class="org-operator">=</span> CoordSys3D(<span class="org-string">'N'</span>)
+
+<span class="org-variable-name">z</span> <span class="org-operator">=</span> N.k
+<span class="org-variable-name">psi</span> <span class="org-operator">=</span> 2<span class="org-operator">*</span>a<span class="org-operator">*</span>b<span class="org-operator">*</span>N.i <span class="org-operator">+</span> (a<span class="org-operator">**</span>2 <span class="org-operator">-</span> b<span class="org-operator">**</span>2)<span class="org-operator">*</span>N.k
+
+<span class="org-variable-name">r_formula_rhs</span> <span class="org-operator">=</span> s<span class="org-operator">*</span>c<span class="org-operator">*</span>(psi <span class="org-operator">+</span> z) <span class="org-operator">+</span> s<span class="org-operator">**</span>2 <span class="org-operator">*</span> psi.cross(z)
+<span class="org-variable-name">r1</span> <span class="org-operator">=</span> b<span class="org-operator">*</span>c<span class="org-operator">*</span>N.i <span class="org-operator">-</span> b<span class="org-operator">*</span>s<span class="org-operator">*</span>N.j <span class="org-operator">+</span> a<span class="org-operator">*</span>c<span class="org-operator">*</span>N.k
+</pre>
+</div>
+
+<p>
+<a id="org1762369"></a>
+Here we check that our <a href="#org942ad22">formula</a> for \(\vec{r}\) is valid:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">norm2_r1</span> <span class="org-operator">=</span> r1.dot(r1).subs(b<span class="org-operator">**</span>2, 1 <span class="org-operator">-</span> a<span class="org-operator">**</span>2).subs(c<span class="org-operator">**</span>2, 1 <span class="org-operator">-</span> s<span class="org-operator">**</span>2)
+
+<span class="org-keyword">assert</span> r_formula_rhs.subs(b<span class="org-operator">**</span>2, 1 <span class="org-operator">-</span> a<span class="org-operator">**</span>2) <span class="org-operator">==</span> 2<span class="org-operator">*</span>a<span class="org-operator">*</span>s <span class="org-operator">*</span> r1
+<span class="org-keyword">assert</span> sp.simplify(norm2_r1) <span class="org-operator">==</span> 1 <span class="org-operator">-</span> a<span class="org-operator">**</span>2 <span class="org-operator">*</span> s<span class="org-operator">**</span>2
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+PASSED
+</pre>
 </div>
 </div>
 </div>
