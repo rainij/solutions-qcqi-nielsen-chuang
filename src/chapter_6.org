@@ -508,6 +508,9 @@ which uses $O(\sqrt{N})$ queries, and for which the ﬁnal state is $\ket{x}$ ex
 is, the algorithm works with probability $1$, rather than with some smaller probability.
 
 *** Proof
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.10-proof
+:END:
 To not obscure the proof by too much technicalities I only prove the result for /large
 enough/ $N$. Let $c=\cos(\Delta t/2)$ and $s=\sin(\Delta t/2)$.
 
@@ -530,6 +533,7 @@ Also recall that $\hat{z}=(0,0,1)$ and $\vec{\psi}=(2\alpha\beta,0,\alpha^2-\bet
 where $\alpha=1/\sqrt{N}$ and $\beta=\sqrt{(N-1)/N}$. Let us further elaborate on
 $\theta$. Using one of the [[exercise-6.10-theta-formula][above formulas]] we get
 
+<<exercise-6.10-cos-theta>>
 $$
   \cos(\theta/2) = 1 - \frac{2s}{N} .
 $$
@@ -625,3 +629,111 @@ Here we check that our [[exercise-6.10-axis-asymptotic][formula]] for $\vec{r}$ 
 
 #+RESULTS[ed5a7b70f53829461dcae6921213b4d1f25fd960]:
 : PASSED
+** Exercise 6.11 (Multiple solution continuous quantum search)
+Guess a Hamiltonian with which one may solve the continuous time search problem in the
+case where the search problem has $M$ solutions.
+
+*** Solution
+My Ansatz looks as follows
+
+$$
+  H = \proj{\chi} + \proj{\psi} ,
+$$
+
+where
+
+$$
+  \chi = \frac{1}{\sqrt{M}} \sum_{f(x)=1} \ket{x}
+$$
+
+and we let $\ket{\psi}$ unspecified at first (as always we take
+$\ket{\psi}=H^{\otimes\,n}\ket{0}$ in the end). It turns out that section 6.2
+/essentially/ works out analogously with this Hamiltonian if one replaces $x$ with $\chi$.
+
+In particular we arrive at the same formula for the Hamiltonian and formula (6.23) which
+states that the corresponding unitary group rotates (the still arbitrary) $\ket{\psi}$
+into $\ket{\chi}$:
+
+$$
+  \cos(\alpha t) \ket{\psi} - i\sin(\alpha t) \ket{\chi} .
+$$
+
+Thus after time $t=\pi/\alpha$ the system is rotated in a state which when measured
+produces a solution of $f(x)=1$ (equal probability for each possibility). So what is the
+difference? Something must be different, right? I am glad you asked! Actually /so far
+nothing/ is different!
+
+Essentially the only thing which differs is the value of $\alpha$ once we fix
+$\ket{\psi}$. As in chapter 6.2 we have to choose $\ket{\psi}$ in a way which allows us to
+determine $\alpha$ without knowing $\ket{\chi}$. This is where we fix
+$\ket{\psi}=H^{\otimes\,n}\ket{0}$. This in turn leads to
+
+$$ \alpha=\sqrt{M/N} . $$
+
+Let us finally investigate the implications for the performance of an approximation
+similar to the one in the book. It is easiest to just follow the [[#exercise-6.10-proof][proof of exercise
+6.10]]. For simplicity we restrict our short analysis to the case $M=o(N)$.
+
+The angle $\theta$ of rotation is determined by (c.f. [[exercise-6.10-cos-theta][the case]] for $M=1$)
+
+$$
+  \cos(\theta/2) = 1 - \frac{2Ms}{N} .
+$$
+
+Hence
+
+$$
+  \theta = 4 \sqrt{\frac{sM}{N}} + O(sMN\inv) .
+$$
+
+The same reasoning as in exercise 6.10 allows us to estimate the angle $\omega$ between $\vec{\psi}$ and $\hat{z}$:
+
+$$
+  \cos(\omega) = -1 + O(MN\inv) .
+$$
+
+Hence $\omega\approx\pi$. We conclude that the number of iterations is
+$\omega/\theta=\Theta(\sqrt{N/M})$ (if we choose $\Delta t=\pi$ and thus $s=1$). But keep in
+mind that we used $M=o(N)$ in this analysis!
+** Exercise 6.12 (Alternative Hamiltonian for quantum search)
+Suppose
+
+$$
+  H = \ket{x}\bra{\psi} + \ket{\psi}\bra {x} .
+$$
+
+1. Show that it takes time $O(1)$ to rotate from the state $\ket{\psi}$ to the state
+   $\ket{x}$, given an evolution according to the Hamiltonian $H$.
+2. Explain how a quantum simulation of the Hamiltonian $H$ may be performed, and determine
+   the number of oracle calls your simulation technique requires to obtain the solution
+   with high probability.
+
+*** Proof of (1)
+Let $\ket{\psi}=\alpha\ket{x}+\beta\ket{y}$. In the basis $(\ket{x},\ket{y})$
+
+$$
+  H = \alpha I + \beta X + \alpha Z .
+$$
+
+Note that the term involving the identity $I$ is not important since it only corresponds
+to a global phase in $e^{-\ii Ht}$. Recall from the book that the Hamiltonian
+$H_0=\proj{x}+\proj{\psi}$ is equal to $I+\alpha(\beta X+\alpha Z)$. Hence
+
+$$
+  e^{-\ii Ht} \sim e^{-\ii H_0 \alpha \inv t}
+$$
+
+where $\sim$ means /up to a global phase/. We already know from equation (6.23) that $H_0$
+rotates $\ket{\psi}$ into $\ket{x}$ after time $t=\pi/2\alpha$. Hence $H$ does the same
+after time $t=\pi/2=O(1)$. QED.
+
+*** Solution to (2)
+First of all note that the two summands of $H$ (I mean $\ket{x}\bra{\psi}$ and
+$\ket{\psi}\bra {x}$) are not self adjoint. Hence their exponentials
+(e.g. $e^{-\ii\ket{x}\bra{\psi}}$) are not unitary. So we cannot simulate the summands by
+a circuit.
+
+On the other hand from the first part we already know that the exponential of $H$ is
+/essentially/ a time-scaled version of the exponential of $H_0$. So if we can simulate the
+latter this yields a simulation of the former. The resource requirements are the same of
+course. Not sure if this is the intended meaning of the exercise though.
