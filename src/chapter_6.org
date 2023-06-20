@@ -658,7 +658,7 @@ $$
   \cos(\alpha t) \ket{\psi} - i\sin(\alpha t) \ket{\chi} .
 $$
 
-Thus after time $t=\pi/\alpha$ the system is rotated in a state which when measured
+Thus after time $t=\pi/2\alpha$ the system is rotated in a state which when measured
 produces a solution of $f(x)=1$ (equal probability for each possibility). So what is the
 difference? Something must be different, right? I am glad you asked! Actually /so far
 nothing/ is different!
@@ -737,3 +737,510 @@ On the other hand from the first part we already know that the exponential of $H
 /essentially/ a time-scaled version of the exponential of $H_0$. So if we can simulate the
 latter this yields a simulation of the former. The resource requirements are the same of
 course. Not sure if this is the intended meaning of the exercise though.
+** Exercise 6.13
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.13
+:END:
+Consider a classical algorithm for the counting problem which samples uniformly and
+independently $k$ times from the search space, and let $X_1,\ldots,X_k$ be the results of
+the oracle calls, that is, $X_j=1$ if the $j$​th oracle call revealed a solution to the
+problem, and $X_j=0$ if the $j$​th oracle call did not reveal a solution to the
+problem. This algorithm returns the estimate $S=\frac{N}{k}\sum_{j=1}^{k}X_j$ for the number
+of solutions to the search problem. Show that the standard deviation of $S$ is
+$\Delta\,S=\sqrt{M(N-M)/k}$. Prove that to obtain a probability at least $3/4$ of estimating $M$
+correctly to within an accuracy $\sqrt{M}$ for all values of $M$ we must have
+$k=\Omega(N)$.
+
+*** Proof
+**** Computing the standard deviation $\Delta\,S$
+Let us denote by $P(\ldots)$ and $E(\ldots)$ the probability of some event and the
+expectation of some random variable.
+
+According to the exercise statement the random variables $X_i$ are [[https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables][iid]]. Whenever the index
+$j$ is irrelevant we denote by $X$ any of the $X_j$. We have
+
+$$
+  p := P(X=1) = \frac{M}{N}, \quad P(X=0) = 1-p = \frac{N-M}{N} .
+$$
+
+The mean value of the $X_j$ is
+
+$$
+  \mu := E(X) = p\cdot 1 + (1-p)\cdot 0 = \frac{M}{N} = p .
+$$
+
+Hence, by linearity $E(S)=N\mu=M$. This justifies $S$ as an estimator for $M$. The variance is
+
+\begin{align*}
+  \Delta\,S^2 = E((S-M)^2)
+  &= \frac{N^2}{k^2} E((\sum_j X_j-\mu)^2) \\
+  &= \frac{N^2}{k^2} \sum_j E((X-\mu)^2) \\
+  &= \frac{N^2}{k} E(X-2\mu X+\mu^2)) \\
+  &= \frac{N^2}{k} p(1-p) \\
+  &= \frac{M(N-M)}{k} .
+\end{align*}
+
+For the second equality we use that due to independence $E(X_iX_j)=E(X_i)E(X_j)$ for
+$i\neq\,j$. For the third equality we use $X^2=X$.
+
+**** Proof of an upper bound for $k$
+The exercise does not really ask for this but we do it anyway. For reasons to become clear
+at the end we consider the accuracy $C\sqrt{M}$ (instead of just $\sqrt{M}$) for some
+$C>0$. By [[https://en.wikipedia.org/wiki/Chebyshev%27s_inequality][Chebychev's inequality]] for any $\lambda > 0$:
+
+$$
+  P(\abs{S-M} \geq \lambda\Delta S) \leq \frac{1}{\lambda^2} .
+$$
+
+Choosing $\lambda$ such that $\lambda\Delta S=C\sqrt{M}$ yields
+
+$$
+  P(\abs{S-M} \geq \sqrt{M}) \leq \frac{1}{\lambda^2} = \frac{N-M}{C^2k} .
+$$
+
+Hence $k=4N/C^2$ is sufficient for the LHS to be smaller than $1-3/4=1/4$. This is the
+desired upper bound. QED.
+
+- Remark :: Clearly the upper bound for the case $C\leq2$ is not really useful. For those
+  $C$ we should either hope to improve our estimate or just systematically visit all $N$
+  points in the search space (which yields the exact count with certainty instead of an
+  estimate just sometimes!).
+
+**** Proof of $k=\Omega(N)$
+We assume that $N$ is even. This simplifies the proof and is a reasonable assumption in
+our context since the quantum counting algorithm even assumes that $N$ is a power of two.
+
+Assume $k$ is chosen in a way that
+
+<<exercise-6.13-target-probability>>
+$$
+  P(\abs{S-M} \leq \sqrt{M}) \geq \frac{2}{3}
+$$
+
+holds for all $M$. In particular this must be satisfied for $M=N/2$. Let
+$Y=\sum_jX_j$. Then
+
+$$
+  \abs{S-M} \leq \sqrt{M} \text{ with } M=N/2 \quad \Longleftrightarrow \quad
+  \frac{k}{2} - \frac{k}{\sqrt{2N}} \leq Y \leq \frac{k}{2} + \frac{k}{\sqrt{2N}}
+$$
+
+Note that
+
+<<exercise-6.13-formula-p_y>>
+$$
+  p_y := P(Y=y) = \binom{k}{y} 2^{-k}
+$$
+
+Let $\alpha=k/\sqrt{2N}$. The [[exercise-6.13-target-probability][target probability requirement]] is equivalent to
+
+<<exercise-6.13-desired-probability>>
+$$
+  \sum_{k/2-\alpha\leq y \leq k/2+\alpha} p_y \geq \frac{3}{4} .
+$$
+
+Recall that in our analysis we only consider asymptotic estimates for $N\to\infty$. It is
+not hard to see that the previous inequality readily implies $k\to\infty$ as
+$N\to\infty$. This is a first step to prove $k=\Omega(N)$. Now let us analyze the LHS more
+deeply. From the [[exercise-6.13-formula-p_y][formula for]] $p_y$ together with Stirling's formula we see that for the
+$p_y$ occurring in the LHS (abbreviating $s=y/k$)
+
+\begin{align*}
+  p_y
+  &= \frac{\sqrt{2\pi k}(k/e)^k}{\sqrt{2\pi y}(y/e)^y \sqrt{2\pi (k-y)}((k-y)/e)^{k-y}} (1 + o(1)) 2^{-k} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{2^{-k}}{(1-s)^{k-y} s^y} (1 + o(1))
+\end{align*}
+
+Let us define $\varepsilon$ by $y=(k+\varepsilon k)/2$. By assumption $\varepsilon\leq\sqrt{2/N}$. Hence
+
+\begin{align*}
+  p_y &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon)^{k-y} (1+\varepsilon)^y} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon)^{(1-\varepsilon)k/2} (1+\varepsilon)^{(1+\varepsilon)k/2}} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon^2)^{k/2}} \cdot
+     \left[ \frac{1-\varepsilon}{1+\varepsilon} \right]^{\varepsilon k/2} .
+\end{align*}
+
+Let us assume that there is a special sequence of values for $k$ which is $o(N)$ while
+still satisfying the [[exercise-6.13-desired-probability][probability estimate]] (the proof is done if we can rule out this
+possibility). Using $(1\pm\delta)^{o(\delta\inv)}=1+o(1)$ if $\delta\to0$ (this is related
+to the well-known formula $e^x=\lim_{n\to\infty}(1+\frac{x}{n})^n$) we obtain
+
+$$
+  p_y = \sqrt{\frac{2}{\pi k}} \cdot (1 + o(1))
+$$
+
+for $k$ from the /special/ sequence. Under these assumptions the LHS of the [[exercise-6.13-desired-probability][probability
+estimate]] is not large enough:
+
+$$
+  \sum_{k/2-\alpha\leq y \leq k/2+\alpha} p_y = O\left(k^{-1/2}\cdot \frac{k}{\sqrt{N}}\right)
+  = O\left(\sqrt{\frac{k}{N}}\right) = o(1) \leq \frac{3}{4} \text{ eventually} .
+$$
+
+This is a contradiction! Hence such a special sequence does not exist. Thus
+$k=\Omega(N)$. QED.
+
+** Exercise 6.14
+Prove that any classical counting algorithm with probability at least $3/4$ for estimating
+$M$ correctly to within an accuracy $c\sqrt{M}$ for some constant $c$ and for all values of $M$
+must make $\Omega(N)$ oracle calls.
+
+- Remark :: This is /vaguely/ related to the fact that the sample mean is a so called
+  /Uniformly Minimum Variance Unbiased Estimator/ (UMVUE) for the mean value parameter of
+  the Bernoulli distribution. See [[https://stats.libretexts.org/Bookshelves/Probability_Theory/Probability_Mathematical_Statistics_and_Stochastic_Processes_(Siegrist)/07%3A_Point_Estimation/7.05%3A_Best_Unbiased_Estimators][libretexts.org]].
+
+*** Proof
+The exercise is a little bit vague in my opinion - but that is OK. If we speak about
+probabilities there must be a probability distribution somewhere. The exercise doesn't
+explicitly define one. Sometimes the distribution is given implicitly. In this case I
+think there are at least two options:
+
+- Postulate a probability distribution on the inputs.
+- Assume that the oracle calls are at randomly selected arguments.
+
+I solved the exercise for both interpretations.
+
+**** Interpretation 1
+For a given $N$, any such algorithm does essentially the following:
+
+<<exercise-6.14-algorithm>>
+1. Input: An oracle computing a function $f:\{0,\ldots,N-1\}\to\{0,1\}$.
+2. Determine $\vec{X}=(X_1,\ldots,X_k)$, where $X_j=f(N_j)$ for some $N_j < N$.
+3. Compute $h(\vec{X})$ and return the result.
+
+As we are interested in the asymptotics of $k$ as $N\to\infty$ we actually have to take
+into account sequences of algorithms which might be specifically tailored to each value of
+$N$. In particular the sequence of algorithms (their "source code") might not be
+computable. This does not complicate the analysis at all (nothing we do here depends on
+computability - measure theory is the framework which governs the math here) but it is
+worth pointing out since the exercise is formulated with computing in mind.
+
+Of course, a concrete algorithm might not actually separate steps 2 and 3 but it is always
+possible to change the algorithm so that it behaves like that by essentially running it
+twice: the first time we just remember the $X_j$ and the second time we plugin the already
+computed values for $X_j$. Of course this is a bit dumb but it simplifies our analysis.
+
+The $N_j$ need not be constant. In fact, any $N_j$ might depend on anything what previously
+was computed, including already known $X_{j'}$. We may assume that the $N_j$ are all
+different. If this was not the case we may change the algorithm by inserting a subroutine
+which checks if $N_j$ already appeared and just retrieves a copy of the corresponding
+$X_{j'}$. In particular $k$ might also depend on the course of computation and hence is
+not necessarily just a function of $N$. For that reason $h$ essentially takes a list of
+$X_j$ as input and not just a fixed size vector.
+
+As the algorithms are supposed to be arbitrary they might in particular be deterministic
+(meaning that they compute a /function/ mapping oracles to integers). In that case it
+wouldn't even make sense to speak about a probability of $3/4$ that something happens! To
+introduce randomness to the setting one could postulate a probability distribution over the
+inputs. Note that under this assumption $M$ is a random variable.
+
+One possible distribution is the uniform distribution over all $f$ (all possible $2^N$
+oracles occur with the same probability $2^{-N}$).
+
+<<exercise-6.14-prob-dist-1>>
+Assuming a uniform distribution over all possible $f$ (the input of the algorithm) we may
+deduce that the $X_j$ are *independent and identically distributed (iid)* according the
+Bernoulli distribution with parameter $p=M/N$ (as in [[#exercise-6.13][exercise 6.13]]). For the independence
+it is important that the $N_j$ are all different.
+
+We show now that in that case the exercise statement is wrong (at least for sufficiently
+large $c$)! In fact just estimating $N/2$ regardless of the input ($f$) does the job! The
+reason for this is that most oracles just have $M=N/2+O(N^{-1/2})$ under this
+distribution.
+
+- Theorem :: Assuming a uniform distribution over all possible $f$ the algorithm =Return
+  N/2= is accurate within $cN^{-1/2}$ with probability $1-o(1)$ as $N\to\infty$ and
+  $c\to\infty$. In particular no oracle calls are needed.
+
+<<exercise-6.14-proof-1>>
+- Proof :: This statement follows from the [[https://en.wikipedia.org/wiki/Central_limit_theorem][central limit theorem]]. Let us proof it
+  directly - just for fun (it is not difficult).
+
+  Let us abbreviate $R=O(m\inv + (N-m)\inv)$ in the following. The probability that the
+  number $M$ of solutions to $f(x)=1$ (for a random $f$) is $m$ is
+
+  $$
+  P(M=m) = \binom{N}{m} 2^{-N} .
+  $$
+
+  A straightforward calculation using Stirling's formula
+  $n!=\sqrt{2\pi\,n}(n/e)^n(1+O(n\inv))$ shows
+
+  $$
+  P(M=m) = \frac{N\inv}{\sqrt{2\pi\sigma^2}} \left[ 2(1-p)^{1-p} p^p \right]^{-N} \; (1 + R) .
+  $$
+
+  Here we set $p=m/N$ and $\sigma^2=\frac{p(1-p)}{N}$. Let us define the entropy function
+  $H(p)=-p\ln(p)-(1-p)\ln(1-p)$. In case you do not know how this function looks like you
+  should search the internet for a plot. [[https://en.wikipedia.org/wiki/Entropy_(information_theory)][Wikipedia]] should have one. Plugging in the
+  entropy function we get
+
+  $$
+  P(M=m) = \frac{N\inv}{\sqrt{2\pi\sigma^2}} e^{-(H(p) - \ln(2))N} \; (1 + R) .
+  $$
+
+  Observe that $H$ is maximal at $p=1/2$. Moreover $H(1/2)=\ln(2)$, $H'(1/2)=0$, and
+  $H''(1/2)=4$. Hence for $p=\frac{1}{2}+\frac{\delta}{\sqrt{2}}$ with small
+  $\delta=O(1/\sqrt{N})$ and $d\delta=O(N\inv)$ we have, setting
+  $\sigma_0^2=\frac{1}{4N}=\sigma+O(N\inv)$,
+
+  $$
+  P\left(\frac{1}{2} + \frac{\delta}{\sqrt{2}} - d\delta
+    < \frac{M}{N} <
+    \frac{1}{2} + \frac{\delta}{\sqrt{2}} + d\delta \right)
+  = \frac{2d\delta}{\sqrt{2\pi\sigma_0^2}} e^{-\frac{\delta^2}{2\sigma_0^2}} \; (1 + O(N\inv)) .
+  $$
+
+  This implies that the probability distribution of $M$ for $N\to\infty$ is close to the
+  normal distribution with mean $N/2$ and standard deviation $\sqrt{N}/2$. In particular
+  almost all of the probability mass lies within a few multiplies of $\sqrt{N}$ around
+  $N/2$. QED.
+
+Let us investigate a different class of probability distributions.
+
+Let $\rho:[0,1]\to[0,\infty)$ be a (fixed) smooth function (which does not depend on $N$)
+with $\int_0^1\rho(x)dx=1$. Consider a probability distribution satisfying
+
+$$
+  P(M=m) = N\inv \rho(m/N) \; (1 + O(N\inv))
+$$
+
+and such that oracles having the same number $m$ of solutions have the same probability
+(/symmetry/ condition). One possibile density function is e.g. $\rho(p)=1$.
+
+The [[exercise-6.14-prob-dist-1][previous distribution]] /does/ satisfy the symmetry condition but not the part about the
+$N$​-independence of $\rho$ as the proof above showed that the corresponding $\rho$
+approached the delta distribution at $1/2$ (got narrower with increasing $N$).
+
+For these distributions one can readily see that [[https://en.wikipedia.org/wiki/Conditional_probability_distribution][conditioned]] on $M=m$ (for any $m$) the
+$X_j$ are again iid according to the Bernoulli distribution with parameter $p=m/N$. The
+symmetry condition is the reason for this (again).
+
+- Theorem :: <<exercise-6.14-theorem-2>> Let $c>0$ and $\beta > 1/2$. Consider the just
+  discussed probability distribution on the inputs (the oracles). Assume that for any $N$
+  and a randomly chosen $f$ the algorithms determine $M$ within an accuracy $c\sqrt{M}$
+  with probability at least $\beta$. Then $k=\Omega(N)$ as $N\to\infty$.
+
+- Proof :: Let us write $a\pm b$ for the interval $[a-b,a+b)$. Recall that $M$ is the
+  number of solutions of the input $f$ and hence is a random variable.
+
+  Without loss of generality we assume that $\rho$ is compactly supported in $(0,1)$,
+  i.e. there is an $\varepsilon > 0$ such that $\rho$ is zero outside of
+  $[\varepsilon,1-\varepsilon]$. If this was not already the case we could just replace
+  $\rho$ by some "trimmed" (and normalized) version $\rho_\varepsilon$. If we choose
+  $\varepsilon$ small enough the success probability $\beta_{\varepsilon}$ of the
+  algorithm is close to $\beta$ (uniformly for all $N$) and hence larger than $1/2$.
+
+  Let
+
+  $$
+  \beta_m = P \left(h(\vec{X}) \in m \pm c\sqrt{m} \; \middle| \; M=m \right)
+  $$
+
+  By assumptions we have $\sum_m\beta_m=\beta > 1/2$. Here and in the following we implicitly
+  assume that $m$ is in the "positive probability zone" (in particular bounded away from $0$
+  and $N-1$). For example in the sum $\sum_m\beta_m$ we may assume
+
+  $$ \varepsilon N \leq m \leq (1 - \varepsilon) N . $$
+
+  For other expressions the "positive probability zone" might be slightly extendend to the
+  left or right (or both). This comes in handy next since it avoids "index overflow". Let
+
+  $$
+  \beta'_m = P \left(h(\vec{X}) \in m \pm c\sqrt{m} \; \middle| \; M = m + c\sqrt{m} \right)
+  $$
+
+  Clearly the corresponding events imply the failure of the algorithm (accuracy is too
+  bad). Hence $\sum_m\beta'_m\leq1-\beta < 1/2$. Let us summarize what we have so far:
+
+  <<exercise-6.14-knowledge-beta-beta-prime>>
+  $$
+  \sum_m\beta_m=\beta > 1/2 \quad \text{and} \quad \sum_m\beta'_m\leq1-\beta < 1/2 .
+  $$
+
+  Recall that we have to show $k=\Omega(N)$. Using proof by contradiction and possibly
+  restricting to an infinite subset of the values for $N$ of we may assume that $k=o(N)$
+  in the following.
+
+  Our goal is to show that under this assumption $\beta'_m\sim\beta_m$
+  (i.e. $\beta'_m/\beta_m\to1$) as $N\to\infty$ uniformly with respect to $m$. This is the
+  desired contradition to what we [[exercise-6.14-knowledge-beta-beta-prime][know already]].
+
+  Let $S=\sum_{j=1}^k X_j$ and $p=m/N$. By our assumption on the probability distribution
+  of $f$ we have that the $X_j$ are Bernoulli distributed with parameter $p$ and hence
+
+  $$
+  P(S=s|M=m) = \binom{k}{s} p^s (1-p)^{k-s} .
+  $$
+
+  (i.e. $S$ satisfies a binomial distribution if conditioned on fixed $M$.) Moreover the
+  symmetry condition on the distribution further implies that
+
+  $$
+  P(\vec{X}=x | S=s \cap M=m)
+  $$
+
+  is the same for all $x$ with $\sum_jx_j=s$ (and $0$ otherwise). One could argue that
+  this condition /means/ that (for fixed $M$) no algorithm has any chance of extracting
+  /any/ information beyond $s$ from $\vec{X}$ since it is not able to generate a
+  probability distribution with less entropy.
+
+  To prove $\beta'_m\sim\beta_m$ it is sufficient to prove that
+  $P(\vec{X}=x|M=m)\,\sim\,P(\vec{X}=x|M=m+c\sqrt{m})$ (both uniformly with respect to
+  $m$). To prove the latter, by the just discussed consequences of the symmetry property,
+  it is sufficient to prove
+
+  <<exercise-6.14-theorem-2-crucial-claim>>
+  $$
+  P(S=s|M=m)\,\sim\,P(S=s|M=m+c\sqrt{m}) ,
+  $$
+
+  uniformly with respect to $m$. Actually we only prove this for "most" $s$ (in the sense
+  that their probability sums to a value asymptotically approaching $1$ (for both values
+  of $M$)), but this is sufficient. Let $R=O(1/s)+O(1/(k-s))$, $q=s/k$, and
+  $\sigma_q^2=q(1-q)/k$. Let $H(q)=-q\ln(q)-(1-q)\ln(1-q)$ and define
+
+  $$
+  E(q,p) = H(q) + q\ln(p) + (1-q)\ln(1-p) .
+  $$
+
+  A straightforward calculation using Stirling's formula
+  $n!=\sqrt{2\pi\,n}(n/e)^n(1+O(n\inv))$ shows
+
+  \begin{align*}
+  P(S=s|M=m)
+  &= \binom{k}{s} p^s (1-p)^{k-s} \\
+  &= \frac{k\inv}{\sqrt{2\pi\sigma_q^2}} \cdot \left[q^q(1-q)^{1-q}\right]^{-k}
+     \cdot \left[p^q(1-p)^{1-q}\right]^k \cdot (1 + R) \\
+  &= \frac{k\inv}{\sqrt{2\pi\sigma_q^2}} \cdot e^{kE(q,p)} \cdot (1 + R) .
+  \end{align*}
+
+  Observe that at $q=p$ we have $E=\partial_qE=0$ and
+  $\frac{1}{2}\partial_q^2E=-1/(2\sigma_p^2)$. Recall that we are /essentially/ only
+  interested in $p\in[\varepsilon,1-\varepsilon]$ (this is not entirely correct but the
+  details do not matter). Note that $\sigma_q=\sigma_p(1+O(k^{-1/2}))$ for
+  $q=p+O(k^{-1/2})$. Hence the probability concentrates around $s=kp\pm O(\sqrt{k})$ and
+  for these $s$ we have:
+
+  $$
+  P(S=s|M=m) = \frac{k\inv}{\sqrt{2\pi\sigma_p^2}} \cdot e^{-\frac{(q-p)^2}{2\sigma_p^2}} \cdot (1 + o(1)) .
+  $$
+
+  Compare this with the normal distribution. We essentially proved the central limit
+  theorem in a special case.
+
+  Recall that $q=s/k$ and $p=m/N$. Also observe that $\sigma_p^2=\Theta(k\inv)$ and that
+  $p':=p+c\sqrt{m}/N=p+o(k^{-1/2})$. Using this in the just derived asymptotic formula for
+  $P(S=s|M=m)$ yields the [[exercise-6.14-theorem-2-crucial-claim][claim]]. QED.
+
+**** Interpretation 2
+Let us offer an interpretation which is analogous to [[#exercise-6.13][exercise 6.13]]. Let again consider an
+[[exercise-6.14-algorithm][algorithm as sketched in the previous interpretation]]. But now we assume /more
+specifically/ that the $N_j$ are just sampled uniformly at random. In particular $k$ is
+deterministic and only depends on $N$ (not on the oracle).
+
+1. Input: An oracle computing a function $f:\{0,\ldots,N-1\}\to\{0,1\}$.
+2. Compute $k=k(N)$.
+3. Determine $\vec{X}=(X_1,\ldots,X_k)$ where $X_j=f(N_j)$ and the $N_j$ are sampled
+   uniformly at random on the input space.
+4. Compute $h_k(\vec{X})$ and return the result.
+
+In this case we can consider individual oracles and need not consider probability
+distributions over them. The $X_j$ are again iid according to the Bernoulli distribution
+with parameter $p=M/N$ where $M$ is the number of solutions for the oracle under
+consideration.
+
+We note again that we consider a /sequence/ of algorithms (as we are interested in the
+asymptotics $N\to\infty$).
+
+- Theorem :: Consider a sequence of algorithms as discussed above. Let $c>0$ and
+  $\alpha>0$. Assume that for any oracle the responsible algorithm (the one with the
+  matching value for $N$) computes $M$ correctly within accuracy $c\sqrt{M}$ with
+  probability at least $\alpha$. Then the number of oracle calls is $k=\Omega(N)$.
+
+- Proof :: First of all we note that if $M$ is correct within accuracy $c\sqrt{M}$ it is
+  also correct within $c\sqrt{N}$. From here on we only assume the latter. Moreover let us
+  write $a\,\pm\,b$ for the interval $[a-b,a+b)$.
+
+  <<exercise-6.14-wlog-k-is-oN>>
+  Without loss of generality we may assume that $k=o(N)$ and have to deduce a
+  contradiction from that. If this were not true we might consider a subsequence $(N_i)$
+  such that the corresponding $k_i=k_i(N_i)$ satisfy $k_i=o(N_i)$.
+
+  <<exercise-6.14-r2k-is-oN>> Let $r=r(k,N)$ be such that $r\to\infty$ in a way such that
+  $r^2k=o(N)$. This is possible due to $k=o(N)$. Consider a set $\{f_1,\ldots,f_r\}$ of
+  oracles with corresponding
+
+  $$ p_i = \frac{1}{2} + \frac{2ic_i}{\sqrt{N}} $$
+
+  so that $M_i=Np_i$ is the number of solutions of $f_i(x)=1$. Here $c_i$ the smallest
+  $c_i\geq c$ so that $M_i$ is an integers. Note that $c_i=c+O(N^{-1/2})$. It is /not/
+  essential that these $p_i$ are close to $1/2$. The important thing is that they are
+  close together (the width is $o(1/\sqrt{k})$) and bounded away from $p=0$ and
+  $p=1$. Moreover we will see below that it is also not really important that
+  $r\to\infty$, instead it is sufficient that we can choose it arbitrary large, at least
+  for large $N$.
+
+  Observe that if $f_i$ is the input oracle the $X_j$ are iid and Bernoulli distributed
+  with parameter $p_i$. Let us denote by $P_{p_i}$ the corresponding probability
+  measure. Let us write
+
+  $$ I_i = p_i \pm \frac{c}{\sqrt{N}} $$
+
+  By definition of the $p_i$ these intervals are disjoint. By assumptions of the theorem
+  we have
+
+  $$
+  P_{p_i} \left( h(\vec{X}) \in I_i \right) \geq \alpha > 0 .
+  $$
+
+  - Lemma :: Let $\beta\in(0,1)$. There is a constant $\delta\in(0,1]$ such that for all
+    $N$ the following holds: For each $k=k(N)$ there is a set $U_k\subseteq\{0,1\}^k$ such
+    that for all the $p_i$
+
+    $$
+    P_{p_i}(\vec{X} \in U_k) \geq \beta .
+    $$
+
+    and for any combination $p_i$, $p_j$ and any $x$
+
+    $$ P_{p_i}(\vec{X}=x)\geq\delta P_{p_j}(\vec{X}=x) . $$
+
+  - Proof :: Let $Y=\sum_{j=1}^kX_j$. For any $f_i$ by the central limit theorem the
+    probability distribution of $Y$ approaches the normal distribution with mean
+    $M_i/2=\frac{1}{2}+O(\sqrt{N})$ and variance $O(k)$ (we have essentially proven this
+    directly in the [[exercise-6.14-theorem-2][proof of another theorem]]).
+
+    [[exercise-6.14-r2k-is-oN][Since]] $r/\sqrt{N}=o(1/\sqrt{k})$ the widths of the corresponding gaussian bell curves
+    are much larger than any of the $p_i$ are away from each other - at least for large
+    $N$. Moreover they are roughly the same and the convergence is uniform. Hence
+
+    $$
+    U_k = \left\{x\in\{0,1\}^k \, \middle| \; \sum_j x_j \in \frac{k}{2} \pm c_0 \sqrt{k} \right\}
+    $$
+
+    for a suitably chosen $c_0$ (independent of $k$ or $N$) does the job for all $k$ large
+    enough ($\delta$ could even be chosen as close to $1$ as we like). For all smaller $k$
+    we can simply choose $U_k=\{0,1\}^k$ because the condition involving $\delta$ is
+    trivially true by finiteness for a sufficiently small $\delta$. QED.
+
+  Let $U_k$ be as in the lemma for $\beta$ chosen such that
+  $\gamma=\alpha+\beta-1\,>\,0$. Moreover let
+
+  $$
+    U_k(j) = h(\vec{X}) \in I_j \cap \vec{X} \in U_k .
+    $$
+
+  Then
+
+  $$ P_{p_i}(U_k(j)) \geq \alpha + \beta - 1 = \gamma > 0 . $$
+
+  By the condition in the lemma involving $\delta$ and the disjointness of the $I_j$ we
+  see that
+
+  $$
+  P_{p_0} \left( \bigcup_{j=1}^r U_k(j) \right) \geq r\gamma\delta .
+  $$
+
+  The LHS is bounded by $1$. On the other hand the RHS tends to $\infty$ as
+  $N\to\infty$ [[exercise-6.14-r2k-is-oN][since]] $r\to\infty$. This is the [[exercise-6.14-wlog-k-is-oN][desired]] contradiction. QED.
