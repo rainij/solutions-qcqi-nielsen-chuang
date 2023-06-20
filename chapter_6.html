@@ -26,32 +26,34 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org28d6477">Setup</a></li>
-<li><a href="#org48e8da7">Exercises</a>
+<li><a href="#orge415d57">Setup</a></li>
+<li><a href="#org29e3ddc">Exercises</a>
 <ul>
-<li><a href="#org64fc03b">Exercise 6.1</a></li>
-<li><a href="#org60a160c">Exercise 6.2</a></li>
-<li><a href="#orgf799fcf">Exercise 6.3</a></li>
-<li><a href="#org8f98c15">Exercise 6.4</a></li>
-<li><a href="#org1b7aeb2">Exercise 6.5</a></li>
-<li><a href="#org2b3ca8b">Exercise 6.6</a></li>
-<li><a href="#org26c3167">Exercise 6.7</a></li>
-<li><a href="#orgb815018">Exercise 6.8</a></li>
+<li><a href="#orgb6a4837">Exercise 6.1</a></li>
+<li><a href="#orgf0d7cbe">Exercise 6.2</a></li>
+<li><a href="#org3327766">Exercise 6.3</a></li>
+<li><a href="#org93791f3">Exercise 6.4</a></li>
+<li><a href="#org30965a3">Exercise 6.5</a></li>
+<li><a href="#org81d3d3b">Exercise 6.6</a></li>
+<li><a href="#org4e20b75">Exercise 6.7</a></li>
+<li><a href="#org9d789a1">Exercise 6.8</a></li>
 <li><a href="#exercise-6.9">Exercise 6.9</a></li>
-<li><a href="#org248302f">Exercise 6.10</a></li>
-<li><a href="#orgeabcbae">Exercise 6.11 (Multiple solution continuous quantum search)</a></li>
-<li><a href="#orgf3fee83">Exercise 6.12 (Alternative Hamiltonian for quantum search)</a></li>
+<li><a href="#orgabda391">Exercise 6.10</a></li>
+<li><a href="#orgbc0ccdc">Exercise 6.11 (Multiple solution continuous quantum search)</a></li>
+<li><a href="#org2deeabd">Exercise 6.12 (Alternative Hamiltonian for quantum search)</a></li>
+<li><a href="#exercise-6.13">Exercise 6.13</a></li>
+<li><a href="#org7fd03ac">Exercise 6.14</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org28d6477" class="outline-2">
-<h2 id="org28d6477">Setup</h2>
-<div class="outline-text-2" id="text-org28d6477">
+<div id="outline-container-orge415d57" class="outline-2">
+<h2 id="orge415d57">Setup</h2>
+<div class="outline-text-2" id="text-orge415d57">
 <div class="org-src-container">
-<pre class="src src-python" id="org90484e9"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
+<pre class="src src-python" id="orgcbe0db3"><span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
 <span class="org-keyword">from</span> sympy.vector <span class="org-keyword">import</span> CoordSys3D
 
 <span class="org-keyword">from</span> chapter_4 <span class="org-keyword">import</span> Ry, theta, Z
@@ -70,22 +72,22 @@ Set up some variables:
 </div>
 </div>
 
-<div id="outline-container-org48e8da7" class="outline-2">
-<h2 id="org48e8da7">Exercises</h2>
-<div class="outline-text-2" id="text-org48e8da7">
+<div id="outline-container-org29e3ddc" class="outline-2">
+<h2 id="org29e3ddc">Exercises</h2>
+<div class="outline-text-2" id="text-org29e3ddc">
 </div>
-<div id="outline-container-org64fc03b" class="outline-3">
-<h3 id="org64fc03b">Exercise 6.1</h3>
-<div class="outline-text-3" id="text-org64fc03b">
+<div id="outline-container-orgb6a4837" class="outline-3">
+<h3 id="orgb6a4837">Exercise 6.1</h3>
+<div class="outline-text-3" id="text-orgb6a4837">
 <p>
 Show that the unitary operator corresponding to the phase shift in the Grover iteration is
 \(2\ket{0}\bra{0}-I\).
 </p>
 </div>
 
-<div id="outline-container-org6f47e37" class="outline-4">
-<h4 id="org6f47e37">Proof</h4>
-<div class="outline-text-4" id="text-org6f47e37">
+<div id="outline-container-org837ceb9" class="outline-4">
+<h4 id="org837ceb9">Proof</h4>
+<div class="outline-text-4" id="text-org837ceb9">
 <p>
 Recall that the phase shift operator in Grover's algorithm does the following to the
 standard basis states:
@@ -104,9 +106,9 @@ Since \(\sprod{0}{x}=\delta_{x,0}\) this is the same as what \(2\ket{0}\bra{0}-I
 </div>
 </div>
 
-<div id="outline-container-org60a160c" class="outline-3">
-<h3 id="org60a160c">Exercise 6.2</h3>
-<div class="outline-text-3" id="text-org60a160c">
+<div id="outline-container-orgf0d7cbe" class="outline-3">
+<h3 id="orgf0d7cbe">Exercise 6.2</h3>
+<div class="outline-text-3" id="text-orgf0d7cbe">
 <p>
 Let \(\ket{\psi}=N^{-1/2}\sum_{i=0}^{N-1}\ket{k}=H^{\otimes n}\ket{0}\). Show that the operation
 \(2\ket{\psi}\bra{\psi}-I\) applied to a general state \(\sum_k\alpha_k\ket{k}\) produces
@@ -125,9 +127,9 @@ operation.
 </p>
 </div>
 
-<div id="outline-container-org0b66fbf" class="outline-4">
-<h4 id="org0b66fbf">Proof</h4>
-<div class="outline-text-4" id="text-org0b66fbf">
+<div id="outline-container-orgfee1d34" class="outline-4">
+<h4 id="orgfee1d34">Proof</h4>
+<div class="outline-text-4" id="text-orgfee1d34">
 <p>
 First of all we note that
 </p>
@@ -157,9 +159,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgf799fcf" class="outline-3">
-<h3 id="orgf799fcf">Exercise 6.3</h3>
-<div class="outline-text-3" id="text-orgf799fcf">
+<div id="outline-container-org3327766" class="outline-3">
+<h3 id="org3327766">Exercise 6.3</h3>
+<div class="outline-text-3" id="text-org3327766">
 <p>
 Show that in the \(\ket{\alpha}\), \(\ket{\beta}\) basis, we may write the Grover iteration as a rotation
 </p>
@@ -176,22 +178,22 @@ where \(\theta\) is a real number in the range \(0\) to \(\pi/2\) (assuming for 
 </p>
 
 <p>
-<a id="org0639e06"></a>
+<a id="orgbe44d3f"></a>
 \[
   \sin(\theta) = \frac{2\sqrt{M(N-M)}}{N} .
 \]
 </p>
 </div>
 
-<div id="outline-container-org18d481e" class="outline-4">
-<h4 id="org18d481e">Proof</h4>
-<div class="outline-text-4" id="text-org18d481e">
+<div id="outline-container-org09d5bc7" class="outline-4">
+<h4 id="org09d5bc7">Proof</h4>
+<div class="outline-text-4" id="text-org09d5bc7">
 <p>
 Recall that \(M\) is the number of solutions of \(f(x)=1\) and that
 </p>
 
 <p>
-<a id="org2578687"></a>
+<a id="orgea450c1"></a>
 \[
   \ket{\alpha} = \frac{1}{\sqrt{N-M}} \sum_{f(x)=0} \ket{x} ,
   \quad \text{and} \quad
@@ -212,7 +214,7 @@ Moreover
 </p>
 
 <p>
-This is consistent with the <a href="#org0639e06">formula for \(\theta\)</a> from the exercise statement, which can be
+This is consistent with the <a href="#orgbe44d3f">formula for \(\theta\)</a> from the exercise statement, which can be
 seen by the trigonometric identity \(\sin(2x)=2\sin(x)\cos(x)\). The Grover iteration \(G\) is
 the product of the inversion about \(\psi\), and the oracle \(\orac\) (inversion about
 \(\alpha\)). We ignore the workspace here.
@@ -283,18 +285,18 @@ Another way to see this (without much calculation) is to note that
 </div>
 </div>
 
-<div id="outline-container-org8f98c15" class="outline-3">
-<h3 id="org8f98c15">Exercise 6.4</h3>
-<div class="outline-text-3" id="text-org8f98c15">
+<div id="outline-container-org93791f3" class="outline-3">
+<h3 id="org93791f3">Exercise 6.4</h3>
+<div class="outline-text-3" id="text-org93791f3">
 <p>
 Give explicit steps for the quantum search algorithm, for the case of multiple solutions
 (\(1 < M \leq N/2\)).
 </p>
 </div>
 
-<div id="outline-container-org0b2906e" class="outline-4">
-<h4 id="org0b2906e">Solution</h4>
-<div class="outline-text-4" id="text-org0b2906e">
+<div id="outline-container-org258faed" class="outline-4">
+<h4 id="org258faed">Solution</h4>
+<div class="outline-text-4" id="text-org258faed">
 <p>
 The difference to the special case \(M=1\) is essentially the number of repetitions of the
 Grover iteration. Also note that \(M\) has an influence on the success probability.
@@ -312,7 +314,7 @@ of \(f(x)=1\), as in the book. Moreover let (recall that we assume \(M\leq N/2\)
 </p>
 
 <p>
-This formula comes from <a href="#org0639e06">exercise 6.3</a>. In the solution of that exercise we showed that
+This formula comes from <a href="#orgbe44d3f">exercise 6.3</a>. In the solution of that exercise we showed that
 </p>
 
 <p>
@@ -322,7 +324,7 @@ This formula comes from <a href="#org0639e06">exercise 6.3</a>. In the solution 
 </p>
 
 <p>
-Here \(\alpha\) and \(\beta\) are as in the <a href="#org2578687">solution of exercise 6.3</a>. Let us write
+Here \(\alpha\) and \(\beta\) are as in the <a href="#orgea450c1">solution of exercise 6.3</a>. Let us write
 </p>
 
 <p>
@@ -390,9 +392,9 @@ Apply \(R\) repetitions of \((2\ket{\psi}\bra{\psi}-I)U_f\):
 </div>
 </div>
 
-<div id="outline-container-org1b7aeb2" class="outline-3">
-<h3 id="org1b7aeb2">Exercise 6.5</h3>
-<div class="outline-text-3" id="text-org1b7aeb2">
+<div id="outline-container-org30965a3" class="outline-3">
+<h3 id="org30965a3">Exercise 6.5</h3>
+<div class="outline-text-3" id="text-org30965a3">
 <p>
 Show that the augmented oracle \(U_f'\) may be constructed using one application of the
 original oracle \(U_f\), and elementary quantum gates, using the extra qubit \(\ket{q}\).
@@ -405,9 +407,9 @@ reversible way.</li>
 </ul>
 </div>
 
-<div id="outline-container-orgb1bc4bd" class="outline-4">
-<h4 id="orgb1bc4bd">Proof</h4>
-<div class="outline-text-4" id="text-orgb1bc4bd">
+<div id="outline-container-orge2ed335" class="outline-4">
+<h4 id="orge2ed335">Proof</h4>
+<div class="outline-text-4" id="text-orge2ed335">
 <p>
 According to the book we have to implement \(U_f'\) as a <i>controlled</i> (by \(q\)) version of
 \(U_f\) which acts like this:
@@ -460,9 +462,9 @@ exchanging registers three and four conditioned on register one. QED.
 </div>
 </div>
 
-<div id="outline-container-orgd601090" class="outline-4">
-<h4 id="orgd601090">Proof of the remark</h4>
-<div class="outline-text-4" id="text-orgd601090">
+<div id="outline-container-org571cfdc" class="outline-4">
+<h4 id="org571cfdc">Proof of the remark</h4>
+<div class="outline-text-4" id="text-org571cfdc">
 <p>
 In the framework of (classical) reversible computation as sketched in chapter 3.2.5 in the
 book we need at least two applications of the oracle.
@@ -591,9 +593,9 @@ is a contradiction as already explained above. QED.
 </div>
 </div>
 
-<div id="outline-container-org2b3ca8b" class="outline-3">
-<h3 id="org2b3ca8b">Exercise 6.6</h3>
-<div class="outline-text-3" id="text-org2b3ca8b">
+<div id="outline-container-org81d3d3b" class="outline-3">
+<h3 id="org81d3d3b">Exercise 6.6</h3>
+<div class="outline-text-3" id="text-org81d3d3b">
 <p>
 Verify that the gates in the dotted box in the second ﬁgure of Box 6.1 perform the
 conditional phase shift operation \(2\ket{00}\bra{00}-I\), up to an unimportant global phase
@@ -601,9 +603,9 @@ factor.
 </p>
 </div>
 
-<div id="outline-container-org527f0b9" class="outline-4">
-<h4 id="org527f0b9">Proof</h4>
-<div class="outline-text-4" id="text-org527f0b9">
+<div id="outline-container-org04259e4" class="outline-4">
+<h4 id="org04259e4">Proof</h4>
+<div class="outline-text-4" id="text-org04259e4">
 <p>
 The circuit in the dotted region implements the following operator
 </p>
@@ -643,9 +645,9 @@ Up to a factor of \(-1\) (the global phase factor) this is precisely what
 </div>
 </div>
 </div>
-<div id="outline-container-org26c3167" class="outline-3">
-<h3 id="org26c3167">Exercise 6.7</h3>
-<div class="outline-text-3" id="text-org26c3167">
+<div id="outline-container-org4e20b75" class="outline-3">
+<h3 id="org4e20b75">Exercise 6.7</h3>
+<div class="outline-text-3" id="text-org4e20b75">
 <p>
 Verify that the circuits shown in Figures 6.4 and 6.5 implement the operations
 \(\exp(-\ii\ket{x}\bra{x}\Delta t)\) and \(\exp(-\ii\ket{\psi}\bra{\psi}\Delta t)\),
@@ -667,9 +669,9 @@ The minus-sign is missing in the figures of the circuits.
 </dl>
 </div>
 
-<div id="outline-container-org9e255b6" class="outline-4">
-<h4 id="org9e255b6">Proof for the first circuit</h4>
-<div class="outline-text-4" id="text-org9e255b6">
+<div id="outline-container-org6d7631e" class="outline-4">
+<h4 id="org6d7631e">Proof for the first circuit</h4>
+<div class="outline-text-4" id="text-org6d7631e">
 <p>
 Since \(\proj{x}\) is a projection (that is, an operator for which \(P^2=P\)) the series
 expansion of the exponential function implies
@@ -711,9 +713,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org59717ae" class="outline-4">
-<h4 id="org59717ae">Proof for the second circuit</h4>
-<div class="outline-text-4" id="text-org59717ae">
+<div id="outline-container-org0daee8d" class="outline-4">
+<h4 id="org0daee8d">Proof for the second circuit</h4>
+<div class="outline-text-4" id="text-org0daee8d">
 <p>
 In the same way as in the first part we see that
 </p>
@@ -748,9 +750,9 @@ does nothing. QED.
 </div>
 </div>
 
-<div id="outline-container-orgb815018" class="outline-3">
-<h3 id="orgb815018">Exercise 6.8</h3>
-<div class="outline-text-3" id="text-orgb815018">
+<div id="outline-container-org9d789a1" class="outline-3">
+<h3 id="org9d789a1">Exercise 6.8</h3>
+<div class="outline-text-3" id="text-org9d789a1">
 <p>
 Suppose the simulation step is performed to an accuracy \(O(\Delta t^r)\). Show that the
 number of oracle calls required to simulate \(H\) to reasonable accuracy is
@@ -758,9 +760,9 @@ number of oracle calls required to simulate \(H\) to reasonable accuracy is
 </p>
 </div>
 
-<div id="outline-container-orgcd25959" class="outline-4">
-<h4 id="orgcd25959">Proof</h4>
-<div class="outline-text-4" id="text-orgcd25959">
+<div id="outline-container-orgdd2e410" class="outline-4">
+<h4 id="orgdd2e410">Proof</h4>
+<div class="outline-text-4" id="text-orgdd2e410">
 <p>
 From equation (6.23) we know that the simulation time is \(t=\pi/2\alpha=O(\sqrt{N})\). Hence
 the number of steps is \(t/\Delta t = O(\Delta t\inv \sqrt{N})\). Since the error of a product
@@ -800,9 +802,9 @@ Verify Equation (6.25): Let \(c=\cos(\Delta t/2)\), \(s=\sin(\Delta t/2)\):
 </p>
 </div>
 
-<div id="outline-container-orgcbbb13c" class="outline-4">
-<h4 id="orgcbbb13c">Proof</h4>
-<div class="outline-text-4" id="text-orgcbbb13c">
+<div id="outline-container-org1b8df80" class="outline-4">
+<h4 id="org1b8df80">Proof</h4>
+<div class="outline-text-4" id="text-org1b8df80">
 <p>
 Let \(\hat{z}=(0,0,1)\) and \(\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)\). From the
 paragraph above equation (6.25) we deduce
@@ -856,9 +858,9 @@ QED.
 </div>
 </div>
 </div>
-<div id="outline-container-org248302f" class="outline-3">
-<h3 id="org248302f">Exercise 6.10</h3>
-<div class="outline-text-3" id="text-org248302f">
+<div id="outline-container-orgabda391" class="outline-3">
+<h3 id="orgabda391">Exercise 6.10</h3>
+<div class="outline-text-3" id="text-orgabda391">
 <p>
 Show that by choosing \(\Delta t\) appropriately we can obtain a quantum search algorithm
 which uses \(O(\sqrt{N})\) queries, and for which the ﬁnal state is \(\ket{x}\) exactly, that
@@ -880,7 +882,7 @@ about \(\vec{r}\) where:
 </p>
 
 <p>
-<a id="orgf4fbec9"></a>
+<a id="orgd5f4985"></a>
 \[
   \cos(\theta/2) = c^2 - s^2 \, \vec{\psi}\cdot\hat{z}
 \]
@@ -891,7 +893,7 @@ and
 </p>
 
 <p>
-<a id="org6429d32"></a>
+<a id="org45ee826"></a>
 \[
   \sin(\theta/2) \vec{r} = sc \, (\vec{\psi}+\hat{z}) + s^2 \, \vec{\psi}\times\hat{z} .
 \]
@@ -900,11 +902,11 @@ and
 <p>
 Also recall that \(\hat{z}=(0,0,1)\) and \(\vec{\psi}=(2\alpha\beta,0,\alpha^2-\beta^2)\)
 where \(\alpha=1/\sqrt{N}\) and \(\beta=\sqrt{(N-1)/N}\). Let us further elaborate on
-\(\theta\). Using one of the <a href="#orgf4fbec9">above formulas</a> we get
+\(\theta\). Using one of the <a href="#orgd5f4985">above formulas</a> we get
 </p>
 
 <p>
-<a id="orgb2acddb"></a>
+<a id="orga4e6ae7"></a>
 \[
   \cos(\theta/2) = 1 - \frac{2s}{N} .
 \]
@@ -915,7 +917,7 @@ From the Taylor expansion \(\cos(x)=1-x^2/2+O(x^4)\) of the cosine function we o
 </p>
 
 <p>
-<a id="orgadae037"></a>
+<a id="org2222b16"></a>
 \[
   \theta = 4 \sqrt{\frac{s}{N}} + O(sN\inv) .
 \]
@@ -923,11 +925,11 @@ From the Taylor expansion \(\cos(x)=1-x^2/2+O(x^4)\) of the cosine function we o
 
 <p>
 Now consider the axis of rotation. Below with \(\sim\) we mean that the LHS is equal to the
-RHS up to a real factor. Using the <a href="#org6429d32">axis-formula</a> a <a href="#orgf5b17db">short calculation</a> yields
+RHS up to a real factor. Using the <a href="#org45ee826">axis-formula</a> a <a href="#orge8fd364">short calculation</a> yields
 </p>
 
 <p>
-<a id="org8511059"></a>
+<a id="org8b43f1a"></a>
 \[
   \vec{r} \sim (\beta c, -\beta s, \alpha c) .
 \]
@@ -938,14 +940,14 @@ The squared norm of the RHS is \(1-\alpha^2s^2\). Hence
 </p>
 
 <p>
-<a id="orgf518b60"></a>
+<a id="org70516c5"></a>
 \[
   \vec{r} = (\beta c, -\beta s, \alpha c) / \sqrt{1-\alpha^2s^2} = (\beta c, -\beta s, \alpha c) + O(s^2N\inv) .
 \]
 </p>
 
 <p>
-From the <a href="#org6429d32">original formula</a> for \(\vec{r}\) we see that
+From the <a href="#org45ee826">original formula</a> for \(\vec{r}\) we see that
 \(\vec{r}\cdot\hat{z}=\vec{r}\cdot\vec{\psi}\approx\alpha\,c=O(N^{-1/2})\). This implies
 that \(\hat{z}\) indeed lies on the same orbit as \(\psi\). Let \(\omega\) be the angle of the
 rotation about \(\vec{r}\) which is needed to rotate \(\vec{\psi}\) into \(\hat{z}\). Let
@@ -985,7 +987,7 @@ Hence
 </p>
 
 <p>
-and therefore \(\omega=\pi+O(N^{-1/2})\). Using this and the <a href="#orgadae037">formula</a> for \(\theta\) we see
+and therefore \(\omega=\pi+O(N^{-1/2})\). Using this and the <a href="#org2222b16">formula</a> for \(\theta\) we see
 that the number of required \(\theta\) rotations is
 </p>
 
@@ -1005,12 +1007,12 @@ for such \(s\). QED.
 </div>
 </div>
 
-<div id="outline-container-org5230436" class="outline-4">
-<h4 id="org5230436">Appendix</h4>
-<div class="outline-text-4" id="text-org5230436">
+<div id="outline-container-orgf55163b" class="outline-4">
+<h4 id="orgf55163b">Appendix</h4>
+<div class="outline-text-4" id="text-orgf55163b">
 <p>
 Let us use <code>sympy</code> to do the boring calculations. First let us define \(\hat{z}\) and
-\(\vec{\psi}\) in a 3D cartesian coordinate system. Moreover we set up our slightly <a href="#org8511059">scaled
+\(\vec{\psi}\) in a 3D cartesian coordinate system. Moreover we set up our slightly <a href="#org8b43f1a">scaled
 version</a> <code>r1</code> of \(\vec{r}\).
 </p>
 
@@ -1026,8 +1028,8 @@ version</a> <code>r1</code> of \(\vec{r}\).
 </div>
 
 <p>
-<a id="orgf5b17db"></a>
-Here we check that our <a href="#orgf518b60">formula</a> for \(\vec{r}\) is valid:
+<a id="orge8fd364"></a>
+Here we check that our <a href="#org70516c5">formula</a> for \(\vec{r}\) is valid:
 </p>
 
 <div class="org-src-container">
@@ -1045,18 +1047,18 @@ PASSED
 </div>
 </div>
 </div>
-<div id="outline-container-orgeabcbae" class="outline-3">
-<h3 id="orgeabcbae">Exercise 6.11 (Multiple solution continuous quantum search)</h3>
-<div class="outline-text-3" id="text-orgeabcbae">
+<div id="outline-container-orgbc0ccdc" class="outline-3">
+<h3 id="orgbc0ccdc">Exercise 6.11 (Multiple solution continuous quantum search)</h3>
+<div class="outline-text-3" id="text-orgbc0ccdc">
 <p>
 Guess a Hamiltonian with which one may solve the continuous time search problem in the
 case where the search problem has \(M\) solutions.
 </p>
 </div>
 
-<div id="outline-container-org59551db" class="outline-4">
-<h4 id="org59551db">Solution</h4>
-<div class="outline-text-4" id="text-org59551db">
+<div id="outline-container-org06b485f" class="outline-4">
+<h4 id="org06b485f">Solution</h4>
+<div class="outline-text-4" id="text-org06b485f">
 <p>
 My Ansatz looks as follows
 </p>
@@ -1096,7 +1098,7 @@ into \(\ket{\chi}\):
 </p>
 
 <p>
-Thus after time \(t=\pi/\alpha\) the system is rotated in a state which when measured
+Thus after time \(t=\pi/2\alpha\) the system is rotated in a state which when measured
 produces a solution of \(f(x)=1\) (equal probability for each possibility). So what is the
 difference? Something must be different, right? I am glad you asked! Actually <i>so far
 nothing</i> is different!
@@ -1120,7 +1122,7 @@ similar to the one in the book. It is easiest to just follow the <a href="#exerc
 </p>
 
 <p>
-The angle \(\theta\) of rotation is determined by (c.f. <a href="#orgb2acddb">the case</a> for \(M=1\))
+The angle \(\theta\) of rotation is determined by (c.f. <a href="#orga4e6ae7">the case</a> for \(M=1\))
 </p>
 
 <p>
@@ -1157,9 +1159,9 @@ mind that we used \(M=o(N)\) in this analysis!
 </div>
 </div>
 </div>
-<div id="outline-container-orgf3fee83" class="outline-3">
-<h3 id="orgf3fee83">Exercise 6.12 (Alternative Hamiltonian for quantum search)</h3>
-<div class="outline-text-3" id="text-orgf3fee83">
+<div id="outline-container-org2deeabd" class="outline-3">
+<h3 id="org2deeabd">Exercise 6.12 (Alternative Hamiltonian for quantum search)</h3>
+<div class="outline-text-3" id="text-org2deeabd">
 <p>
 Suppose
 </p>
@@ -1179,9 +1181,9 @@ with high probability.</li>
 </ol>
 </div>
 
-<div id="outline-container-orgcf7ca62" class="outline-4">
-<h4 id="orgcf7ca62">Proof of (1)</h4>
-<div class="outline-text-4" id="text-orgcf7ca62">
+<div id="outline-container-orge63b532" class="outline-4">
+<h4 id="orge63b532">Proof of (1)</h4>
+<div class="outline-text-4" id="text-orge63b532">
 <p>
 Let \(\ket{\psi}=\alpha\ket{x}+\beta\ket{y}\). In the basis \((\ket{x},\ket{y})\)
 </p>
@@ -1212,9 +1214,9 @@ after time \(t=\pi/2=O(1)\). QED.
 </div>
 </div>
 
-<div id="outline-container-org236aa97" class="outline-4">
-<h4 id="org236aa97">Solution to (2)</h4>
-<div class="outline-text-4" id="text-org236aa97">
+<div id="outline-container-org695687f" class="outline-4">
+<h4 id="org695687f">Solution to (2)</h4>
+<div class="outline-text-4" id="text-org695687f">
 <p>
 First of all note that the two summands of \(H\) (I mean \(\ket{x}\bra{\psi}\) and
 \(\ket{\psi}\bra {x}\)) are not self adjoint. Hence their exponentials
@@ -1231,5 +1233,787 @@ course. Not sure if this is the intended meaning of the exercise though.
 </div>
 </div>
 </div>
+<div id="outline-container-exercise-6.13" class="outline-3">
+<h3 id="exercise-6.13">Exercise 6.13</h3>
+<div class="outline-text-3" id="text-exercise-6.13">
+<p>
+Consider a classical algorithm for the counting problem which samples uniformly and
+independently \(k\) times from the search space, and let \(X_1,\ldots,X_k\) be the results of
+the oracle calls, that is, \(X_j=1\) if the \(j\)​th oracle call revealed a solution to the
+problem, and \(X_j=0\) if the \(j\)​th oracle call did not reveal a solution to the
+problem. This algorithm returns the estimate \(S=\frac{N}{k}\sum_{j=1}^{k}X_j\) for the number
+of solutions to the search problem. Show that the standard deviation of \(S\) is
+\(\Delta\,S=\sqrt{M(N-M)/k}\). Prove that to obtain a probability at least \(3/4\) of estimating \(M\)
+correctly to within an accuracy \(\sqrt{M}\) for all values of \(M\) we must have
+\(k=\Omega(N)\).
+</p>
 </div>
-<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.91 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
+
+<div id="outline-container-orgcfdbc31" class="outline-4">
+<h4 id="orgcfdbc31">Proof</h4>
+<div class="outline-text-4" id="text-orgcfdbc31">
+</div>
+<div id="outline-container-orgc70198a" class="outline-5">
+<h5 id="orgc70198a">Computing the standard deviation \(\Delta\,S\)</h5>
+<div class="outline-text-5" id="text-orgc70198a">
+<p>
+Let us denote by \(P(\ldots)\) and \(E(\ldots)\) the probability of some event and the
+expectation of some random variable.
+</p>
+
+<p>
+According to the exercise statement the random variables \(X_i\) are <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables">iid</a>. Whenever the index
+\(j\) is irrelevant we denote by \(X\) any of the \(X_j\). We have
+</p>
+
+<p>
+\[
+  p := P(X=1) = \frac{M}{N}, \quad P(X=0) = 1-p = \frac{N-M}{N} .
+\]
+</p>
+
+<p>
+The mean value of the \(X_j\) is
+</p>
+
+<p>
+\[
+  \mu := E(X) = p\cdot 1 + (1-p)\cdot 0 = \frac{M}{N} = p .
+\]
+</p>
+
+<p>
+Hence, by linearity \(E(S)=N\mu=M\). This justifies \(S\) as an estimator for \(M\). The variance is
+</p>
+
+\begin{align*}
+  \Delta\,S^2 = E((S-M)^2)
+  &= \frac{N^2}{k^2} E((\sum_j X_j-\mu)^2) \\
+  &= \frac{N^2}{k^2} \sum_j E((X-\mu)^2) \\
+  &= \frac{N^2}{k} E(X-2\mu X+\mu^2)) \\
+  &= \frac{N^2}{k} p(1-p) \\
+  &= \frac{M(N-M)}{k} .
+\end{align*}
+
+<p>
+For the second equality we use that due to independence \(E(X_iX_j)=E(X_i)E(X_j)\) for
+\(i\neq\,j\). For the third equality we use \(X^2=X\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf5ea7fe" class="outline-5">
+<h5 id="orgf5ea7fe">Proof of an upper bound for \(k\)</h5>
+<div class="outline-text-5" id="text-orgf5ea7fe">
+<p>
+The exercise does not really ask for this but we do it anyway. For reasons to become clear
+at the end we consider the accuracy \(C\sqrt{M}\) (instead of just \(\sqrt{M}\)) for some
+\(C>0\). By <a href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality">Chebychev's inequality</a> for any \(\lambda > 0\):
+</p>
+
+<p>
+\[
+  P(\abs{S-M} \geq \lambda\Delta S) \leq \frac{1}{\lambda^2} .
+\]
+</p>
+
+<p>
+Choosing \(\lambda\) such that \(\lambda\Delta S=C\sqrt{M}\) yields
+</p>
+
+<p>
+\[
+  P(\abs{S-M} \geq \sqrt{M}) \leq \frac{1}{\lambda^2} = \frac{N-M}{C^2k} .
+\]
+</p>
+
+<p>
+Hence \(k=4N/C^2\) is sufficient for the LHS to be smaller than \(1-3/4=1/4\). This is the
+desired upper bound. QED.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>Clearly the upper bound for the case \(C\leq2\) is not really useful. For those
+\(C\) we should either hope to improve our estimate or just systematically visit all \(N\)
+points in the search space (which yields the exact count with certainty instead of an
+estimate just sometimes!).</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-orgc2450ec" class="outline-5">
+<h5 id="orgc2450ec">Proof of \(k=\Omega(N)\)</h5>
+<div class="outline-text-5" id="text-orgc2450ec">
+<p>
+We assume that \(N\) is even. This simplifies the proof and is a reasonable assumption in
+our context since the quantum counting algorithm even assumes that \(N\) is a power of two.
+</p>
+
+<p>
+Assume \(k\) is chosen in a way that
+</p>
+
+<p>
+<a id="orgea4a4fe"></a>
+\[
+  P(\abs{S-M} \leq \sqrt{M}) \geq \frac{2}{3}
+\]
+</p>
+
+<p>
+holds for all \(M\). In particular this must be satisfied for \(M=N/2\). Let
+\(Y=\sum_jX_j\). Then
+</p>
+
+<p>
+\[
+  \abs{S-M} \leq \sqrt{M} \text{ with } M=N/2 \quad \Longleftrightarrow \quad
+  \frac{k}{2} - \frac{k}{\sqrt{2N}} \leq Y \leq \frac{k}{2} + \frac{k}{\sqrt{2N}}
+\]
+</p>
+
+<p>
+Note that
+</p>
+
+<p>
+<a id="orgc286e59"></a>
+\[
+  p_y := P(Y=y) = \binom{k}{y} 2^{-k}
+\]
+</p>
+
+<p>
+Let \(\alpha=k/\sqrt{2N}\). The <a href="#orgea4a4fe">target probability requirement</a> is equivalent to
+</p>
+
+<p>
+<a id="org8e322fb"></a>
+\[
+  \sum_{k/2-\alpha\leq y \leq k/2+\alpha} p_y \geq \frac{3}{4} .
+\]
+</p>
+
+<p>
+Recall that in our analysis we only consider asymptotic estimates for \(N\to\infty\). It is
+not hard to see that the previous inequality readily implies \(k\to\infty\) as
+\(N\to\infty\). This is a first step to prove \(k=\Omega(N)\). Now let us analyze the LHS more
+deeply. From the <a href="#orgc286e59">formula for</a> \(p_y\) together with Stirling's formula we see that for the
+\(p_y\) occurring in the LHS (abbreviating \(s=y/k\))
+</p>
+
+\begin{align*}
+  p_y
+  &= \frac{\sqrt{2\pi k}(k/e)^k}{\sqrt{2\pi y}(y/e)^y \sqrt{2\pi (k-y)}((k-y)/e)^{k-y}} (1 + o(1)) 2^{-k} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{2^{-k}}{(1-s)^{k-y} s^y} (1 + o(1))
+\end{align*}
+
+<p>
+Let us define \(\varepsilon\) by \(y=(k+\varepsilon k)/2\). By assumption \(\varepsilon\leq\sqrt{2/N}\). Hence
+</p>
+
+\begin{align*}
+  p_y &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon)^{k-y} (1+\varepsilon)^y} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon)^{(1-\varepsilon)k/2} (1+\varepsilon)^{(1+\varepsilon)k/2}} \\
+  &= \sqrt{\frac{2}{\pi k}} \cdot \frac{1 + o(1)}{(1-\varepsilon^2)^{k/2}} \cdot
+     \left[ \frac{1-\varepsilon}{1+\varepsilon} \right]^{\varepsilon k/2} .
+\end{align*}
+
+<p>
+Let us assume that there is a special sequence of values for \(k\) which is \(o(N)\) while
+still satisfying the <a href="#org8e322fb">probability estimate</a> (the proof is done if we can rule out this
+possibility). Using \((1\pm\delta)^{o(\delta\inv)}=1+o(1)\) if \(\delta\to0\) (this is related
+to the well-known formula \(e^x=\lim_{n\to\infty}(1+\frac{x}{n})^n\)) we obtain
+</p>
+
+<p>
+\[
+  p_y = \sqrt{\frac{2}{\pi k}} \cdot (1 + o(1))
+\]
+</p>
+
+<p>
+for \(k\) from the <i>special</i> sequence. Under these assumptions the LHS of the <a href="#org8e322fb">probability
+estimate</a> is not large enough:
+</p>
+
+<p>
+\[
+  \sum_{k/2-\alpha\leq y \leq k/2+\alpha} p_y = O\left(k^{-1/2}\cdot \frac{k}{\sqrt{N}}\right)
+  = O\left(\sqrt{\frac{k}{N}}\right) = o(1) \leq \frac{3}{4} \text{ eventually} .
+\]
+</p>
+
+<p>
+This is a contradiction! Hence such a special sequence does not exist. Thus
+\(k=\Omega(N)\). QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7fd03ac" class="outline-3">
+<h3 id="org7fd03ac">Exercise 6.14</h3>
+<div class="outline-text-3" id="text-org7fd03ac">
+<p>
+Prove that any classical counting algorithm with probability at least \(3/4\) for estimating
+\(M\) correctly to within an accuracy \(c\sqrt{M}\) for some constant \(c\) and for all values of \(M\)
+must make \(\Omega(N)\) oracle calls.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>This is <i>vaguely</i> related to the fact that the sample mean is a so called
+<i>Uniformly Minimum Variance Unbiased Estimator</i> (UMVUE) for the mean value parameter of
+the Bernoulli distribution. See <a href="https://stats.libretexts.org/Bookshelves/Probability_Theory/Probability_Mathematical_Statistics_and_Stochastic_Processes_(Siegrist)/07%3A_Point_Estimation/7.05%3A_Best_Unbiased_Estimators">libretexts.org</a>.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org800af70" class="outline-4">
+<h4 id="org800af70">Proof</h4>
+<div class="outline-text-4" id="text-org800af70">
+<p>
+The exercise is a little bit vague in my opinion - but that is OK. If we speak about
+probabilities there must be a probability distribution somewhere. The exercise doesn't
+explicitly define one. Sometimes the distribution is given implicitly. In this case I
+think there are at least two options:
+</p>
+
+<ul class="org-ul">
+<li>Postulate a probability distribution on the inputs.</li>
+<li>Assume that the oracle calls are at randomly selected arguments.</li>
+</ul>
+
+<p>
+I solved the exercise for both interpretations.
+</p>
+</div>
+
+<div id="outline-container-org99c306e" class="outline-5">
+<h5 id="org99c306e">Interpretation 1</h5>
+<div class="outline-text-5" id="text-org99c306e">
+<p>
+For a given \(N\), any such algorithm does essentially the following:
+</p>
+
+<p>
+<a id="orgc627b8a"></a>
+</p>
+<ol class="org-ol">
+<li>Input: An oracle computing a function \(f:\{0,\ldots,N-1\}\to\{0,1\}\).</li>
+<li>Determine \(\vec{X}=(X_1,\ldots,X_k)\), where \(X_j=f(N_j)\) for some \(N_j < N\).</li>
+<li>Compute \(h(\vec{X})\) and return the result.</li>
+</ol>
+
+<p>
+As we are interested in the asymptotics of \(k\) as \(N\to\infty\) we actually have to take
+into account sequences of algorithms which might be specifically tailored to each value of
+\(N\). In particular the sequence of algorithms (their "source code") might not be
+computable. This does not complicate the analysis at all (nothing we do here depends on
+computability - measure theory is the framework which governs the math here) but it is
+worth pointing out since the exercise is formulated with computing in mind.
+</p>
+
+<p>
+Of course, a concrete algorithm might not actually separate steps 2 and 3 but it is always
+possible to change the algorithm so that it behaves like that by essentially running it
+twice: the first time we just remember the \(X_j\) and the second time we plugin the already
+computed values for \(X_j\). Of course this is a bit dumb but it simplifies our analysis.
+</p>
+
+<p>
+The \(N_j\) need not be constant. In fact, any \(N_j\) might depend on anything what previously
+was computed, including already known \(X_{j'}\). We may assume that the \(N_j\) are all
+different. If this was not the case we may change the algorithm by inserting a subroutine
+which checks if \(N_j\) already appeared and just retrieves a copy of the corresponding
+\(X_{j'}\). In particular \(k\) might also depend on the course of computation and hence is
+not necessarily just a function of \(N\). For that reason \(h\) essentially takes a list of
+\(X_j\) as input and not just a fixed size vector.
+</p>
+
+<p>
+As the algorithms are supposed to be arbitrary they might in particular be deterministic
+(meaning that they compute a <i>function</i> mapping oracles to integers). In that case it
+wouldn't even make sense to speak about a probability of \(3/4\) that something happens! To
+introduce randomness to the setting one could postulate a probability distribution over the
+inputs. Note that under this assumption \(M\) is a random variable.
+</p>
+
+<p>
+One possible distribution is the uniform distribution over all \(f\) (all possible \(2^N\)
+oracles occur with the same probability \(2^{-N}\)).
+</p>
+
+<p>
+<a id="org495190f"></a>
+Assuming a uniform distribution over all possible \(f\) (the input of the algorithm) we may
+deduce that the \(X_j\) are <b>independent and identically distributed (iid)</b> according the
+Bernoulli distribution with parameter \(p=M/N\) (as in <a href="#exercise-6.13">exercise 6.13</a>). For the independence
+it is important that the \(N_j\) are all different.
+</p>
+
+<p>
+We show now that in that case the exercise statement is wrong (at least for sufficiently
+large \(c\))! In fact just estimating \(N/2\) regardless of the input (\(f\)) does the job! The
+reason for this is that most oracles just have \(M=N/2+O(N^{-1/2})\) under this
+distribution.
+</p>
+
+<dl class="org-dl">
+<dt>Theorem</dt><dd>Assuming a uniform distribution over all possible \(f\) the algorithm <code>Return
+  N/2</code> is accurate within \(cN^{-1/2}\) with probability \(1-o(1)\) as \(N\to\infty\) and
+\(c\to\infty\). In particular no oracle calls are needed.</dd>
+</dl>
+
+<p>
+<a id="org744951c"></a>
+</p>
+<dl class="org-dl">
+<dt>Proof</dt><dd><p>
+This statement follows from the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>. Let us proof it
+directly - just for fun (it is not difficult).
+</p>
+
+<p>
+Let us abbreviate \(R=O(m\inv + (N-m)\inv)\) in the following. The probability that the
+number \(M\) of solutions to \(f(x)=1\) (for a random \(f\)) is \(m\) is
+</p>
+
+<p>
+\[
+  P(M=m) = \binom{N}{m} 2^{-N} .
+  \]
+</p>
+
+<p>
+A straightforward calculation using Stirling's formula
+\(n!=\sqrt{2\pi\,n}(n/e)^n(1+O(n\inv))\) shows
+</p>
+
+<p>
+\[
+  P(M=m) = \frac{N\inv}{\sqrt{2\pi\sigma^2}} \left[ 2(1-p)^{1-p} p^p \right]^{-N} \; (1 + R) .
+  \]
+</p>
+
+<p>
+Here we set \(p=m/N\) and \(\sigma^2=\frac{p(1-p)}{N}\). Let us define the entropy function
+\(H(p)=-p\ln(p)-(1-p)\ln(1-p)\). In case you do not know how this function looks like you
+should search the internet for a plot. <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">Wikipedia</a> should have one. Plugging in the
+entropy function we get
+</p>
+
+<p>
+\[
+  P(M=m) = \frac{N\inv}{\sqrt{2\pi\sigma^2}} e^{-(H(p) - \ln(2))N} \; (1 + R) .
+  \]
+</p>
+
+<p>
+Observe that \(H\) is maximal at \(p=1/2\). Moreover \(H(1/2)=\ln(2)\), \(H'(1/2)=0\), and
+\(H''(1/2)=4\). Hence for \(p=\frac{1}{2}+\frac{\delta}{\sqrt{2}}\) with small
+\(\delta=O(1/\sqrt{N})\) and \(d\delta=O(N\inv)\) we have, setting
+\(\sigma_0^2=\frac{1}{4N}=\sigma+O(N\inv)\),
+</p>
+
+<p>
+\[
+  P\left(\frac{1}{2} + \frac{\delta}{\sqrt{2}} - d\delta
+    < \frac{M}{N} <
+    \frac{1}{2} + \frac{\delta}{\sqrt{2}} + d\delta \right)
+  = \frac{2d\delta}{\sqrt{2\pi\sigma_0^2}} e^{-\frac{\delta^2}{2\sigma_0^2}} \; (1 + O(N\inv)) .
+  \]
+</p>
+
+<p>
+This implies that the probability distribution of \(M\) for \(N\to\infty\) is close to the
+normal distribution with mean \(N/2\) and standard deviation \(\sqrt{N}/2\). In particular
+almost all of the probability mass lies within a few multiplies of \(\sqrt{N}\) around
+\(N/2\). QED.
+</p></dd>
+</dl>
+
+<p>
+Let us investigate a different class of probability distributions.
+</p>
+
+<p>
+Let \(\rho:[0,1]\to[0,\infty)\) be a (fixed) smooth function (which does not depend on \(N\))
+with \(\int_0^1\rho(x)dx=1\). Consider a probability distribution satisfying
+</p>
+
+<p>
+\[
+  P(M=m) = N\inv \rho(m/N) \; (1 + O(N\inv))
+\]
+</p>
+
+<p>
+and such that oracles having the same number \(m\) of solutions have the same probability
+(<i>symmetry</i> condition). One possibile density function is e.g. \(\rho(p)=1\).
+</p>
+
+<p>
+The <a href="#org495190f">previous distribution</a> <i>does</i> satisfy the symmetry condition but not the part about the
+\(N\)​-independence of \(\rho\) as the proof above showed that the corresponding \(\rho\)
+approached the delta distribution at \(1/2\) (got narrower with increasing \(N\)).
+</p>
+
+<p>
+For these distributions one can readily see that <a href="https://en.wikipedia.org/wiki/Conditional_probability_distribution">conditioned</a> on \(M=m\) (for any \(m\)) the
+\(X_j\) are again iid according to the Bernoulli distribution with parameter \(p=m/N\). The
+symmetry condition is the reason for this (again).
+</p>
+
+<dl class="org-dl">
+<dt>Theorem</dt><dd><a id="orgc202c3b"></a> Let \(c>0\) and \(\beta > 1/2\). Consider the just
+discussed probability distribution on the inputs (the oracles). Assume that for any \(N\)
+and a randomly chosen \(f\) the algorithms determine \(M\) within an accuracy \(c\sqrt{M}\)
+with probability at least \(\beta\). Then \(k=\Omega(N)\) as \(N\to\infty\).</dd>
+
+<dt>Proof</dt><dd><p>
+Let us write \(a\pm b\) for the interval \([a-b,a+b)\). Recall that \(M\) is the
+number of solutions of the input \(f\) and hence is a random variable.
+</p>
+
+<p>
+Without loss of generality we assume that \(\rho\) is compactly supported in \((0,1)\),
+i.e. there is an \(\varepsilon > 0\) such that \(\rho\) is zero outside of
+\([\varepsilon,1-\varepsilon]\). If this was not already the case we could just replace
+\(\rho\) by some "trimmed" (and normalized) version \(\rho_\varepsilon\). If we choose
+\(\varepsilon\) small enough the success probability \(\beta_{\varepsilon}\) of the
+algorithm is close to \(\beta\) (uniformly for all \(N\)) and hence larger than \(1/2\).
+</p>
+
+<p>
+Let
+</p>
+
+<p>
+\[
+  \beta_m = P \left(h(\vec{X}) \in m \pm c\sqrt{m} \; \middle| \; M=m \right)
+  \]
+</p>
+
+<p>
+By assumptions we have \(\sum_m\beta_m=\beta > 1/2\). Here and in the following we implicitly
+assume that \(m\) is in the "positive probability zone" (in particular bounded away from \(0\)
+and \(N-1\)). For example in the sum \(\sum_m\beta_m\) we may assume
+</p>
+
+<p>
+\[ \varepsilon N \leq m \leq (1 - \varepsilon) N . \]
+</p>
+
+<p>
+For other expressions the "positive probability zone" might be slightly extendend to the
+left or right (or both). This comes in handy next since it avoids "index overflow". Let
+</p>
+
+<p>
+\[
+  \beta'_m = P \left(h(\vec{X}) \in m \pm c\sqrt{m} \; \middle| \; M = m + c\sqrt{m} \right)
+  \]
+</p>
+
+<p>
+Clearly the corresponding events imply the failure of the algorithm (accuracy is too
+bad). Hence \(\sum_m\beta'_m\leq1-\beta < 1/2\). Let us summarize what we have so far:
+</p>
+
+<p>
+<a id="org714bbae"></a>
+\[
+  \sum_m\beta_m=\beta > 1/2 \quad \text{and} \quad \sum_m\beta'_m\leq1-\beta < 1/2 .
+  \]
+</p>
+
+<p>
+Recall that we have to show \(k=\Omega(N)\). Using proof by contradiction and possibly
+restricting to an infinite subset of the values for \(N\) of we may assume that \(k=o(N)\)
+in the following.
+</p>
+
+<p>
+Our goal is to show that under this assumption \(\beta'_m\sim\beta_m\)
+(i.e. \(\beta'_m/\beta_m\to1\)) as \(N\to\infty\) uniformly with respect to \(m\). This is the
+desired contradition to what we <a href="#org714bbae">know already</a>.
+</p>
+
+<p>
+Let \(S=\sum_{j=1}^k X_j\) and \(p=m/N\). By our assumption on the probability distribution
+of \(f\) we have that the \(X_j\) are Bernoulli distributed with parameter \(p\) and hence
+</p>
+
+<p>
+\[
+  P(S=s|M=m) = \binom{k}{s} p^s (1-p)^{k-s} .
+  \]
+</p>
+
+<p>
+(i.e. \(S\) satisfies a binomial distribution if conditioned on fixed \(M\).) Moreover the
+symmetry condition on the distribution further implies that
+</p>
+
+<p>
+\[
+  P(\vec{X}=x | S=s \cap M=m)
+  \]
+</p>
+
+<p>
+is the same for all \(x\) with \(\sum_jx_j=s\) (and \(0\) otherwise). One could argue that
+this condition <i>means</i> that (for fixed \(M\)) no algorithm has any chance of extracting
+<i>any</i> information beyond \(s\) from \(\vec{X}\) since it is not able to generate a
+probability distribution with less entropy.
+</p>
+
+<p>
+To prove \(\beta'_m\sim\beta_m\) it is sufficient to prove that
+\(P(\vec{X}=x|M=m)\,\sim\,P(\vec{X}=x|M=m+c\sqrt{m})\) (both uniformly with respect to
+\(m\)). To prove the latter, by the just discussed consequences of the symmetry property,
+it is sufficient to prove
+</p>
+
+<p>
+<a id="orgc340a66"></a>
+\[
+  P(S=s|M=m)\,\sim\,P(S=s|M=m+c\sqrt{m}) ,
+  \]
+</p>
+
+<p>
+uniformly with respect to \(m\). Actually we only prove this for "most" \(s\) (in the sense
+that their probability sums to a value asymptotically approaching \(1\) (for both values
+of \(M\))), but this is sufficient. Let \(R=O(1/s)+O(1/(k-s))\), \(q=s/k\), and
+\(\sigma_q^2=q(1-q)/k\). Let \(H(q)=-q\ln(q)-(1-q)\ln(1-q)\) and define
+</p>
+
+<p>
+\[
+  E(q,p) = H(q) + q\ln(p) + (1-q)\ln(1-p) .
+  \]
+</p>
+
+<p>
+A straightforward calculation using Stirling's formula
+\(n!=\sqrt{2\pi\,n}(n/e)^n(1+O(n\inv))\) shows
+</p>
+
+\begin{align*}
+P(S=s|M=m)
+&= \binom{k}{s} p^s (1-p)^{k-s} \\
+&= \frac{k\inv}{\sqrt{2\pi\sigma_q^2}} \cdot \left[q^q(1-q)^{1-q}\right]^{-k}
+   \cdot \left[p^q(1-p)^{1-q}\right]^k \cdot (1 + R) \\
+&= \frac{k\inv}{\sqrt{2\pi\sigma_q^2}} \cdot e^{kE(q,p)} \cdot (1 + R) .
+\end{align*}
+
+<p>
+Observe that at \(q=p\) we have \(E=\partial_qE=0\) and
+\(\frac{1}{2}\partial_q^2E=-1/(2\sigma_p^2)\). Recall that we are <i>essentially</i> only
+interested in \(p\in[\varepsilon,1-\varepsilon]\) (this is not entirely correct but the
+details do not matter). Note that \(\sigma_q=\sigma_p(1+O(k^{-1/2}))\) for
+\(q=p+O(k^{-1/2})\). Hence the probability concentrates around \(s=kp\pm O(\sqrt{k})\) and
+for these \(s\) we have:
+</p>
+
+<p>
+\[
+  P(S=s|M=m) = \frac{k\inv}{\sqrt{2\pi\sigma_p^2}} \cdot e^{-\frac{(q-p)^2}{2\sigma_p^2}} \cdot (1 + o(1)) .
+  \]
+</p>
+
+<p>
+Compare this with the normal distribution. We essentially proved the central limit
+theorem in a special case.
+</p>
+
+<p>
+Recall that \(q=s/k\) and \(p=m/N\). Also observe that \(\sigma_p^2=\Theta(k\inv)\) and that
+\(p':=p+c\sqrt{m}/N=p+o(k^{-1/2})\). Using this in the just derived asymptotic formula for
+\(P(S=s|M=m)\) yields the <a href="#orgc340a66">claim</a>. QED.
+</p></dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-org36e1950" class="outline-5">
+<h5 id="org36e1950">Interpretation 2</h5>
+<div class="outline-text-5" id="text-org36e1950">
+<p>
+Let us offer an interpretation which is analogous to <a href="#exercise-6.13">exercise 6.13</a>. Let again consider an
+<a href="#orgc627b8a">algorithm as sketched in the previous interpretation</a>. But now we assume <i>more
+specifically</i> that the \(N_j\) are just sampled uniformly at random. In particular \(k\) is
+deterministic and only depends on \(N\) (not on the oracle).
+</p>
+
+<ol class="org-ol">
+<li>Input: An oracle computing a function \(f:\{0,\ldots,N-1\}\to\{0,1\}\).</li>
+<li>Compute \(k=k(N)\).</li>
+<li>Determine \(\vec{X}=(X_1,\ldots,X_k)\) where \(X_j=f(N_j)\) and the \(N_j\) are sampled
+uniformly at random on the input space.</li>
+<li>Compute \(h_k(\vec{X})\) and return the result.</li>
+</ol>
+
+<p>
+In this case we can consider individual oracles and need not consider probability
+distributions over them. The \(X_j\) are again iid according to the Bernoulli distribution
+with parameter \(p=M/N\) where \(M\) is the number of solutions for the oracle under
+consideration.
+</p>
+
+<p>
+We note again that we consider a <i>sequence</i> of algorithms (as we are interested in the
+asymptotics \(N\to\infty\)).
+</p>
+
+<dl class="org-dl">
+<dt>Theorem</dt><dd>Consider a sequence of algorithms as discussed above. Let \(c>0\) and
+\(\alpha>0\). Assume that for any oracle the responsible algorithm (the one with the
+matching value for \(N\)) computes \(M\) correctly within accuracy \(c\sqrt{M}\) with
+probability at least \(\alpha\). Then the number of oracle calls is \(k=\Omega(N)\).</dd>
+
+<dt>Proof</dt><dd><p>
+First of all we note that if \(M\) is correct within accuracy \(c\sqrt{M}\) it is
+also correct within \(c\sqrt{N}\). From here on we only assume the latter. Moreover let us
+write \(a\,\pm\,b\) for the interval \([a-b,a+b)\).
+</p>
+
+<p>
+<a id="orgdc2ef0a"></a>
+Without loss of generality we may assume that \(k=o(N)\) and have to deduce a
+contradiction from that. If this were not true we might consider a subsequence \((N_i)\)
+such that the corresponding \(k_i=k_i(N_i)\) satisfy \(k_i=o(N_i)\).
+</p>
+
+<p>
+<a id="org43981b3"></a> Let \(r=r(k,N)\) be such that \(r\to\infty\) in a way such that
+\(r^2k=o(N)\). This is possible due to \(k=o(N)\). Consider a set \(\{f_1,\ldots,f_r\}\) of
+oracles with corresponding
+</p>
+
+<p>
+\[ p_i = \frac{1}{2} + \frac{2ic_i}{\sqrt{N}} \]
+</p>
+
+<p>
+so that \(M_i=Np_i\) is the number of solutions of \(f_i(x)=1\). Here \(c_i\) the smallest
+\(c_i\geq c\) so that \(M_i\) is an integers. Note that \(c_i=c+O(N^{-1/2})\). It is <i>not</i>
+essential that these \(p_i\) are close to \(1/2\). The important thing is that they are
+close together (the width is \(o(1/\sqrt{k})\)) and bounded away from \(p=0\) and
+\(p=1\). Moreover we will see below that it is also not really important that
+\(r\to\infty\), instead it is sufficient that we can choose it arbitrary large, at least
+for large \(N\).
+</p>
+
+<p>
+Observe that if \(f_i\) is the input oracle the \(X_j\) are iid and Bernoulli distributed
+with parameter \(p_i\). Let us denote by \(P_{p_i}\) the corresponding probability
+measure. Let us write
+</p>
+
+<p>
+\[ I_i = p_i \pm \frac{c}{\sqrt{N}} \]
+</p>
+
+<p>
+By definition of the \(p_i\) these intervals are disjoint. By assumptions of the theorem
+we have
+</p>
+
+<p>
+\[
+  P_{p_i} \left( h(\vec{X}) \in I_i \right) \geq \alpha > 0 .
+  \]
+</p>
+
+<dl class="org-dl">
+<dt>Lemma</dt><dd><p>
+Let \(\beta\in(0,1)\). There is a constant \(\delta\in(0,1]\) such that for all
+\(N\) the following holds: For each \(k=k(N)\) there is a set \(U_k\subseteq\{0,1\}^k\) such
+that for all the \(p_i\)
+</p>
+
+<p>
+\[
+    P_{p_i}(\vec{X} \in U_k) \geq \beta .
+    \]
+</p>
+
+<p>
+and for any combination \(p_i\), \(p_j\) and any \(x\)
+</p>
+
+<p>
+\[ P_{p_i}(\vec{X}=x)\geq\delta P_{p_j}(\vec{X}=x) . \]
+</p></dd>
+
+<dt>Proof</dt><dd><p>
+Let \(Y=\sum_{j=1}^kX_j\). For any \(f_i\) by the central limit theorem the
+probability distribution of \(Y\) approaches the normal distribution with mean
+\(M_i/2=\frac{1}{2}+O(\sqrt{N})\) and variance \(O(k)\) (we have essentially proven this
+directly in the <a href="#orgc202c3b">proof of another theorem</a>).
+</p>
+
+<p>
+<a href="#org43981b3">Since</a> \(r/\sqrt{N}=o(1/\sqrt{k})\) the widths of the corresponding gaussian bell curves
+are much larger than any of the \(p_i\) are away from each other - at least for large
+\(N\). Moreover they are roughly the same and the convergence is uniform. Hence
+</p>
+
+<p>
+\[
+    U_k = \left\{x\in\{0,1\}^k \, \middle| \; \sum_j x_j \in \frac{k}{2} \pm c_0 \sqrt{k} \right\}
+    \]
+</p>
+
+<p>
+for a suitably chosen \(c_0\) (independent of \(k\) or \(N\)) does the job for all \(k\) large
+enough (\(\delta\) could even be chosen as close to \(1\) as we like). For all smaller \(k\)
+we can simply choose \(U_k=\{0,1\}^k\) because the condition involving \(\delta\) is
+trivially true by finiteness for a sufficiently small \(\delta\). QED.
+</p></dd>
+</dl>
+
+<p>
+Let \(U_k\) be as in the lemma for \(\beta\) chosen such that
+\(\gamma=\alpha+\beta-1\,>\,0\). Moreover let
+</p>
+
+<p>
+\[
+    U_k(j) = h(\vec{X}) \in I_j \cap \vec{X} \in U_k .
+    \]
+</p>
+
+<p>
+Then
+</p>
+
+<p>
+\[ P_{p_i}(U_k(j)) \geq \alpha + \beta - 1 = \gamma > 0 . \]
+</p>
+
+<p>
+By the condition in the lemma involving \(\delta\) and the disjointness of the \(I_j\) we
+see that
+</p>
+
+<p>
+\[
+  P_{p_0} \left( \bigcup_{j=1}^r U_k(j) \right) \geq r\gamma\delta .
+  \]
+</p>
+
+<p>
+The LHS is bounded by \(1\). On the other hand the RHS tends to \(\infty\) as
+\(N\to\infty\) <a href="#org43981b3">since</a> \(r\to\infty\). This is the <a href="#orgdc2ef0a">desired</a> contradiction. QED.
+</p></dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.92 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
