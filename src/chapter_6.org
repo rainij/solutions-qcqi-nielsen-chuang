@@ -1244,3 +1244,251 @@ asymptotics $N\to\infty$).
 
   The LHS is bounded by $1$. On the other hand the RHS tends to $\infty$ as
   $N\to\infty$ [[exercise-6.14-r2k-is-oN][since]] $r\to\infty$. This is the [[exercise-6.14-wlog-k-is-oN][desired]] contradiction. QED.
+** Exercise 6.15
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.15
+:END:
+Use the Cauchy–Schwarz inequality to show that for any normalized state vector
+$\ket{\psi}$ and set of $N$ orthonormal basis vectors $\ket{x}$,
+
+$$
+  \sum_x \norm{\psi - x}^2 \geq 2N - 2\sqrt{N} .
+$$
+
+*** Proof
+Let $\psi_x=\sprod{x}{\psi}$. Observe that
+
+<<exercise-6.15-1>>
+$$
+  \norm{\psi - x}^2 = 2 - 2\Re(\sprod{x}{\psi}) = 2 - 2\Re(\psi_x) .
+$$
+
+Moreover by the Cauchy-Schwarz inequality
+
+$$
+  \sum_x \Re(\psi_x) \leq \sum_x \abs{\psi_x}\cdot 1
+  \leq \left(\sum_x \abs{\psi_x}^2 \right)^{\frac{1}{2}} \cdot \left(\sum_x 1 \right)^{\frac{1}{2}}
+  = \sqrt{N} .
+$$
+
+Using this while doing a summation of the [[exercise-6.15-1][first observation]] yields the claim.
+
+** Exercise 6.16
+Suppose we merely require that the probability of an error being made is less than $1/2$
+when averaged uniformly over the possible values for $x$, instead of for all values of
+$x$. Show that $\Omega(\sqrt{N})$ oracle calls are still required to solve the search problem.
+
+- Remark :: The original exercise spoke about $O(\sqrt{N})$ instead of
+  $\Omega(\sqrt{N})$. I corrected this typo.
+
+*** Proof
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.16-proof
+:END:
+Below we sketch the main steps of the proof as it is presented in the book. For this
+exercise the only relevant modification happens at step [[6.16-5]]. Let the notation be as in
+the book:
+
+$$
+  D_k = \sum_x \norm{\psi_k^x - \psi_k}^2, \quad
+  E_k = \sum_x \norm{\psi_k^x - x}^2, \quad
+  F_k = \sum_x \norm{x - \psi_k}^2.
+$$
+
+with $\psi_k=(\prod_{i=1}^kU_i)\psi$ and $\psi_k^x=(\prod_{i=1}^kU_iO_x)\psi$ where the
+$U_i$ are arbitrary unitary operators, $\psi$ is an arbitrary normalized state, and
+$O_x=I-2\proj{x}$ is the oracle. Moreover let
+
+$$
+  p_x = \abs{\sprod{x}{\psi_k^x}}^2
+$$
+
+be the success probability for a given value of $x$. The proof from the book assumed
+$p_x\geq1/2$. The exercise weakened this to $\sum_xp_x\geq N/2$.
+
+1. <<6.16-1>> For all $k$
+
+   $$ D_{k+1} \leq (\sqrt{D_k} + 2)^2 . $$
+
+   This can be proved using $O_x-I=-2\proj{x}$ and the Cauchy-Schwarz inequality.
+2. <<6.16-2>> For all $k$
+
+   $$ D_k\leq4k^2 . $$
+
+   Follows by induction from [[6.16-1]] and $D_0=0$.
+3. <<6.16-3>> For all $k$
+
+   $$ D_k \geq (\sqrt{F_k} - \sqrt{E_k})^2 . $$
+
+   Follows from the triangle inequality and the Cauchy-Schwarz inequality.
+4. <<6.16-4>> For all $k$
+
+   $$ F_k \geq 2N - 2\sqrt{N} . $$
+
+   This follows from the Cauchy-Schwarz inequality (see [[#exercise-6.15][exercise 6.15]]).
+5. <<6.16-5>> If $\sum_x p_x\geq N/2$ then for all $k$
+
+   $$ E_k \leq N . $$
+
+   Since this is the crucial step for this exercise we give a detailed proof [[exercise-6.16-main][below]]. (Under
+   the stronger assumption that $p_x\geq1/2$, for all $x$, the proof from the book showed
+   the stronger statement $E_k\leq(2-\sqrt{2})N$.)
+6. <<6.16-6>> For all $k$
+
+   $$ D_k = \Omega(N) . $$
+
+   Follows from [[6.16-3]], [[6.16-4]], and [[6.16-5]].
+
+The claim (that $\Omega(\sqrt{N})$ oracle calls are necessary) follows from [[6.16-2]] and
+[[6.16-6]]. QED.
+
+<<exercise-6.16-main>>
+- Proof of [[6.16-5]] :: As in the main text we may assume that $\sprod{x}{\psi_k^x} > 0$
+  (replace $\ket{x}$ by $e^{\ii\theta}\ket{x}$ if necessary). Hence
+
+  $$
+  \norm{\psi_k^x - x}^2 = 2 - 2 \abs{\sprod{x}{\psi_k^x}} = 2 - 2 \sqrt{p_x} .
+  $$
+
+  Using $0\leq p_x \leq 1$ (hence $\sqrt{p_x}\,\geq\,p_x$) and $\sum_x p_x\geq N/2$ we
+  obtain
+
+  $$
+  E_k = \sum_x (2  - 2\sqrt{p_x}) \leq \sum_x (2  - 2p_x) \leq N .
+  $$
+
+  Note that this inequality is (essentially) sharp since equality holds if half of the
+  $p_x$ is $1$ and the other half are $0$ (at least for even $N$ this is possible). QED.
+
+** Exercise 6.17 (Optimality for multiple solutions)
+Suppose the search problem has $M$ solutions. Show that $\Omega(\sqrt{N/M})$ oracle
+applications are required to ﬁnd a solution.
+
+- Remark :: The original exercise spoke about $O(\sqrt{N/M})$ instead of
+  $\Omega(\sqrt{N/M})$. I corrected this typo.
+
+*** Proof
+We closely follow the structure of the [[#exercise-6.16-proof][proof of exercise 6.16]] (which in turn follows the
+proof from the book). Without loss of generality we may assume that
+
+<<exercise-6.17-bound-on-M>>
+$$
+  M \leq \frac{N}{4} .
+$$
+
+Otherwise $O(\sqrt{N/M})=O(1)$ isn't interesting anyway. Let us define, essentially as in
+the book, $\psi_k=(\prod_{i=1}^kU_i)\psi$ and $\psi_k^f=(\prod_{i=1}^kU_iO_f)\psi$ where
+the $U_i$ are arbitrary unitary operators, $\psi$ is an arbitrary normalized state, and
+$O_f=I-2\sum_{f(x)=1}\proj{x}$ is the oracle for some $f$ with $M$ solutions for the
+equation $f(x)=1$. Let us define the projection operator
+
+$$
+  P_f = \sum_{f(x)=1} \proj{x} = (I - O_f)/2 .
+$$
+
+Note that there are unique normalized states $\chi_k^f$ and $\phi_k^f$ from the subspaces
+corresponding to $f(x)=1$ and $f(x)=0$ resepectively, and unique $a_f,b_f\geq0$ (with
+$a_f^2+b_f^2=1$) such that
+
+<<exercise-6.17-psi_kf-vs-chi_kf>>
+$$
+  \psi_k^f = a_f \chi_k^f + b_f \phi_k^f .
+$$
+
+Note that the success probability (which is assumed to be at least $1/2$ for any
+$f$) is given by $p_f=a_f^2$. Finally consider
+
+$$
+  D_k = \sum_f \norm{\psi_k^f - \psi_k}^2, \quad
+  E_k = \sum_f \norm{\psi_k^f - \chi_k^f}^2, \quad
+  F_k = \sum_f \norm{\chi_k^f - \psi_k}^2.
+$$
+
+Here the summation ranges over all $f$ which have exactly $M$ solutions for $f(x)=1$.
+
+1. <<6.17-1>> For all $k$
+
+   $$ \sum_f \norm{P_f\psi_k}^2 = \frac{M}{N} \binom{N}{M} =: S . $$
+
+   - Proof :: Let $\psi_k=\sum_xc_x\ket{x}$. Then
+     $\norm{P_f\psi_k}^2=\sum_{f(x)=1}\abs{c_x}^2$ is just a sum of squares of $M$ of the
+     coefficients of $\psi_k$. By symmetry in the overall sum over all $f$ each coefficient
+     appears equally often. All in all there are $M\binom{N}{M}$ summands of the form
+     $\abs{c_x}^2$. Because $\sum_x\abs{c_x}^2=1$ (which are exactly $N$ summands) the
+     claim follows. QED.
+
+2. <<6.17-2>> For all $k$
+
+   $$ D_{k+1} \leq (\sqrt{D_k} + 2\sqrt{S})^2 . $$
+
+   - Proof :: This is just a short calculation using the Cauchy-Schwarz inequality (in the second
+     to last step):
+
+     \begin{align*}
+       D_{k+1} &= \sum_f \norm{O_f \psi_k^f - \psi_k}^2 \\
+       &= \sum_f \norm{O_f(\psi_k^f - \psi_k) + (O_f - I)\psi_k}^2 \\
+       &\leq \sum_f \left( \norm{\psi_k^f-\psi_k}^2 + 4\norm{\psi_k^f-\psi_k}\norm{P_f\psi_k} + 4\norm{P_f\psi_k}^2 \right) \\
+       &\leq D_k + 4\sqrt{D_k S} + 4S \\
+       &= (\sqrt{D_k} + 2\sqrt{S})^2 .
+     \end{align*}
+
+     QED.
+
+3. <<6.17-3>> For all $k$
+
+   $$ D_k \leq 4k^2 \cdot S . $$
+
+   - Proof :: This follows by induction from [[6.17-2]] and $D_0=0$. QED.
+
+4. <<6.17-4>> For all $k$
+
+   $$ D_k \geq (\sqrt{F_k} - \sqrt{E_k})^2 . $$
+
+   - Proof :: This follows from the triangle inequality and the Cauchy-Schwarz inequality
+     (the short proof is exactly the same as the analogous inequality from the book).
+
+5. <<6.17-5>> For all $k$
+
+   $$ F_k \geq \left(2 - 2\sqrt{\frac{M}{N}}\right) \binom{N}{M} . $$
+
+   Note that here [[exercise-6.17-bound-on-M][the bound]] on $M$ comes in handy.
+
+   - Proof :: By $P_f\chi_k^f=\chi_k^f$, $\norm{\chi_k^f}=1$, and the fact that $P_f$ is
+     hermitian we have
+
+     $$
+     \norm{\chi_k^f - \psi_k} = 2 - 2\Re(\sprod{\chi_k^f}{P_f\psi_k})
+     \geq 2 - 2\norm{P_f\psi_k} .
+     $$
+
+     Using this together with the definition of $S$ (see [[6.17-1]]) and the Cauchy-Schwarz
+     inequality we get
+
+     $$
+     F_k \geq 2\binom{N}{M} - 2 \left( \sum_f\norm{P_f\psi_k}^2 \right)^{\frac{1}{2}}
+              \cdot \left( \sum_f 1 \right)^{\frac{1}{2}}
+         = 2\binom{N}{M} - 2 \sqrt{S \binom{N}{M}} .
+     $$
+
+     The claim follows from  [[6.17-1]]. QED.
+
+6. <<6.17-6>> If $p_f\geq1/2$ for all $f$ then for all $k$
+
+   $$ E_k \leq (2 - \sqrt{2}) \binom{N}{M} . $$
+
+   - Proof :: From [[exercise-6.17-psi_kf-vs-chi_kf][the relation between]] $\chi_k^f$ and $\psi_k^f$ we get
+
+     $$
+     E_k = \sum_f \left( (1 - a_f)^2 + b_f^2 \right) = \sum_f (2 - 2 a_f)
+     $$
+
+     Now the assumption on the success probability $a_f^2=p_f\geq1/2$ yields the
+     claim. QED.
+
+7. <<6.17-7>> For all $k$
+
+   $$ D_k = \Omega\left( \binom{N}{M} \right) . $$
+
+   - Proof :: This follows from [[6.17-4]], [[6.17-5]], [[6.17-6]], and [[exercise-6.17-bound-on-M][the bound]] on $M$.
+
+The assertion $k=\Omega(\sqrt{N/M})$ now follows from [[6.17-1]], [[6.17-3]], and [[6.17-7]]. QED.
