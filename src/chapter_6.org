@@ -1492,3 +1492,50 @@ Here the summation ranges over all $f$ which have exactly $M$ solutions for $f(x
    - Proof :: This follows from [[6.17-4]], [[6.17-5]], [[6.17-6]], and [[exercise-6.17-bound-on-M][the bound]] on $M$.
 
 The assertion $k=\Omega(\sqrt{N/M})$ now follows from [[6.17-1]], [[6.17-3]], and [[6.17-7]]. QED.
+
+** Exercise 6.18
+Prove that the minimum degree polynomial representing a Boolean function $F(X)$ is unique.
+
+*** Proof
+Any minimal polynomial representing $F$ is of the form
+
+$$
+  P(X) = \sum_{e} c_e \prod_{k=0}^{N-1} X_k^{e_k}
+$$
+
+where the sum ranges over all $e:\{0,\ldots,N-1\}\to\{0,1\}$ (binary strings of length
+$N$). In the following we use the notation $\mathrm{bc}(e)$ (bit count) to denote
+$\sum_ke_k$.
+
+- Lemma :: Let $P$ and $Q$ be two minimial polynomials representing $F$ with corresponding
+  coefficients $(c_e)$ and $(d_e)$. Let $n\in\{0,\ldots,N-1\}$. Assume that $c_e=d_e$ for
+  all $e$ with $\mathrm{bc}(e)\leq\,n$. Then $c_e=d_e$ for all $e$ with
+  $\mathrm{bc}(e)\leq\,n+1$.
+
+- Proof :: Let $e$ be such that $\mathrm{bc}(e)=n+1$. Choose $X=e$. By assumptions
+
+  $$
+    0 = F(X) - F(X) = P(X) - Q(X) = c_e - d_e .
+  $$
+
+  This (essentially) implies the claim. QED.
+
+Also note that $P(0,\ldots,0)=c_{(0,\ldots,0)}$. Hence two minimal polynomials
+representing $F$ are proven to be equal by mathematical induction (using the lemma as the
+induction step and the just mentioned fact as the induction start). QED.
+
+** Exercise 6.19
+Show that $P(X)=1-\prod_{k=0}^{N-1}(1-X_k)$ represents =OR=.
+
+*** Proof
+This is obvious. Probably one way to make it even more obvious is to note that
+
+$$
+  P(X) = \begin{cases} 0 & \text{if } X_k = 0 \text{ for all } k, \\ 1 & \text{else.} \end{cases}
+$$
+
+This is precisely the behaviour of the =OR= function. QED.
+
+** TODO Exercise 6.20
+Show that $Q_0(\mathrm{OR})\geq N$ by constructing a polynomial which represents the =OR=
+function from the output of a quantum circuit which computes =OR= with zero error.
