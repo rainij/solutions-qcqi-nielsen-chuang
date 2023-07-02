@@ -1496,8 +1496,16 @@ The assertion $k=\Omega(\sqrt{N/M})$ now follows from [[6.17-1]], [[6.17-3]], an
 ** Exercise 6.18
 Prove that the minimum degree polynomial representing a Boolean function $F(X)$ is unique.
 
+- Remark :: The [[#exercise-6.18-proof][proof]] below shows a stronger statement: The /multi-linear/ polynomial
+  representing $F$ is unique. Here (as in the book) /multi-linear/ means that any variable
+  $X_i$ occurs only as $X_i^0=1$ or $X_i^1$ but not with higher powers. Note that any
+  minimal polynomial is necessarily multi-linear.
+
 *** Proof
-Any minimal polynomial representing $F$ is of the form
+:PROPERTIES:
+:CUSTOM_ID: exercise-6.18-proof
+:END:
+Any multi-linear polynomial representing $F$ is of the form
 
 $$
   P(X) = \sum_{e} c_e \prod_{k=0}^{N-1} X_k^{e_k}
@@ -1507,9 +1515,9 @@ where the sum ranges over all $e:\{0,\ldots,N-1\}\to\{0,1\}$ (binary strings of 
 $N$). In the following we use the notation $\mathrm{bc}(e)$ (bit count) to denote
 $\sum_ke_k$.
 
-- Lemma :: Let $P$ and $Q$ be two minimial polynomials representing $F$ with corresponding
-  coefficients $(c_e)$ and $(d_e)$. Let $n\in\{0,\ldots,N-1\}$. Assume that $c_e=d_e$ for
-  all $e$ with $\mathrm{bc}(e)\leq\,n$. Then $c_e=d_e$ for all $e$ with
+- Lemma :: Let $P$ and $Q$ be two multi-linear polynomials representing $F$ with
+  corresponding coefficients $(c_e)$ and $(d_e)$. Let $n\in\{0,\ldots,N-1\}$. Assume that
+  $c_e=d_e$ for all $e$ with $\mathrm{bc}(e)\leq\,n$. Then $c_e=d_e$ for all $e$ with
   $\mathrm{bc}(e)\leq\,n+1$.
 
 - Proof :: Let $e$ be such that $\mathrm{bc}(e)=n+1$. Choose $X=e$. By assumptions
@@ -1520,7 +1528,7 @@ $\sum_ke_k$.
 
   This (essentially) implies the claim. QED.
 
-Also note that $P(0,\ldots,0)=c_{(0,\ldots,0)}$. Hence two minimal polynomials
+Also note that $P(0,\ldots,0)=c_{(0,\ldots,0)}$. Hence two multi-linear polynomials
 representing $F$ are proven to be equal by mathematical induction (using the lemma as the
 induction step and the just mentioned fact as the induction start). QED.
 
@@ -1536,6 +1544,62 @@ $$
 
 This is precisely the behaviour of the =OR= function. QED.
 
-** TODO Exercise 6.20
+** Exercise 6.20
 Show that $Q_0(\mathrm{OR})\geq N$ by constructing a polynomial which represents the =OR=
 function from the output of a quantum circuit which computes =OR= with zero error.
+
+- Remark ::
+  - Proving $Q_0(\mathrm{OR})\geq N$ implies $Q_0(\mathrm{OR})=N$ since $N$ oracle calls
+    to /all/ possible inputs are clearly sufficient to implement a /deterministic/
+    algorithm to solve the search problem (=OR= corresponds to the search problem
+    whether $X_i=1$ has a solution $i$).
+  - Exactly this is proved in [cite:@quant-ph_9802049]. This paper served me well
+    as a nice introduction to the /method of polynomials/.
+
+*** Proof
+First of all note that $1-\prod_{k=0}^{N-1}(1-X_k)$ is the /minimal/ polynomial of
+$\mathrm{OR}$. This follows from the [[#exercise-6.18-proof][proof]] of exercise 6.18 since this polynomial is
+already multi-linear.
+
+Hence $\deg(\mathrm{OR})=N$.
+
+Let us briefly recall how an algorithm for the zero-error case works. First a number $m$
+of qubits is prepared in some initial state, without loss of generality $\ket{0}$. Then a
+quantum circuit $(\prod_{i=1}^{T}U_iO)U_0$ is applied, where the $U_i$ are arbitrary
+unitary operators and $O$ is the call to the oracle. Overall there are $T$ calls and we
+have to prove that $T\geq N$.
+
+To actually return something we have to measure at least some of the qubits. Without loss
+of generality we may assume that all $m$ qubits are measured (in practice one probably
+only measures two qubits (which is sufficient to differentiate up to four answers)). Let
+$\mathcal{Y}$, $\mathcal{N}$, $\mathcal{I}$ be disjoint sets whose union is
+$\{0,\ldots,2^m-1\}$. Based on whether the measurement is in $\mathcal{Y}$, $\mathcal{N}$,
+or $\mathcal{I}$ we return =yes=, =no=, and =inconclusive=. We may assume that at least
+$\mathcal{Y}$ and $\mathcal{N}$ are non-empty (otherwise the algorithm cannot be useful).
+
+Let
+
+$$ \ket{\psi(X)}=\sum_{k=0}^{2^m-1} c_k(X) \ket{k} $$
+
+be the final state right before measurement. From the book we already know that each
+$c_k(X)$ is a complex polynomial of degree at most $T$. Consider
+
+$$
+  P_{\mathcal{N}}(X) = \sum_{k\in \mathcal{N}} \abs{c_k(X)}^2 .
+$$
+
+This is the probability of returning =no= (meaning that the algorithm claims that $X$
+contains no ones). Since the algorithm is zero-error we have $P_{\mathcal{N}}(X)=0$ for
+$X\neq\vec{0}$. Hence $c_k(X)=0$ for $X\neq\vec{0}$ and all $k\in\mathcal{N}$. On the
+other hand there must be a $k'\in\mathcal{N}$ such that $c_{k'}(\vec{0})\neq0$. Let
+
+$$
+  P(X) = \Re\left(1 - \frac{c_{k'}(X)}{c_{k'}(\vec{0})}\right) .
+$$
+
+Clearly this is a /real/ polynomial of degree at most $T$. By construction it represents
+=OR=. Using the fact that $\deg(\mathrm{OR})=N$ this implies that $T\geq N$, as
+desired. QED.
+
+* References
+#+print_bibliography:
