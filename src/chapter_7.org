@@ -2,12 +2,38 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
-#+property: header-args:python :session *chapter-7* :tangle chapter_7.py
+#+property: header-args:sage :session *sage-chapter-7* :tangle chapter_7.sage
+#+property: header-args:python :session *py-chapter-7* :tangle chapter_7.py
 
 #+toc: headlines 2
 
-* Setup
-#+name: chapter-7-python-imports
+* TODO Setup
+#+name: foo
+#+begin_src sage
+  R.<x> = QQbar[]
+  W = DifferentialWeylAlgebra(R)
+  (x, dx) = W.gens()
+  p = -i*dx
+#+end_src
+
+#+name: bar
+#+begin_src sage :results replace
+  def com(a, b):
+      """Commutator [a,b] of a an b."""
+      return a*b - b*a
+
+  a = (x + i*p) / sqrt(2)
+  ad = (x - i*p) / sqrt(2)
+
+  assert com(x, p) == i
+  assert com(a, ad) == 1
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+#+name: dummy
 #+begin_src python
   import sympy as sp
 #+end_src
