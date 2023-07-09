@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 7</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 7</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\inv}{^{-1}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\sprod}[2]{\langle#1|#2\rangle} % scalar product
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\proj}[1]{\ket{#1}\bra{#1}}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\orac}{\mathrm{Orac}}
+\]
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org880d459">Setup</a></li>
+<li><a href="#orga3a0541">Exercises</a>
+<ul>
+<li><a href="#org270f331"><span class="todo TODO">TODO</span> Exercise 7.1</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org880d459" class="outline-2">
+<h2 id="org880d459">Setup</h2>
+<div class="outline-text-2" id="text-org880d459">
+<p>
+Let us use <a href="https://www.sagemath.org/">sage</a> to define position and momentum operator.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="org8d09485">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
+(<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
+<span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
+</pre>
+</div>
+
+<p>
+Now let us define the commutator operation, the annihilation (\(a\)), and creation operator
+(\(a^\dagger\)).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="org831db03"><span class="org-keyword">def</span> <span class="org-function-name">com</span>(a, b):
+    <span class="org-doc">"""Commutator [a,b] of a and b."""</span>
+    <span class="org-keyword">return</span> a<span class="org-operator">*</span>b <span class="org-operator">-</span> b<span class="org-operator">*</span>a
+
+<span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
+<span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
+
+<span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+'PASSED'
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orga3a0541" class="outline-2">
+<h2 id="orga3a0541">Exercises</h2>
+<div class="outline-text-2" id="text-orga3a0541">
+</div>
+<div id="outline-container-org270f331" class="outline-3">
+<h3 id="org270f331"><span class="todo TODO">TODO</span> Exercise 7.1</h3>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.92 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
