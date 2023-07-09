@@ -7,8 +7,10 @@
 
 #+toc: headlines 2
 
-* TODO Setup
-#+name: foo
+* Setup
+Let us use [[https://www.sagemath.org/][sage]] to define position and momentum operator.
+
+#+name: position-momentum-operator
 #+begin_src sage
   R.<x> = QQbar[]
   W = DifferentialWeylAlgebra(R)
@@ -16,7 +18,10 @@
   p = -i*dx
 #+end_src
 
-#+name: bar
+Now let us define the commutator operation, the annihilation ($a$), and creation operator
+($a^\dagger$).
+
+#+name: commutator-ladder-operators
 #+begin_src sage :results replace
   def com(a, b):
       """Commutator [a,b] of a and b."""
