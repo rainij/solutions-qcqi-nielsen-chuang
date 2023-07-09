@@ -1,0 +1,42 @@
+#+title:  Chapter 7
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:sage :session *sage-chapter-7* :tangle chapter_7.sage
+#+property: header-args:python :session *py-chapter-7* :tangle chapter_7.py
+
+#+toc: headlines 2
+
+* Setup
+Let us use [[https://www.sagemath.org/][sage]] to define position and momentum operator.
+
+#+name: position-momentum-operator
+#+begin_src sage
+  R.<x> = QQbar[]
+  W = DifferentialWeylAlgebra(R)
+  (x, dx) = W.gens()
+  p = -i*dx
+#+end_src
+
+Now let us define the commutator operation, the annihilation ($a$), and creation operator
+($a^\dagger$).
+
+#+name: commutator-ladder-operators
+#+begin_src sage :results replace
+  def com(a, b):
+      """Commutator [a,b] of a and b."""
+      return a*b - b*a
+
+  a = (x + i*p) / sqrt(2)
+  ad = (x - i*p) / sqrt(2)
+
+  assert com(x, p) == i
+  assert com(a, ad) == 1
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+* Exercises
+** TODO Exercise 7.1
