@@ -25,7 +25,7 @@ tangle-full: tangle $(TANGLED_FILES_SAGE_PY)
 tangle-zip: $(TANGLED_ZIP)
 
 test: tangle-full
-	python -m pytest -v test/
+	sage -python -m pytest -v test/
 
 clean:
 	rm -rf public
