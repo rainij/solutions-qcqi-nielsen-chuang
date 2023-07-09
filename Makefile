@@ -3,7 +3,7 @@
 # Specify the files to tangle:
 TANGLE_PY := chapter_2 chapter_3 chapter_4 chapter_5 chapter_6
 TANGLE_PY += appendix_2
-TANGLE_PY += continued_fractions
+TANGLE_PY += continued_fractions utils
 TANGLE_SAGE := chapter_7
 
 THIS_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
