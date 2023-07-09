@@ -9,7 +9,6 @@ TANGLE_SAGE := chapter_7
 THIS_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 ORG_FILES := $(wildcard src/*.org)
 
-# TODO: rename to TANGLED_FILES_PY:
 TANGLED_FILES_PY := $(addprefix src/, $(addsuffix .py,$(TANGLE_PY)))
 TANGLED_FILES_SAGE := $(addprefix src/, $(addsuffix .sage,$(TANGLE_SAGE)))
 TANGLED_FILES_SAGE_PY := $(addsuffix _sage.py,$(basename $(TANGLED_FILES_SAGE)))
