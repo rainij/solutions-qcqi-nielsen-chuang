@@ -24,12 +24,9 @@ FROM fedora:37
 COPY --from=build-emacs /opt/emacs /opt/emacs
 ENV PATH /opt/emacs/bin:$PATH
 # Dirty hack: we just install fedoras emacs for the dependencies:
-RUN dnf -y install --setopt=install_weak_deps=False git make emacs sagemath && dnf clean all && \
+RUN dnf -y install --setopt=install_weak_deps=False git make emacs sagemath python3-pip && \
+  dnf clean all && \
   rpm -e --nodeps emacs
-
-# After this 'python' refers to the virtual env (and pip is available):
-RUN python3 -m venv /opt/venv
-ENV PATH /opt/venv/bin:$PATH
 
 # NOTE: We use sage's python environment! Among other things it relies on the python
 # intepreter of the just set up environment. It provides its own (sage related) libraries
