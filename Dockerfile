@@ -28,9 +28,8 @@ RUN dnf -y install --setopt=install_weak_deps=False git make emacs sagemath pyth
   dnf clean all && \
   rpm -e --nodeps emacs
 
-# NOTE: We use sage's python environment! Among other things it relies on the python
-# intepreter of the just set up environment. It provides its own (sage related) libraries
-# in addition.
+# NOTE: We use sage's python environment! Among other things it relies on the system
+# python interpreter, but it adds its own (sage related) libraries in addition.
 COPY src/requirements.txt src_requirements.txt
 COPY test/requirements.txt test_requirements.txt
 RUN sage -pip install --no-cache-dir -r src_requirements.txt -r test_requirements.txt
