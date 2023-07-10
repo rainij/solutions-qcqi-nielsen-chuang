@@ -26,25 +26,65 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org880d459">Setup</a></li>
-<li><a href="#orga3a0541">Exercises</a>
+<li><a href="#org370b78a">Setup</a>
 <ul>
-<li><a href="#org270f331"><span class="todo TODO">TODO</span> Exercise 7.1</a></li>
+<li><a href="#org23ff898">Imports</a></li>
+<li><a href="#org3cfe4d2">Harmonic Oscillator</a></li>
+</ul>
+</li>
+<li><a href="#orgaac69c3">Exercises</a>
+<ul>
+<li><a href="#orgf803b9b">Exercise 7.1</a></li>
+<li><a href="#orgc7a55f0">Exercise 7.2</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org880d459" class="outline-2">
-<h2 id="org880d459">Setup</h2>
-<div class="outline-text-2" id="text-org880d459">
+<div id="outline-container-org370b78a" class="outline-2">
+<h2 id="org370b78a">Setup</h2>
+<div class="outline-text-2" id="text-org370b78a">
+</div>
+<div id="outline-container-org23ff898" class="outline-3">
+<h3 id="org23ff898">Imports</h3>
+<div class="outline-text-3" id="text-org23ff898">
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-keyword">from</span> utils <span class="org-keyword">import</span> commutator <span class="org-keyword">as</span> com
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3cfe4d2" class="outline-3">
+<h3 id="org3cfe4d2">Harmonic Oscillator</h3>
+<div class="outline-text-3" id="text-org3cfe4d2">
 <p>
-Let us use <a href="https://www.sagemath.org/">sage</a> to define position and momentum operator.
+To simplify calculations we will use unit-less expressions. To do this let \(\tilde{x}\),
+\(\tilde{p}\), etc denote physical quantities <i>with</i> units and denote the unit-less versions
+without the tilde, such that e.g.
+</p>
+
+<p>
+<a id="orgc54de6e"></a>
+\[
+  \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
+\]
+</p>
+
+<p>
+Note that this implies \(p=-\ii\partial_x\). The effect on \(H\) and \(a\) is the same as
+setting \(m=\hbar=\omega=1\) (we have e.g. \(H=p^2/2+x^2/2\)).
+</p>
+
+<p>
+In this chapter let us use the python based computer algebra system <a href="https://www.sagemath.org/">sage</a> to solve the
+exercises (some of them). For this reason we define momentum and position operator in code
+as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org8d09485">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<pre class="src src-sage" id="orgf21db43">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
 <span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
 (<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
 <span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
@@ -52,19 +92,24 @@ Let us use <a href="https://www.sagemath.org/">sage</a> to define position and m
 </div>
 
 <p>
-Now let us define the commutator operation, the annihilation (\(a\)), and creation operator
-(\(a^\dagger\)).
+Having this we can define the Hamiltonian \(H\) of the one-dimensional harmonic oscillator
+and the corresponding annihilation (\(a\)), and creation operator (\(a^\dagger\)):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org831db03"><span class="org-keyword">def</span> <span class="org-function-name">com</span>(a, b):
-    <span class="org-doc">"""Commutator [a,b] of a and b."""</span>
-    <span class="org-keyword">return</span> a<span class="org-operator">*</span>b <span class="org-operator">-</span> b<span class="org-operator">*</span>a
+<pre class="src src-sage" id="org77e7152"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
 
 <span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
 <span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
+</pre>
+</div>
 
-<span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<p>
+Some basic sanity checks:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="orgac9c1eb"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
 <span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
 <span class="org-string">"PASSED"</span>
 </pre>
@@ -73,15 +118,85 @@ Now let us define the commutator operation, the annihilation (\(a\)), and creati
 <pre class="example">
 'PASSED'
 </pre>
+
+
+<p>
+Note that from <a href="#orgc54de6e">above</a> we get
+</p>
+
+<p>
+<a id="org870d729"></a>
+\[
+  \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
+\]
+</p>
+</div>
 </div>
 </div>
 
-<div id="outline-container-orga3a0541" class="outline-2">
-<h2 id="orga3a0541">Exercises</h2>
-<div class="outline-text-2" id="text-orga3a0541">
+<div id="outline-container-orgaac69c3" class="outline-2">
+<h2 id="orgaac69c3">Exercises</h2>
+<div class="outline-text-2" id="text-orgaac69c3">
 </div>
-<div id="outline-container-org270f331" class="outline-3">
-<h3 id="org270f331"><span class="todo TODO">TODO</span> Exercise 7.1</h3>
+<div id="outline-container-orgf803b9b" class="outline-3">
+<h3 id="orgf803b9b">Exercise 7.1</h3>
+<div class="outline-text-3" id="text-orgf803b9b">
+<p>
+Using the fact that \(x\) and \(p\) do not commute, and that in fact \([x,p]=\ii\,\hbar\),
+explicitly show that \(a^\dagger\,a=H/\hbar\omega-1/2\).
+</p>
+</div>
+
+<div id="outline-container-orgede6e05" class="outline-4">
+<h4 id="orgede6e05">Solution</h4>
+<div class="outline-text-4" id="text-orgede6e05">
+<p>
+This is just boring algebra which can be done much faster (and more reliably) by <i>sage</i>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="org6fc1ba4"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
+<span class="org-doc">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+'PASSED'
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc7a55f0" class="outline-3">
+<h3 id="orgc7a55f0">Exercise 7.2</h3>
+<div class="outline-text-3" id="text-orgc7a55f0">
+<p>
+Given that \([x,p]=\ii\,\hbar\), compute \([a^\dagger,a]\).
+</p>
+</div>
+
+<div id="outline-container-orge7298ad" class="outline-4">
+<h4 id="orge7298ad">Solution</h4>
+<div class="outline-text-4" id="text-orge7298ad">
+<p>
+The unitless result is \(-1\):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="orgee316e5">com(ad, a)
+</pre>
+</div>
+
+<pre class="example">
+-1
+</pre>
+
+
+<p>
+Since the <a href="#org870d729">creator/annihilator is already unit-less</a> the same is true with units.
+</p>
+</div>
+</div>
 </div>
 </div>
 <footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.92 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
