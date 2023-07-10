@@ -8,7 +8,27 @@
 #+toc: headlines 2
 
 * Setup
-Let us use [[https://www.sagemath.org/][sage]] to define position and momentum operator.
+** Imports
+#+begin_src sage
+  from utils import commutator as com
+#+end_src
+
+** Harmonic Oscillator
+To simplify calculations we will use unit-less expressions. To do this let $\tilde{x}$,
+$\tilde{p}$, etc denote physical quantities /with/ units and denote the unit-less versions
+without the tilde, such that e.g.
+
+<<unitless-position-and-momentum>>
+$$
+  \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
+$$
+
+Note that this implies $p=-\ii\partial_x$. The effect on $H$ and $a$ is the same as
+setting $m=\hbar=\omega=1$ (we have e.g. $H=p^2/2+x^2/2$).
+
+In this chapter let us use the python based computer algebra system [[https://www.sagemath.org/][sage]] to solve the
+exercises (some of them). For this reason we define momentum and position operator in code
+as follows:
 
 #+name: position-momentum-operator
 #+begin_src sage
@@ -18,25 +38,65 @@ Let us use [[https://www.sagemath.org/][sage]] to define position and momentum o
   p = -i*dx
 #+end_src
 
-Now let us define the commutator operation, the annihilation ($a$), and creation operator
-($a^\dagger$).
+Having this we can define the Hamiltonian $H$ of the one-dimensional harmonic oscillator
+and the corresponding annihilation ($a$), and creation operator ($a^\dagger$):
 
 #+name: commutator-ladder-operators
-#+begin_src sage :results replace
-  def com(a, b):
-      """Commutator [a,b] of a and b."""
-      return a*b - b*a
+#+begin_src sage
+  H = p^2 / 2 + x^2 / 2
 
   a = (x + i*p) / sqrt(2)
   ad = (x - i*p) / sqrt(2)
+#+end_src
 
+Some basic sanity checks:
+
+#+name: commutator-ladder-operators-checks
+#+begin_src sage :results replace :tangle no cache: yes
   assert com(x, p) == i
   assert com(a, ad) == 1
   "PASSED"
 #+end_src
 
-#+RESULTS:
+#+RESULTS: commutator-ladder-operators-checks
 : 'PASSED'
 
+Note that from [[unitless-position-and-momentum][above]] we get
+
+<<unitless-hamiltonian-and-annihilator>>
+$$
+  \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
+$$
+
 * Exercises
-** TODO Exercise 7.1
+** Exercise 7.1
+Using the fact that $x$ and $p$ do not commute, and that in fact $[x,p]=\ii\,\hbar$,
+explicitly show that $a^\dagger\,a=H/\hbar\omega-1/2$.
+
+*** Solution
+This is just boring algebra which can be done much faster (and more reliably) by /sage/:
+
+#+name: exercise-7.1
+#+begin_src sage :results replace :tangle no :cache yes
+  assert ad * a == H - 1/2
+  "PASSED"
+#+end_src
+
+#+RESULTS[39888cccfad91cfa7dfd76c46743e018e631a159]: exercise-7.1
+: 'PASSED'
+
+** Exercise 7.2
+Given that $[x,p]=\ii\,\hbar$, compute $[a^\dagger,a]$.
+
+*** Solution
+The unitless result is $-1$:
+
+#+name: exercise-7.2
+#+begin_src sage :results replace :tangle no :cache yes
+  com(ad, a)
+#+end_src
+
+#+RESULTS[0feea403f51d02c49d548e30737b083b7a84c973]: exercise-7.2
+: -1
+
+Since the [[unitless-hamiltonian-and-annihilator][creator/annihilator is already unit-less]] the same is true with units.
