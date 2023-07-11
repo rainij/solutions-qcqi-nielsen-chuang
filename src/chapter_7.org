@@ -68,6 +68,25 @@ $$
   \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
 $$
 
+For convenience let us also define the number operator $N=a^\dagger a = H-1/2$. Clearly
+the number operator has the same eigenstates as $H$. The corresponding eigenvalues are
+shifted by $1/2$.
+
+<<spectrum-harmonic-oscillator-1d>>
+- Theorem (Spectrum of 1D Harmonic Oscillator) :: Let
+
+  $$ \ket{0} = \frac{1}{\sqrt{2\pi}} e^{-x^2 / 2} , $$
+
+  and
+
+  $$ \ket{n} = \frac{(a^\dagger)^n}{\sqrt{n!}} \ket{0} , $$
+
+  for $n\in\{1,2,\ldots\}$. These states form an orthonormal set of the Hilbert space
+  $L^2 (\RR)$ of square integrable functions. Moreover they are eigenstates of $H$ and $N$
+  with $N\ket{n}=n\ket{n}$.
+  - Remark :: <<gaussian-integral>> It is well known that the gaussian function which
+    defines $\ket{0}$ is already normalized (see [[https://en.wikipedia.org/wiki/Gaussian_integral][gaussian integral]]).
+  - Proof :: See [[#exercise-7.4-proof][solution of exercise 7.4]].
 * Exercises
 ** Exercise 7.1
 Using the fact that $x$ and $p$ do not commute, and that in fact $[x,p]=\ii\,\hbar$,
@@ -86,17 +105,160 @@ This is just boring algebra which can be done much faster (and more reliably) by
 : 'PASSED'
 
 ** Exercise 7.2
-Given that $[x,p]=\ii\,\hbar$, compute $[a^\dagger,a]$.
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.2
+:END:
+Given that $[x,p]=\ii\,\hbar$, compute $[a,a^\dagger]$.
 
 *** Solution
-The unitless result is $-1$:
+The unitless result is $1$:
 
 #+name: exercise-7.2
 #+begin_src sage :results replace :tangle no :cache yes
-  com(ad, a)
+  com(a, ad)
 #+end_src
 
-#+RESULTS[0feea403f51d02c49d548e30737b083b7a84c973]: exercise-7.2
-: -1
+#+RESULTS[78c440463e894f8531e28cce10a7a932478e9b08]: exercise-7.2
+: 1
 
 Since the [[unitless-hamiltonian-and-annihilator][creator/annihilator is already unit-less]] the same is true with units.
+
+** Exercise 7.3
+Compute $[H,a]$ and use the result to show that if $\ket{\psi}$ is an eigenstate of $H$
+with energy $E\geq n\hbar\omega$, then $a^n\ket{\psi}$ is an eigenstate with energy
+$E-n\hbar\omega$.
+
+*** Solution
+Using $[a^\dagger,a]=-[a,a^\dagger]=-1$ (see [[#exercise-7.2][exercise 7.2]]) we deduce (assuming unit-less quantities)
+
+$$
+  [H,a] = [a^\dagger a, a] = (a^\dagger a - a a^\dagger) a = [a^\dagger,a] a = -a .
+$$
+
+Using this we get
+
+\begin{align*}
+  H a^n \ket{\psi} &= (Ha) a^{n-1} \ket{\psi} \\
+  &= ([H,a] + aH)a^{n-1} \ket{\psi} \\
+  &= (-a^n + a H a^{n-1}) \ket{\psi} \\
+  &= a H a^{n-1} \ket{\psi} - a^n \ket{\psi} .
+\end{align*}
+
+Recall that we want to show that $Ha^n\ket{\psi}=(E-n)a^n\ket{\psi}$ for all natural
+numbers $n\leq E$. Using the above calculation we can prove this by induction. In fact,
+for $n=0$ the assertion is trivial. For $n>0$ we may use the above calculation together
+with the assertion for $n-1$:
+
+$$
+  H a^n \ket{\psi} = a(E-n+1)a^{n-1}\ket{\psi} - a^n \ket{\psi} = (E-n)a^n\ket{\psi} .
+$$
+
+QED.
+
+** Exercise 7.4
+Show that $\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}$.
+
+*** Proof
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.4-proof
+:END:
+
+The exercise statement is rather "vague" (I try to be friendly here 😉), so let us prove
+some definite statement like the [[spectrum-harmonic-oscillator-1d][theorem about the spectrum of the harmonic oscillator]]
+instead.
+
+To find the /ground state/ consider
+
+$$
+  \bra{\phi} N \ket{\phi} = \norm{a\phi}^2 \geq 0 .
+$$
+
+Equality holds iff
+
+$$
+  x \phi(x) + \phi'(x) = \sqrt{2} \cdot (a\phi)(x) = 0 .
+$$
+
+This is a linear ordinary differential equation. One solution is given by
+$x\mapsto\exp(-x^2/2)$, which can be easily checked by plugging this in. We do not need
+this fact (since it follows automatically later on) but the solution is unique up to a
+scalar factor, which can be seen by observing that the ODE is equivalent to
+$\partial_x\log(\phi(x))=-x$.
+
+The factor $1/\sqrt{2\pi}$ in the definition of $\ket{0}$ [[gaussian-integral][ensures normalization]]. We thus
+proved $N\ket{0}=0$. Next let us verify that $\ket{n}$ is an eigenvector. To simplify the
+notation let us define $\ket{n'}:=\sqrt{n!}\ket{n}$.
+
+$$
+  N\ket{n'} = a^\dagger a (a^\dagger)^n \ket{0} .
+$$
+
+By using $[a,a^\dagger]=1$ ([[*Exercise 7.2][exercise 7.2]]) we may move the single $a$ to the right and then
+use $a\ket{0}=0$ (this procedure is just simple example of mathematical induction). This
+leads to
+
+$$
+  N\ket{n'} = n (a^\dagger)^n \ket{0} = n \ket{n'} ,
+$$
+
+hence establishing that $\ket{n'}$ (and $\ket{n}$) is an eigenvector for the eigenvalue
+$n$. To see that the $1/\sqrt{n!}$ in the definition of $\ket{n}$ is indeed the right
+normalization factor use the freshly proved equality $N\ket{n'}=n\ket{n'}$ and consider
+(don't forget $[a,a^\dagger]=1$)
+
+$$
+  \norm{(n+1)'}^2 = \bra{n'} a a^\dagger \ket{n'}
+  = \bra{n'} N + 1 \ket{n'}
+  = (n+1) \norm{n'}^2 .
+$$
+
+Hence, since $\ket{0}$ is already normalized mathematical induction shows that $\ket{n}$
+is normalized too.
+
+It remains to show that the $(\ket{n})$ generate the whole Hilbert space (completeness),
+since orthogonality already follows from the fact that they are eigenstates to /different/
+eigenvalues of some (unbounded) self-adjoint operator. This essentially boils down to show
+that finite linear combinations of the eigenstates are dense in $L^2(\RR)$.
+
+We only sketch the proof since this reaches out to other parts of mathematics. First of
+all observe that
+
+$$
+  \ket{n}(x) = \frac{1}{\sqrt{2\pi}} \; p_n(x) \; e^{-x^2/2} ,
+$$
+
+where the $p_n(x)$ are polynomials which satisfy the recursive relation
+
+$$ p_{n+1}(x)=(2x+\partial_x)p_n(x), \quad p_0(x) = 1 . $$
+
+These are the well-known [[https://en.wikipedia.org/wiki/Hermite_polynomials][hermite polynomials]]. From the recursive relation we directly see
+(inductively) the /for our purpose important/ property that $p_n$ has degree $n$ (with
+leading factor $2^n$). The density now follows from the following well known results
+
+1. <<ex-7.4-mollification>> The compactly supported continuous functions are dense in
+   $L^2(\RR)$. I do not have a good resource on that but one way to see this is by a
+   method called /[[https://en.wikipedia.org/wiki/Mollifier][mollification]]/.
+2. <<ex-7.4-weierstrass-approx>> For any finite interval $I$ the polynomials on that
+   interval are dense in the continuous function on $I$ with respect to the
+   $L^\infty$-norm which is stronger than the $L^2$ norm (since the interval is
+   finite). This is the [[https://en.wikipedia.org/wiki/Stone%E2%80%93Weierstrass_theorem][Stone-Weierstrass Theorem]].
+
+By [[ex-7.4-weierstrass-approx]] finite linear combinations of eigenstates can approximate any
+compactly supported continuous function. Here it is important that any degree is
+represented among the eigenstates. It should be obvious that the factor $e^{-x^2/2}$ does
+not disturb this argument at all. Now completeness directly follows from
+[[ex-7.4-mollification]]. QED.
+
+** Exercise 7.5
+Verify that Equations (7.11) and (7.12) are consistent with (7.10) and the normalization
+condition $\norm{\ket{n}}^2=1$.
+
+*** Solution
+It is not hard to see that (7.11) and (7.12) imply (7.10):
+
+$$
+  a^\dagger a \ket{n} = a^\dagger \sqrt{n} \ket{n-1} = n \ket{n} .
+$$
+
+The normalization condition is not relevant here. So it is indeed true that it is
+consistent with the three equations but for trivial reasons.
