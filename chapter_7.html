@@ -26,29 +26,32 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org370b78a">Setup</a>
+<li><a href="#org593f947">Setup</a>
 <ul>
-<li><a href="#org23ff898">Imports</a></li>
-<li><a href="#org3cfe4d2">Harmonic Oscillator</a></li>
+<li><a href="#org7364ceb">Imports</a></li>
+<li><a href="#org17d0fcc">Harmonic Oscillator</a></li>
 </ul>
 </li>
-<li><a href="#orgaac69c3">Exercises</a>
+<li><a href="#orge9693de">Exercises</a>
 <ul>
-<li><a href="#orgf803b9b">Exercise 7.1</a></li>
-<li><a href="#orgc7a55f0">Exercise 7.2</a></li>
+<li><a href="#orgb01c0fc">Exercise 7.1</a></li>
+<li><a href="#exercise-7.2">Exercise 7.2</a></li>
+<li><a href="#org6d8c00e">Exercise 7.3</a></li>
+<li><a href="#org485f79c">Exercise 7.4</a></li>
+<li><a href="#org3834364">Exercise 7.5</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org370b78a" class="outline-2">
-<h2 id="org370b78a">Setup</h2>
-<div class="outline-text-2" id="text-org370b78a">
+<div id="outline-container-org593f947" class="outline-2">
+<h2 id="org593f947">Setup</h2>
+<div class="outline-text-2" id="text-org593f947">
 </div>
-<div id="outline-container-org23ff898" class="outline-3">
-<h3 id="org23ff898">Imports</h3>
-<div class="outline-text-3" id="text-org23ff898">
+<div id="outline-container-org7364ceb" class="outline-3">
+<h3 id="org7364ceb">Imports</h3>
+<div class="outline-text-3" id="text-org7364ceb">
 <div class="org-src-container">
 <pre class="src src-sage"><span class="org-keyword">from</span> utils <span class="org-keyword">import</span> commutator <span class="org-keyword">as</span> com
 </pre>
@@ -56,9 +59,9 @@
 </div>
 </div>
 
-<div id="outline-container-org3cfe4d2" class="outline-3">
-<h3 id="org3cfe4d2">Harmonic Oscillator</h3>
-<div class="outline-text-3" id="text-org3cfe4d2">
+<div id="outline-container-org17d0fcc" class="outline-3">
+<h3 id="org17d0fcc">Harmonic Oscillator</h3>
+<div class="outline-text-3" id="text-org17d0fcc">
 <p>
 To simplify calculations we will use unit-less expressions. To do this let \(\tilde{x}\),
 \(\tilde{p}\), etc denote physical quantities <i>with</i> units and denote the unit-less versions
@@ -66,7 +69,7 @@ without the tilde, such that e.g.
 </p>
 
 <p>
-<a id="orgc54de6e"></a>
+<a id="org7e001a3"></a>
 \[
   \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
 \]
@@ -84,7 +87,7 @@ as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgf21db43">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<pre class="src src-sage" id="orgcb12888">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
 <span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
 (<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
 <span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
@@ -97,7 +100,7 @@ and the corresponding annihilation (\(a\)), and creation operator (\(a^\dagger\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org77e7152"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
+<pre class="src src-sage" id="org99c0340"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
 
 <span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
 <span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
@@ -109,7 +112,7 @@ Some basic sanity checks:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgac9c1eb"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<pre class="src src-sage" id="orga59b863"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
 <span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
 <span class="org-string">"PASSED"</span>
 </pre>
@@ -121,41 +124,78 @@ Some basic sanity checks:
 
 
 <p>
-Note that from <a href="#orgc54de6e">above</a> we get
+Note that from <a href="#org7e001a3">above</a> we get
 </p>
 
 <p>
-<a id="org870d729"></a>
+<a id="org67ed361"></a>
 \[
   \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
 \]
 </p>
-</div>
-</div>
-</div>
 
-<div id="outline-container-orgaac69c3" class="outline-2">
-<h2 id="orgaac69c3">Exercises</h2>
-<div class="outline-text-2" id="text-orgaac69c3">
+<p>
+For convenience let us also define the number operator \(N=a^\dagger a = H-1/2\). Clearly
+the number operator has the same eigenstates as \(H\). The corresponding eigenvalues are
+shifted by \(1/2\).
+</p>
+
+<p>
+<a id="orgb4fe278"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem (Spectrum of 1D Harmonic Oscillator)</dt><dd><p>
+Let
+</p>
+
+<p>
+\[ \ket{0} = \frac{1}{\sqrt{2\pi}} e^{-x^2 / 2} , \]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[ \ket{n} = \frac{(a^\dagger)^n}{\sqrt{n!}} \ket{0} , \]
+</p>
+
+<p>
+for \(n\in\{1,2,\ldots\}\). These states form an orthonormal set of the Hilbert space
+\(L^2 (\RR)\) of square integrable functions. Moreover they are eigenstates of \(H\) and \(N\)
+with \(N\ket{n}=n\ket{n}\).
+</p>
+<dl class="org-dl">
+<dt>Remark</dt><dd><a id="orgddbbfb6"></a> It is well known that the gaussian function which
+defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org/wiki/Gaussian_integral">gaussian integral</a>).</dd>
+<dt>Proof</dt><dd>See <a href="#exercise-7.4-proof">solution of exercise 7.4</a>.</dd>
+</dl></dd>
+</dl>
 </div>
-<div id="outline-container-orgf803b9b" class="outline-3">
-<h3 id="orgf803b9b">Exercise 7.1</h3>
-<div class="outline-text-3" id="text-orgf803b9b">
+</div>
+</div>
+<div id="outline-container-orge9693de" class="outline-2">
+<h2 id="orge9693de">Exercises</h2>
+<div class="outline-text-2" id="text-orge9693de">
+</div>
+<div id="outline-container-orgb01c0fc" class="outline-3">
+<h3 id="orgb01c0fc">Exercise 7.1</h3>
+<div class="outline-text-3" id="text-orgb01c0fc">
 <p>
 Using the fact that \(x\) and \(p\) do not commute, and that in fact \([x,p]=\ii\,\hbar\),
 explicitly show that \(a^\dagger\,a=H/\hbar\omega-1/2\).
 </p>
 </div>
 
-<div id="outline-container-orgede6e05" class="outline-4">
-<h4 id="orgede6e05">Solution</h4>
-<div class="outline-text-4" id="text-orgede6e05">
+<div id="outline-container-org99711e6" class="outline-4">
+<h4 id="org99711e6">Solution</h4>
+<div class="outline-text-4" id="text-org99711e6">
 <p>
 This is just boring algebra which can be done much faster (and more reliably) by <i>sage</i>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org6fc1ba4"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
+<pre class="src src-sage" id="org82d2a47"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
 <span class="org-doc">"PASSED"</span>
 </pre>
 </div>
@@ -167,33 +207,259 @@ This is just boring algebra which can be done much faster (and more reliably) by
 </div>
 </div>
 
-<div id="outline-container-orgc7a55f0" class="outline-3">
-<h3 id="orgc7a55f0">Exercise 7.2</h3>
-<div class="outline-text-3" id="text-orgc7a55f0">
+<div id="outline-container-exercise-7.2" class="outline-3">
+<h3 id="exercise-7.2">Exercise 7.2</h3>
+<div class="outline-text-3" id="text-exercise-7.2">
 <p>
-Given that \([x,p]=\ii\,\hbar\), compute \([a^\dagger,a]\).
+Given that \([x,p]=\ii\,\hbar\), compute \([a,a^\dagger]\).
 </p>
 </div>
 
-<div id="outline-container-orge7298ad" class="outline-4">
-<h4 id="orge7298ad">Solution</h4>
-<div class="outline-text-4" id="text-orge7298ad">
+<div id="outline-container-org5c22747" class="outline-4">
+<h4 id="org5c22747">Solution</h4>
+<div class="outline-text-4" id="text-org5c22747">
 <p>
-The unitless result is \(-1\):
+The unitless result is \(1\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgee316e5">com(ad, a)
+<pre class="src src-sage" id="org8fb67e4">com(a, ad)
 </pre>
 </div>
 
 <pre class="example">
--1
+1
 </pre>
 
 
 <p>
-Since the <a href="#org870d729">creator/annihilator is already unit-less</a> the same is true with units.
+Since the <a href="#org67ed361">creator/annihilator is already unit-less</a> the same is true with units.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6d8c00e" class="outline-3">
+<h3 id="org6d8c00e">Exercise 7.3</h3>
+<div class="outline-text-3" id="text-org6d8c00e">
+<p>
+Compute \([H,a]\) and use the result to show that if \(\ket{\psi}\) is an eigenstate of \(H\)
+with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with energy
+\(E-n\hbar\omega\).
+</p>
+</div>
+
+<div id="outline-container-org71b280a" class="outline-4">
+<h4 id="org71b280a">Solution</h4>
+<div class="outline-text-4" id="text-org71b280a">
+<p>
+Using \([a^\dagger,a]=-[a,a^\dagger]=-1\) (see <a href="#exercise-7.2">exercise 7.2</a>) we deduce (assuming unit-less quantities)
+</p>
+
+<p>
+\[
+  [H,a] = [a^\dagger a, a] = (a^\dagger a - a a^\dagger) a = [a^\dagger,a] a = -a .
+\]
+</p>
+
+<p>
+Using this we get
+</p>
+
+\begin{align*}
+  H a^n \ket{\psi} &= (Ha) a^{n-1} \ket{\psi} \\
+  &= ([H,a] + aH)a^{n-1} \ket{\psi} \\
+  &= (-a^n + a H a^{n-1}) \ket{\psi} \\
+  &= a H a^{n-1} \ket{\psi} - a^n \ket{\psi} .
+\end{align*}
+
+<p>
+Recall that we want to show that \(Ha^n\ket{\psi}=(E-n)a^n\ket{\psi}\) for all natural
+numbers \(n\leq E\). Using the above calculation we can prove this by induction. In fact,
+for \(n=0\) the assertion is trivial. For \(n>0\) we may use the above calculation together
+with the assertion for \(n-1\):
+</p>
+
+<p>
+\[
+  H a^n \ket{\psi} = a(E-n+1)a^{n-1}\ket{\psi} - a^n \ket{\psi} = (E-n)a^n\ket{\psi} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org485f79c" class="outline-3">
+<h3 id="org485f79c">Exercise 7.4</h3>
+<div class="outline-text-3" id="text-org485f79c">
+<p>
+Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
+</p>
+</div>
+
+<div id="outline-container-exercise-7.4-proof" class="outline-4">
+<h4 id="exercise-7.4-proof">Proof</h4>
+<div class="outline-text-4" id="text-exercise-7.4-proof">
+<p>
+The exercise statement is rather "vague" (I try to be friendly here 😉), so let us prove
+some definite statement like the <a href="#orgb4fe278">theorem about the spectrum of the harmonic oscillator</a>
+instead.
+</p>
+
+<p>
+To find the <i>ground state</i> consider
+</p>
+
+<p>
+\[
+  \bra{\phi} N \ket{\phi} = \norm{a\phi}^2 \geq 0 .
+\]
+</p>
+
+<p>
+Equality holds iff
+</p>
+
+<p>
+\[
+  x \phi(x) + \phi'(x) = \sqrt{2} \cdot (a\phi)(x) = 0 .
+\]
+</p>
+
+<p>
+This is a linear ordinary differential equation. One solution is given by
+\(x\mapsto\exp(-x^2/2)\), which can be easily checked by plugging this in. We do not need
+this fact (since it follows automatically later on) but the solution is unique up to a
+scalar factor, which can be seen by observing that the ODE is equivalent to
+\(\partial_x\log(\phi(x))=-x\).
+</p>
+
+<p>
+The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#orgddbbfb6">ensures normalization</a>. We thus
+proved \(N\ket{0}=0\). Next let us verify that \(\ket{n}\) is an eigenvector. To simplify the
+notation let us define \(\ket{n'}:=\sqrt{n!}\ket{n}\).
+</p>
+
+<p>
+\[
+  N\ket{n'} = a^\dagger a (a^\dagger)^n \ket{0} .
+\]
+</p>
+
+<p>
+By using \([a,a^\dagger]=1\) (<a href="#exercise-7.2">exercise 7.2</a>) we may move the single \(a\) to the right and then
+use \(a\ket{0}=0\) (this procedure is just simple example of mathematical induction). This
+leads to
+</p>
+
+<p>
+\[
+  N\ket{n'} = n (a^\dagger)^n \ket{0} = n \ket{n'} ,
+\]
+</p>
+
+<p>
+hence establishing that \(\ket{n'}\) (and \(\ket{n}\)) is an eigenvector for the eigenvalue
+\(n\). To see that the \(1/\sqrt{n!}\) in the definition of \(\ket{n}\) is indeed the right
+normalization factor use the freshly proved equality \(N\ket{n'}=n\ket{n'}\) and consider
+(don't forget \([a,a^\dagger]=1\))
+</p>
+
+<p>
+\[
+  \norm{(n+1)'}^2 = \bra{n'} a a^\dagger \ket{n'}
+  = \bra{n'} N + 1 \ket{n'}
+  = (n+1) \norm{n'}^2 .
+\]
+</p>
+
+<p>
+Hence, since \(\ket{0}\) is already normalized mathematical induction shows that \(\ket{n}\)
+is normalized too.
+</p>
+
+<p>
+It remains to show that the \((\ket{n})\) generate the whole Hilbert space (completeness),
+since orthogonality already follows from the fact that they are eigenstates to <i>different</i>
+eigenvalues of some (unbounded) self-adjoint operator. This essentially boils down to show
+that finite linear combinations of the eigenstates are dense in \(L^2(\RR)\).
+</p>
+
+<p>
+We only sketch the proof since this reaches out to other parts of mathematics. First of
+all observe that
+</p>
+
+<p>
+\[
+  \ket{n}(x) = \frac{1}{\sqrt{2\pi}} \; p_n(x) \; e^{-x^2/2} ,
+\]
+</p>
+
+<p>
+where the \(p_n(x)\) are polynomials which satisfy the recursive relation
+</p>
+
+<p>
+\[ p_{n+1}(x)=(2x+\partial_x)p_n(x), \quad p_0(x) = 1 . \]
+</p>
+
+<p>
+These are the well-known <a href="https://en.wikipedia.org/wiki/Hermite_polynomials">hermite polynomials</a>. From the recursive relation we directly see
+(inductively) the <i>for our purpose important</i> property that \(p_n\) has degree \(n\) (with
+leading factor \(2^n\)). The density now follows from the following well known results
+</p>
+
+<ol class="org-ol">
+<li><a id="org9b9199f"></a> The compactly supported continuous functions are dense in
+\(L^2(\RR)\). I do not have a good resource on that but one way to see this is by a
+method called <i><a href="https://en.wikipedia.org/wiki/Mollifier">mollification</a></i>.</li>
+<li><a id="org151e085"></a> For any finite interval \(I\) the polynomials on that
+interval are dense in the continuous function on \(I\) with respect to the
+$L^&infin;$-norm which is stronger than the \(L^2\) norm (since the interval is
+finite). This is the <a href="https://en.wikipedia.org/wiki/Stone%E2%80%93Weierstrass_theorem">Stone-Weierstrass Theorem</a>.</li>
+</ol>
+
+<p>
+By <a href="#org151e085">2</a> finite linear combinations of eigenstates can approximate any
+compactly supported continuous function. Here it is important that any degree is
+represented among the eigenstates. It should be obvious that the factor \(e^{-x^2/2}\) does
+not disturb this argument at all. Now completeness directly follows from
+<a href="#org9b9199f">1</a>. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3834364" class="outline-3">
+<h3 id="org3834364">Exercise 7.5</h3>
+<div class="outline-text-3" id="text-org3834364">
+<p>
+Verify that Equations (7.11) and (7.12) are consistent with (7.10) and the normalization
+condition \(\norm{\ket{n}}^2=1\).
+</p>
+</div>
+
+<div id="outline-container-org6ab2b12" class="outline-4">
+<h4 id="org6ab2b12">Solution</h4>
+<div class="outline-text-4" id="text-org6ab2b12">
+<p>
+It is not hard to see that (7.11) and (7.12) imply (7.10):
+</p>
+
+<p>
+\[
+  a^\dagger a \ket{n} = a^\dagger \sqrt{n} \ket{n-1} = n \ket{n} .
+\]
+</p>
+
+<p>
+The normalization condition is not relevant here. So it is indeed true that it is
+consistent with the three equations but for trivial reasons.
 </p>
 </div>
 </div>
