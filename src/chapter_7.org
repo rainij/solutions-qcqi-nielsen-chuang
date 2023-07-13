@@ -262,3 +262,59 @@ $$
 
 The normalization condition is not relevant here. So it is indeed true that it is
 consistent with the three equations but for trivial reasons.
+
+** Exercise 7.6 (Eigenstates of photon annihilation)
+Prove that a coherent state is an eigenstate of the photon annihilation operator, that is,
+show $a\ket{\alpha}=\lambda\ket{\alpha}$ for some constant $\lambda$.
+
+*** Proof
+Recall that $a\ket{n}=\sqrt{n}\ket{n-1}$ for $n\geq1$ and $a\ket{0}=0$. Hence
+
+$$
+  a\ket{\alpha} = e^{-\abs{\alpha}/2} \sum_n \frac{\alpha^n}{\sqrt{n}} \, a \, \ket{n}
+  = e^{-\abs{\alpha}/2} \sum_n \frac{\alpha^{n+1}}{\sqrt{n}} \ket{n}
+  = \alpha \ket{\alpha} .
+$$
+
+The claim follows with $\lambda=\alpha$. QED.
+
+** Exercise 7.7
+Show that the circuit below transforms a dual-rail state by
+
+$$
+  \ket{\psi_{\mathrm{out}}} = \begin{bmatrix} e^{\ii\pi} & 0 \\ 0 & 1 \end{bmatrix} \ket{\psi_{\mathrm{in}}} .
+$$
+
+if we take the top wire to represent the $\ket{01}$ mode, and $\ket{10}$ the bottom mode,
+and the boxed $\pi$ to represent a phase shift by $\pi$.
+
+- Remark :: The book contains a picture showing the circuit.
+
+*** Solution
+By definition the circuit acts like this (we use $e^{\ii\pi}=-1$ to simplify notation):
+
+$$
+  \ket{0_L} = \ket{01} \mapsto -\ket{0_L}, \quad
+  \ket{1_L} = \ket{10} \mapsto \ket{1_L}.
+$$
+
+The matrix representing this linear transformation with respect to the basis
+$(\ket{0_L},\ket{1_L})$ (the order is important) is
+
+\begin{bmatrix} -1 & 0 \\ 0 & 1 \end{bmatrix}
+
+as desired.
+
+** Exercise 7.8
+Show that $P\ket{\alpha}=\ket{\alpha e^{\ii\Delta}}$ where $\ket{\alpha}$ is a coherent
+state (note that, in general, $\alpha$ is a complex number!).
+
+*** Proof
+The phase shift operator is given by $P\ket{n}=e^{\ii n\Delta}\ket{n}$. Hence, using $\abs{e^{\ii\Delta}}=1$
+
+$$
+P\ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n \, e^{\ii n\Delta}}{\sqrt{n!}} \ket{n}
+= \ket{\alpha e^{\ii\Delta}} .
+$$
+
+QED.
