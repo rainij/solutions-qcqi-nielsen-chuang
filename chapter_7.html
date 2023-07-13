@@ -26,32 +26,35 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org593f947">Setup</a>
+<li><a href="#orgecd07dd">Setup</a>
 <ul>
-<li><a href="#org7364ceb">Imports</a></li>
-<li><a href="#org17d0fcc">Harmonic Oscillator</a></li>
+<li><a href="#orgb57bcaf">Imports</a></li>
+<li><a href="#org7129161">Harmonic Oscillator</a></li>
 </ul>
 </li>
-<li><a href="#orge9693de">Exercises</a>
+<li><a href="#orgddf843d">Exercises</a>
 <ul>
-<li><a href="#orgb01c0fc">Exercise 7.1</a></li>
+<li><a href="#org44001cb">Exercise 7.1</a></li>
 <li><a href="#exercise-7.2">Exercise 7.2</a></li>
-<li><a href="#org6d8c00e">Exercise 7.3</a></li>
-<li><a href="#org485f79c">Exercise 7.4</a></li>
-<li><a href="#org3834364">Exercise 7.5</a></li>
+<li><a href="#orgbbc81b6">Exercise 7.3</a></li>
+<li><a href="#org351e0f9">Exercise 7.4</a></li>
+<li><a href="#orgae24328">Exercise 7.5</a></li>
+<li><a href="#org9df8102">Exercise 7.6 (Eigenstates of photon annihilation)</a></li>
+<li><a href="#orge39cae9">Exercise 7.7</a></li>
+<li><a href="#org8a496fb">Exercise 7.8</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org593f947" class="outline-2">
-<h2 id="org593f947">Setup</h2>
-<div class="outline-text-2" id="text-org593f947">
+<div id="outline-container-orgecd07dd" class="outline-2">
+<h2 id="orgecd07dd">Setup</h2>
+<div class="outline-text-2" id="text-orgecd07dd">
 </div>
-<div id="outline-container-org7364ceb" class="outline-3">
-<h3 id="org7364ceb">Imports</h3>
-<div class="outline-text-3" id="text-org7364ceb">
+<div id="outline-container-orgb57bcaf" class="outline-3">
+<h3 id="orgb57bcaf">Imports</h3>
+<div class="outline-text-3" id="text-orgb57bcaf">
 <div class="org-src-container">
 <pre class="src src-sage"><span class="org-keyword">from</span> utils <span class="org-keyword">import</span> commutator <span class="org-keyword">as</span> com
 </pre>
@@ -59,9 +62,9 @@
 </div>
 </div>
 
-<div id="outline-container-org17d0fcc" class="outline-3">
-<h3 id="org17d0fcc">Harmonic Oscillator</h3>
-<div class="outline-text-3" id="text-org17d0fcc">
+<div id="outline-container-org7129161" class="outline-3">
+<h3 id="org7129161">Harmonic Oscillator</h3>
+<div class="outline-text-3" id="text-org7129161">
 <p>
 To simplify calculations we will use unit-less expressions. To do this let \(\tilde{x}\),
 \(\tilde{p}\), etc denote physical quantities <i>with</i> units and denote the unit-less versions
@@ -69,7 +72,7 @@ without the tilde, such that e.g.
 </p>
 
 <p>
-<a id="org7e001a3"></a>
+<a id="org735d13f"></a>
 \[
   \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
 \]
@@ -87,7 +90,7 @@ as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgcb12888">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<pre class="src src-sage" id="org094474c">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
 <span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
 (<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
 <span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
@@ -100,7 +103,7 @@ and the corresponding annihilation (\(a\)), and creation operator (\(a^\dagger\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org99c0340"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
+<pre class="src src-sage" id="org69781bd"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
 
 <span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
 <span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
@@ -112,7 +115,7 @@ Some basic sanity checks:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orga59b863"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<pre class="src src-sage" id="orgbc01d5d"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
 <span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
 <span class="org-string">"PASSED"</span>
 </pre>
@@ -124,11 +127,11 @@ Some basic sanity checks:
 
 
 <p>
-Note that from <a href="#org7e001a3">above</a> we get
+Note that from <a href="#org735d13f">above</a> we get
 </p>
 
 <p>
-<a id="org67ed361"></a>
+<a id="orgb56065e"></a>
 \[
   \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
 \]
@@ -141,7 +144,7 @@ shifted by \(1/2\).
 </p>
 
 <p>
-<a id="orgb4fe278"></a>
+<a id="orgc16f855"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem (Spectrum of 1D Harmonic Oscillator)</dt><dd><p>
@@ -166,7 +169,7 @@ for \(n\in\{1,2,\ldots\}\). These states form an orthonormal set of the Hilbert 
 with \(N\ket{n}=n\ket{n}\).
 </p>
 <dl class="org-dl">
-<dt>Remark</dt><dd><a id="orgddbbfb6"></a> It is well known that the gaussian function which
+<dt>Remark</dt><dd><a id="org68d5e48"></a> It is well known that the gaussian function which
 defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org/wiki/Gaussian_integral">gaussian integral</a>).</dd>
 <dt>Proof</dt><dd>See <a href="#exercise-7.4-proof">solution of exercise 7.4</a>.</dd>
 </dl></dd>
@@ -174,28 +177,28 @@ defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org
 </div>
 </div>
 </div>
-<div id="outline-container-orge9693de" class="outline-2">
-<h2 id="orge9693de">Exercises</h2>
-<div class="outline-text-2" id="text-orge9693de">
+<div id="outline-container-orgddf843d" class="outline-2">
+<h2 id="orgddf843d">Exercises</h2>
+<div class="outline-text-2" id="text-orgddf843d">
 </div>
-<div id="outline-container-orgb01c0fc" class="outline-3">
-<h3 id="orgb01c0fc">Exercise 7.1</h3>
-<div class="outline-text-3" id="text-orgb01c0fc">
+<div id="outline-container-org44001cb" class="outline-3">
+<h3 id="org44001cb">Exercise 7.1</h3>
+<div class="outline-text-3" id="text-org44001cb">
 <p>
 Using the fact that \(x\) and \(p\) do not commute, and that in fact \([x,p]=\ii\,\hbar\),
 explicitly show that \(a^\dagger\,a=H/\hbar\omega-1/2\).
 </p>
 </div>
 
-<div id="outline-container-org99711e6" class="outline-4">
-<h4 id="org99711e6">Solution</h4>
-<div class="outline-text-4" id="text-org99711e6">
+<div id="outline-container-org283da1b" class="outline-4">
+<h4 id="org283da1b">Solution</h4>
+<div class="outline-text-4" id="text-org283da1b">
 <p>
 This is just boring algebra which can be done much faster (and more reliably) by <i>sage</i>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org82d2a47"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
+<pre class="src src-sage" id="org76a56ba"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
 <span class="org-doc">"PASSED"</span>
 </pre>
 </div>
@@ -215,15 +218,15 @@ Given that \([x,p]=\ii\,\hbar\), compute \([a,a^\dagger]\).
 </p>
 </div>
 
-<div id="outline-container-org5c22747" class="outline-4">
-<h4 id="org5c22747">Solution</h4>
-<div class="outline-text-4" id="text-org5c22747">
+<div id="outline-container-orgd9158ca" class="outline-4">
+<h4 id="orgd9158ca">Solution</h4>
+<div class="outline-text-4" id="text-orgd9158ca">
 <p>
 The unitless result is \(1\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org8fb67e4">com(a, ad)
+<pre class="src src-sage" id="org2773986">com(a, ad)
 </pre>
 </div>
 
@@ -233,15 +236,15 @@ The unitless result is \(1\):
 
 
 <p>
-Since the <a href="#org67ed361">creator/annihilator is already unit-less</a> the same is true with units.
+Since the <a href="#orgb56065e">creator/annihilator is already unit-less</a> the same is true with units.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6d8c00e" class="outline-3">
-<h3 id="org6d8c00e">Exercise 7.3</h3>
-<div class="outline-text-3" id="text-org6d8c00e">
+<div id="outline-container-orgbbc81b6" class="outline-3">
+<h3 id="orgbbc81b6">Exercise 7.3</h3>
+<div class="outline-text-3" id="text-orgbbc81b6">
 <p>
 Compute \([H,a]\) and use the result to show that if \(\ket{\psi}\) is an eigenstate of \(H\)
 with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with energy
@@ -249,9 +252,9 @@ with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with
 </p>
 </div>
 
-<div id="outline-container-org71b280a" class="outline-4">
-<h4 id="org71b280a">Solution</h4>
-<div class="outline-text-4" id="text-org71b280a">
+<div id="outline-container-orgd4d3206" class="outline-4">
+<h4 id="orgd4d3206">Solution</h4>
+<div class="outline-text-4" id="text-orgd4d3206">
 <p>
 Using \([a^\dagger,a]=-[a,a^\dagger]=-1\) (see <a href="#exercise-7.2">exercise 7.2</a>) we deduce (assuming unit-less quantities)
 </p>
@@ -293,9 +296,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org485f79c" class="outline-3">
-<h3 id="org485f79c">Exercise 7.4</h3>
-<div class="outline-text-3" id="text-org485f79c">
+<div id="outline-container-org351e0f9" class="outline-3">
+<h3 id="org351e0f9">Exercise 7.4</h3>
+<div class="outline-text-3" id="text-org351e0f9">
 <p>
 Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 </p>
@@ -306,7 +309,7 @@ Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 <div class="outline-text-4" id="text-exercise-7.4-proof">
 <p>
 The exercise statement is rather "vague" (I try to be friendly here 😉), so let us prove
-some definite statement like the <a href="#orgb4fe278">theorem about the spectrum of the harmonic oscillator</a>
+some definite statement like the <a href="#orgc16f855">theorem about the spectrum of the harmonic oscillator</a>
 instead.
 </p>
 
@@ -339,7 +342,7 @@ scalar factor, which can be seen by observing that the ODE is equivalent to
 </p>
 
 <p>
-The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#orgddbbfb6">ensures normalization</a>. We thus
+The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#org68d5e48">ensures normalization</a>. We thus
 proved \(N\ket{0}=0\). Next let us verify that \(\ket{n}\) is an eigenvector. To simplify the
 notation let us define \(\ket{n'}:=\sqrt{n!}\ket{n}\).
 </p>
@@ -415,38 +418,38 @@ leading factor \(2^n\)). The density now follows from the following well known r
 </p>
 
 <ol class="org-ol">
-<li><a id="org9b9199f"></a> The compactly supported continuous functions are dense in
+<li><a id="org2d931ab"></a> The compactly supported continuous functions are dense in
 \(L^2(\RR)\). I do not have a good resource on that but one way to see this is by a
 method called <i><a href="https://en.wikipedia.org/wiki/Mollifier">mollification</a></i>.</li>
-<li><a id="org151e085"></a> For any finite interval \(I\) the polynomials on that
+<li><a id="org7264a57"></a> For any finite interval \(I\) the polynomials on that
 interval are dense in the continuous function on \(I\) with respect to the
 $L^&infin;$-norm which is stronger than the \(L^2\) norm (since the interval is
 finite). This is the <a href="https://en.wikipedia.org/wiki/Stone%E2%80%93Weierstrass_theorem">Stone-Weierstrass Theorem</a>.</li>
 </ol>
 
 <p>
-By <a href="#org151e085">2</a> finite linear combinations of eigenstates can approximate any
+By <a href="#org7264a57">2</a> finite linear combinations of eigenstates can approximate any
 compactly supported continuous function. Here it is important that any degree is
 represented among the eigenstates. It should be obvious that the factor \(e^{-x^2/2}\) does
 not disturb this argument at all. Now completeness directly follows from
-<a href="#org9b9199f">1</a>. QED.
+<a href="#org2d931ab">1</a>. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3834364" class="outline-3">
-<h3 id="org3834364">Exercise 7.5</h3>
-<div class="outline-text-3" id="text-org3834364">
+<div id="outline-container-orgae24328" class="outline-3">
+<h3 id="orgae24328">Exercise 7.5</h3>
+<div class="outline-text-3" id="text-orgae24328">
 <p>
 Verify that Equations (7.11) and (7.12) are consistent with (7.10) and the normalization
 condition \(\norm{\ket{n}}^2=1\).
 </p>
 </div>
 
-<div id="outline-container-org6ab2b12" class="outline-4">
-<h4 id="org6ab2b12">Solution</h4>
-<div class="outline-text-4" id="text-org6ab2b12">
+<div id="outline-container-org23d24d4" class="outline-4">
+<h4 id="org23d24d4">Solution</h4>
+<div class="outline-text-4" id="text-org23d24d4">
 <p>
 It is not hard to see that (7.11) and (7.12) imply (7.10):
 </p>
@@ -460,6 +463,118 @@ It is not hard to see that (7.11) and (7.12) imply (7.10):
 <p>
 The normalization condition is not relevant here. So it is indeed true that it is
 consistent with the three equations but for trivial reasons.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9df8102" class="outline-3">
+<h3 id="org9df8102">Exercise 7.6 (Eigenstates of photon annihilation)</h3>
+<div class="outline-text-3" id="text-org9df8102">
+<p>
+Prove that a coherent state is an eigenstate of the photon annihilation operator, that is,
+show \(a\ket{\alpha}=\lambda\ket{\alpha}\) for some constant \(\lambda\).
+</p>
+</div>
+
+<div id="outline-container-org53cb254" class="outline-4">
+<h4 id="org53cb254">Proof</h4>
+<div class="outline-text-4" id="text-org53cb254">
+<p>
+Recall that \(a\ket{n}=\sqrt{n}\ket{n-1}\) for \(n\geq1\) and \(a\ket{0}=0\). Hence
+</p>
+
+<p>
+\[
+  a\ket{\alpha} = e^{-\abs{\alpha}/2} \sum_n \frac{\alpha^n}{\sqrt{n}} \, a \, \ket{n}
+  = e^{-\abs{\alpha}/2} \sum_n \frac{\alpha^{n+1}}{\sqrt{n}} \ket{n}
+  = \alpha \ket{\alpha} .
+\]
+</p>
+
+<p>
+The claim follows with \(\lambda=\alpha\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge39cae9" class="outline-3">
+<h3 id="orge39cae9">Exercise 7.7</h3>
+<div class="outline-text-3" id="text-orge39cae9">
+<p>
+Show that the circuit below transforms a dual-rail state by
+</p>
+
+<p>
+\[
+  \ket{\psi_{\mathrm{out}}} = \begin{bmatrix} e^{\ii\pi} & 0 \\ 0 & 1 \end{bmatrix} \ket{\psi_{\mathrm{in}}} .
+\]
+</p>
+
+<p>
+if we take the top wire to represent the \(\ket{01}\) mode, and \(\ket{10}\) the bottom mode,
+and the boxed \(\pi\) to represent a phase shift by \(\pi\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The book contains a picture showing the circuit.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org1df308a" class="outline-4">
+<h4 id="org1df308a">Solution</h4>
+<div class="outline-text-4" id="text-org1df308a">
+<p>
+By definition the circuit acts like this (we use \(e^{\ii\pi}=-1\) to simplify notation):
+</p>
+
+<p>
+\[
+  \ket{0_L} = \ket{01} \mapsto -\ket{0_L}, \quad
+  \ket{1_L} = \ket{10} \mapsto \ket{1_L}.
+\]
+</p>
+
+<p>
+The matrix representing this linear transformation with respect to the basis
+\((\ket{0_L},\ket{1_L})\) (the order is important) is
+</p>
+
+\begin{bmatrix} -1 & 0 \\ 0 & 1 \end{bmatrix}
+
+<p>
+as desired.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8a496fb" class="outline-3">
+<h3 id="org8a496fb">Exercise 7.8</h3>
+<div class="outline-text-3" id="text-org8a496fb">
+<p>
+Show that \(P\ket{\alpha}=\ket{\alpha e^{\ii\Delta}}\) where \(\ket{\alpha}\) is a coherent
+state (note that, in general, \(\alpha\) is a complex number!).
+</p>
+</div>
+
+<div id="outline-container-org7cbaad0" class="outline-4">
+<h4 id="org7cbaad0">Proof</h4>
+<div class="outline-text-4" id="text-org7cbaad0">
+<p>
+The phase shift operator is given by \(P\ket{n}=e^{\ii n\Delta}\ket{n}\). Hence, using \(\abs{e^{\ii\Delta}}=1\)
+</p>
+
+<p>
+\[
+P\ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n \, e^{\ii n\Delta}}{\sqrt{n!}} \ket{n}
+= \ket{\alpha e^{\ii\Delta}} .
+\]
+</p>
+
+<p>
+QED.
 </p>
 </div>
 </div>
