@@ -11,6 +11,7 @@
 ** Imports
 #+begin_src sage
   from utils import commutator as com
+  from utils_sage import Z, H, Ry, Rz
 #+end_src
 
 ** Harmonic Oscillator
@@ -43,7 +44,7 @@ and the corresponding annihilation ($a$), and creation operator ($a^\dagger$):
 
 #+name: commutator-ladder-operators
 #+begin_src sage
-  H = p^2 / 2 + x^2 / 2
+  H_qho = p^2 / 2 + x^2 / 2
 
   a = (x + i*p) / sqrt(2)
   ad = (x - i*p) / sqrt(2)
@@ -52,13 +53,13 @@ and the corresponding annihilation ($a$), and creation operator ($a^\dagger$):
 Some basic sanity checks:
 
 #+name: commutator-ladder-operators-checks
-#+begin_src sage :results replace :tangle no cache: yes
+#+begin_src sage :results replace :tangle no :cache yes
   assert com(x, p) == i
   assert com(a, ad) == 1
   "PASSED"
 #+end_src
 
-#+RESULTS: commutator-ladder-operators-checks
+#+RESULTS[7274798eb8e917891bbfa50d7dfa80ec1b7a9b47]: commutator-ladder-operators-checks
 : 'PASSED'
 
 Note that from [[unitless-position-and-momentum][above]] we get
@@ -87,6 +88,26 @@ shifted by $1/2$.
   - Remark :: <<gaussian-integral>> It is well known that the gaussian function which
     defines $\ket{0}$ is already normalized (see [[https://en.wikipedia.org/wiki/Gaussian_integral][gaussian integral]]).
   - Proof :: See [[#exercise-7.4-proof][solution of exercise 7.4]].
+
+** Optical photon quantum computers
+The book showed that the beamsplitter $B=e^{-\ii (ab^\dagger-a^\dagger b)}$ acts as
+follows on the dual-rail representation
+
+#+name: beamsplitter-dual-rail-basis
+#+begin_src sage
+  theta = SR.var('theta', domain='real')
+  B = matrix([[cos(theta), -sin(theta)], [sin(theta), cos(theta)]])
+#+end_src
+
+This essentially follows from these commutation relations:
+
+<<beamsplitter-commutation-relations>>
+$$
+  BaB^\dagger = a \cos(\theta) + b \sin(\theta)
+  \quad \text{and} \quad
+  BbB^\dagger = b \cos(\theta) - a \sin(\theta) .
+$$
+
 * Exercises
 ** Exercise 7.1
 Using the fact that $x$ and $p$ do not commute, and that in fact $[x,p]=\ii\,\hbar$,
@@ -97,11 +118,11 @@ This is just boring algebra which can be done much faster (and more reliably) by
 
 #+name: exercise-7.1
 #+begin_src sage :results replace :tangle no :cache yes
-  assert ad * a == H - 1/2
+  assert ad * a == H_qho - 1/2
   "PASSED"
 #+end_src
 
-#+RESULTS[39888cccfad91cfa7dfd76c46743e018e631a159]: exercise-7.1
+#+RESULTS[38f2058bc713985fbab62335c0887638d917a285]: exercise-7.1
 : 'PASSED'
 
 ** Exercise 7.2
@@ -318,3 +339,152 @@ P\ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n \, e^{\ii n\Delta}}{
 $$
 
 QED.
+
+** Exercise 7.9 (Optical Hadamard gate)
+Show that the following circuit acts as a Hadamard gate on dual-rail single photon states,
+that is, $\ket{01}\mapsto(\ket{01}+\ket{10})/\sqrt{2}$ and
+$\ket{10}\mapsto(\ket{01}-\ket{10})/\sqrt{2}$ up to an overall phase.
+
+- Remark :: The book contains a picture showing the circuit.
+
+*** Solution
+Assuming evolution from left to right the circuit implements $ZB_{\theta=\pi/4}$ (note
+that the phase shift is $Z$ up to a global phase). Below you can see that then the
+assertion of the exercise is wrong. We give two alternatives instead.
+
+#+begin_src sage :results replace :tangle no :cache yes
+  B0 = B.subs(theta=pi/4)
+  B1 = B.subs(theta=-pi/4)
+
+  # This shows that the original circuit does not implement H, not even if we neglect a
+  # global phase
+  f"sqrt(2)*H != {sqrt(2) * Z * B0}"
+
+  # These alternatives implement the Hadamard gate:
+  assert B0 * Z == H
+  assert Z * B1 == H
+  "PASSED"
+#+end_src
+
+#+RESULTS[04d7c5cbd0a5ca296a6d967664b6e4facfdcd1d6]:
+: 'sqrt(2)*H != [ 1 -1]\n[-1 -1]'
+: 'PASSED'
+
+** Exercise 7.10 (Mach–Zehnder interferometer)
+Interferometers are optical tools used to measure small phase shifts, which are
+constructed from two beamsplitters. Their basic principle of operation can be understood
+by this simple exercise.
+
+
+1. Note that this circuit performs the identity operation:
+
+   $$ B_{\theta=\pi/4}^\dagger \cdot B_{\theta=\pi/4} $$
+2. Compute the rotation operation (on dual-rail states) which this circuit performs, as a
+   function of the phase shift $\varphi$:
+
+   $$ B_{\theta=\pi/4}^\dagger \cdot R_z(-\varphi) \cdot B_{\theta=\pi/4} $$
+
+
+- Remark :: The book contains actual circuits drawings instead of algebraic
+  expressions. The second expression neglects the global phase (as is common).
+
+
+*** Solution
+Recall that we have $B=B(\theta)=R_y(2\theta)$. Hence $B_{\theta=\pi/4}$ is a rotation
+around the y-axis by ninety degrees. This maps the x-axis onto the reversed z-axsis. Hence
+the (reversed) z-rotation in the middle effectively acts like a rotation around the x-axis
+by an angle $+\varphi$. The net result is $R_x(\varphi)$.
+
+Such reasoning easily leads to subtle errors. Therefore let us verify this using sagemath:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  B0 = B.subs(theta=pi/4)
+  phi = SR.var('phi', domain='real')
+
+  assert B0.H * Rz.subs(theta=-phi) * B0 == Rx.subs(theta=phi)
+  "PASSED"
+#+end_src
+
+#+RESULTS[d181afcb2e3cccc86669ae1b88ef476fc645b9a9]:
+: 'PASSED'
+
+It worked out 😎!
+
+** Exercise 7.11
+What is $B\ket{2,0}$ for $\theta=\pi/4$?
+
+*** Solution
+Following the book we basically identify states with products of creation operators and
+then use the [[beamsplitter-commutation-relations][commutation relations]] for the beamsplitter and $B\ket{0,0}=\ket{0,0}$:
+
+$$
+  B\ket{2,0} = \frac{1}{\sqrt{2}} B (a^\dagger)^2 \ket{0,0}
+  = \frac{1}{\sqrt{2}} \left(a^\dagger \cos(\theta) + b^\dagger \sin(\theta) \right)^2 \ket{0,0} .
+$$
+
+Now it helps that $a^\dagger$ and $b^\dagger$ commute, which implies
+
+$$
+  \left(a^\dagger \cos(\theta) + b^\dagger \sin(\theta) \right)^2
+  = (a^\dagger)^2 \cos(\theta)^2 + (b^\dagger)^2 \sin(\theta)^2 + 2a^\dagger b^\dagger \sin(\theta)\cos(\theta) .
+$$
+
+Using $2\sin(x)\cos(x)=\sin(2x)$ we obtain:
+
+$$
+  B\ket{2,0} = \cos(\theta)^2 \ket{2,0} + \sin(\theta)^2 \ket{0,2} +
+  \frac{\sin(2\theta)}{\sqrt{2}} \ket{1,1} .
+$$
+
+Plugging in $\theta=\pi/4$ we obtain
+
+$$
+  B_{\theta=\pi/4} \ket{2,0} = \frac{1}{2} \ket{2,0} + \frac{1}{2} \ket{0,2} +
+  \frac{1}{\sqrt{2}} \ket{1,1}
+$$
+
+** Exercise 7.12 (Quantum beamsplitter with classical inputs)
+What is $B\ket{\alpha,\beta}$ where $\ket{\alpha}$ and $\ket{\beta}$ are two coherent
+states as in Equation (7.16)? (Hint: recall † n that
+$\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}$.)
+
+*** Solution
+Observe that
+
+$$
+  \ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n}{\sqrt{n!}} \ket{n}
+  = e^{\alpha a^\dagger - \abs{\alpha}^2/2} \ket{0} .
+$$
+
+There is one subtle thing to note here. The operator $(a^\dagger)$ is neither bounded nor
+normal. So it is not clear if $e^{\alpha a^\dagger}$ is well defined as an
+operator.
+
+Let us give a sketch of how one might make the exponential function rigorous. Let us
+define the (large) Hilbert space spanned by the $\ket{n}$ but with scalar product
+(implicitly) defined by $\sprod{n}{n}_1=(n!)\inv$. With respect to this Hilbert space
+$a^\dagger$ is bounded. Hence we can define $e^{\alpha a^\dagger}$ by the usual
+exponential series (we need the space for convergence).
+
+Another way to deal with the problem is to just see it as an abbreviation. In fact, we
+only ever apply such operators to $\ket{0,0}$.
+
+In the following let us abreviate $K=e^{-(\abs{\alpha}^2+\abs{\beta}^2)/2}$,
+$c=\cos(\theta)$, and $s=\sin(\theta)$. Now let us go on with the calculation:
+
+\begin{align*}
+  B \ket{\alpha,\beta}
+  &= K B e^{\alpha a^\dagger + \beta b^\dagger} \ket{0,0} \\
+  &= K B e^{\alpha a^\dagger + \beta b^\dagger} B^\dagger B \ket{0,0} \\
+  &= K \exp(\alpha B a^\dagger B^\dagger + \beta B b^\dagger B^\dagger) \ket{0,0} \\
+  &= K \exp(\alpha[ca^\dagger + sb^\dagger] + \beta[cb^\dagger-sa^\dagger]) \ket{0,0} \\
+  &= K \exp((\alpha c - \beta s)a^\dagger + (\alpha s + \beta c)b^\dagger) \ket{0,0} \\
+  & = \ket{\alpha c - \beta s, \alpha s + \beta c} .
+\end{align*}
+
+Hence the operation of $B$ on coherent states is again given by a rotation matrix:
+
+$$
+  B: \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \mapsto
+  \begin{bmatrix} c & -s \\ s & c \end{bmatrix} \begin{pmatrix} \alpha \\ \beta \end{pmatrix} .
+$$

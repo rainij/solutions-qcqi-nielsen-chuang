@@ -30,6 +30,7 @@ The commutator:
 
 The Pauli matrices implemented in sage
 
+#+name: pauli-matrices
 #+begin_src sage
   # Pauli matrices:
   Id = matrix.identity(2)
@@ -39,4 +40,14 @@ The Pauli matrices implemented in sage
 
   # Hadamard matrix
   H = matrix([[1, 1], [1, -1]]) / sqrt(2)
+#+end_src
+
+The Pauli Rotations
+
+#+name: pauli-rotations
+#+begin_src sage
+  theta = SR.var('theta', domain='real')
+  Rz = matrix([[exp(-i*theta/2), 0], [0, exp(i*theta/2)]])
+  Rx = matrix([[cos(theta/2), -i*sin(theta/2)], [-i*sin(theta/2), cos(theta/2)]])
+  Ry = matrix([[cos(theta/2), -sin(theta/2)], [sin(theta/2), cos(theta/2)]])
 #+end_src
