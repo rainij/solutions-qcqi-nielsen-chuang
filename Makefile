@@ -5,6 +5,7 @@ TANGLE_PY := chapter_2 chapter_3 chapter_4 chapter_5 chapter_6
 TANGLE_PY += appendix_2
 TANGLE_PY += continued_fractions utils
 TANGLE_SAGE := chapter_7
+TANGLE_SAGE += utils
 
 THIS_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 ORG_FILES := $(wildcard src/*.org)
@@ -35,7 +36,10 @@ clean:
 pull-latest-simple-css:
 	curl https://raw.githubusercontent.com/kevquirk/simple.css/main/simple.css -o ./src/css/simple.css
 
-src/%.sage src/%.py: src/%.org
+src/%.py: src/%.org
+	emacs --batch --script ./bin/build-site.el --eval "(org-babel-tangle-file \"$<\")"
+
+src/%.sage: src/%.org
 	emacs --batch --script ./bin/build-site.el --eval "(org-babel-tangle-file \"$<\")"
 
 src/%_sage.py: src/%.sage

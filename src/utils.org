@@ -2,6 +2,7 @@
 #+author: Reinhard Stahn
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
+#+property: header-args:sage :session *sage-utils* :tangle utils.sage
 #+property: header-args:python :session none :tangle utils.py
 
 The code in this file is available via src_python{import utils} (after tangling).
@@ -25,4 +26,17 @@ The commutator:
   def commutator(a, b):
       """Commutator [a,b] of a and b."""
       return a*b - b*a
+#+end_src
+
+The Pauli matrices implemented in sage
+
+#+begin_src sage
+  # Pauli matrices:
+  Id = matrix.identity(2)
+  X = matrix([[0, 1], [1, 0]])
+  Y = matrix([[0, -i], [i, 0]])
+  Z = matrix([[1, 0], [0, -1]])
+
+  # Hadamard matrix
+  H = matrix([[1, 1], [1, -1]]) / sqrt(2)
 #+end_src
