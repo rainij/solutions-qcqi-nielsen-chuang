@@ -52,4 +52,32 @@ The commutator:
     <span class="org-keyword">return</span> a<span class="org-operator">*</span>b <span class="org-operator">-</span> b<span class="org-operator">*</span>a
 </pre>
 </div>
+
+<p>
+The Pauli matrices implemented in sage
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="orgeb89fb5"><span class="org-comment-delimiter"># </span><span class="org-comment">Pauli matrices:</span>
+<span class="org-variable-name">Id</span> <span class="org-operator">=</span> matrix.identity(2)
+<span class="org-variable-name">X</span> <span class="org-operator">=</span> matrix([[0, 1], [1, 0]])
+<span class="org-variable-name">Y</span> <span class="org-operator">=</span> matrix([[0, <span class="org-operator">-</span>i], [i, 0]])
+<span class="org-variable-name">Z</span> <span class="org-operator">=</span> matrix([[1, 0], [0, <span class="org-operator">-</span>1]])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Hadamard matrix</span>
+<span class="org-variable-name">H</span> <span class="org-operator">=</span> matrix([[1, 1], [1, <span class="org-operator">-</span>1]]) <span class="org-operator">/</span> sqrt(2)
+</pre>
+</div>
+
+<p>
+The Pauli Rotations
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="org7664e97"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+<span class="org-variable-name">Rz</span> <span class="org-operator">=</span> matrix([[exp(<span class="org-operator">-</span>i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2), 0], [0, exp(i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2)]])
+<span class="org-variable-name">Rx</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2)], [<span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
+<span class="org-variable-name">Ry</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>sin(theta<span class="org-operator">/</span>2)], [sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
+</pre>
+</div>
 <footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.0.92 (<a href="https://orgmode.org">Org</a> mode 9.6.6)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>

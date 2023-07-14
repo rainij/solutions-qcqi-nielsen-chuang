@@ -26,45 +26,51 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgecd07dd">Setup</a>
+<li><a href="#org03a5605">Setup</a>
 <ul>
-<li><a href="#orgb57bcaf">Imports</a></li>
-<li><a href="#org7129161">Harmonic Oscillator</a></li>
+<li><a href="#org8aef045">Imports</a></li>
+<li><a href="#orgbfa8dfe">Harmonic Oscillator</a></li>
+<li><a href="#org43f0562">Optical photon quantum computers</a></li>
 </ul>
 </li>
-<li><a href="#orgddf843d">Exercises</a>
+<li><a href="#org5c31473">Exercises</a>
 <ul>
-<li><a href="#org44001cb">Exercise 7.1</a></li>
+<li><a href="#org5d4a9cc">Exercise 7.1</a></li>
 <li><a href="#exercise-7.2">Exercise 7.2</a></li>
-<li><a href="#orgbbc81b6">Exercise 7.3</a></li>
-<li><a href="#org351e0f9">Exercise 7.4</a></li>
-<li><a href="#orgae24328">Exercise 7.5</a></li>
-<li><a href="#org9df8102">Exercise 7.6 (Eigenstates of photon annihilation)</a></li>
-<li><a href="#orge39cae9">Exercise 7.7</a></li>
-<li><a href="#org8a496fb">Exercise 7.8</a></li>
+<li><a href="#org8ba9d5d">Exercise 7.3</a></li>
+<li><a href="#org176a858">Exercise 7.4</a></li>
+<li><a href="#org8e8d51f">Exercise 7.5</a></li>
+<li><a href="#org1e7e3c6">Exercise 7.6 (Eigenstates of photon annihilation)</a></li>
+<li><a href="#orgec0682c">Exercise 7.7</a></li>
+<li><a href="#orgd3dfb02">Exercise 7.8</a></li>
+<li><a href="#orgdbfa256">Exercise 7.9 (Optical Hadamard gate)</a></li>
+<li><a href="#org71041d6">Exercise 7.10 (Mach–Zehnder interferometer)</a></li>
+<li><a href="#orgab8c023">Exercise 7.11</a></li>
+<li><a href="#org79b99c6">Exercise 7.12 (Quantum beamsplitter with classical inputs)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgecd07dd" class="outline-2">
-<h2 id="orgecd07dd">Setup</h2>
-<div class="outline-text-2" id="text-orgecd07dd">
+<div id="outline-container-org03a5605" class="outline-2">
+<h2 id="org03a5605">Setup</h2>
+<div class="outline-text-2" id="text-org03a5605">
 </div>
-<div id="outline-container-orgb57bcaf" class="outline-3">
-<h3 id="orgb57bcaf">Imports</h3>
-<div class="outline-text-3" id="text-orgb57bcaf">
+<div id="outline-container-org8aef045" class="outline-3">
+<h3 id="org8aef045">Imports</h3>
+<div class="outline-text-3" id="text-org8aef045">
 <div class="org-src-container">
 <pre class="src src-sage"><span class="org-keyword">from</span> utils <span class="org-keyword">import</span> commutator <span class="org-keyword">as</span> com
+<span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> Z, H, Ry, Rz
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7129161" class="outline-3">
-<h3 id="org7129161">Harmonic Oscillator</h3>
-<div class="outline-text-3" id="text-org7129161">
+<div id="outline-container-orgbfa8dfe" class="outline-3">
+<h3 id="orgbfa8dfe">Harmonic Oscillator</h3>
+<div class="outline-text-3" id="text-orgbfa8dfe">
 <p>
 To simplify calculations we will use unit-less expressions. To do this let \(\tilde{x}\),
 \(\tilde{p}\), etc denote physical quantities <i>with</i> units and denote the unit-less versions
@@ -72,7 +78,7 @@ without the tilde, such that e.g.
 </p>
 
 <p>
-<a id="org735d13f"></a>
+<a id="orgb037dad"></a>
 \[
   \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
 \]
@@ -90,7 +96,7 @@ as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org094474c">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<pre class="src src-sage" id="org30f8030">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
 <span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
 (<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
 <span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
@@ -103,7 +109,7 @@ and the corresponding annihilation (\(a\)), and creation operator (\(a^\dagger\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org69781bd"><span class="org-variable-name">H</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
+<pre class="src src-sage" id="org2c57742"><span class="org-variable-name">H_qho</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
 
 <span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
 <span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
@@ -115,7 +121,7 @@ Some basic sanity checks:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgbc01d5d"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<pre class="src src-sage" id="org59dbc62"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
 <span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
 <span class="org-string">"PASSED"</span>
 </pre>
@@ -127,11 +133,11 @@ Some basic sanity checks:
 
 
 <p>
-Note that from <a href="#org735d13f">above</a> we get
+Note that from <a href="#orgb037dad">above</a> we get
 </p>
 
 <p>
-<a id="orgb56065e"></a>
+<a id="org368e042"></a>
 \[
   \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
 \]
@@ -144,7 +150,7 @@ shifted by \(1/2\).
 </p>
 
 <p>
-<a id="orgc16f855"></a>
+<a id="org1a4112e"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem (Spectrum of 1D Harmonic Oscillator)</dt><dd><p>
@@ -169,36 +175,66 @@ for \(n\in\{1,2,\ldots\}\). These states form an orthonormal set of the Hilbert 
 with \(N\ket{n}=n\ket{n}\).
 </p>
 <dl class="org-dl">
-<dt>Remark</dt><dd><a id="org68d5e48"></a> It is well known that the gaussian function which
+<dt>Remark</dt><dd><a id="org963cceb"></a> It is well known that the gaussian function which
 defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org/wiki/Gaussian_integral">gaussian integral</a>).</dd>
 <dt>Proof</dt><dd>See <a href="#exercise-7.4-proof">solution of exercise 7.4</a>.</dd>
 </dl></dd>
 </dl>
 </div>
 </div>
+
+<div id="outline-container-org43f0562" class="outline-3">
+<h3 id="org43f0562">Optical photon quantum computers</h3>
+<div class="outline-text-3" id="text-org43f0562">
+<p>
+The book showed that the beamsplitter \(B=e^{-\ii (ab^\dagger-a^\dagger b)}\) acts as
+follows on the dual-rail representation
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="org588326e"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+<span class="org-variable-name">B</span> <span class="org-operator">=</span> matrix([[cos(theta), <span class="org-operator">-</span>sin(theta)], [sin(theta), cos(theta)]])
+</pre>
 </div>
-<div id="outline-container-orgddf843d" class="outline-2">
-<h2 id="orgddf843d">Exercises</h2>
-<div class="outline-text-2" id="text-orgddf843d">
+
+<p>
+This essentially follows from these commutation relations:
+</p>
+
+<p>
+<a id="org3c8ad4c"></a>
+\[
+  BaB^\dagger = a \cos(\theta) + b \sin(\theta)
+  \quad \text{and} \quad
+  BbB^\dagger = b \cos(\theta) - a \sin(\theta) .
+\]
+</p>
 </div>
-<div id="outline-container-org44001cb" class="outline-3">
-<h3 id="org44001cb">Exercise 7.1</h3>
-<div class="outline-text-3" id="text-org44001cb">
+</div>
+</div>
+
+<div id="outline-container-org5c31473" class="outline-2">
+<h2 id="org5c31473">Exercises</h2>
+<div class="outline-text-2" id="text-org5c31473">
+</div>
+<div id="outline-container-org5d4a9cc" class="outline-3">
+<h3 id="org5d4a9cc">Exercise 7.1</h3>
+<div class="outline-text-3" id="text-org5d4a9cc">
 <p>
 Using the fact that \(x\) and \(p\) do not commute, and that in fact \([x,p]=\ii\,\hbar\),
 explicitly show that \(a^\dagger\,a=H/\hbar\omega-1/2\).
 </p>
 </div>
 
-<div id="outline-container-org283da1b" class="outline-4">
-<h4 id="org283da1b">Solution</h4>
-<div class="outline-text-4" id="text-org283da1b">
+<div id="outline-container-org0f8035b" class="outline-4">
+<h4 id="org0f8035b">Solution</h4>
+<div class="outline-text-4" id="text-org0f8035b">
 <p>
 This is just boring algebra which can be done much faster (and more reliably) by <i>sage</i>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org76a56ba"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
+<pre class="src src-sage" id="org99b0349"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H_qho <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
 <span class="org-doc">"PASSED"</span>
 </pre>
 </div>
@@ -218,15 +254,15 @@ Given that \([x,p]=\ii\,\hbar\), compute \([a,a^\dagger]\).
 </p>
 </div>
 
-<div id="outline-container-orgd9158ca" class="outline-4">
-<h4 id="orgd9158ca">Solution</h4>
-<div class="outline-text-4" id="text-orgd9158ca">
+<div id="outline-container-orgb81e2d1" class="outline-4">
+<h4 id="orgb81e2d1">Solution</h4>
+<div class="outline-text-4" id="text-orgb81e2d1">
 <p>
 The unitless result is \(1\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org2773986">com(a, ad)
+<pre class="src src-sage" id="org776f4b5">com(a, ad)
 </pre>
 </div>
 
@@ -236,15 +272,15 @@ The unitless result is \(1\):
 
 
 <p>
-Since the <a href="#orgb56065e">creator/annihilator is already unit-less</a> the same is true with units.
+Since the <a href="#org368e042">creator/annihilator is already unit-less</a> the same is true with units.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbbc81b6" class="outline-3">
-<h3 id="orgbbc81b6">Exercise 7.3</h3>
-<div class="outline-text-3" id="text-orgbbc81b6">
+<div id="outline-container-org8ba9d5d" class="outline-3">
+<h3 id="org8ba9d5d">Exercise 7.3</h3>
+<div class="outline-text-3" id="text-org8ba9d5d">
 <p>
 Compute \([H,a]\) and use the result to show that if \(\ket{\psi}\) is an eigenstate of \(H\)
 with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with energy
@@ -252,9 +288,9 @@ with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with
 </p>
 </div>
 
-<div id="outline-container-orgd4d3206" class="outline-4">
-<h4 id="orgd4d3206">Solution</h4>
-<div class="outline-text-4" id="text-orgd4d3206">
+<div id="outline-container-org2919a0f" class="outline-4">
+<h4 id="org2919a0f">Solution</h4>
+<div class="outline-text-4" id="text-org2919a0f">
 <p>
 Using \([a^\dagger,a]=-[a,a^\dagger]=-1\) (see <a href="#exercise-7.2">exercise 7.2</a>) we deduce (assuming unit-less quantities)
 </p>
@@ -296,9 +332,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org351e0f9" class="outline-3">
-<h3 id="org351e0f9">Exercise 7.4</h3>
-<div class="outline-text-3" id="text-org351e0f9">
+<div id="outline-container-org176a858" class="outline-3">
+<h3 id="org176a858">Exercise 7.4</h3>
+<div class="outline-text-3" id="text-org176a858">
 <p>
 Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 </p>
@@ -309,7 +345,7 @@ Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 <div class="outline-text-4" id="text-exercise-7.4-proof">
 <p>
 The exercise statement is rather "vague" (I try to be friendly here 😉), so let us prove
-some definite statement like the <a href="#orgc16f855">theorem about the spectrum of the harmonic oscillator</a>
+some definite statement like the <a href="#org1a4112e">theorem about the spectrum of the harmonic oscillator</a>
 instead.
 </p>
 
@@ -342,7 +378,7 @@ scalar factor, which can be seen by observing that the ODE is equivalent to
 </p>
 
 <p>
-The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#org68d5e48">ensures normalization</a>. We thus
+The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#org963cceb">ensures normalization</a>. We thus
 proved \(N\ket{0}=0\). Next let us verify that \(\ket{n}\) is an eigenvector. To simplify the
 notation let us define \(\ket{n'}:=\sqrt{n!}\ket{n}\).
 </p>
@@ -418,38 +454,38 @@ leading factor \(2^n\)). The density now follows from the following well known r
 </p>
 
 <ol class="org-ol">
-<li><a id="org2d931ab"></a> The compactly supported continuous functions are dense in
+<li><a id="orgcd94f95"></a> The compactly supported continuous functions are dense in
 \(L^2(\RR)\). I do not have a good resource on that but one way to see this is by a
 method called <i><a href="https://en.wikipedia.org/wiki/Mollifier">mollification</a></i>.</li>
-<li><a id="org7264a57"></a> For any finite interval \(I\) the polynomials on that
+<li><a id="org1b8e113"></a> For any finite interval \(I\) the polynomials on that
 interval are dense in the continuous function on \(I\) with respect to the
 $L^&infin;$-norm which is stronger than the \(L^2\) norm (since the interval is
 finite). This is the <a href="https://en.wikipedia.org/wiki/Stone%E2%80%93Weierstrass_theorem">Stone-Weierstrass Theorem</a>.</li>
 </ol>
 
 <p>
-By <a href="#org7264a57">2</a> finite linear combinations of eigenstates can approximate any
+By <a href="#org1b8e113">2</a> finite linear combinations of eigenstates can approximate any
 compactly supported continuous function. Here it is important that any degree is
 represented among the eigenstates. It should be obvious that the factor \(e^{-x^2/2}\) does
 not disturb this argument at all. Now completeness directly follows from
-<a href="#org2d931ab">1</a>. QED.
+<a href="#orgcd94f95">1</a>. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgae24328" class="outline-3">
-<h3 id="orgae24328">Exercise 7.5</h3>
-<div class="outline-text-3" id="text-orgae24328">
+<div id="outline-container-org8e8d51f" class="outline-3">
+<h3 id="org8e8d51f">Exercise 7.5</h3>
+<div class="outline-text-3" id="text-org8e8d51f">
 <p>
 Verify that Equations (7.11) and (7.12) are consistent with (7.10) and the normalization
 condition \(\norm{\ket{n}}^2=1\).
 </p>
 </div>
 
-<div id="outline-container-org23d24d4" class="outline-4">
-<h4 id="org23d24d4">Solution</h4>
-<div class="outline-text-4" id="text-org23d24d4">
+<div id="outline-container-org67e231b" class="outline-4">
+<h4 id="org67e231b">Solution</h4>
+<div class="outline-text-4" id="text-org67e231b">
 <p>
 It is not hard to see that (7.11) and (7.12) imply (7.10):
 </p>
@@ -468,18 +504,18 @@ consistent with the three equations but for trivial reasons.
 </div>
 </div>
 
-<div id="outline-container-org9df8102" class="outline-3">
-<h3 id="org9df8102">Exercise 7.6 (Eigenstates of photon annihilation)</h3>
-<div class="outline-text-3" id="text-org9df8102">
+<div id="outline-container-org1e7e3c6" class="outline-3">
+<h3 id="org1e7e3c6">Exercise 7.6 (Eigenstates of photon annihilation)</h3>
+<div class="outline-text-3" id="text-org1e7e3c6">
 <p>
 Prove that a coherent state is an eigenstate of the photon annihilation operator, that is,
 show \(a\ket{\alpha}=\lambda\ket{\alpha}\) for some constant \(\lambda\).
 </p>
 </div>
 
-<div id="outline-container-org53cb254" class="outline-4">
-<h4 id="org53cb254">Proof</h4>
-<div class="outline-text-4" id="text-org53cb254">
+<div id="outline-container-orgb930413" class="outline-4">
+<h4 id="orgb930413">Proof</h4>
+<div class="outline-text-4" id="text-orgb930413">
 <p>
 Recall that \(a\ket{n}=\sqrt{n}\ket{n-1}\) for \(n\geq1\) and \(a\ket{0}=0\). Hence
 </p>
@@ -499,9 +535,9 @@ The claim follows with \(\lambda=\alpha\). QED.
 </div>
 </div>
 
-<div id="outline-container-orge39cae9" class="outline-3">
-<h3 id="orge39cae9">Exercise 7.7</h3>
-<div class="outline-text-3" id="text-orge39cae9">
+<div id="outline-container-orgec0682c" class="outline-3">
+<h3 id="orgec0682c">Exercise 7.7</h3>
+<div class="outline-text-3" id="text-orgec0682c">
 <p>
 Show that the circuit below transforms a dual-rail state by
 </p>
@@ -522,9 +558,9 @@ and the boxed \(\pi\) to represent a phase shift by \(\pi\).
 </dl>
 </div>
 
-<div id="outline-container-org1df308a" class="outline-4">
-<h4 id="org1df308a">Solution</h4>
-<div class="outline-text-4" id="text-org1df308a">
+<div id="outline-container-org6fc4924" class="outline-4">
+<h4 id="org6fc4924">Solution</h4>
+<div class="outline-text-4" id="text-org6fc4924">
 <p>
 By definition the circuit acts like this (we use \(e^{\ii\pi}=-1\) to simplify notation):
 </p>
@@ -550,18 +586,18 @@ as desired.
 </div>
 </div>
 
-<div id="outline-container-org8a496fb" class="outline-3">
-<h3 id="org8a496fb">Exercise 7.8</h3>
-<div class="outline-text-3" id="text-org8a496fb">
+<div id="outline-container-orgd3dfb02" class="outline-3">
+<h3 id="orgd3dfb02">Exercise 7.8</h3>
+<div class="outline-text-3" id="text-orgd3dfb02">
 <p>
 Show that \(P\ket{\alpha}=\ket{\alpha e^{\ii\Delta}}\) where \(\ket{\alpha}\) is a coherent
 state (note that, in general, \(\alpha\) is a complex number!).
 </p>
 </div>
 
-<div id="outline-container-org7cbaad0" class="outline-4">
-<h4 id="org7cbaad0">Proof</h4>
-<div class="outline-text-4" id="text-org7cbaad0">
+<div id="outline-container-orgec7735f" class="outline-4">
+<h4 id="orgec7735f">Proof</h4>
+<div class="outline-text-4" id="text-orgec7735f">
 <p>
 The phase shift operator is given by \(P\ket{n}=e^{\ii n\Delta}\ket{n}\). Hence, using \(\abs{e^{\ii\Delta}}=1\)
 </p>
@@ -575,6 +611,254 @@ P\ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n \, e^{\ii n\Delta}}{
 
 <p>
 QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdbfa256" class="outline-3">
+<h3 id="orgdbfa256">Exercise 7.9 (Optical Hadamard gate)</h3>
+<div class="outline-text-3" id="text-orgdbfa256">
+<p>
+Show that the following circuit acts as a Hadamard gate on dual-rail single photon states,
+that is, \(\ket{01}\mapsto(\ket{01}+\ket{10})/\sqrt{2}\) and
+\(\ket{10}\mapsto(\ket{01}-\ket{10})/\sqrt{2}\) up to an overall phase.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The book contains a picture showing the circuit.</dd>
+</dl>
+</div>
+
+<div id="outline-container-orgab6c0b7" class="outline-4">
+<h4 id="orgab6c0b7">Solution</h4>
+<div class="outline-text-4" id="text-orgab6c0b7">
+<p>
+Assuming evolution from left to right the circuit implements \(ZB_{\theta=\pi/4}\) (note
+that the phase shift is \(Z\) up to a global phase). Below you can see that then the
+assertion of the exercise is wrong. We give two alternatives instead.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-variable-name">B0</span> <span class="org-operator">=</span> B.subs(theta<span class="org-operator">=</span>pi<span class="org-operator">/</span>4)
+<span class="org-variable-name">B1</span> <span class="org-operator">=</span> B.subs(theta<span class="org-operator">=-</span>pi<span class="org-operator">/</span>4)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">This shows that the original circuit does not implement H, not even if we neglect a</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">global phase</span>
+f<span class="org-string">"sqrt(2)*H != </span>{sqrt(2) <span class="org-operator">*</span> Z <span class="org-operator">*</span> B0}<span class="org-string">"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">These alternatives implement the Hadamard gate:</span>
+<span class="org-keyword">assert</span> B0 <span class="org-operator">*</span> Z <span class="org-operator">==</span> H
+<span class="org-keyword">assert</span> Z <span class="org-operator">*</span> B1 <span class="org-operator">==</span> H
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+'sqrt(2)*H != [ 1 -1]\n[-1 -1]'
+'PASSED'
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org71041d6" class="outline-3">
+<h3 id="org71041d6">Exercise 7.10 (Mach–Zehnder interferometer)</h3>
+<div class="outline-text-3" id="text-org71041d6">
+<p>
+Interferometers are optical tools used to measure small phase shifts, which are
+constructed from two beamsplitters. Their basic principle of operation can be understood
+by this simple exercise.
+</p>
+
+
+<ol class="org-ol">
+<li><p>
+Note that this circuit performs the identity operation:
+</p>
+
+<p>
+\[ B_{\theta=\pi/4}^\dagger \cdot B_{\theta=\pi/4} \]
+</p></li>
+<li><p>
+Compute the rotation operation (on dual-rail states) which this circuit performs, as a
+function of the phase shift \(\varphi\):
+</p>
+
+<p>
+\[ B_{\theta=\pi/4}^\dagger \cdot R_z(-\varphi) \cdot B_{\theta=\pi/4} \]
+</p></li>
+</ol>
+
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The book contains actual circuits drawings instead of algebraic
+expressions. The second expression neglects the global phase (as is common).</dd>
+</dl>
+</div>
+
+
+<div id="outline-container-orgf986802" class="outline-4">
+<h4 id="orgf986802">Solution</h4>
+<div class="outline-text-4" id="text-orgf986802">
+<p>
+Recall that we have \(B=B(\theta)=R_y(2\theta)\). Hence \(B_{\theta=\pi/4}\) is a rotation
+around the y-axis by ninety degrees. This maps the x-axis onto the reversed z-axsis. Hence
+the (reversed) z-rotation in the middle effectively acts like a rotation around the x-axis
+by an angle \(+\varphi\). The net result is \(R_x(\varphi)\).
+</p>
+
+<p>
+Such reasoning easily leads to subtle errors. Therefore let us verify this using sagemath:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-variable-name">B0</span> <span class="org-operator">=</span> B.subs(theta<span class="org-operator">=</span>pi<span class="org-operator">/</span>4)
+<span class="org-variable-name">phi</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'phi'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+
+<span class="org-keyword">assert</span> B0.H <span class="org-operator">*</span> Rz.subs(theta<span class="org-operator">=-</span>phi) <span class="org-operator">*</span> B0 <span class="org-operator">==</span> Rx.subs(theta<span class="org-operator">=</span>phi)
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+'PASSED'
+</pre>
+
+
+<p>
+It worked out 😎!
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgab8c023" class="outline-3">
+<h3 id="orgab8c023">Exercise 7.11</h3>
+<div class="outline-text-3" id="text-orgab8c023">
+<p>
+What is \(B\ket{2,0}\) for \(\theta=\pi/4\)?
+</p>
+</div>
+
+<div id="outline-container-org294df72" class="outline-4">
+<h4 id="org294df72">Solution</h4>
+<div class="outline-text-4" id="text-org294df72">
+<p>
+Following the book we basically identify states with products of creation operators and
+then use the <a href="#org3c8ad4c">commutation relations</a> for the beamsplitter and \(B\ket{0,0}=\ket{0,0}\):
+</p>
+
+<p>
+\[
+  B\ket{2,0} = \frac{1}{\sqrt{2}} B (a^\dagger)^2 \ket{0,0}
+  = \frac{1}{\sqrt{2}} \left(a^\dagger \cos(\theta) + b^\dagger \sin(\theta) \right)^2 \ket{0,0} .
+\]
+</p>
+
+<p>
+Now it helps that \(a^\dagger\) and \(b^\dagger\) commute, which implies
+</p>
+
+<p>
+\[
+  \left(a^\dagger \cos(\theta) + b^\dagger \sin(\theta) \right)^2
+  = (a^\dagger)^2 \cos(\theta)^2 + (b^\dagger)^2 \sin(\theta)^2 + 2a^\dagger b^\dagger \sin(\theta)\cos(\theta) .
+\]
+</p>
+
+<p>
+Using \(2\sin(x)\cos(x)=\sin(2x)\) we obtain:
+</p>
+
+<p>
+\[
+  B\ket{2,0} = \cos(\theta)^2 \ket{2,0} + \sin(\theta)^2 \ket{0,2} +
+  \frac{\sin(2\theta)}{\sqrt{2}} \ket{1,1} .
+\]
+</p>
+
+<p>
+Plugging in \(\theta=\pi/4\) we obtain
+</p>
+
+<p>
+\[
+  B_{\theta=\pi/4} \ket{2,0} = \frac{1}{2} \ket{2,0} + \frac{1}{2} \ket{0,2} +
+  \frac{1}{\sqrt{2}} \ket{1,1}
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org79b99c6" class="outline-3">
+<h3 id="org79b99c6">Exercise 7.12 (Quantum beamsplitter with classical inputs)</h3>
+<div class="outline-text-3" id="text-org79b99c6">
+<p>
+What is \(B\ket{\alpha,\beta}\) where \(\ket{\alpha}\) and \(\ket{\beta}\) are two coherent
+states as in Equation (7.16)? (Hint: recall † n that
+\(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).)
+</p>
+</div>
+
+<div id="outline-container-orgcd37fad" class="outline-4">
+<h4 id="orgcd37fad">Solution</h4>
+<div class="outline-text-4" id="text-orgcd37fad">
+<p>
+Observe that
+</p>
+
+<p>
+\[
+  \ket{\alpha} = e^{-\abs{\alpha}^2/2} \sum_n \frac{\alpha^n}{\sqrt{n!}} \ket{n}
+  = e^{\alpha a^\dagger - \abs{\alpha}^2/2} \ket{0} .
+\]
+</p>
+
+<p>
+There is one subtle thing to note here. The operator \((a^\dagger)\) is neither bounded nor
+normal. So it is not clear if \(e^{\alpha a^\dagger}\) is well defined as an
+operator.
+</p>
+
+<p>
+Let us give a sketch of how one might make the exponential function rigorous. Let us
+define the (large) Hilbert space spanned by the \(\ket{n}\) but with scalar product
+(implicitly) defined by \(\sprod{n}{n}_1=(n!)\inv\). With respect to this Hilbert space
+\(a^\dagger\) is bounded. Hence we can define \(e^{\alpha a^\dagger}\) by the usual
+exponential series (we need the space for convergence).
+</p>
+
+<p>
+Another way to deal with the problem is to just see it as an abbreviation. In fact, we
+only ever apply such operators to \(\ket{0,0}\).
+</p>
+
+<p>
+In the following let us abreviate \(K=e^{-(\abs{\alpha}^2+\abs{\beta}^2)/2}\),
+\(c=\cos(\theta)\), and \(s=\sin(\theta)\). Now let us go on with the calculation:
+</p>
+
+\begin{align*}
+  B \ket{\alpha,\beta}
+  &= K B e^{\alpha a^\dagger + \beta b^\dagger} \ket{0,0} \\
+  &= K B e^{\alpha a^\dagger + \beta b^\dagger} B^\dagger B \ket{0,0} \\
+  &= K \exp(\alpha B a^\dagger B^\dagger + \beta B b^\dagger B^\dagger) \ket{0,0} \\
+  &= K \exp(\alpha[ca^\dagger + sb^\dagger] + \beta[cb^\dagger-sa^\dagger]) \ket{0,0} \\
+  &= K \exp((\alpha c - \beta s)a^\dagger + (\alpha s + \beta c)b^\dagger) \ket{0,0} \\
+  & = \ket{\alpha c - \beta s, \alpha s + \beta c} .
+\end{align*}
+
+<p>
+Hence the operation of \(B\) on coherent states is again given by a rotation matrix:
+</p>
+
+<p>
+\[
+  B: \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \mapsto
+  \begin{bmatrix} c & -s \\ s & c \end{bmatrix} \begin{pmatrix} \alpha \\ \beta \end{pmatrix} .
+\]
 </p>
 </div>
 </div>
