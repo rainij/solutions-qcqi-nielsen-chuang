@@ -3,7 +3,6 @@
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
 #+property: header-args:sage :session *sage-chapter-7* :tangle chapter_7.sage
-#+property: header-args:python :session *py-chapter-7* :tangle chapter_7.py
 
 #+toc: headlines 2
 
@@ -82,15 +81,15 @@ shifted by $1/2$.
 
   $$ \ket{n} = \frac{(a^\dagger)^n}{\sqrt{n!}} \ket{0} , $$
 
-  for $n\in\{1,2,\ldots\}$. These states form an orthonormal set of the Hilbert space
-  $L^2 (\RR)$ of square integrable functions. Moreover they are eigenstates of $H$ and $N$
-  with $N\ket{n}=n\ket{n}$.
+  for $n\in\{1,2,\ldots\}$. These states form a complete orthonormal set of the Hilbert
+  space $L^2 (\RR)$ of square integrable functions. Moreover they are eigenstates of $H$
+  and $N$ with $N\ket{n}=n\ket{n}$.
   - Remark :: <<gaussian-integral>> It is well known that the gaussian function which
     defines $\ket{0}$ is already normalized (see [[https://en.wikipedia.org/wiki/Gaussian_integral][gaussian integral]]).
   - Proof :: See [[#exercise-7.4-proof][solution of exercise 7.4]].
 
 ** Optical photon quantum computers
-The book showed that the beamsplitter $B=e^{-\ii (ab^\dagger-a^\dagger b)}$ acts as
+The book showed that the beamsplitter $B=e^{\theta(ab^\dagger-a^\dagger b)}$ acts as
 follows on the dual-rail representation
 
 #+name: beamsplitter-dual-rail-basis
@@ -444,6 +443,9 @@ $$
 $$
 
 ** Exercise 7.12 (Quantum beamsplitter with classical inputs)
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.12
+:END:
 What is $B\ket{\alpha,\beta}$ where $\ket{\alpha}$ and $\ket{\beta}$ are two coherent
 states as in Equation (7.16)? (Hint: recall † n that
 $\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}$.)
@@ -488,3 +490,217 @@ $$
   B: \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \mapsto
   \begin{bmatrix} c & -s \\ s & c \end{bmatrix} \begin{pmatrix} \alpha \\ \beta \end{pmatrix} .
 $$
+
+** Exercise 7.13 (Optical Deutsch–Jozsa quantum circuit)
+In Section 1.4.4 (page 34), we described a quantum circuit for solving the one-bit
+Deutsch–Jozsa problem. Here is a version of that circuit for single photon states (in the
+dual-rail representation), using beamsplitters, phase shifters, and nonlinear Kerr media:
+
+: The book contains a drawing of the circuit at this place.
+
+1. Construct circuits for the four possible classical functions $U_f$ using Fredkin gates and
+   beamsplitters.
+2. Why are no phase shifters necessary in this construction?
+3. For each $U_f$ show explicitly how interference can be used to explain how the quantum
+   algorithm works.
+4. Does this implementation work if the single photon states are replaced by coherent
+   states?
+
+*** Solution to 1
+Recall that $U_f$ implements the following operation on the logical qubits:
+
+$$
+  U_f \ket{x,y} = \ket{x,y\oplus f(x)} .
+$$
+
+Recall from box 7.4 that the optical Fredkin gate
+
+$$ \exp\left(\frac{\pi}{2} c^\dagger c (a^\dagger b - b^\dagger a)\right) $$
+
+can be used two implement two different logical gates:
+
+- A =CX= gate in the dual-rail representation.
+- A =CSWAP= (the /actual/ Fredkin gate) if operating directly on the physical qubits.
+
+There are four possible functions (two constant, two balanced). Let us sketch how to
+implement each of them.
+
+$$
+  f_1(x) = 0, \quad f_2(x) = 1, \quad f_3(x) = x, \quad f_4(x) = \neg x .
+$$
+
+1. $f(x)=0$ can be implemented trivially by the empty circuit.
+2. $f(x)=1$ can accomplished by performing =X= on the second rail. This in turn can be
+   implemented by a =CX= and an ancilla initialized to =1=. We can use the optical Fredkin
+   gate in the dual-rail representation as mentioned above to do the =CX=.
+3. $f(x)=x$ just needs a =CX= which directly be implemented by the optical Fredkin gate in
+   the dual rail representation.
+4. $f(x)=\neg x$ just needs a =CX= conjugated by =X= in the control. Both types of gates
+   can be implemented as shown above.
+
+So overall, we could do this with the /optical/ Fredkin gate alone!
+
+*** Solution to 2
+That $U_f$ can be implemented without phase shifts should be clear since controlled =X=
+gates (this is what the optical Fredkin does on the dual-rail represenation as we have
+just seen) are sufficient to implement any boolean function.
+
+So let us turn to the question "why" no phase shifts are needed in the rest of the
+circuit. More precisely we show that the circuit leads to the same measurement statistics
+as the Deutsch-Josza algorithm (and so is identical for all practical purposes). The
+circuit implements
+
+$$
+  B^\dagger \otimes I \cdot U_f \cdot B \otimes B .
+$$
+
+The original Deutsch-Josza algorithm is the same, but with $B$ replaced by $H$. The
+initial state $\ket{01_L}$ is the same. But recall that $B=B_{\theta=\pi/4}=HZ$. The $Z$
+would be implemented by a phase shift. But we actually do not need them since in this
+particular setting at the intial state they just produce a global phase $-1$ and at the
+final state it does not matter since we measure in the computational base anyway).
+
+*** Solution to 3
+Not sure what this exercise even means. If it means to show that the circuit actually
+implements the Deutsch-Josza algorithm: then this was done in the solution to 2.
+
+*** Solution to 4
+No it does not work with coherent states. No matter how the measurement outcome is
+interpreted there is always a non-zero chance of failure for some $f$ (recall that the
+Deutsch-Josza algorithm is one of a few /quantum/ algorithms with a 100% success
+probability).
+
+To see this consider the constructions of $U_f$ from part 1 (we need to look at a
+particular implemenation since the action on coherent states might be different for
+different implementation). We only look at the cases $f(x)=0$ (constant) and $f(x)=x$
+(balanced).
+
+Let us assume that the intial state is $\ket{\alpha,\beta,\gamma,\delta}$.  Let us
+abbreviate $\phi_{\pm}=(\gamma\pm\delta)/\sqrt{2}$. In the constant case the final state
+is (see [[#exercise-7.12][exercise 7.12]] for the action of beamsplitters on coherent states)
+
+$$
+  \ket{\alpha, \beta, \phi_-, \phi_+} ,
+$$
+
+In the balanced case, in addition there is also an /optical/ Fredkin gate applied =a=, =b=
+with control at =d=. In this case the final state is:
+
+$$
+  e^{\frac{\pi}{2} d^\dagger d(a^\dagger b - ab^\dagger)} \ket{\alpha,\beta,\phi_-,\phi_+}
+  = e^{-\abs{\phi_+}^2/2} \sum_n \frac{\phi_+^n}{\sqrt{n!}} e^{\frac{\pi n}{2}(a^\dagger b - ab^\dagger)}
+    \ket{\alpha,\beta,\phi_-,n} .
+$$
+
+Note that the Fredkin gate acts as a controlled beamsplitter, and for this particular angle we have
+
+$$
+  e^{\frac{\pi n}{2}(a^\dagger b - ab^\dagger)} \ket{\alpha,\beta,\phi_-,n} = \begin{cases}
+     \ket{\alpha,\beta,\phi_-,n} & \text{for } n \text{ even,} \\
+     \ket{-\beta,\alpha,\phi_-,n} & \text{for } n \text{ odd.} \end{cases}
+$$
+
+Note that there is always a non-zero probability that $n=0$ (even) is measured in $d$. In
+that case the measurement statistics for the other three rails is the same as for the
+constant case. In particular there are measurement results which match both, the constant
+and the balanced case. Hence an exact algorithm with 100% success probability is not
+possible. QED.
+
+** Exercise 7.14 (Classical cross phase modulation)
+To see that the expected classical behavior of a Kerr medium is obtained from the
+deﬁnition of $K$, Equation (7.41), apply it to two modes, one with a coherent state and
+the other in state $\ket{n}$; that is, show that
+
+$$
+  K \ket{\alpha}\ket{n} = \ket{\alpha e^{\ii\chi Ln}}\ket{n} .
+$$
+
+Use this to compute
+
+\begin{align*}
+  \rho_a &= \ptrace{b}{K\ket{\alpha}\ket{\beta}\bra{\beta}\bra{\alpha} K^\dagger} \\
+  &= e^{-\abs{\beta}^2} \sum_m \frac{\abs{\beta}^{2m}}{m!} \proj{\alpha e^{\ii\chi Lm}} .
+\end{align*}
+
+and show that the main contribution to the sum is for $m=\abs{\beta}^2$.
+
+*** Proof of the first part
+Let us abbreviate $\xi=\chi L$ and $J=a^\dagger ab^\dagger b$. We have
+
+$$
+  \ket{\alpha}\ket{n} = e^{-\abs{\alpha}^2/2} \, (b^\dagger)^n \, e^{\alpha a^\dagger} \ket{0,0} .
+$$
+
+Hence we are interested to compute
+
+$$
+  K (b^\dagger)^n \, e^{\alpha a^\dagger} K^\dagger
+  = K (b^\dagger)^n K^\dagger \, e^{\alpha K a^\dagger K^\dagger} .
+$$
+
+By the CBH formula we have
+
+$$
+  K a^\dagger K^\dagger = \sum_n \frac{(\ii\xi)^n}{n!} [(J)^n,a^\dagger] .
+$$
+
+For that reason let us look at
+
+$$
+  [J,a^\dagger] = [a^\dagger a, a^\dagger] b^\dagger b = a^\dagger [a, a^\dagger] b^\dagger b
+  = a^\dagger b^\dagger b .
+$$
+
+Hence the iterated commutator is $[(J)^n,a^\dagger]=a^\dagger(b^\dagger b)^n$. Let
+$P_b=e^{\ii\xi\,b^\dagger\,b}$. Then
+
+$$
+  K a^\dagger K^\dagger = a^\dagger P_b .
+$$
+
+Similarly
+
+$$
+  K b^\dagger K^\dagger = b^\dagger P_a .
+$$
+
+Therefore
+
+$$
+  K (b^\dagger)^n \, e^{\alpha a^\dagger} K^\dagger
+  = (b^\dagger)^n P_a^n \, e^{\alpha a^\dagger P_b} .
+$$
+
+Finally, using $P_a^n\ket{k}=e^{\ii\xi\,nk}\ket{k}$, we obtain
+
+$$
+  K \ket{\alpha} \ket{n}
+  = e^{-\abs{\alpha}^2/2} (b^\dagger)^n P_a^n \, e^{\alpha a^\dagger P_b} \ket{0,0}
+  = e^{-\abs{\alpha}^2/2} (b^\dagger)^n \, e^{\alpha e^{\ii\xi\,n} a^\dagger} \ket{0,0}
+  = \ket{\alpha e^{\ii\xi\,n}} \ket{n} .
+$$
+
+QED.
+
+*** Proof of the second part
+Using the first part we get
+
+\begin{align*}
+  \rho_b
+  &= \sum_{mn} \ptrace{b}{K \ket{\alpha} \frac{\beta^{m+n}}{\sqrt{m!n!}} \ket{m}\bra{n} \bra{\alpha} K^\dagger} \\
+  &= \sum_{mn} \ptrace{b}{\ket{\alpha e^{\ii\xi\,m}} \frac{\beta^{m+n}}{\sqrt{m!n!}} \ket{m}\bra{n} \bra{\alpha e^{\ii\xi\,n}}} \\
+  &= \sum_{m} \frac{\beta^{2m}}{m!} \proj{\alpha e^{\ii\xi\,m}} .
+\end{align*}
+
+To show the final claim consider the function
+
+$$ g(m) = \log(b^{2m}/m!) . $$
+
+For simplicity let us assume $\beta\geq0$ (to avoid writing $\abs{\beta}$ all the
+time). We have to find the maximum of $g$. I put the logarithm there to simplify
+differentiating this function. By Stirlings formula we have
+
+$$ g(m) \approx m (1 + 2\log{\beta} - \log{m}) . $$
+
+The derivative is $g'(m)=2\log{\beta}-\log{m}$. This is zero iff $m=\beta^2$. Hence the
+biggest contribution to $\rho_b$ comes from a state close to $\ket{\alpha\,e^{\ii\xi\abs{\beta}^2}}$. QED.
