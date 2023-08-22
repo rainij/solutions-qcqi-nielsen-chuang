@@ -447,7 +447,7 @@ $$
 :CUSTOM_ID: exercise-7.12
 :END:
 What is $B\ket{\alpha,\beta}$ where $\ket{\alpha}$ and $\ket{\beta}$ are two coherent
-states as in Equation (7.16)? (Hint: recall † n that
+states as in Equation (7.16)? (Hint: recall that
 $\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}$.)
 
 *** Solution
@@ -704,3 +704,291 @@ $$ g(m) \approx m (1 + 2\log{\beta} - \log{m}) . $$
 
 The derivative is $g'(m)=2\log{\beta}-\log{m}$. This is zero iff $m=\beta^2$. Hence the
 biggest contribution to $\rho_b$ comes from a state close to $\ket{\alpha\,e^{\ii\xi\abs{\beta}^2}}$. QED.
+** Exercise 7.15
+Plot (7.55):
+
+$$
+  P_{\mathrm{cav}}/P_{\mathrm{in}} = \frac{1 - R_1}{\abs{1 + e^{\ii\varphi}\sqrt{R_1R_2}}^2}
+$$
+
+as a function of field detuning $\varphi$, for $R_1=R_2=0.9$.
+
+*** Solution
+Here is the code to make the plot in =sage=:
+
+#+name: exercise-7.15
+#+begin_src sage
+  R1, R2 = SR.var('R1 R2', domain='positive')
+  phi = SR.var('phi', domain='real')
+
+  power = (1 - R1) / abs(1 + exp(i*phi)*sqrt(R1*R2))**2
+
+  def make_plot_ex715(r1, r2=None, interval=(0, 2), **kwargs):
+      """Plot P_cav/P_in according to exercise 7.15 but with s=phi/pi on the x-axis."""
+      s = SR.var('s', domain='real')
+      return parametric_plot((s, power.subs(phi=pi*s, R1=r1, R2=r2 or r1)), (s,) + interval, **kwargs)
+#+end_src
+
+You can use it like so:
+
+#+begin_src sage :tangle no :eval no
+  show(make_plot_ex715(0.9, interval=(0.5, 1.5), aspect_ratio='automatic'))
+#+end_src
+
+#+caption: Fabry-Perot cavity, relative power $P_{\mathrm{cav}}/P_{\mathrm{in}}$ inside cavity vs $\varphi/\pi$.
+[[file:images/exercise_7_15_plot.png]]
+
+As we can see $P_{\mathrm{cav}}/P_{\mathrm{in}}$ is maximal at $\varphi=\pi$ with value
+$(1-R)^{-1}=10$. Let us also note that at $\varphi=0$ and $\varphi=2\pi$ the value is
+roughly $(1-R_1)/4$ if $R_1,R_2\approx1$. Moreover the width of the central peak is around
+$R_1\inv$ as can be easily verified by plugging in the Taylor expansion of
+$e^{\ii\varphi}$ at $\varphi=\pi$ into the formula for $P_{\mathrm{cav}}/P_{\mathrm{in}}$.
+
+** Exercise 7.16 (Electric dipole selection rules)
+Show that (7.60):
+
+$$
+  \int Y_{l_1m_1}^* Y_{1,\pm1} Y_{l_2m_2} \dd \Omega
+$$
+
+is non-zero only when $m_2-m_1=\pm1$ and $\Delta\,l=\pm1$.
+
+- Remark :: More precisely: Let $a\in\{+1,-1\}$ and replace the middle function by
+  $Y_{1a}$. Then the integral does not vanish if and only if
+
+  $$
+  m_2 - m_1 = a \text{ and } \abs{l_2-l_1} = 1 .
+  $$
+
+  That is, the sign of $\Delta\,m$ does depend on which of the two $Y_{1,\pm1}$ is chosen
+  but the sign of $\Delta\,l$ does not.
+
+*** Proof
+All relevant functions involve relatively complicated constant factors. Since we are only
+interested in the question whether the integral is non-zero or not, let us introduce a
+specific notation for this exercise: We write $a\sim b$ if $a=cb$ for some /non-zero/ and
+/constant/ $c$. By constant I mean that $c$ does not depend on $\theta$ or $\varphi$ (the
+variables we integrate over).
+
+Let $a=\pm1$ and note that $Y_{1,a}\sim\sin(\theta)e^{a\ii\varphi}$. By
+$\dd\Omega=\sin(\theta)\dd\theta\dd\varphi$ the definition of the spherical harmonics in
+terms of the [[https://en.wikipedia.org/wiki/Associated_Legendre_polynomials][associated Legendre polynomials]] we have:
+
+\begin{align*}
+  \int Y_{l_1m_1}^* Y_{1,\pm1} Y_{l_2m_2} \dd \Omega
+  &\sim \int_0^{\pi} \int_0^{2\pi} Y_{l_1m_1}^* Y_{l_2m_2} \sin(\theta)^2 e^{a\ii\varphi} \dd\varphi\dd\theta \\
+  &\sim \int_{-1}^{+1} \int_{0}^{2\pi} P_{l_1m_1}^*(x) P_{l_2m_2}(x) \sqrt{1-x^2} e^{\ii\varphi(m_2-m_1+a)} \dd\varphi \dd x \\
+  &\sim: I_1 .
+\end{align*}
+
+The integral over $\varphi$ vanishes iff $m_1=m_2+a$. This already proves the first part
+of the exercise. Let $b=(a+1)/2$. The question now translates to the task to find out when
+the following integral vanishes:
+
+$$
+  I_1 \sim I_2 := \int_{-1}^{+1} (1-x^2)^{m_2+b} \partial_x^{m_2+a+l_1} (x^2-1)^{l_1} \partial_x^{m_2+l_2} (x^2-1)^{l_2} \dd x .
+$$
+
+Let us rewrite this in terms of the "normal" [[https://en.wikipedia.org/wiki/Legendre_polynomials][Legendre polynomials]]
+$P_l(x)\sim\partial_x^l(x^2-1)^l$:
+
+$$
+  I_2 \sim I_3(b) :=
+  \int_{-1}^{+1} (1-x^2)^{m_2+b} \partial_x^{m_2+a} P_{l_1}(x) \cdot \partial_x^{m_2} P_{l_2}(x) \dd x .
+$$
+
+Let us define the differential operator $D_n=\partial_x^n(1-x^2)^n\partial_x^n$. Moreover,
+write $\tilde{P}_l(x)\sim\partial_x^{l-1}(x^2-1)^l$ (this is the Legendre polynomial of
+order $l$ for $l\,>\,0$ where one derivative was "stolen"). Integration by parts $m_2+b$
+times (in one or in the other direction) yields:
+
+<<exercise-7.16-b-0>>
+$$
+  I_3(b=0) \sim \int_{-1}^{+1} \tilde{P}_{l_1}(x) \cdot D_{m_2} P_{l_2}(x) \dd x .
+$$
+
+assuming $l_1\neq0$, and
+
+<<exercise-7.16-b-1>>
+$$
+  I_3(b=1) \sim \int_{-1}^{+1} D_{m_2+1} P_{l_1}(x) \cdot \tilde{P}_{l_2}(x) \dd x .
+$$
+
+assuming $l_2\neq1$.
+
+As said these formulas are only valid for $l_1\neq0$ or $l_2\neq0$ respectively. This
+however is not a big issue since these special cases are very simple. Let us briefly
+consider the case $b=l_1=0$. It follows that $m_1=0$ and hence $m_2=m_1+1=1$ and
+$l_2\geq1$. Hence the integral simplifies to
+$\int(1-x^2)\partial_x\,P_{l_2}(x)\dd\,x$. Using integration by parts (once) we see that
+this is only ever non-zero if $l_2=1$, proving the claim for this special case (we use
+that $P_1(x)\sim\,x$ and take the orthogonality relations for the Legendre polynomials for
+granted). The case $b=1$ is similar.
+
+Let us come back to the above formulas for [[exercise-7.16-b-0][$b=0$]] and [[exercise-7.16-b-1][$b=1$]]. We have the following
+
+- Lemma :: <<exercise-7.16-lemma>> $P_l$ is an eigenfunction of $D_n$. More precisely
+  $D_nP_l=\lambda_{nl}P_l$ where
+
+  $$
+  \lambda_{nl} = \prod_{j=0}^{n-1} \left( j(j+1) - l(l+1) \right) .
+  $$
+
+  - Remark :: Note that $\lambda_{nl}=0$ for $n\geq\,l+1$.
+
+Before we prove the Lemma let us see why this helps us. We only have to consider the case
+$b=0$ since the other case is the same. Using the lemma we see that
+
+$$
+  I_3(b=0) \sim \int_{-1}^{+1} \tilde{P}_{l_1}(x) \cdot P_{l_2}(x) \dd x .
+$$
+
+Recall that the Legendre polynomial form an orthogonal (and complete) set of functions of
+the Hilbert space $L^2(-1,+1)$. We will show that the above "skewed" version of the scalar
+product is non-zero iff $\abs{l_1-l_2}=1$ (yes there are two values of $l_2$ for each
+$l_1\geq1$).
+
+The idea to see this is a case analysis. We use integration by parts below. Please observe
+that the reason that no boundary terms are introduced by this is precisely because one of
+the derivatives is "missing".
+
+- Case $l_1\geq\,l_2+1$ :: Integration by parts yields
+
+  $$
+  I_3(b=0) \sim \int_{-1}^{+1} (x^2-1)^{l_1} \partial_x^{l_1+l_2-1} (x^2-1)^{l_2} \dd x.
+  $$
+
+  Clearly the term with the many derivatives vanishes if $l_1\,>\,l_2+1$. On the other
+  hand it is a constant if $l_1=l_2+1$. Hence the integral is non-zero iff $l_1=l_2+1$.
+- Case $l_2\geq\,l_1+1$ :: This case is analogous to the first case. The only difference is
+  that we move the derivative to the other side. The integral is non-zero iff $l_2=l_1+1$.
+- Case $l_1=l_2+1=:l$ :: In that case we can move all derivatives to either side and get
+
+  $$
+  I_3(b=0) \sim \int_{-1}^{+1} x(x^2-1)^l = 0,
+  $$
+
+  since the integrand is an odd function (meaning $f(-x)=-f(x)$) over a symmetric
+  interval.
+
+It remains to do the following
+
+- Proof of the [[exercise-7.16-lemma][lemma]] :: We prove this by mathematical induction. The case $n=0$ is trivial
+  ($D_0$ is the identity and $\lambda_{0l}=1$). Let us assume the claim for an $n\geq0$
+  and consider
+
+  $$
+  D_{n+1} P_l = \partial_x^{n+1} (1-x^2)^{n+1} \partial_x^{n+1} P_l .
+  $$
+
+  Note that $D_{n+1}$ consists of three blocks, the left and right one contain only
+  derivatives and the middle one is a function of the position operator. The idea is to
+  commute one of the derivatives from the right block through the middle block and
+  similarly one factor $(1-x^2)$ from the middle block through the left block (including
+  the one derivative which was moved there from the right block). This should lead to an
+  expression of the form $(\ldots)D_nP_l$ and we can apply the induction hypothesis.
+
+  Let us start:
+
+  \begin{align*}
+  D_{n+1} P_l &= \partial_x^{n+2} (1-x^2)^{n+1} \partial_x^{n} P_l +
+      2(n+1)\partial_x^{n+1} x(1-x^2)^{n} \partial_x^{n} P_l \\
+  &=: A + 2(n+1)B .
+  \end{align*}
+
+  Next, let us treat $B$ by commuting the $x$ to the left:
+
+  \begin{align*}
+  B &= x\partial_x D_n P_l + (n+1)D_nP_l \\
+  &= \lambda_{nl} \left(xP_l' + (n+1)P_l \right) .
+  \end{align*}
+
+  Now we go on with $A$. We first make a simple thing: just take one of the factors
+  $(1-x^2)$ and split the some with $1$ and $-x^2$:
+
+  \begin{align*}
+  A &= \partial_x^2 D_n P_l - \partial_x^{n+2} x^2 (1-x^2)^n \partial_x^n P_l \\
+  &=: \lambda_{nl} P_l'' - A_1 .
+  \end{align*}
+
+  For $A_1$ we try to commute the $x^2$ to the left:
+
+  \begin{align*}
+  A_1 &= x^2 \partial_x^2 D_nP_l + 2(n+2) x \partial_x D_nP_l + (n+2)(n+1)D_nP_l \\
+  &= \lambda_{nl} \left(x^2P_l'' + 2(n+2)xP_l' + (n+2)(n+1)P_l  \right) .
+  \end{align*}
+
+  Gathering what we obtained leads to
+
+  $$
+  D_{n+1} P_l = \lambda_{nl} \left((1-x^2)P_l'' - 2x P_l' + n(n+1) P_l \right) .
+  $$
+
+  Recall /Legendre's differential equation/:
+
+  $$
+  (1-x^2)P_l'' - 2xP_l' + n(n+1)P_l = 0 .
+  $$
+
+  I won't prove it (it is well known) but let me mention the following. Legendre's
+  differential equation is actually the special case $n=1$: $D_1P_l=-l(l+1)P_l$. I am
+  confident that one can prove it by induction on $l$ (I did not check this claim
+  though). The case $l=0$ is trivial. The induction step can probably be proved by moving
+  around derivatives and position operators as we have seen above.
+
+  Using Legendre's differential equation we obtain
+
+  $$
+  D_{n+1} P_l = \lambda_{nl} \left(n(n+1) - l(l+1)\right) P_l ,
+  $$
+
+  which essentially proves the claim. QED.
+
+
+*** Appendix
+Before I finally managed to find the solution to this exercise I had to do a lot of
+experiments with sage math. I do not want to collect them all here but let me just give
+one example.
+
+I was a bit surprised by the fact that the [[exercise-7.16-lemma][lemma]] should be true. By what the exercise
+demanded to show and what I already managed to prove it had to be true. On the other hand
+I typically do a lot of mistakes when doing such calculations so I needed a way to verify
+the claim for concrete values of $n$ and $l$. It turned out that my experiments backed the
+lemma and I could go on proving it.
+
+#+name: exercise_7.16_appendix-1
+#+begin_src sage
+  # We have to call it xx to not overwrite the position operator.
+  xx = SR.var('x', domain='real')
+
+  def Pl(l):
+      """Legendre polynomial of order l."""
+      q = xx^2 - 1
+      return diff(q^l, xx, l)
+
+  def Dn(f, n=1):
+      """Differential operator dx^n (1-x^2)^n dx^n."""
+      return diff((1-xx^2)^n * diff(f, xx, n), xx, n)
+
+
+  def lambda_nl(n, l):
+      """Eigenvalues: DnPl=lambda_nl*Pl."""
+      result = 1
+      for j in range(n):
+          result *= j*(j+1) - l*(l+1)
+      return result
+#+end_src
+
+Test the claim of the lemma:
+
+#+name: exercise_7.16_appendix-2
+#+begin_src sage :results replace :tangle no :cache yes
+  for l in range(6):
+      for n in range(l+1):
+          q = Dn(Pl(l), n) - lambda_nl(n, l)*Pl(l)
+          assert q == 0
+  "PASSED"
+#+end_src
+
+#+RESULTS[021c6f7f8020eb04cfac32a360208225ade56f4d]: exercise_7.16_appendix-2
+: 'PASSED'
