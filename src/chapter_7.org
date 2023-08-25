@@ -944,7 +944,6 @@ It remains to do the following
 
   which essentially proves the claim. QED.
 
-
 *** Appendix
 Before I finally managed to find the solution to this exercise I had to do a lot of
 experiments with sage math. I do not want to collect them all here but let me just give
@@ -992,3 +991,162 @@ Test the claim of the lemma:
 
 #+RESULTS[021c6f7f8020eb04cfac32a360208225ade56f4d]: exercise_7.16_appendix-2
 : 'PASSED'
+
+** Exercise 7.17 (Eigenstates of the Jaynes–Cummings Hamiltonian)
+Show that
+
+\begin{align*}
+  \ket{\chi_n} &= \frac{1}{\sqrt{2}} \left[ \ket{n,1} + \ket{n+1,0} \right] \\
+  \ket{\overline{\chi}_n} &= \frac{1}{\sqrt{2}} \left[ \ket{n,1} - \ket{n+1,0} \right]
+\end{align*}
+
+are eigenstates of the Jaynes–Cummings Hamiltonian (7.71) for $\omega=\delta=0$, with the
+eigenvalues
+
+\begin{align*}
+  H \ket{\chi_n} &= g \sqrt{n+1} \; \ket{\chi_n} \\
+  H \ket{\overline{\chi}_n} &= -g \sqrt{n+1} \; \ket{\overline{\chi}_n}
+\end{align*}
+
+where the labels in the ket are $\ket{\mathrm{field},\mathrm{atom}}$.
+
+*** Proof
+Recall
+
+$$
+  \sigma_{+} = \begin{pmatrix} 0 & 0 \\ 1 & 0  \end{pmatrix} \quad \text{and} \quad
+  \sigma_{-} = \begin{pmatrix} 0 & 1 \\ 0 & 0  \end{pmatrix} .
+$$
+
+Using this with the [[spectrum-harmonic-oscillator-1d][theorem on the ladder operators]] for the harmonic oscillator yields
+
+\begin{align*}
+  a^\dagger \sigma_{-} \ket{n,1}   &= \sqrt{n+1} \; \ket{n+1,0}, \\
+  a^\dagger \sigma_{-} \ket{n+1,0} &= 0, \\
+  a \sigma_{+ } \ket{n,1}          &= 0, \\
+  a \sigma_{+} \ket{n+1,0}         &= \sqrt{n+1} \; \ket{n,0}.
+\end{align*}
+
+Finally, using this with
+
+$$
+  H = g ( a^\dagger \sigma_{-} + a \sigma_{+} ) ,
+$$
+
+yields the claim. QED.
+
+** Exercise 7.18 (Rabi oscillations)
+Show that (7.77):
+
+\begin{align*}
+  U = e^{-\ii Ht} = \; & e^{-\ii\delta t} \proj{00} \\
+    &+ \left(\cos(\Omega t) + \ii \frac{\delta}{\Omega} \sin(\Omega t) \right) \proj{01} \\
+    &+ \left(\cos(\Omega t) - \ii \frac{\delta}{\Omega} \sin(\Omega t) \right) \proj{10} \\
+    &- \ii \frac{g}{\Omega} \sin(\Omega t) \left(\ket{01}\bra{10} + \ket{10}\bra{01}\right) ,
+\end{align*}
+
+(with $\Omega=\sqrt{g^2+\delta^2}$) is correct by using
+
+$$
+  e^{\ii \vec{n}\cdot\vec{\sigma}} = \cos(\abs{\vec{n}}) + \ii \abs{\vec{n}}\inv \, \vec{n}\cdot\vec{\sigma} \cos(\abs{\vec{n}}) .
+$$
+
+to exponentiate $H$. This is an unusually simple derivation of the Rabi oscillations and
+the Rabi frequency; ordinarily, one solves coupled differential equations to obtain
+$\Omega$, but here we obtain the essential dynamics just by focusing on the single-atom,
+single-photon subspace!
+
+- Remarks ::
+  - In the original hint the formula for $e^{\ii\vec{n}\cdot\vec{\sigma}}$ is wrong. I
+    corrected this here.
+  - The formula (7.76) for $H$ is wrong, it contains some sign errors and should read
+
+    $$
+    H = \begin{bmatrix} \delta & 0 & 0 \\ 0 & -\delta & g \\ 0 & g & \delta \end{bmatrix}
+    $$
+
+    (as in the book the basis states are $\ket{00}$, $\ket{01}$, $\ket{10}$ with the left
+    one for the field and the right one for the atom). To see that this is correct recall
+    that $H$ without $N$ is
+
+    $$
+      H = \delta Z + g ( a^\dagger \sigma_{-} + a \sigma_{+} ) .
+    $$
+
+*** Proof
+Observe that $H$ is block-diagonal
+
+\begin{bmatrix} H_1 & 0 \\ 0 & H_2 \end{bmatrix}
+
+with $H_1=\delta$ and
+
+$$
+  H_2 = \begin{bmatrix} -\delta & g \\ g & \delta \end{bmatrix} .
+$$
+
+Hence
+
+$$
+  e^{-\ii Ht} = \begin{bmatrix} e^{-\ii\delta} & 0 \\ 0 & e^{-\ii H_2} \end{bmatrix} .
+$$
+
+which already explains the term $e^{-\ii\delta\,t}\proj{00}$ in the formula we have to
+prove. Hence we can restrict our analysis to the sub-space spanned by $\ket{01}$,
+$\ket{10}$ on which $H_2$ acts. Note how $H_2$ can be represented as a sum of Pauli
+matrices (where we relabel the two basis vectors by $0$ and $1$ respectively to have the
+standard matrix representations of these operators):
+
+$$
+  H_2 = \Omega \left( \frac{g}{\Omega} X - \frac{\delta}{\Omega} Z \right) .
+$$
+
+Here we factored out $\Omega$ to make the norm apparent. Using the hint we get
+
+$$
+  e^{-\ii H_2 t} = \cos(\Omega t) I -
+  \ii \left( \frac{g}{\Omega} X - \frac{\delta}{\Omega} Z \right) \sin(\Omega t) .
+$$
+
+Plugging in $Z=\proj{01}-\proj{10}$, $X=\ket{01}\bra{10}+\ket{10}\bra{01}$, and
+$I=\proj{01}+\proj{10}$ yields the claim. QED.
+
+** Exercise 7.19 (Lorentzian absorption profile)
+Plot the photon-absorbtion probability (7.79)
+
+$$
+  \chi_r = \abs{\bra{01}U\ket{10}}^2 = \frac{g^2}{g^2+\delta^2} \sin(\Omega t)^2,
+$$
+
+for $t=1$ and $g=1.2$, as a function of the detuning $\delta$, and (if you know it)
+the corresponding classical result. What are the oscillations due to?
+
+*** Proof
+First of all observe that for $\delta\to\infty$ we have the following asymptotics
+
+$$
+  \chi_r \sim \frac{g^2}{\delta^2} \sin(\delta t)^2 .
+$$
+
+This is consistent with the following plot:
+
+#+caption: Absorbtion probability $\chi_r$ against $\delta$ for $t=1$ and $g=1.2$.
+[[file:images/exercise_7_19_plot.png]]
+
+The plot is produced by the following function
+
+#+name: exercise-7.19-1
+#+begin_src sage
+  def make_plot_ex719(interval=(-15, 15), t=1, g=1.2):
+      """Plot for exercise 7.19."""
+      d = SR.var('delta')
+      Omega2 = g^2 + d^2
+      Omega = sqrt(Omega2)
+
+      chi_r = (g^2/Omega2) * sin(Omega*t)^2
+
+      return parametric_plot((d, chi_r), (d,)+interval, aspect_ratio='automatic')
+#+end_src
+
+Note that the peak of $\chi_r$ at $0$ has value $\sin(g)\approx0.932$. For other values of
+$g$ or $t$ the maximum is not necessarily at $\delta=0$.
+
