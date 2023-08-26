@@ -1036,6 +1036,9 @@ $$
 yields the claim. QED.
 
 ** Exercise 7.18 (Rabi oscillations)
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.18
+:END:
 Show that (7.77):
 
 \begin{align*}
@@ -1059,19 +1062,23 @@ single-photon subspace!
 - Remarks ::
   - In the original hint the formula for $e^{\ii\vec{n}\cdot\vec{\sigma}}$ is wrong. I
     corrected this here.
-  - The formula (7.76) for $H$ is wrong, it contains some sign errors and should read
+  - The formula (7.76) for $H$ seems to be wrong (at least if considering (7.77) as
+    correct). It contains some sign errors and should read
 
     $$
     H = \begin{bmatrix} \delta & 0 & 0 \\ 0 & -\delta & g \\ 0 & g & \delta \end{bmatrix}
     $$
 
     (as in the book the basis states are $\ket{00}$, $\ket{01}$, $\ket{10}$ with the left
-    one for the field and the right one for the atom). To see that this is correct recall
-    that $H$ without $N$ is
+    one for the field and the right one for the atom). Recall that $H$ without $N$ is
 
     $$
       H = \delta Z + g ( a^\dagger \sigma_{-} + a \sigma_{+} ) .
     $$
+
+    Assuming the standard matrix representation $\mathrm{diag}(1,-1)$ for $Z$ this is also
+    consistent with the above matrix. So at least all this is self-consistent now (does
+    not mean it is correct though).
 
 *** Proof
 Observe that $H$ is block-diagonal
@@ -1150,3 +1157,292 @@ The plot is produced by the following function
 Note that the peak of $\chi_r$ at $0$ has value $\sin(g)\approx0.932$. For other values of
 $g$ or $t$ the maximum is not necessarily at $\delta=0$.
 
+** Exercise 7.20 (Single photon phase shift)
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.20
+:END:
+Derive the phase shift of a single photon (7.80)
+
+$$
+  \chi_i = \arg \left[ e^{\ii\delta t} \left( \cos(\Omega t) -
+    \ii \frac{\delta}{\Omega} \sin(\Omega t) \right) \right]
+$$
+
+from $U$, and plot it for $t=1$ and $g=1.2$, as a function of the detuning
+$\delta$. Compare with $\delta/\Omega^2$.
+
+- Remark :: In case you wonder, $\arg(z)$ is the so called [[https://en.wikipedia.org/wiki/Argument_(complex_analysis)][/argument/]] of a complex number
+  $z$. Its value is an element of $\RR/2\pi$ (the unit circle, or in other words, the real
+  numbers where two numbers are considered equivalent if their difference is an integer
+  multiple of $2\pi$).
+
+*** Solution
+At first I didn't really understand what the authors want (the wording in the main text was
+very confusing for me). But reading on I could infer what they meant (hopefully).
+
+The task is /essentially/ to find out the phase shift which happens to the single photon
+state $\ket{10}$ if it evolves under $U=e^{-\ii\,Ht}$ and does not get absorbed (so we
+project to $\ket{10}$). That is
+
+$$
+  \arg\left[ \frac{\bra{10}U\ket{10}}{\abs{\bra{10}U\ket{10}}} \right]
+  = \arg\left[ \bra{10}U\ket{10} \right] .
+$$
+
+More precisely the /refractive index/ is the difference of /this/ phase with the analogous
+phase change of the $\ket{00}$ state:
+
+$$
+  \chi_i = \arg\left[ \bra{10}U\ket{10} \right] - \arg\left[ \bra{00}U\ket{00} \right] .
+$$
+
+Note that in both cases the atom remains in the ground state. According to (7.77), the
+formula for $U$ this is
+
+$$
+  \chi_i = \arg \left[\left( \cos(\Omega t) - \ii \frac{\delta}{\Omega} \sin(\Omega t) \right) \right] -
+    \arg\left[ e^{-\ii\delta t} \right] .
+$$
+
+The given formula for $\chi_i$ follows from $\arg(z_1z_2)=\arg(z_1)+\arg(z_2)$ (this is
+only true in $\RR/2\pi$, not in $\RR$) and $\arg(z\inv)=-\arg(z)$.
+
+It remains to compare this to $\delta/\Omega^2$ and make a plot. It will turn out that
+$\chi_i$ and $-\delta/\Omega^2$ "look" very similar. Let us make this more precise by
+considering the behavior at $\delta=0$ and $\delta=\infty$.
+
+Let us write $a\sim b$ whenever the principle asymptotic behavior is the same as that of
+$b$, that is $a=b(1+o(1))$ as $\delta$ goes to zero or infinity (depending on the case).
+
+- Case $\delta$ near $0$ :: Observe that $\Omega=g(1+O(\delta^2))\sim g$. Hence (using
+  $\arg(x+iy)=\arctan(y/x)$ for $x\,>\,0$)
+
+  $$
+  \chi_i \sim \arctan\left(- \frac{\delta \sin(gt)}{g \cos(gt)}\right) + \delta t .
+  $$
+
+  Using $\arctan(x)\sim x$ at zero we see
+
+  $$
+  \chi_i \sim - (g\tan(gt) - g^2 t) \, \frac{\delta}{\Omega^2} .
+  $$
+
+  For our particular values $g=1.2$ and $t=1.0$ we have $\chi_i\approx-1.647\cdot\delta/\Omega^2$ near $\delta=0$.
+- Case $\delta$ near $\infty$ :: In this case we have $\delta/\Omega^2\sim\delta\inv$. Moreover
+
+  $$
+  \Omega = \delta + \frac{g^2}{2\delta} + O(\delta^{-3}) ,
+  $$
+
+  and
+
+  $$
+  \frac{\delta}{\Omega} = 1 - \frac{g^2}{2\delta^2} + O(\delta^{-4}) .
+  $$
+
+  Hence
+
+  \begin{align*}
+  \chi_i &= \delta t + \arg\left[\cos(\Omega t) - \ii \frac{\delta}{\Omega} \sin(\Omega t)\right] \\
+    &= \delta t + \arg\left[ e^{-\Omega t} \right] + O(\delta^{-2}) \\
+    &= (\delta - \Omega)t + O(\delta^{-2}) \\
+    &= - \frac{g^2 t}{2\delta} + O(\delta^{-2}) \\
+    &\sim - \frac{g^2 t}{2} \cdot \frac{\delta}{\Omega^2} .
+  \end{align*}
+
+  For our particular values $g=1.2$ and $t=1.0$ we have
+  $\chi_i\approx-0.72\cdot\delta/\Omega^2$ near $\delta=\infty$.
+
+In the plot below we show how well these approximations work. Even for the intermediate
+zone away from $0$ and $\infty$ the approximation works well at the /qualitative/ level
+(at least for these values of $g$ and $t$).
+
+#+caption: The refractive index $\chi_i$ of a single atom against the detuning $\delta$ (blue) for $g=1.2$ and $t=1$. In green and red approximations in terms of $\sim-\delta/\Omega^2$ at $0$ and $\infty$.
+[[file:./images/exercise_7_20_plot.png]]
+
+This is the code to produce the plot:
+
+#+name: exercise-7-20-1
+#+begin_src sage
+  def make_plot_ex720(interval=(-15, 15), t=1, g=1.2):
+      """Plot for exercise 7.20."""
+      d = SR.var('delta')
+      Omega = sqrt(g^2 + d^2)
+
+      # The refractive index:
+      chi_i = arg(exp(i*d*t) * (cos(Omega*t) - i*(d/Omega)*sin(Omega*t)))
+
+      # Approximations at delta=0 and delta=infinity
+      approx_0 = - (g*tan(g*t) - t*g^2) * d/Omega^2
+      approx_inf = - (t*g^2/2) * d/Omega^2
+
+      p1 = parametric_plot((d, chi_i), (d,)+interval, aspect_ratio='automatic',
+                           color='blue')
+      p2 = parametric_plot((d, approx_0), (d,)+interval, aspect_ratio='automatic',
+                           color='green')
+      p3 = parametric_plot((d, approx_inf), (d,)+interval, aspect_ratio='automatic',
+                           color='red')
+
+      return p1 + p2 + p3
+#+end_src
+
+** Exercise 7.21
+Explicitly exponentiate (7.82) and show that
+
+$$
+  \varphi_{ab} = \arg\left[ e^{\ii\delta t} \left( \cos(\Omega_{ab}t) - \ii \frac{\delta}{\Omega_{ab}}\sin(\Omega_{ab} t) \right) \right] ,
+$$
+
+where $\Omega_{ab}=\sqrt{\delta^2+g_a^2+g_b^2}$. Use this to compute $\chi_3$, the nonlinear
+Kerr phase shift. This is a very simple way to model and understand the Kerr interaction,
+which sidesteps much of the complication typically involved in classical nonlinear optics.
+
+*** Solution
+To be consistent with the remark from [[#exercise-7.18][exercise 7.18]] I assume that equation (7.83) reads
+$H_0=\delta$ (instead of $H_0=-\delta$). Let
+
+$$
+  \varphi_0 = \arg(\bra{000}U\ket{000}) = \arg(e^{-\ii\delta t}) = -\delta .
+$$
+
+We have
+
+$$
+  \varphi_a + \varphi_0 = \arg(\bra{100}U\ket{100})
+  = \arg\left(\cos(\Omega_a t) - \ii \frac{\delta}{\Omega_a}\sin(\Omega_a t)\right) .
+$$
+
+Similarly
+
+$$
+  \varphi_b + \varphi_0 = \arg(\bra{010}U\ket{010})
+  = \arg\left(\cos(\Omega_b t) - \ii \frac{\delta}{\Omega_b}\sin(\Omega_b t)\right) .
+$$
+
+This is basically what we dealt with in [[#exercise-7.20][exercise 7.20]]. Now we want to compute
+
+$$
+  \varphi_{ab} + \varphi_0 = \arg(\bra{110}U\ket{110}) .
+$$
+
+We only have to exponentiate $H_2$ to compute this (not all of $H$). But actually we not
+even have to do this due to the following observation (see also [[exercise-7.21-square-H2][sage code]] below):
+
+$$
+  H_2^2 = \begin{bmatrix} \Omega_{ab}^2 & 0 & \\ 0 & \Omega_a^2 & g_ag_b \\ 0 & g_ag_b & \Omega_b^2 \end{bmatrix} .
+$$
+
+Note that $\ket{110}$ corresponds to the upper left corner of the matrix $H_2$. Hence
+
+<<exercise-7.21-110>>
+$$
+  \bra{110}U\ket{110} = \sum_{n \text{ even}} \frac{(-\ii t)^n}{n!} \Omega_{ab}^n +
+    \sum_{n \text{ odd}} \frac{(-\ii t)^n}{n!} (-\delta)\Omega_{ab}^{n-1}
+  = \cos(\Omega_{ab} t) - \ii \frac{\delta}{\Omega_{ab}}\sin(\Omega_{ab} t) .
+$$
+
+Hence
+
+$$
+  \varphi_{ab} + \varphi_0 = \arg(\bra{110}U\ket{110})
+  = \arg\left(\cos(\Omega_{ab} t) - \ii \frac{\delta}{\Omega_{ab}}\sin(\Omega_{ab} t)\right) .
+$$
+
+Interestingly this is the same formula as for the single-photon case, but with a different
+value for $\Omega$. This proves the stated formula for $\varphi_{ab}$. Let us write
+
+$$
+  R(\Omega) = \cos(\Omega t) - \ii \frac{\delta}{\Omega}\sin(\Omega t) .
+$$
+
+By what we have just shown the Kerr phase shift is
+
+$$
+  \chi_3 = \varphi_{ab} - \varphi_a - \varphi_b
+  = \arg\left[e^{-\ii\delta t} \frac{R(\Omega_{ab})}{R(\Omega_a)R(\Omega_b)}\right] .
+$$
+
+#+caption: Kerr phase shift $\chi_3$, in degrees, for $g=1$, $t=0.98$ plotted against the detuning $\delta$.
+[[file:./images/exercise_7_21_plot.png]]
+
+The code for the plot can be found [[exercise-7.21-plot-chi_3][below]]. In principle my plot should show the same as
+Figure 7.5 in the book. And indeed it looks very similar. However it is not exactly the
+same. Not sure why this is the case 🤨.
+
+*** Appendix
+Code to square $H_2$:
+
+#+name: exercise-7.21-square-H2
+#+begin_src sage :results replace :tangle no
+  def square_H2():
+      delta, ga, gb = SR.var('delta g_a g_b')
+
+      H2 = matrix([
+          [-delta, ga, gb],
+          [ga, delta, 0],
+          [gb, 0, delta],
+      ])
+
+      return H2^2
+
+  square_H2()
+#+end_src
+
+#+RESULTS:
+: [delta^2 + g_a^2 + g_b^2                       0                       0]
+: [                      0         delta^2 + g_a^2                 g_a*g_b]
+: [                      0                 g_a*g_b         delta^2 + g_b^2]
+
+Code to make the plot:
+
+#+name: exercise-7.21-plot-chi_3
+#+begin_src sage
+  def make_plot_ex721(interval=(-2, 2), t=0.98, ga=1, gb=1):
+      """Plot for exercise 7.21."""
+      d = SR.var('delta')
+      Omega_a = sqrt(ga^2 + d^2)
+      Omega_b = sqrt(gb^2 + d^2)
+      Omega_ab = sqrt(ga^2 + gb^2 + d^2)
+
+      def phi(Omega):
+          # Note that we convert to degrees at the end
+          return arg(exp(i*d*t) * (cos(Omega*t) - i*(d/Omega)*sin(Omega*t))) * 180 / pi
+
+      phi_a = phi(Omega_a)
+      phi_b = phi(Omega_b)
+      phi_ab = phi(Omega_ab)
+
+      chi_3 = phi_ab - phi_a - phi_b
+
+      p1 = parametric_plot((d, chi_3), (d,)+interval, aspect_ratio='automatic', color='blue')
+      return p1
+#+end_src
+
+** Exercise 7.22
+Associated with the cross phase modulation is also a certain amount of loss, which is
+given by the probability that a photon is absorbed by the atom. Compute this probability,
+$1-\abs{\bra{110}U\ket{110}}^2$, where $U=\exp(-\ii\,Ht)$ for $H$ as in (7.82); compare
+with $1-\abs{\bra{100}U\ket{100}}^2$ as a function of $\delta$, $g_a$, $g_b$, and $t$.
+
+- Remark :: The original exercise contained $1-\bra{110}U\ket{110}$ as the formula for the
+  probability. I corrected this.
+
+*** Solution
+Let $\Omega_{ab}=\sqrt{\delta^2+g_a^2+g_b^2}$. By a [[exercise-7.21-110][formula for]] $\bra{110}U\ket{110}$ from
+exercise 7.21 we have
+
+$$
+  P_{ab} := 1 - \abs{\bra{110}U\ket{110}}^2
+  = 1 - \abs{\cos(\Omega_{ab}t)-\frac{\ii\delta}{\Omega_{ab}}\sin(\Omega_{ab}t)}^2
+  = \frac{1}{1+\frac{\delta^2}{g_a^2+g_b^2}} \, \sin(\Omega_{ab}t)^2 .
+$$
+
+In the same way we have (c.f. (7.82) and (7.77)):
+
+$$
+  P_{a} := 1 - \abs{\bra{100}U\ket{100}}^2
+  = \frac{1}{1+\frac{\delta^2}{g_a^2}} \, \sin(\Omega_{a}t)^2 .
+$$
+
+Averaging over the time we see that the two-photon absorbtion probability is higher than
+the one-photon absorbtion probability (which seems plausible of course).
