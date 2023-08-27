@@ -1329,7 +1329,7 @@ We only have to exponentiate $H_2$ to compute this (not all of $H$). But actuall
 even have to do this due to the following observation (see also [[exercise-7.21-square-H2][sage code]] below):
 
 $$
-  H_2^2 = \begin{bmatrix} \Omega_{ab}^2 & 0 & \\ 0 & \Omega_a^2 & g_ag_b \\ 0 & g_ag_b & \Omega_b^2 \end{bmatrix} .
+  H_2^2 = \begin{bmatrix} \Omega_{ab}^2 & 0 & 0 \\ 0 & \Omega_a^2 & g_ag_b \\ 0 & g_ag_b & \Omega_b^2 \end{bmatrix} .
 $$
 
 Note that $\ket{110}$ corresponds to the upper left corner of the matrix $H_2$. Hence
@@ -1446,3 +1446,45 @@ $$
 
 Averaging over the time we see that the two-photon absorbtion probability is higher than
 the one-photon absorbtion probability (which seems plausible of course).
+
+** Exercise 7.23
+Show that the two qubit gate of (7.87)
+
+$$
+  G(\Delta) = \begin{bmatrix}
+  1 & 0 & 0 & 0 \\
+  0 & e^{\ii\varphi_a} & 0 & 0 \\
+  0 & 0 & e^{\ii\varphi_b} & 0 \\
+  0 & 0 & 0 & e^{\ii(\varphi_a+\varphi_b+\Delta)} \end{bmatrix}
+$$
+
+can be used to realize a controlled-=NOT= gate, when augmented with arbitrary single qubit
+operations, for any $\varphi_a$ and $\varphi_b$ , and $\Delta=\pi$. It turns out that for
+nearly any value of $\Delta$ this gate is universal when augmented with single qubit
+unitaries.
+
+*** Proof
+Note that up to a global phase $e^{\ii(\varphi_a+\varphi_b)/2}$ we have
+
+$$
+  G(\Delta=0) = R_z(\varphi_b) \otimes R_z(\varphi_a) .
+$$
+
+Hence we can easily produce the controlled-=Z= gate
+
+$$
+  C(Z) = G(\Delta=\pi) \cdot R_z(-\varphi_b) \otimes R_z(-\varphi_a)
+$$
+
+By using $X=HZH$ ($H$ being the Hadamard gate) we get
+
+$$
+  \mathrm{CNOT} = I \otimes H \cdot G(\Delta=\pi) \cdot R_z(-\varphi_b) \otimes R_z(-\varphi_a)H .
+$$
+
+Note that we have some freedom to arrange the gates here. Due to the fact that $R_z$
+commutes with $G$ we could move the $R_z$ gates to either side of $G$. Moreover, by the
+symmetry of the =CZ= gate we could also conjugate by $H\otimes\,I$ to obtain the =CNOT=
+gate with the control and target bits swapped.
+
+QED.
