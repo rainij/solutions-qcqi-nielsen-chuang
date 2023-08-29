@@ -27,6 +27,9 @@
 The code in this file is available via <code class="src src-python"><span class="org-keyword">import</span> utils</code> (after tangling).
 </p>
 
+<div id="outline-container-org8d84ed5" class="outline-2">
+<h2 id="org8d84ed5">Pure Python</h2>
+<div class="outline-text-2" id="text-org8d84ed5">
 <p>
 The following class can be used to print colored text to the (ipython) terminal:
 </p>
@@ -53,13 +56,18 @@ The commutator:
     <span class="org-keyword">return</span> a<span class="org-operator">*</span>b <span class="org-operator">-</span> b<span class="org-operator">*</span>a
 </pre>
 </div>
+</div>
+</div>
 
+<div id="outline-container-org16b3be9" class="outline-2">
+<h2 id="org16b3be9">Sage</h2>
+<div class="outline-text-2" id="text-org16b3be9">
 <p>
 The Pauli matrices implemented in sage
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orge68b00c"><span class="org-comment-delimiter"># </span><span class="org-comment">Pauli matrices:</span>
+<pre class="src src-sage" id="orgeb34b7c"><span class="org-comment-delimiter"># </span><span class="org-comment">Pauli matrices:</span>
 <span class="org-variable-name">Id</span> <span class="org-operator">=</span> matrix.identity(2)
 <span class="org-variable-name">X</span> <span class="org-operator">=</span> matrix([[0, 1], [1, 0]])
 <span class="org-variable-name">Y</span> <span class="org-operator">=</span> matrix([[0, <span class="org-operator">-</span>i], [i, 0]])
@@ -75,10 +83,44 @@ The Pauli Rotations
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org2611c78"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+<pre class="src src-sage" id="org107f4b1"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 <span class="org-variable-name">Rz</span> <span class="org-operator">=</span> matrix([[exp(<span class="org-operator">-</span>i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2), 0], [0, exp(i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2)]])
 <span class="org-variable-name">Rx</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2)], [<span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
 <span class="org-variable-name">Ry</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>sin(theta<span class="org-operator">/</span>2)], [sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
 </pre>
+</div>
+
+<p>
+Next we define the kronecker product, commutator, and functions to create kets and bras
+from bit-strings:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage" id="orgf4e8e26"><span class="org-keyword">def</span> <span class="org-function-name">kron</span>(A1, <span class="org-operator">*</span>As):
+    <span class="org-doc">"""Generalize TensorProduct to one and more then two arguments."""</span>
+    <span class="org-variable-name">P</span> <span class="org-operator">=</span> A1
+    <span class="org-keyword">for</span> A <span class="org-keyword">in</span> As:
+        <span class="org-variable-name">P</span> <span class="org-operator">=</span> P.tensor_product(A)
+    <span class="org-keyword">return</span> P
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">commutator</span>(a, b):
+    <span class="org-doc">"""Commutator [a,b] of a and b."""</span>
+    <span class="org-keyword">return</span> a<span class="org-operator">*</span>b <span class="org-operator">-</span> b<span class="org-operator">*</span>a
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">ket</span>(bits: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns |bits&gt;."""</span>
+    <span class="org-variable-name">vec</span> <span class="org-operator">=</span> [0] <span class="org-operator">*</span> 2<span class="org-operator">**</span><span class="org-builtin">len</span>(bits)
+    <span class="org-variable-name">vec</span>[<span class="org-builtin">int</span>(bits, 2)] <span class="org-operator">=</span> 1
+    <span class="org-keyword">return</span> vector(vec)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">bra</span>(bits: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> matrix:
+    <span class="org-doc">"""If bits is a string of '0' and '1' this returns &lt;bits|."""</span>
+    <span class="org-keyword">return</span> ket(bits).H
+</pre>
+</div>
+</div>
 </div>
 <footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.7)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>

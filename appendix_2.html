@@ -27,68 +27,68 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf454b80">Setup</a>
+<li><a href="#org4fa3ce8">Setup</a>
 <ul>
-<li><a href="#org0259d19">Python libraries</a></li>
+<li><a href="#org02965a9">Python libraries</a></li>
 </ul>
 </li>
-<li><a href="#orge1dbf43">Character theory</a>
+<li><a href="#org40430f6">Character theory</a>
 <ul>
-<li><a href="#orga9e65dc">Definitions</a></li>
+<li><a href="#org8932b20">Definitions</a></li>
 <li><a href="#unitary-representations">Unitary Representations</a></li>
-<li><a href="#org3cf9526">Constructing new from old representations</a></li>
+<li><a href="#orgaff9bf6">Constructing new from old representations</a></li>
 <li><a href="#schurs-lemma">Schur's Lemma</a></li>
 <li><a href="#decomposition-of-representations">Decomposition of representations</a></li>
 <li><a href="#class-functions-hilbert-space">Class functions as a Hilbert Space</a></li>
 </ul>
 </li>
-<li><a href="#org745807e">Fourier transform on groups</a>
+<li><a href="#org406789d">Fourier transform on groups</a>
 <ul>
 <li><a href="#section-fundamental-formula">Fundamental formula</a></li>
 <li><a href="#group-ring-cg">Group ring \(\CC[G]\)</a></li>
-<li><a href="#org7830726">Group ring \(\ZZ[G]\) and algebraic integers</a></li>
-<li><a href="#org9dd7860">Fourier transform - Definition</a></li>
+<li><a href="#orgcf29b1e">Group ring \(\ZZ[G]\) and algebraic integers</a></li>
+<li><a href="#org245189a">Fourier transform - Definition</a></li>
 </ul>
 </li>
-<li><a href="#org424a475">Fourier transform on abelian groups</a>
+<li><a href="#orgddac6e0">Fourier transform on abelian groups</a>
 <ul>
 <li><a href="#section-fourier-abelian-groups">Definition for abelian groups</a></li>
 <li><a href="#pontryagin-duality">Pontryagin duality</a></li>
 <li><a href="#direct-sums-invariant-subspaces">On direct sums</a></li>
-<li><a href="#org70d97ec">Product formula and the isomorphism \(G\cong\hat{G}\)</a></li>
+<li><a href="#org07d9d9d">Product formula and the isomorphism \(G\cong\hat{G}\)</a></li>
 <li><a href="#section-dual-subgroup">Character dual of subgroups</a></li>
 </ul>
 </li>
-<li><a href="#orgcf91452">Exercises</a>
+<li><a href="#org7d47f1b">Exercises</a>
 <ul>
 <li><a href="#exercise-a2-11">Exercise A2.11 (Characters)</a></li>
 <li><a href="#exercise-a2-12">Exercise A2.12 (Unitary matrix groups)</a></li>
-<li><a href="#org208f627">Exercise A2.13</a></li>
+<li><a href="#org98cbf69">Exercise A2.13</a></li>
 <li><a href="#exercise-a2-14">Exercise A2.14</a></li>
 <li><a href="#exercise-a2-15">Exercise A2.15</a></li>
 <li><a href="#exercise-a2-16">Exercise A2.16</a></li>
-<li><a href="#orgc5204da">Exercise A2.17</a></li>
-<li><a href="#orgcfff7af">Exercise A2.18</a></li>
-<li><a href="#org1c0f6b6">Exercise A2.19</a></li>
-<li><a href="#orgfa3604b">Exercise A2.20</a></li>
-<li><a href="#orga46ae4c">Exercise A2.21</a></li>
-<li><a href="#org34ba3bd">Exercise A2.22</a></li>
+<li><a href="#orgb378881">Exercise A2.17</a></li>
+<li><a href="#org9d9163f">Exercise A2.18</a></li>
+<li><a href="#org593bfdc">Exercise A2.19</a></li>
+<li><a href="#orgdc8e3ef">Exercise A2.20</a></li>
+<li><a href="#orgd6495c1">Exercise A2.21</a></li>
+<li><a href="#org95bb665">Exercise A2.22</a></li>
 <li><a href="#exercise-a2-23">Exercise A2.23</a></li>
-<li><a href="#org73213ff">Exercise A2.24</a></li>
+<li><a href="#orge7aa728">Exercise A2.24</a></li>
 </ul>
 </li>
-<li><a href="#org34236db">References</a></li>
+<li><a href="#org4c02faf">References</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf454b80" class="outline-2">
-<h2 id="orgf454b80">Setup</h2>
-<div class="outline-text-2" id="text-orgf454b80">
+<div id="outline-container-org4fa3ce8" class="outline-2">
+<h2 id="org4fa3ce8">Setup</h2>
+<div class="outline-text-2" id="text-org4fa3ce8">
 </div>
-<div id="outline-container-org0259d19" class="outline-3">
-<h3 id="org0259d19">Python libraries</h3>
-<div class="outline-text-3" id="text-org0259d19">
+<div id="outline-container-org02965a9" class="outline-3">
+<h3 id="org02965a9">Python libraries</h3>
+<div class="outline-text-3" id="text-org02965a9">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">from</span> numbers <span class="org-keyword">import</span> Number
 
@@ -102,9 +102,9 @@
 </div>
 </div>
 
-<div id="outline-container-orge1dbf43" class="outline-2">
-<h2 id="orge1dbf43">Character theory</h2>
-<div class="outline-text-2" id="text-orge1dbf43">
+<div id="outline-container-org40430f6" class="outline-2">
+<h2 id="org40430f6">Character theory</h2>
+<div class="outline-text-2" id="text-org40430f6">
 <p>
 For me <i>Character Theory</i> was rather new when I accountered the appendix for the first
 time. I found it hard to learn it from this Appendix so I searched for alternative
@@ -121,9 +121,9 @@ book. To make it self contained I decided to repeat certain things.
 </p>
 </div>
 
-<div id="outline-container-orga9e65dc" class="outline-3">
-<h3 id="orga9e65dc">Definitions</h3>
-<div class="outline-text-3" id="text-orga9e65dc">
+<div id="outline-container-org8932b20" class="outline-3">
+<h3 id="org8932b20">Definitions</h3>
+<div class="outline-text-3" id="text-org8932b20">
 <p>
 Let \((G,\cdot,e)\) be a group. A <b>matrix representation</b> of \(G\) is a homomorphism of groups
 \(\rho:G\to M\) where \(M\) is a group of matrices over some complex vector space \(V\) (other
@@ -195,7 +195,7 @@ preserves the corresponding characters. A linear map \(S:V\to W\in\hom(V,W)\) is
 </p>
 
 <p>
-<a id="org865b5f7"></a>
+<a id="org86b02a0"></a>
 \[
   \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
 \]
@@ -208,7 +208,7 @@ class of representations of \(G\) into a <a href="https://en.wikipedia.org/wiki/
 </p>
 
 <p>
-<a id="org9c2b280"></a>
+<a id="orge509b32"></a>
 Clearly two representations are equivalent iff there exists a G-isomorphism between them.
 </p>
 
@@ -243,9 +243,9 @@ via <i>averaging</i> is standard in Character Theory.
 </div>
 </div>
 
-<div id="outline-container-org3cf9526" class="outline-3">
-<h3 id="org3cf9526">Constructing new from old representations</h3>
-<div class="outline-text-3" id="text-org3cf9526">
+<div id="outline-container-orgaff9bf6" class="outline-3">
+<h3 id="orgaff9bf6">Constructing new from old representations</h3>
+<div class="outline-text-3" id="text-orgaff9bf6">
 <p>
 Assuming we have a representation on certain vector spaces \(V\), \(W\) we can construct new
 ones like in the following listing. Note that sometimes we write \(gv\) instead of
@@ -339,7 +339,7 @@ complex vector spaces \(V\) and \(W\). Let \(S:V\to W\) be a <code>G</code>-line
 </p>
 
 <p>
-<a id="org288340b"></a>
+<a id="org28505a9"></a>
 \[
   \forall g: \rho_W(g) \, S = S \, \rho_V(g) .
 \]
@@ -364,7 +364,7 @@ other one.
 <dl class="org-dl">
 <dt>Remarks</dt><dd><ul class="org-ul">
 <li>One could weaken the assumptions by replacing \(\rho_V(G)\) and \(\rho_W(G)\) by any two matrix
-groups \(G\) and \(H\) which have equal cardinality \(I\) and replace the above <a href="#org288340b">relation</a> by
+groups \(G\) and \(H\) which have equal cardinality \(I\) and replace the above <a href="#org28505a9">relation</a> by
 \(g_iS=Sh_i\) for \(i\,\in\,I\). The proof below shows this implicitly. In the isomorphism case we
 see that \(H\) and \(G\) are in fact <i>equivalent</i>.</li>
 <li>Schur's Lemma essentially says that for irreducible representations
@@ -398,7 +398,7 @@ and \(W\) are non-trivial. The other two cases are:
 This shows the first part. Now consider the second part where (among other things) \(V=W\)
 is assumed. Since \(\CC\) is algebraically closed and the vector spaces are finite
 dimensional \(S\) must have an eigenvalue \(\alpha\). Clearly \(S-\alpha\) satisfies the
-<a href="#org288340b">G-linearity</a> in place of \(S\) too. By the first part and since \(S-\alpha\) is no isomorphism
+<a href="#org28505a9">G-linearity</a> in place of \(S\) too. By the first part and since \(S-\alpha\) is no isomorphism
 we must have \(S=\alpha\).
 </p>
 
@@ -551,7 +551,7 @@ Using the following scalar product, the vector space turns into a Hilbert Space:
 </p>
 
 <p>
-<a id="org1ae715c"></a>
+<a id="org0e5b30c"></a>
 \[
   \langle \alpha, \beta \rangle =
   \frac{1}{\abs{G}} \sum_{g\in G} \alpha(g)^* \beta(g) .
@@ -559,7 +559,7 @@ Using the following scalar product, the vector space turns into a Hilbert Space:
 </p>
 
 <p>
-<a id="orgd94f9fe"></a>
+<a id="org4fafc64"></a>
 It turns out that the irreducible characters are an orthonormal basis of this Hilbert
 Space. This should be shown in <a href="#exercise-a2-15">exercise A2.15</a>. This exercise however bases the proof on a
 more difficult result so it does not really help to understand this nice result. For a
@@ -609,14 +609,14 @@ decomposes like this into irreducible characters:
 </p>
 
 <p>
-<a id="org7f0962a"></a>
+<a id="org26bc79b"></a>
 \[
   \chi_V = \sum_{i=1}^n a_n \chi_{V_i}
 \]
 </p>
 
 <p>
-<a id="orga308a02"></a>
+<a id="org44aa975"></a>
 In particular we deduce that a character is irreducible iff its norm is \(1\) (all other
 characters have a larger norm).
 </p>
@@ -624,12 +624,12 @@ characters have a larger norm).
 <p>
 As special case consider the characters \(\chi_p(j)=\exp(2\pi\ii jp/N)\) of the Abelian group
 \(\ZZ_N\). The general theory shows that these functions are a basis of \(\CC^N\). This basis
-is orthogonal if we scale the scalar product on \(\CC^N\) by \(1/\sqrt{N}\) (as in the <a href="#org1ae715c">formula</a>
-for general groups). Note that the <a href="#orgd94f9fe">orthonormality relation</a> is equivalent to the well known
+is orthogonal if we scale the scalar product on \(\CC^N\) by \(1/\sqrt{N}\) (as in the <a href="#org0e5b30c">formula</a>
+for general groups). Note that the <a href="#org4fafc64">orthonormality relation</a> is equivalent to the well known
 </p>
 
 <p>
-<a id="org79b282d"></a>
+<a id="org18b2030"></a>
 \[
   \sum_{j=0}^{N-1} e^{2\pi\ii jp/N} = \begin{cases} N & \text{if } p=0 \\ 0 & \text{otherwise.} \end{cases}
 \]
@@ -642,9 +642,9 @@ Of course the latter can also be seen from the formula for geometric sums.
 </div>
 </div>
 
-<div id="outline-container-org745807e" class="outline-2">
-<h2 id="org745807e">Fourier transform on groups</h2>
-<div class="outline-text-2" id="text-org745807e">
+<div id="outline-container-org406789d" class="outline-2">
+<h2 id="org406789d">Fourier transform on groups</h2>
+<div class="outline-text-2" id="text-org406789d">
 </div>
 <div id="outline-container-section-fundamental-formula" class="outline-3">
 <h3 id="section-fundamental-formula">Fundamental formula</h3>
@@ -655,7 +655,7 @@ each isomorphy class). Then for \(\rho,\sigma\in\hat{G}\) (and for any choice of
 </p>
 
 <p>
-<a id="org4e83235"></a>
+<a id="org41fd639"></a>
 \[
   \sum_{g\in G} \rho(g\inv)_{ij} \sigma(g)_{kl}
   = \frac{\abs{G}}{d_\rho} \delta_{il} \delta_{jk} \delta_{\rho \sigma} .
@@ -749,10 +749,10 @@ irreducible representations:
 </p>
 
 <p>
-<a id="orgfbd4983"></a>
+<a id="orgb8c5181"></a>
 Notice that with the above ordering for fixed \(\rho\), \(i\), and \(j\) (\(N\) possible
 combinations) each \((\rho(g)_{ij})_{g\in G}\) can be identified with a vector in
-\(\CC^N\). The <a href="#org4e83235">fundamental formula</a> states that these vectors are an orthonormal basis of
+\(\CC^N\). The <a href="#org41fd639">fundamental formula</a> states that these vectors are an orthonormal basis of
 \(\CC^N\).
 </p>
 
@@ -763,7 +763,7 @@ rows are orthonormal (taking the \(\rho\in\hat{G}\) as the row index).
 </p>
 
 <p>
-But as a unitary matrix \(\rho^F\) has orthonormal columns too! So the <a href="#org4e83235">fundamental formula</a>
+But as a unitary matrix \(\rho^F\) has orthonormal columns too! So the <a href="#org41fd639">fundamental formula</a>
 has a companion which looks like this:
 </p>
 
@@ -789,7 +789,7 @@ For a unital <a href="https://en.wikipedia.org/wiki/Ring_(mathematics)">ring</a>
 </p>
 
 <p>
-<a id="org0e3e483"></a>
+<a id="org5fae439"></a>
 \[
   \sum_{g\in G} c_g \, g \text{ where } c_g \in R .
 \]
@@ -810,7 +810,7 @@ a mapping \(G\to\CC^N\) and that \(\{\rho^F(g)\}_{g\in G}\) is an orthonormal ba
 </p>
 
 <p>
-<a id="org5fc5129"></a>
+<a id="orged31769"></a>
 \[
   \rho^F\left( \sum_{g\in G} c_g \, g \right) := \sum_{g\in G} c_g \, \rho^F(g) .
 \]
@@ -828,7 +828,7 @@ its natural norm (making it into a Hilbert space):
 </p>
 
 <p>
-<a id="orgfc51514"></a>
+<a id="org712b7ca"></a>
 Let us give another interpretation of \(R[G]\) - as the <a href="https://en.wikipedia.org/wiki/Ring_(mathematics)">ring</a> of functions \(f:G\to\CC\) which
 can be denoted as \(R^G\). Identifying \(f(g)=c_g\) the elements of \(R[G]\) have the form
 </p>
@@ -866,7 +866,7 @@ For addition this should be obvious so let us just show it for the convolution:
 </p>
 
 <p>
-<a id="orgdaf90b8"></a>
+<a id="org032d7ed"></a>
 \[
   \left( \sum_{u\in G} f(u) \, u \right) \left( \sum_{v\in G} g(v) \, v \right)
   = \sum_x \sum_{uv=x} f(u)g(v) x
@@ -876,9 +876,9 @@ For addition this should be obvious so let us just show it for the convolution:
 </div>
 </div>
 
-<div id="outline-container-org7830726" class="outline-3">
-<h3 id="org7830726">Group ring \(\ZZ[G]\) and algebraic integers</h3>
-<div class="outline-text-3" id="text-org7830726">
+<div id="outline-container-orgcf29b1e" class="outline-3">
+<h3 id="orgcf29b1e">Group ring \(\ZZ[G]\) and algebraic integers</h3>
+<div class="outline-text-3" id="text-orgcf29b1e">
 <p>
 In the section on the <a href="#group-ring-cg">group ring \(\CC[G]\)</a> we have seen that \(\rho^F\) naturally extends to
 \(\CC[G]\) and yields a representation as linear matrices. In fact, we have seen that we get
@@ -888,13 +888,13 @@ irreducible representations.
 
 <p>
 Let us now restrict \(\rho^F\) to \(\ZZ[G]\). That is, we only use integer coefficients in the
-<a href="#org0e3e483">formal linear combinations</a>. What do we gain from this? We will show that the eigenvalues
+<a href="#org5fae439">formal linear combinations</a>. What do we gain from this? We will show that the eigenvalues
 of the corresponding linear maps are <i>algebraic integers</i>. This will be useful in
 <a href="#exercise-a2-14">exercise A2.14</a>.
 </p>
 
 <p>
-<a id="org873b3b8"></a>
+<a id="orgab75456"></a>
 The <b>algebraic numbers</b> are defined as all complex numbers which are a root of some
 polynomial with <i>rational</i> coefficients. Likewise <b>algebraic integers</b> are defined as all
 complex numbers which are a root of some polynomial with <i>integer</i> coefficients and whose
@@ -902,7 +902,7 @@ leading coefficient is \(1\) (this is called a <b>monic</b> polynomial).
 </p>
 
 <p>
-<a id="org26ee28e"></a>
+<a id="orgb629a43"></a>
 Clearly rational numbers are algebraic numbers. Similarly integers are algebraic
 integers. It is also not hard to see that a rational number which is an algebraic integer
 is already an integer (consider \(p/q\) with coprime \(p\), \(q\) and look what the highest
@@ -910,7 +910,7 @@ monomial does to the denominator).
 </p>
 
 <p>
-<a id="orgfee4b7c"></a>
+<a id="orgbb9ffac"></a>
 THEOREM: Algebraic integers are a ring and algebraic numbers are a field.
 </p>
 
@@ -931,7 +931,7 @@ corresponding eigenvectors are \(u\,\otimes\,v\) both times. QED.
 </p>
 
 <p>
-<a id="org99582a6"></a>
+<a id="orgd8e1a96"></a>
 THEOREM: Each element in \(\\Z[G]\) satisfies a monic polynomial with integer coefficients
 ("satisfies" means \(p(\alpha)=0\)). In particular the eigenvalues of the matrices in
 \(\rho^F(\ZZ[G])\) are algebraic integers.
@@ -958,7 +958,7 @@ that \(\alpha\) naturally acts on \(\ZZ[G]\) by
 </p>
 
 <p>
-where we use the fact that \(\ZZ[G]\) can be interpreted <a href="#orgfc51514">as a ring</a>. Note that this is
+where we use the fact that \(\ZZ[G]\) can be interpreted <a href="#org712b7ca">as a ring</a>. Note that this is
 essentially the <i>regular representation</i> of \(\ZZ[G]\)). Let us define the matrix \(A\) with
 coefficients \(a_{gh}\in\ZZ\) by:
 </p>
@@ -1006,11 +1006,11 @@ The regular representation (which <i>essentially</i> maps \(\alpha\) to \(A\)) i
 </div>
 </div>
 
-<div id="outline-container-org9dd7860" class="outline-3">
-<h3 id="org9dd7860">Fourier transform - Definition</h3>
-<div class="outline-text-3" id="text-org9dd7860">
+<div id="outline-container-org245189a" class="outline-3">
+<h3 id="org245189a">Fourier transform - Definition</h3>
+<div class="outline-text-3" id="text-org245189a">
 <p>
-The <i>Fourier transformation</i> is already defined <a href="#org5fc5129">here</a>. But let us re-introduce it with
+The <i>Fourier transformation</i> is already defined <a href="#orged31769">here</a>. But let us re-introduce it with
 slightly enhanced notation which is closer to what we know from the standard case. For
 \(f\in\CC^G\) let
 </p>
@@ -1022,7 +1022,7 @@ slightly enhanced notation which is closer to what we know from the standard cas
 </p>
 
 <p>
-By the chapter on the <a href="#orgfbd4983">fundamental formula</a> we can identify \(\hat{f}\) with a vector \(\CC^N\),
+By the chapter on the <a href="#orgb8c5181">fundamental formula</a> we can identify \(\hat{f}\) with a vector \(\CC^N\),
 which is the set of functions from \(\{1,2,\ldots,N\}\) to \(\CC\). By the same chapter the
 mapping \(\FT:f\mapsto\hat{f}\) is <b>unitary</b>.
 </p>
@@ -1034,7 +1034,7 @@ ordering of the irreducible representation \(\rho\) and the matrix indices
 </p>
 
 <p>
-<a id="org305a25e"></a>
+<a id="orga2922b4"></a>
 \[
   \hat{f}(n(\rho,i,j)) = \sqrt{\frac{d_\rho}{N}} \sum_{g\in G} f(g) \, \rho(g)_{ij} .
 \]
@@ -1069,7 +1069,7 @@ component-wise multiplication as the multiplication operation. Observe
 </p>
 
 <p>
-In fact, this follows by the same reasoning which <a href="#orgdaf90b8">justified convolution</a> as the "right"
+In fact, this follows by the same reasoning which <a href="#org032d7ed">justified convolution</a> as the "right"
 multiplication on \(\CC^G\) to be compatible with the free module \(\CC[G]\).
 </p>
 
@@ -1095,9 +1095,9 @@ yields \(\FT\inv\).
 </div>
 </div>
 
-<div id="outline-container-org424a475" class="outline-2">
-<h2 id="org424a475">Fourier transform on abelian groups</h2>
-<div class="outline-text-2" id="text-org424a475">
+<div id="outline-container-orgddac6e0" class="outline-2">
+<h2 id="orgddac6e0">Fourier transform on abelian groups</h2>
+<div class="outline-text-2" id="text-orgddac6e0">
 </div>
 <div id="outline-container-section-fourier-abelian-groups" class="outline-3">
 <h3 id="section-fourier-abelian-groups">Definition for abelian groups</h3>
@@ -1131,7 +1131,7 @@ The inverse Fourier transform is
 <h3 id="pontryagin-duality">Pontryagin duality</h3>
 <div class="outline-text-3" id="text-pontryagin-duality">
 <p>
-Using <a href="#exercise-a2-11">Exercise A2.11(5)</a> or more precisely the fact that \(\chi(g)\) is a <a href="#orga41dbf9">root of unity</a>
+Using <a href="#exercise-a2-11">Exercise A2.11(5)</a> or more precisely the fact that \(\chi(g)\) is a <a href="#org1218404">root of unity</a>
 (whose order divides \(N\)) we can show that \(\hat{G}\) can be identified with the Abelian
 group \(\hom(G,S^1)\) (group homomorphisms from \(G\) to the unit circle
 \(S^1\subseteq\CC\)). See also <a href="https://en.wikipedia.org/wiki/Pontryagin_duality">Pontryagin duality</a> at wikipedia. That \(\hat{G}\) is a
@@ -1228,7 +1228,7 @@ Now, let \(f:G\to\CC\) be a function which is invariant with respect to \(K\), t
 
 <p>
 This is clearly a special case of a product with second factor being just the constant
-function \(1\). By the <a href="#orgd94f9fe">orthonormality relation</a> for irreducible characters we have
+function \(1\). By the <a href="#org4fafc64">orthonormality relation</a> for irreducible characters we have
 </p>
 
 <p>
@@ -1242,7 +1242,7 @@ Hence for \(K\)​-invariant functions \(f\) we have
 </p>
 
 <p>
-<a id="org7beb087"></a>
+<a id="org144ee1b"></a>
 \[
   \FT_Gf(\chi_G^{ij}) = \begin{cases}
     \sqrt{\frac{\abs{K}}{\abs{H}}} (\FT_H f(\cdot,0))(\chi_H^i) & \text{if } j=0 \\
@@ -1252,15 +1252,15 @@ Hence for \(K\)​-invariant functions \(f\) we have
 </div>
 </div>
 
-<div id="outline-container-org70d97ec" class="outline-3">
-<h3 id="org70d97ec">Product formula and the isomorphism \(G\cong\hat{G}\)</h3>
-<div class="outline-text-3" id="text-org70d97ec">
+<div id="outline-container-org07d9d9d" class="outline-3">
+<h3 id="org07d9d9d">Product formula and the isomorphism \(G\cong\hat{G}\)</h3>
+<div class="outline-text-3" id="text-org07d9d9d">
 <p>
 Recall that abelian groups are direct sums of cyclic groups:
 </p>
 
 <p>
-<a id="orgd1c3f1b"></a>
+<a id="org0cdff0f"></a>
 \[
   G = \bigoplus_{i=1}^n \ZZ_{r_i} .
 \]
@@ -1285,7 +1285,7 @@ From a <a href="#direct-sums-invariant-subspaces">previous section</a> we see th
 </p>
 
 <p>
-<a id="orgc9364c8"></a>
+<a id="org21c4557"></a>
 \[
   \FT_G = \bigotimes_{i=1}^n \FT_{\ZZ_{r_i}} .
 \]
@@ -1298,7 +1298,7 @@ given by:
 </p>
 
 <p>
-<a id="orgac2fd53"></a>
+<a id="org98bcaa5"></a>
 \[
   \chi_l(g) = \exp\left( 2\pi\ii \sum_{i=1}^n l_i g_i / r_i \right) \text{ for } l\in G .
 \]
@@ -1307,7 +1307,7 @@ given by:
 <p>
 Note that \(\chi_{l+h}(g)=\chi_l(g)\chi_h(g)\) and \(\chi_{-l}(g)=\chi_l(g)^\dagger\). In
 particular \(\hat{G} \cong G\). I.e. both groups are isomorphic. Also note that this
-isomorphism is <i>not</i> canonical. First of all the <a href="#orgd1c3f1b">decomposition</a> of \(G\) is not completely
+isomorphism is <i>not</i> canonical. First of all the <a href="#org0cdff0f">decomposition</a> of \(G\) is not completely
 unique. Moreover there are at least two competing conventions whether to put a sign in
 front of \(2\pi\) in the formula for \(\chi_l(g)\) or not.
 </p>
@@ -1341,7 +1341,7 @@ above notation. However, I try to avoid that because it does not have the proper
 associate with orthogonal complements in (complex) Hilbert spaces. For example, let
 \(G=\ZZ_4\) and \(K=2\ZZ_4\), then \(K^\perp=K\).</dd>
 </dl></dd>
-<dt>Theorem <a id="orga9e1476"></a></dt><dd>Let \(K\) be a subgroup of the finite abelian
+<dt>Theorem <a id="org3c31e68"></a></dt><dd>Let \(K\) be a subgroup of the finite abelian
 group \(G\). Then
 <ol class="org-ol">
 <li><p>
@@ -1395,7 +1395,7 @@ The isomorphism \(K^\perp\cong\widehat{(G/K)}\) is given by
 </p>
 
 <p>
-<a id="org6c48e16"></a>
+<a id="org8350e91"></a>
 \[ h\mapsto(\chi_h^{G/K}:g+K\mapsto\chi_h(g)) \]
 </p>
 
@@ -1416,7 +1416,7 @@ to a \(\tilde{\chi}\in\hat{G}\) satisfying \(\tilde{\chi}(k)=1\) for all \(K\). 
 </p>
 
 <p>
-Clearly this is the reverse of the <a href="#org6c48e16">above mapping</a>. QED.
+Clearly this is the reverse of the <a href="#org8350e91">above mapping</a>. QED.
 </p></dd>
 <dt>Proof of 2</dt><dd><p>
 We have to show that
@@ -1463,7 +1463,7 @@ theorem is produced (with high probability).
 </p>
 
 <p>
-<a id="org65ca3a4"></a>
+<a id="org40e5cd9"></a>
 How do we find a generating set for
 </p>
 
@@ -1524,9 +1524,9 @@ a (not necessarily minimal) generating set for \(K\).
 </div>
 </div>
 
-<div id="outline-container-orgcf91452" class="outline-2">
-<h2 id="orgcf91452">Exercises</h2>
-<div class="outline-text-2" id="text-orgcf91452">
+<div id="outline-container-org7d47f1b" class="outline-2">
+<h2 id="org7d47f1b">Exercises</h2>
+<div class="outline-text-2" id="text-org7d47f1b">
 </div>
 <div id="outline-container-exercise-a2-11" class="outline-3">
 <h3 id="exercise-a2-11">Exercise A2.11 (Characters)</h3>
@@ -1545,18 +1545,18 @@ Prove the following properties of characters on a <i>finite</i> (and complex) ma
 </ol>
 </div>
 
-<div id="outline-container-orgd0dcf8c" class="outline-4">
-<h4 id="orgd0dcf8c">Proof of (1)</h4>
-<div class="outline-text-4" id="text-orgd0dcf8c">
+<div id="outline-container-org6e6f1bc" class="outline-4">
+<h4 id="org6e6f1bc">Proof of (1)</h4>
+<div class="outline-text-4" id="text-org6e6f1bc">
 <p>
 This should be clear since the identity matrix has exactly \(n\) ones on the diagonal.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org0870cf5" class="outline-4">
-<h4 id="org0870cf5">Proof of (2)</h4>
-<div class="outline-text-4" id="text-org0870cf5">
+<div id="outline-container-orgf02a6cd" class="outline-4">
+<h4 id="orgf02a6cd">Proof of (2)</h4>
+<div class="outline-text-4" id="text-orgf02a6cd">
 <p>
 Recall that the trace is just the sum of all eigenvalues, counted with multiplicity
 (exactly \(n\) numbers). Let \(\lambda\) be one of the eigenvalues and consider a
@@ -1575,7 +1575,7 @@ Each element of a finite group has finite order. Hence there is an integer \(r\)
 </p>
 
 <p>
-<a id="orga41dbf9"></a>
+<a id="org1218404"></a>
 \[ \lambda^r=1 \]
 </p>
 
@@ -1586,19 +1586,19 @@ we get the claim. QED.
 </div>
 </div>
 
-<div id="outline-container-orge823b6b" class="outline-4">
-<h4 id="orge823b6b">Proof of (3)</h4>
-<div class="outline-text-4" id="text-orge823b6b">
+<div id="outline-container-orga2956e8" class="outline-4">
+<h4 id="orga2956e8">Proof of (3)</h4>
+<div class="outline-text-4" id="text-orga2956e8">
 <p>
-This follows from the <a href="#orga41dbf9">special form</a> of the eigenvalues, together with the fact that the
+This follows from the <a href="#org1218404">special form</a> of the eigenvalues, together with the fact that the
 triangle inequality is strict iff all summands are colinear.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org6a65fef" class="outline-4">
-<h4 id="org6a65fef">Proof of (4)</h4>
-<div class="outline-text-4" id="text-org6a65fef">
+<div id="outline-container-orgde2e712" class="outline-4">
+<h4 id="orgde2e712">Proof of (4)</h4>
+<div class="outline-text-4" id="text-orgde2e712">
 <p>
 We have to show \(\chi(h^{-1}gh)=\chi(g)\). This follows from the cyclicity property of the trace:
 </p>
@@ -1615,9 +1615,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org0a80ce8" class="outline-4">
-<h4 id="org0a80ce8">Proof of (5)</h4>
-<div class="outline-text-4" id="text-org0a80ce8">
+<div id="outline-container-org5c5af8e" class="outline-4">
+<h4 id="org5c5af8e">Proof of (5)</h4>
+<div class="outline-text-4" id="text-org5c5af8e">
 <p>
 Since we work on vector spaces of <i>complex</i> numbers, the <a href="https://en.wikipedia.org/wiki/Characteristic_polynomial">characteristic polynomial</a> can be
 factored into <i>linear</i> polynomials:
@@ -1632,17 +1632,17 @@ factored into <i>linear</i> polynomials:
 <p>
 This assumes that the eigenvalues (including multiplicities) are \(\lambda_i\). Multiplying
 this by \(g^{-n}\) shows that the eigenvalues of \(g^{-1}\) are \(\lambda_i^{-1}\) (including
-multiplicities). From the <a href="#orga41dbf9">special form</a> of the eigenvalues we get
+multiplicities). From the <a href="#org1218404">special form</a> of the eigenvalues we get
 \(\lambda_i^{-1}=\lambda_i^*\) which implies the claim. QED.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgd035c95" class="outline-4">
-<h4 id="orgd035c95">Proof of (6)</h4>
-<div class="outline-text-4" id="text-orgd035c95">
+<div id="outline-container-org0710b86" class="outline-4">
+<h4 id="org0710b86">Proof of (6)</h4>
+<div class="outline-text-4" id="text-org0710b86">
 <p>
-Again by the <a href="#orga41dbf9">special form</a> of the eigenvalues the character is just a sum of roots of
+Again by the <a href="#org1218404">special form</a> of the eigenvalues the character is just a sum of roots of
 unity. The latter are algebraic. According to <a href="https://en.wikipedia.org/wiki/Algebraic_number#Field">wikipedia</a> algebraic numbers form a field (in
 fact, they are the algebraic closure of the rational numbers). Hence sums of algebraic
 numbers are algebraic too. QED.
@@ -1662,9 +1662,9 @@ representation</i>.
 </p>
 </div>
 
-<div id="outline-container-org1fd47f4" class="outline-4">
-<h4 id="org1fd47f4">Example of a non-unitary matrix group</h4>
-<div class="outline-text-4" id="text-org1fd47f4">
+<div id="outline-container-org8ff61c0" class="outline-4">
+<h4 id="org8ff61c0">Example of a non-unitary matrix group</h4>
+<div class="outline-text-4" id="text-org8ff61c0">
 <p>
 An example of a non-unitary matrix group is generated by
 </p>
@@ -1679,7 +1679,7 @@ An example of a non-unitary matrix group is generated by
 Clearly \(\langle g \rangle = \{I, g\}\), since \(g^2=I\). Moreover \(g\) is not unitary for any
 \(a\neq0\). On the other hand \(g\) is diagonalizable (its eigenvalues are \(\pm1\)). Note that
 the claim of the exercise implies diagonalizability for <i>any</i> representation of a finite
-group! In fact, equivalence to a unitary group <a href="#org9c2b280">means</a> that there is a G-isomorphism \(h\)
+group! In fact, equivalence to a unitary group <a href="#orge509b32">means</a> that there is a G-isomorphism \(h\)
 such that \(hgh\inv\) is unitary and hence diagonalizable. But if \(hgh\inv\) is
 diagonalizable the same is true for \(g\).
 </p>
@@ -1703,9 +1703,9 @@ representation is not equivalent to a unitary representation.
 </div>
 </div>
 
-<div id="outline-container-org7103f3d" class="outline-4">
-<h4 id="org7103f3d">Proof</h4>
-<div class="outline-text-4" id="text-org7103f3d">
+<div id="outline-container-org58eb705" class="outline-4">
+<h4 id="org58eb705">Proof</h4>
+<div class="outline-text-4" id="text-org58eb705">
 <p>
 Let us define the positive semi-definite operator (identifying group elements with their
 matrix representation)
@@ -1756,17 +1756,17 @@ Since conjugation preserves the trace (exercise A2.11) we are done. QED.
 </div>
 </div>
 
-<div id="outline-container-org208f627" class="outline-3">
-<h3 id="org208f627">Exercise A2.13</h3>
-<div class="outline-text-3" id="text-org208f627">
+<div id="outline-container-org98cbf69" class="outline-3">
+<h3 id="org98cbf69">Exercise A2.13</h3>
+<div class="outline-text-3" id="text-org98cbf69">
 <p>
 Show that every irreducible Abelian matrix group is one dimensional.
 </p>
 </div>
 
-<div id="outline-container-org9885188" class="outline-4">
-<h4 id="org9885188">Proof</h4>
-<div class="outline-text-4" id="text-org9885188">
+<div id="outline-container-orgcb2889c" class="outline-4">
+<h4 id="orgcb2889c">Proof</h4>
+<div class="outline-text-4" id="text-orgcb2889c">
 <p>
 Let \(s\) by an <i>arbitrary</i> element of the group. Since the group is abelian we have:
 </p>
@@ -1795,9 +1795,9 @@ integer.
 </p>
 </div>
 
-<div id="outline-container-org055b018" class="outline-4">
-<h4 id="org055b018">Proof</h4>
-<div class="outline-text-4" id="text-org055b018">
+<div id="outline-container-orgd8a33dc" class="outline-4">
+<h4 id="orgd8a33dc">Proof</h4>
+<div class="outline-text-4" id="text-orgd8a33dc">
 <p>
 Let \(\mathcal{C}\) be the set of all (different) conjugacy classes of \(G\). Let
 \(C\in\mathcal{C}\). Consider
@@ -1835,7 +1835,7 @@ get
 </p>
 
 <p>
-<a id="orgb2b0869"></a>
+<a id="org5a9b8c2"></a>
 \[
   \lambda_C = \frac{\abs{C}}{d_\rho}\chi(C) .
 \]
@@ -1847,9 +1847,9 @@ Here \(\chi\) is the character of \(\rho\) and \(\chi(C)\) is the (only) value \
 </p>
 
 <p>
-Now comes the crucial part. Observe that \(p\in\ZZ[G]\). Each element of \(\ZZ[G]\) <a href="#org99582a6">satisfies</a>
+Now comes the crucial part. Observe that \(p\in\ZZ[G]\). Each element of \(\ZZ[G]\) <a href="#orgd8e1a96">satisfies</a>
 a monic polynomial with integer coefficients (<i>monic</i> means that the leading coefficient
-is \(1\)). Hence \(\lambda_C\) (which satisfies the same polynomial) is an <a href="#org873b3b8">algebraic integer</a>.
+is \(1\)). Hence \(\lambda_C\) (which satisfies the same polynomial) is an <a href="#orgab75456">algebraic integer</a>.
 </p>
 
 <p>
@@ -1865,15 +1865,15 @@ Consider
 </p>
 
 <p>
-The first equality follows from the <a href="#orgb2b0869">formula for</a> \(\lambda_C\). The second one from the
-<a href="#orga308a02">orthonormality</a> of irreducible characters. The left-hand side is an algebraic integer since
+The first equality follows from the <a href="#org5a9b8c2">formula for</a> \(\lambda_C\). The second one from the
+<a href="#org44aa975">orthonormality</a> of irreducible characters. The left-hand side is an algebraic integer since
 \(\lambda_C\) is an algebraic integer (as we have just seen), \(\chi(C)^*\) too (as a root of
-unity), and algebraic integers <a href="#orgfee4b7c">are a ring</a>.
+unity), and algebraic integers <a href="#orgbb9ffac">are a ring</a>.
 </p>
 
 <p>
 Hence \(N/d_\rho\) is an algebraic integer. Clearly it is a rational too. But the only
-rationals which are algebraic integers are the <a href="#org26ee28e">integers themselves</a>. QED.
+rationals which are algebraic integers are the <a href="#orgb629a43">integers themselves</a>. QED.
 </p>
 </div>
 </div>
@@ -1900,9 +1900,9 @@ conjugacy class of \(G\), and \(r_i\) is the size of the \(i\)​th conjugacy cl
 </p>
 </div>
 
-<div id="outline-container-org41ab57b" class="outline-4">
-<h4 id="org41ab57b">Proof</h4>
-<div class="outline-text-4" id="text-org41ab57b">
+<div id="outline-container-org0a8215d" class="outline-4">
+<h4 id="org0a8215d">Proof</h4>
+<div class="outline-text-4" id="text-org0a8215d">
 <p>
 Consider the first equality. We have
 </p>
@@ -1996,9 +1996,9 @@ sentence.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org91c5778" class="outline-4">
-<h4 id="org91c5778">Solution</h4>
-<div class="outline-text-4" id="text-org91c5778">
+<div id="outline-container-orgc5bc9e9" class="outline-4">
+<h4 id="orgc5bc9e9">Solution</h4>
+<div class="outline-text-4" id="text-orgc5bc9e9">
 <p>
 It is convenient to work with <code>sympy</code>. First let us define the group \(S_3\) and its
 representation \(\rho_{\mathrm{perm}}\) as permutation matrices.
@@ -2040,7 +2040,7 @@ character is given by:
 
 <p>
 The norm of this (see <a href="#class-functions-hilbert-space">Class Functions as a Hilbert Space</a>) is bigger than \(1\) hence it is
-not irreducible <a href="#orga308a02">since</a> a character is irreducible iff its norm is \(1\). We can also see this
+not irreducible <a href="#org44aa975">since</a> a character is irreducible iff its norm is \(1\). We can also see this
 directly by observing that \(V_{\mathrm{triv}}=\CC(1,1,1)\) is an invariant subspace.
 </p>
 
@@ -2096,7 +2096,7 @@ Let \(V_{\mathrm{std}}=V_{\mathrm{triv}}^\perp\). By definition
 We claim that \(\rho_{\mathrm{perm}}\) restricted to \(V_{\mathrm{std}}\) is the 2D
 representation \(\rho_{\mathrm{std}}\) presented in the exercise statement (for a certain
 choice of basis in \(V_{\mathrm{std}}\)). But first let us observe that this restriction is
-indeed irreducible. In fact (c.f. <a href="#org7f0962a">decomposition of characters</a>):
+indeed irreducible. In fact (c.f. <a href="#org26bc79b">decomposition of characters</a>):
 </p>
 
 <p>
@@ -2223,17 +2223,17 @@ PASSED
 </div>
 </div>
 
-<div id="outline-container-orgc5204da" class="outline-3">
-<h3 id="orgc5204da">Exercise A2.17</h3>
-<div class="outline-text-3" id="text-orgc5204da">
+<div id="outline-container-orgb378881" class="outline-3">
+<h3 id="orgb378881">Exercise A2.17</h3>
+<div class="outline-text-3" id="text-orgb378881">
 <p>
 Prove that the regular representation is faithful.
 </p>
 </div>
 
-<div id="outline-container-org7957ad0" class="outline-4">
-<h4 id="org7957ad0">Proof</h4>
-<div class="outline-text-4" id="text-org7957ad0">
+<div id="outline-container-orgbee9215" class="outline-4">
+<h4 id="orgbee9215">Proof</h4>
+<div class="outline-text-4" id="text-orgbee9215">
 <p>
 This is more or less obvious. In fact, the regular representation \(\rho^R\) can be
 <i>identified</i> with the vector space \(R=\CC^{\oplus G}\) made up of the following formal sums:
@@ -2266,18 +2266,18 @@ Clearly this is a homomorphism of groups. It is also an isomorphism since
 </div>
 </div>
 
-<div id="outline-container-orgcfff7af" class="outline-3">
-<h3 id="orgcfff7af">Exercise A2.18</h3>
-<div class="outline-text-3" id="text-orgcfff7af">
+<div id="outline-container-org9d9163f" class="outline-3">
+<h3 id="org9d9163f">Exercise A2.18</h3>
+<div class="outline-text-3" id="text-org9d9163f">
 <p>
 Show that the character of the regular representation is zero except on the representation
 of the identity element, for which \(\chi^R(I)=\abs{G}\).
 </p>
 </div>
 
-<div id="outline-container-orga1f6584" class="outline-4">
-<h4 id="orga1f6584">Proof</h4>
-<div class="outline-text-4" id="text-orga1f6584">
+<div id="outline-container-org81b9e83" class="outline-4">
+<h4 id="org81b9e83">Proof</h4>
+<div class="outline-text-4" id="text-org81b9e83">
 <p>
 We have
 </p>
@@ -2296,9 +2296,9 @@ the diagonal iff \(g=e\). QED.
 </div>
 </div>
 
-<div id="outline-container-org1c0f6b6" class="outline-3">
-<h3 id="org1c0f6b6">Exercise A2.19</h3>
-<div class="outline-text-3" id="text-org1c0f6b6">
+<div id="outline-container-org593bfdc" class="outline-3">
+<h3 id="org593bfdc">Exercise A2.19</h3>
+<div class="outline-text-3" id="text-org593bfdc">
 <p>
 Use Theorem A2.5 to show that the regular representation contains \(d_{\rho^p}\) instances
 of each irreducible representation \(\rho^p\). Thus, if \(R\) denotes the regular
@@ -2313,9 +2313,9 @@ representations, then
 </p>
 </div>
 
-<div id="outline-container-org6266f8b" class="outline-4">
-<h4 id="org6266f8b">Proof</h4>
-<div class="outline-text-4" id="text-org6266f8b">
+<div id="outline-container-orgea48ca7" class="outline-4">
+<h4 id="orgea48ca7">Proof</h4>
+<div class="outline-text-4" id="text-orgea48ca7">
 <p>
 By Theorem A2.4 (the fundamental theorem) the irreducible representations are an
 orthonormal basis of the Hilbert Space of class functions (see <a href="#class-functions-hilbert-space">here</a> too). Hence
@@ -2345,9 +2345,9 @@ A2.11(1). QED.
 </div>
 </div>
 
-<div id="outline-container-orgfa3604b" class="outline-3">
-<h3 id="orgfa3604b">Exercise A2.20</h3>
-<div class="outline-text-3" id="text-orgfa3604b">
+<div id="outline-container-orgdc8e3ef" class="outline-3">
+<h3 id="orgdc8e3ef">Exercise A2.20</h3>
+<div class="outline-text-3" id="text-orgdc8e3ef">
 <p>
 The character of the regular representation is zero except for the conjugacy class
 containing \(e\) (which is \(\{e\}\)), the identity element in \(G\) (see exercise A2.18). Show,
@@ -2361,9 +2361,9 @@ therefore, that
 </p>
 </div>
 
-<div id="outline-container-orgf26858c" class="outline-4">
-<h4 id="orgf26858c">Proof</h4>
-<div class="outline-text-4" id="text-orgf26858c">
+<div id="outline-container-orgfd9738b" class="outline-4">
+<h4 id="orgfd9738b">Proof</h4>
+<div class="outline-text-4" id="text-orgfd9738b">
 <p>
 We have
 </p>
@@ -2382,17 +2382,17 @@ The first equality follows from exercise A2.19. The second one from exercise A2.
 </div>
 </div>
 
-<div id="outline-container-orga46ae4c" class="outline-3">
-<h3 id="orga46ae4c">Exercise A2.21</h3>
-<div class="outline-text-3" id="text-orga46ae4c">
+<div id="outline-container-orgd6495c1" class="outline-3">
+<h3 id="orgd6495c1">Exercise A2.21</h3>
+<div class="outline-text-3" id="text-orgd6495c1">
 <p>
 Show that \(\sum_{\rho\in\hat{G}}d_\rho^2=\abs{G}\).
 </p>
 </div>
 
-<div id="outline-container-orgc3ce947" class="outline-4">
-<h4 id="orgc3ce947">Proof</h4>
-<div class="outline-text-4" id="text-orgc3ce947">
+<div id="outline-container-org5b30886" class="outline-4">
+<h4 id="org5b30886">Proof</h4>
+<div class="outline-text-4" id="text-org5b30886">
 <p>
 We have
 </p>
@@ -2411,20 +2411,20 @@ again from A2.11(1). QED.
 </div>
 </div>
 
-<div id="outline-container-org34ba3bd" class="outline-3">
-<h3 id="org34ba3bd">Exercise A2.22</h3>
-<div class="outline-text-3" id="text-org34ba3bd">
+<div id="outline-container-org95bb665" class="outline-3">
+<h3 id="org95bb665">Exercise A2.22</h3>
+<div class="outline-text-3" id="text-org95bb665">
 <p>
 Substitute (A2.10) into (A2.9) and prove that \(\hat{f}(\rho)\) is obtained.
 </p>
 </div>
 
-<div id="outline-container-org336ecab" class="outline-4">
-<h4 id="org336ecab">Solution</h4>
-<div class="outline-text-4" id="text-org336ecab">
+<div id="outline-container-orga5217c3" class="outline-4">
+<h4 id="orga5217c3">Solution</h4>
+<div class="outline-text-4" id="text-orga5217c3">
 <p>
 Let us fix an irreducible representation \(\rho\) and indices \(i,j\). Let \(n=n(\rho,i,j)\)
-where we use the same notation as in the <a href="#org305a25e">coordinate formulation</a> of the Fourier transform.
+where we use the same notation as in the <a href="#orga2922b4">coordinate formulation</a> of the Fourier transform.
 </p>
 
 \begin{align*}
@@ -2438,7 +2438,7 @@ where we use the same notation as in the <a href="#org305a25e">coordinate formul
 \end{align*}
 
 <p>
-In the fourth equality we used the <a href="#org4e83235">fundamental formula</a>.
+In the fourth equality we used the <a href="#org41fd639">fundamental formula</a>.
 </p>
 </div>
 </div>
@@ -2463,9 +2463,9 @@ transform relations for \(G\) are
 </p>
 </div>
 
-<div id="outline-container-orgbaf002f" class="outline-4">
-<h4 id="orgbaf002f">Solution</h4>
-<div class="outline-text-4" id="text-orgbaf002f">
+<div id="outline-container-org9b94691" class="outline-4">
+<h4 id="org9b94691">Solution</h4>
+<div class="outline-text-4" id="text-org9b94691">
 <p>
 Let us first note that \(g\inv\) is to be translated to \(-g\) since the group operation is
 \(+\). That the \(\rho_g\) are representations is easy to verify. To see that they are
@@ -2480,31 +2480,31 @@ irreducibility follows from
 </p>
 
 <p>
-which <a href="#orga308a02">characterizes</a> irreducible characters. The rest is pluggin stuff into formulas. See
+which <a href="#org44aa975">characterizes</a> irreducible characters. The rest is pluggin stuff into formulas. See
 also the section on the <a href="#section-fourier-abelian-groups">Fourier transform on Abelian groups</a>.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org73213ff" class="outline-3">
-<h3 id="org73213ff">Exercise A2.24</h3>
-<div class="outline-text-3" id="text-org73213ff">
+<div id="outline-container-orge7aa728" class="outline-3">
+<h3 id="orge7aa728">Exercise A2.24</h3>
+<div class="outline-text-3" id="text-orge7aa728">
 <p>
 Using the results of <a href="#exercise-a2-16">Exercise A2.16</a>, construct the Fourier transform over \(S_3\) and
 express it as a 6×6 unitary matrix.
 </p>
 </div>
 
-<div id="outline-container-org6dbe681" class="outline-4">
-<h4 id="org6dbe681">Solution</h4>
-<div class="outline-text-4" id="text-org6dbe681">
+<div id="outline-container-org8f5e2d5" class="outline-4">
+<h4 id="org8f5e2d5">Solution</h4>
+<div class="outline-text-4" id="text-org8f5e2d5">
 <p>
 It is easy to write some code which does this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgcbbced4"><span class="org-keyword">def</span> <span class="org-function-name">get_fourier_matrix</span>(representations: <span class="org-builtin">list</span>[<span class="org-builtin">list</span>[Matrix <span class="org-operator">|</span> Number]]) <span class="org-operator">-&gt;</span> Matrix:
+<pre class="src src-python" id="orgce1d64d"><span class="org-keyword">def</span> <span class="org-function-name">get_fourier_matrix</span>(representations: <span class="org-builtin">list</span>[<span class="org-builtin">list</span>[Matrix <span class="org-operator">|</span> Number]]) <span class="org-operator">-&gt;</span> Matrix:
     <span class="org-doc">"""Get a matrix representation of the Fourier transform F of a group G.</span>
 
 <span class="org-doc">    Args:</span>
@@ -2546,7 +2546,7 @@ Plug in the arguments for \(S_3\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org39fc177"><span class="org-variable-name">s3_triv</span> <span class="org-operator">=</span> 6<span class="org-operator">*</span>[1]
+<pre class="src src-python" id="orgd2a4ace"><span class="org-variable-name">s3_triv</span> <span class="org-operator">=</span> 6<span class="org-operator">*</span>[1]
 <span class="org-variable-name">s3_sign</span> <span class="org-operator">=</span> 3<span class="org-operator">*</span>[1] <span class="org-operator">+</span> 3<span class="org-operator">*</span>[<span class="org-operator">-</span>1]
 
 <span class="org-variable-name">FT_s3</span> <span class="org-operator">=</span> get_fourier_matrix([s3_triv, s3_sign, s3_std])
@@ -2620,9 +2620,9 @@ element in \(\rho_{\mathrm{std}}\). This finishes the demonstration.
 </div>
 </div>
 
-<div id="outline-container-org34236db" class="outline-2">
-<h2 id="org34236db">References</h2>
-<div class="outline-text-2" id="text-org34236db">
+<div id="outline-container-org4c02faf" class="outline-2">
+<h2 id="org4c02faf">References</h2>
+<div class="outline-text-2" id="text-org4c02faf">
 <p>
 Lang, Serge (2002). <i>Algebra.</i>, New York, NY: Springer.</p>
 
