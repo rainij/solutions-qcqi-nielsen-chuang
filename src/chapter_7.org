@@ -9,8 +9,10 @@
 * Setup
 ** Imports
 #+begin_src sage
+  from scipy.constants import physical_constants, pi as pi_numeric
+
   from utils import commutator as com
-  from utils_sage import Z, H, Ry, Rz
+  from utils_sage import Id, X, Y, Z, H, Ry, Rz, kron, bra, ket
 #+end_src
 
 ** Harmonic Oscillator
@@ -106,6 +108,46 @@ $$
   \quad \text{and} \quad
   BbB^\dagger = b \cos(\theta) - a \sin(\theta) .
 $$
+
+** Discussion of an annoying error
+:PROPERTIES:
+:CUSTOM_ID: discussion-annoying-error
+:END:
+I /think/ that (7.66):
+
+$$ H_{\mathrm{atom}}=\hbar\omega_0Z/2 $$
+
+is not correct. The state $\ket{1}$ (for the atom) is considered (by the book) the
+"excited" state after absorbtion of a photon. Clearly this should correspond to a higher
+energy (than that of $\ket{0}$) but this is not the case with this Hamiltonian.
+
+One way to resolve the issue is to consider $\ket{0}$ to the be excited state. I would be
+definitely confused by this. Another solution might be to replace the Pauli matrices by
+
+$$
+  X' = XXX = X, Y' = XYX = -Y, \text{ and } Z' = XZX = -Z .
+$$
+
+These modified Pauli matrices still satisfy the following algebraic identities
+
+$$
+  X^2 = Y^2 = Z^2 = -\ii XYZ = I
+$$
+
+Note that these identities essentially characterize the /Quaternions/ (using
+$I\in\CC^{2\times2}$ as the unit and $-\ii\,X$, $-\ii\,Y$, and $-\ii\,Z$ as the imaginary
+units). This is important for the interpretation of the Pauli-rotations as actual
+rotations in $\RR^3$.
+
+In particular the commutation relations $[\sigma_i,\sigma_j]=2\ii\epsilon_{ijk}\sigma_k$
+hold. I didn't do this conversion in the exercises in part because I was not aware of the
+error when I started to solve the exercises. But some inconsistencies in the exercises
+made me suspecting that something is wrong and lead me to the formula for
+$H_{\mathrm{atom}}$.
+
+In some of the exercises I just ignore this error. In other exercises I try to circumvent
+the error by swapping zeros and ones. In any case, if I do not ignore the error I say so
+within the exercise.
 
 * Exercises
 ** Exercise 7.1
@@ -1388,6 +1430,11 @@ Code to square $H_2$:
   square_H2()
 #+end_src
 
+#+RESULTS: exercise-7.21-square-H2
+: [delta^2 + g_a^2 + g_b^2                       0                       0]
+: [                      0         delta^2 + g_a^2                 g_a*g_b]
+: [                      0                 g_a*g_b         delta^2 + g_b^2]
+
 #+RESULTS:
 : [delta^2 + g_a^2 + g_b^2                       0                       0]
 : [                      0         delta^2 + g_a^2                 g_a*g_b]
@@ -1488,3 +1535,481 @@ symmetry of the =CZ= gate we could also conjugate by $H\otimes\,I$ to obtain the
 gate with the control and target bits swapped.
 
 QED.
+
+** Exercise 7.24
+The energy of a nuclear spin in a magnetic ﬁeld is approximately $\mu_NB$, where
+$\mu_N=eh/4\pi\,m_p\approx5\times10^{-27}$ joules per tesla is the nuclear Bohr magneton.
+Compute the energy of a nuclear spin in a $B=10$ tesla ﬁeld, and compare with the thermal
+energy $k_BT$ at $T=300K$.
+
+*** Solution
+Let us do a quick calculation:
+
+#+name: exercise-7.24-1
+#+begin_src sage
+  def thermal_vs_spin_energy(T=300, B=10):
+      """Ratio of thermal energy against nuclear spin energy.
+
+      Args:
+          T: Temperature in Kelvin.
+          B: Magnetic field in Tesla.
+
+      NOTE: Only the ratio T/B is really relevant.
+      """
+      kB, _, _ = physical_constants["Boltzmann constant"]
+      m_p, _, _ = physical_constants["proton mass"]
+      q, _, _ = physical_constants["elementary charge"]
+      h, _, _ = physical_constants["Planck constant"]
+
+      mu_N = q*h / (4*pi_numeric*m_p) # according to exercise
+
+      return kB*T / (B*mu_N)
+#+end_src
+
+At room temperature we get:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  thermal_vs_spin_energy(T=300, B=10)
+#+end_src
+
+#+RESULTS[c2ab6b865707202b4a583fd9c0ecd32ef9141056]:
+: 82006.02536588917
+
+Hence the thermal energy at room temperature is around five orders of magnitude larger
+than the energy of a spin in a very strong magnetic field. Conversely one can deduce that
+the Temperature where both quantities are roughly equal is around $1mK$ (still for this
+strong magnetic field).
+
+** Exercise 7.25
+Show that the total angular momenta operators obey the commutation relations for $\mathrm{SU}(2)$,
+that is, $[j_i,j_j]=\ii\epsilon_{ijk}j_k$.
+
+*** Proof
+Let $\sigma=(X,Y,Z)$ be a vector of Pauli matrices. Then
+
+$$
+  j_i = \left(\sigma_i^{(1)} + \sigma_i^{(2)}\right) / 2 .
+$$
+
+Since $[\sigma_i^{(n)},\sigma_j^{(n')}]=0$ if $n\neq\,n'$ we have
+
+$$
+  [j_i,j_j] = \frac{1}{4} \left(\left[\sigma_i^{(1)}, \sigma_j^{(1)}\right] +
+    \left[\sigma_i^{(2)}, \sigma_j^{(2)}\right]\right) .
+$$
+
+Now the claim follows from the commutator relations of the Pauli matrices:
+$[\sigma_i,\sigma_j]=2\ii\epsilon_{ijk}\sigma_k$. QED.
+
+** Exercise 7.26
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.26
+:END:
+Verify the properties of $\ket{j,m_j}_J$ by explicitly writing the 4×4 matrices $J^2$ and
+$j_z$ in the basis deﬁned by $\ket{j,m_j}_J$.
+
+- Remark :: As posed the exercise contains a tiny error. We discuss this in the solution.
+
+*** Solution
+#+name: exercise-7.26-make-spin-half
+#+begin_src sage
+  def make_ji(A, n=2):
+      """Return one component of the Angular momentum operator for n spin-1/2 particles.
+
+      Args:
+          A: A 2x2 matrix, typically X, Y, Z (Pauli).
+          n: The number of spin-1/2 particles.
+
+      Example:
+          make_ji(A,3) returns the same as
+          (kron(A, Id, Id) + kron(Id, A, Id) + kron(Id, Id, A)) / 2
+      """
+      result = matrix.zero(2^n)
+
+      for i in range(n):
+          result += kron(*[Id if j!=i else A for j in range(n)])
+
+      return result / 2
+#+end_src
+
+Having this we can define the total angular momentum operator $J^2$ and the basis
+transformation $U$ corresponding to equations (7.93) to (7.96).
+
+#+begin_src sage :tangle no
+  jz = make_ji(Z, 2)
+  jx = make_ji(X, 2)
+  jy = make_ji(Y, 2)
+
+  J2 = jx^2 + jy^2 + jz^2
+
+  U = matrix([
+      (ket('10') - ket('01')) / sqrt(2), ket('11'), # |0,0>_J, |1,-1>_J
+      (ket('01') + ket('10')) / sqrt(2), ket('00'), # |1,0>_J, |1,+1>_J
+  ]).H
+#+end_src
+
+You might note that I swapped zeros and ones if you compare $U$ with the formulas from the
+book. I did this because the claim of the exercise does not hold otherwise (for example
+$j_z\ket{00}=\ket{00}$ as opposed to $j_z\ket{00}=-\ket{00}$). I think the reason for this
+confusion is that the authors wanted $\ket{1}$ to be of a higher level than $\ket{0}$ in
+the $Z$ matrix (but the opposite is true, since $\ket{0}$ as eigenvalue $1$ which is
+larger than the eigenvalue $-1$ of $\ket{1}$). Another way to resolve this might have been
+to replace $Z$ by $-Z$ and $Y$ by $-Y$ (One cannot just negate $Z$ since otherwise the
+commutator relations do not hold) but I do not do this here. This is related to the
+[[#discussion-annoying-error][discussion of an annoying error]].
+
+Having said that, the following shows that $U$ simultaneously diagonalizes $J^2$ and $j_z$
+and it shows that $\ket{j,m}$ corresponds to eigenvalues $j(j+1)$ for $J^2$ and $m$ for
+$j_z$.
+
+#+begin_src sage :results replace :tangle no :cache yes
+  print("J^2 diagonalized:")
+  U.H * J2 * U
+  print("\nj_z diagonalized:")
+  U.H * jz * U
+#+end_src
+
+#+RESULTS[8ec764bc6d58569a66ccc3c9fb2589c430e083f4]:
+#+begin_example
+J^2 diagonalized:
+[0 0 0 0]
+[0 2 0 0]
+[0 0 2 0]
+[0 0 0 2]
+
+j_z diagonalized:
+[ 0  0  0  0]
+[ 0 -1  0  0]
+[ 0  0  0  0]
+[ 0  0  0  1]
+#+end_example
+
+** Exercise 7.27 (Three spin angular momenta states)
+Three spin-1/2 spins can combine together to give states of total angular momenta with
+$j=1/2$ and $j=3/2$. Show that the states
+
+\begin{align*}
+  \ket{3/2, 3/2} &= \ket{000} \\
+  \ket{3/2, 1/2} &= \frac{1}{\sqrt{3}} (\ket{100} + \ket{010} + \ket{001}) \\
+  \ket{3/2, -1/2} &= \frac{1}{\sqrt{3}} (\ket{011} + \ket{101} + \ket{110}) \\
+  \ket{3/2, -3/2} &= \ket{111} \\
+  \ket{1/2, 1/2}_1 &= \frac{1}{\sqrt{2}} (\ket{100} - \ket{001}) \\
+  \ket{1/2, -1/2}_1 &= \frac{1}{\sqrt{2}} (\ket{011} + \ket{110})  \\
+  \ket{1/2, 1/2}_2 &= \frac{1}{\sqrt{6}} (\ket{001} - 2\ket{010} + \ket{100})  \\
+  \ket{1/2, -1/2}_2 &= \frac{1}{\sqrt{6}} (-\ket{011} + 2\ket{101} - \ket{110})
+\end{align*}
+
+form a basis for the space, satisfying $J^2\ket{j,m}=j(j+1)\ket{j,m}$ and
+$j_z\ket{j,m}=m\ket{j,m}$, for $j_z=(Z_1+Z_2+Z_3)/2$ (similarly for $j_x$ and $j_y$) and
+$J^2=j_x^2+j_y^2+j_z^2$. There are sophisticated ways to obtain these states, but a
+straightforward brute-force method is simply to simultaneously diagonalize the 8×8
+matrices $J^2$ and $j_z$.
+
+- Remark :: I adjusted the formulas for the eigenvectors because the claim did not hold
+  for the old formulas. The issue is essentially the same as in [[#exercise-7.26][exercise 7.26]].
+
+*** Solution
+We proceed in the same way as in [[#exercise-7.26][exercise 7.26]] by first defining the operators and then
+the unitary matrix $U$ made of the mentioned basis vectors:
+
+#+begin_src sage :tangle no
+  jz = make_ji(Z, 3)
+  jx = make_ji(X, 3)
+  jy = make_ji(Y, 3)
+
+  J2 = jx^2 + jy^2 + jz^2
+
+  U = matrix([
+    # 1: The spin-3/2 subspace
+    ket('000'),                                          # |3/2, +3/2>
+    (ket('100') + ket('010') + ket('001')) / sqrt(3),    # |3/2, +1/2>
+    (ket('011') + ket('101') + ket('110')) / sqrt(3),    # |3/2, -1/2>
+    ket('111'),                                          # |3/2, -3/2>
+    # 2: the spin-1/2 subspace
+    (ket('100') - ket('001')) / sqrt(2),                 # |1/2, +1/2>_1
+    (ket('011') - ket('110')) / sqrt(2),                 # |1/2, -1/2>_1
+    (ket('001') - 2*ket('010') + ket('100')) / sqrt(6),  # |1/2, +1/2>_2
+    (-ket('011') + 2*ket('101') - ket('110')) / sqrt(6), # |1/2, -1/2>_2
+  ]).H
+#+end_src
+
+A test that $U$ is actually unitary:
+
+#+begin_src sage :results replace :tangle no :cache no
+  assert U.H * U == matrix.identity(8)
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+The following code shows that $U$ simultaneously diagonalizes $J^2$ and $j_z$. The
+eigenvalues are as claimed ($j(j+1)$ and $m$). That the eight vectors are actually an
+orthonormal basis of $\CC^8$ follows mostly from the fact that most of the eigenvalue
+pairs $(j(j+1),m)$ are different, one only has to check that $\ket{1/2,\pm1/2}_1$ and
+$\ket{1/2,\pm1/2}_2$ are really orthogonal.
+
+#+begin_src sage :results replace :tangle no :cache yes
+  print("J^2 diagonalized:")
+  U.H * J2 * U
+  print("\nj_z diagonalized:")
+  U.H * jz * U
+#+end_src
+
+#+RESULTS[8ec764bc6d58569a66ccc3c9fb2589c430e083f4]:
+#+begin_example
+J^2 diagonalized:
+[15/4    0    0    0    0    0    0    0]
+[   0 15/4    0    0    0    0    0    0]
+[   0    0 15/4    0    0    0    0    0]
+[   0    0    0 15/4    0    0    0    0]
+[   0    0    0    0  3/4    0    0    0]
+[   0    0    0    0    0  3/4    0    0]
+[   0    0    0    0    0    0  3/4    0]
+[   0    0    0    0    0    0    0  3/4]
+
+j_z diagonalized:
+[ 3/2    0    0    0    0    0    0    0]
+[   0  1/2    0    0    0    0    0    0]
+[   0    0 -1/2    0    0    0    0    0]
+[   0    0    0 -3/2    0    0    0    0]
+[   0    0    0    0  1/2    0    0    0]
+[   0    0    0    0    0 -1/2    0    0]
+[   0    0    0    0    0    0  1/2    0]
+[   0    0    0    0    0    0    0 -1/2]
+#+end_example
+
+** Exercise 7.28 (Hyperfine states)
+We shall be taking a look at beryllium in Section 7.6.4 – the total angular momenta states
+relevant there involve a nuclear spin $I=3/2$ combining with an electron spin $S=1/2$ to
+give $F=2$ or $F=1$.  For a spin-3/2 particle, the angular momenta operators are
+
+\begin{align*}
+  i_x &= \frac{1}{2} \begin{bmatrix}
+    0 & \sqrt{3} & 0 & 0 \\
+    \sqrt{3} & 0 & 2 & 0 \\
+    0 & 2 & 0 & \sqrt{3} \\
+    0 & 0 & \sqrt{3} & 0 \end{bmatrix} , \\
+  i_y &= \frac{1}{2} \begin{bmatrix}
+    0 & \ii\sqrt{3} & 0 & 0 \\
+    -\ii\sqrt{3} & 0 & 2\ii & 0 \\
+    0 & -2\ii & 0 & \ii\sqrt{3} \\
+    0 & 0 & -\ii\sqrt{3} & 0 \end{bmatrix} , \\
+  i_z &= \frac{1}{2} \begin{bmatrix}
+    -3 & 0 & 0 & 0 \\
+    0 & -1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 3 \end{bmatrix}
+\end{align*}
+
+1. Show that $i_x$, $i_y$, and $i_z$ satisfy $\mathrm{SU}(2)$ commutation rules.
+2. Give 8×8 matrix representations of $f_z=i_z\otimes\,I+I\otimes\,Z/2$ (where $I$ here
+   represents the identity operator on the appropriate subspace) and similarly $f_x$ and
+   $f_y$, and, $F^2=f_x^2+f_y^2+f_z^2$. Simultaneously diagonalize $f_z$ and $F^2$ to
+   obtain basis states $\ket{f,m}$ for which $F\ket{f,m}=f(f+1)\ket{f,m}$ and
+   $f_z\ket{f,m}=m\ket{f,m}$.
+
+*** Solution for claim 1
+Let us first define $i_x$, $i_y$, and $i_z$ within sage:
+
+#+name: exercise-7.28-1
+#+begin_src sage
+  iz = matrix([
+      [-3, 0, 0, 0],
+      [0, -1, 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 3],
+  ]) / 2
+
+  ix = matrix([
+      [0, sqrt(3), 0, 0],
+      [sqrt(3), 0, 2, 0],
+      [0, 2, 0, sqrt(3)],
+      [0, 0, sqrt(3), 0],
+  ]) / 2
+
+  iy = matrix([
+      [0, i*sqrt(3), 0, 0],
+      [-i*sqrt(3), 0, 2*i, 0],
+      [0, -2*i, 0, i*sqrt(3)],
+      [0, 0, -i*sqrt(3), 0],
+  ]) / 2
+#+end_src
+
+The commutator relations are now easily verified:
+
+#+begin_src sage :results replace :tangle no
+  assert com(ix, iy) == i*iz
+  assert com(iy, iz) == i*ix
+  assert com(iz, ix) == i*iy
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+Hence $[i_i,i_j]=\ii\epsilon_{ijk}i_k$ since $[A,B]=-[B,A]$ and $[A,A]=0$.
+
+*** Solution for claim 2
+Let us first define the relevant operators
+
+#+name: exercise-7-28-2
+#+begin_src sage
+  Id2 = matrix.identity(2)
+  Id4 = matrix.identity(4)
+
+  fz = kron(iz, Id2) + kron(Id4, Z/2)
+  fx = kron(ix, Id2) + kron(Id4, X/2)
+  fy = kron(iy, Id2) + kron(Id4, Y/2)
+
+  F2 = fx^2 + fy^2 + fz^2
+#+end_src
+
+Unfortunately I did not find a builtin method (in sage) to simultaneously diagonalize two
+matrices. Hence we do it manually. Recall that to simultaneously diagonalize two matrices
+$A$ and $B$ you first diagonalize $A$ and then diagonalize the restrictions of $B$ to the
+sub-spaces of $A$.
+
+Before we go on let us define two auxiliary functions.
+
+#+name: exercise-7-28-3
+#+begin_src sage
+  def restrict(A: matrix, M: matrix) -> matrix:
+      """A is a d×d matrix and M a l×d matrix whose rows are linearly independent. This
+      method returns the matrix A restricted to the subspace spanned by these l vectors and
+      with respect to those vectors as basis.
+      """
+      d1, d2 = A.dimensions()
+      l, d = M.dimensions()
+
+      assert d == d1 == d2, "Dimensions of A and M are not consistent."
+      assert rank(M) == l, "Rows of M have to linearly independent."
+
+      return M * A * M.H
+
+
+  def column_normalized(M: matrix) -> matrix:
+      """Return a matrix which has the same columms as M but normalized. We expect M to be a
+      symbolic (SR) or rational matrix. It returns a symbolic matrix (SR)."""
+      Q = M.change_ring(SR).H
+      _, d = M.dimensions()
+
+      for i in range(d):
+          n = Q[i].norm()
+          Q[i] = Q[i] / n
+
+      return Q.H
+#+end_src
+
+We first calculate the eigenvalues and the corresponding diagonalization matrix for
+$F^2$. By default sage does not normalize $P$, that is why we have to use
+src_py{column_normalized} to make $P$ into a unitary matrix.
+
+#+begin_src sage :results replace :tangle no
+  D, P = F2.eigenmatrix_right()
+  P = column_normalized(P)
+  assert P.H * P == matrix.identity(8)
+
+  # D = P.H * F2 * P:
+  D
+#+end_src
+
+#+RESULTS:
+: [6 0 0 0 0 0 0 0]
+: [0 6 0 0 0 0 0 0]
+: [0 0 6 0 0 0 0 0]
+: [0 0 0 6 0 0 0 0]
+: [0 0 0 0 6 0 0 0]
+: [0 0 0 0 0 2 0 0]
+: [0 0 0 0 0 0 2 0]
+: [0 0 0 0 0 0 0 2]
+
+We see that $F^2$ has five eigenvalues $f(f+1)$ for $f=2$ (i.e. $6$) and three for $f=1$
+(i.e. $2$). The goal of the following code is to transform $P$ into another unitary $U$
+which diagonalizes $F^2$ too, but also $f_z$. Actually already the original $P$ does this
+(at least at time of writing this), but this could be a lucky coincidence. However the
+code still reorders the matrix so that the eigenvalues of $f_z$ are not randomly ordered
+(the order of the eigenvalues returned by =eigenmatrix_right= seems to be unspecified in
+general but at least at the time of writing this some sensible ordering is visible - which
+might change in the future of course).
+
+#+begin_src sage :results replace :tangle no
+  # Splitting according to the two eigenspaces of F^2:
+  P1 = P.H[:5]
+  P2 = P.H[5:]
+
+  # Restrict f_z to the two eigenspaces in the basis given by P:
+  fz1 = restrict(fz, P1)
+  fz2 = restrict(fz, P2)
+
+  # Get the unitaries which make the restrictions diagonal relative to the P-basis
+  _, Pz1 = fz1.eigenmatrix_right()
+  _, Pz2 = fz2.eigenmatrix_right()
+
+  # Assable U:
+  U1 = Pz1.H * P1
+  U2 = Pz2.H * P2
+  U = U1.stack(U2).H.simplify_full()
+  assert U.H * U == matrix.identity(8)
+
+  print("U^† * F^2 * U:")
+  U.H * F2 * U # diag 6,6,6,6,6;  2,2,2
+  print("\nU^† * f_z * U:")
+  U.H * fz * U # diag 2,1,0-1,-2; 1,0,-1
+  print("\nU:")
+  U
+#+end_src
+
+#+RESULTS:
+#+begin_example
+U^† * F^2 * U:
+[6 0 0 0 0 0 0 0]
+[0 6 0 0 0 0 0 0]
+[0 0 6 0 0 0 0 0]
+[0 0 0 6 0 0 0 0]
+[0 0 0 0 6 0 0 0]
+[0 0 0 0 0 2 0 0]
+[0 0 0 0 0 0 2 0]
+[0 0 0 0 0 0 0 2]
+
+U^† * f_z * U:
+[-2  0  0  0  0  0  0  0]
+[ 0 -1  0  0  0  0  0  0]
+[ 0  0  0  0  0  0  0  0]
+[ 0  0  0  1  0  0  0  0]
+[ 0  0  0  0  2  0  0  0]
+[ 0  0  0  0  0 -1  0  0]
+[ 0  0  0  0  0  0  0  0]
+[ 0  0  0  0  0  0  0  1]
+
+U:
+[           0          1/2            0            0            0  1/2*sqrt(3)            0            0]
+[           1            0            0            0            0            0            0            0]
+[           0            0  1/2*sqrt(2)            0            0            0  1/2*sqrt(2)            0]
+[           0  1/2*sqrt(3)            0            0            0         -1/2            0            0]
+[           0            0            0  1/2*sqrt(3)            0            0            0          1/2]
+[           0            0  1/2*sqrt(2)            0            0            0 -1/2*sqrt(2)            0]
+[           0            0            0            0            1            0            0            0]
+[           0            0            0          1/2            0            0            0 -1/2*sqrt(3)]
+#+end_example
+
+From this we can easily read out the eigenbasis:
+
+\begin{align*}
+  \ket{2, +2} &= \ket{110} \\
+  \ket{2, +1} &= \frac{1}{2}(\sqrt{3}\ket{100} + \ket{111}) \\
+  \ket{2,  0} &= \frac{1}{\sqrt{2}}(\ket{010} + \ket{101}) \\
+  \ket{2, -1} &= \frac{1}{2}(\ket{000} + \sqrt{3}\ket{011}) \\
+  \ket{2, -2} &= \ket{001} \\
+  \ket{1, +1} &= \frac{1}{2}(\ket{100} - \sqrt{3}\ket{111}) \\
+  \ket{1,  0} &= \frac{1}{\sqrt{2}}(\ket{010} - \ket{101}) \\
+  \ket{1, -1} &= \frac{1}{2}(\sqrt{3}\ket{000} - \ket{011})
+\end{align*}
+
+** TODO Exercise 7.29
+
+** TODO Exercise 7.30
+
+** TODO Exercise 7.31
+
+** TODO Exercise 7.32
