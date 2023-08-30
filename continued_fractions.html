@@ -27,18 +27,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgefa2924">Definition</a></li>
-<li><a href="#org571a750">Properties</a>
+<li><a href="#org31467d5">Definition</a></li>
+<li><a href="#orgb1168d5">Properties</a>
 <ul>
-<li><a href="#orga81630a">Uniqueness and Non-uniqueness</a></li>
+<li><a href="#org7560e29">Uniqueness and Non-uniqueness</a></li>
 <li><a href="#monotonicity-section">Monotonicity</a></li>
-<li><a href="#orgfef9a27">Recursive Formulas</a></li>
+<li><a href="#org901db98">Recursive Formulas</a></li>
 <li><a href="#error-estimate-section">Error Estimates</a></li>
-<li><a href="#org9ab683b">Best Approximation Property</a></li>
+<li><a href="#org7c8887d">Best Approximation Property</a></li>
 <li><a href="#6c146ca8-7130-4b91-9e06-983fcbf6143e">Sufficient criterion to be a convergent</a></li>
 </ul>
 </li>
-<li><a href="#org08c841b">Some Code!</a></li>
+<li><a href="#org6945f5b">Some Code!</a></li>
 </ul>
 </div>
 </div>
@@ -47,14 +47,14 @@
 This chapter contains my own perspective on continued fractions. When I skimmed over the
 Appendix or read <a href="https://en.wikipedia.org/wiki/Continued_fraction">wikipedia</a> I felt that there is something missing I should understand more
 deeply. Hence I decided to write down my own thoughts. In particular I think that one
-should put a lot of emphasis in the <a href="#orgb823fb8">representation formula</a> in every introduction to continued
-fractions. A lot of interesting corollaries follow from it. Most importantly an nice <a href="#org8f9d371">error
+should put a lot of emphasis in the <a href="#org6d5b52d">representation formula</a> in every introduction to continued
+fractions. A lot of interesting corollaries follow from it. Most importantly an nice <a href="#orgce7bccc">error
 estimate</a>.
 </p>
 
-<div id="outline-container-orgefa2924" class="outline-2">
-<h2 id="orgefa2924">Definition</h2>
-<div class="outline-text-2" id="text-orgefa2924">
+<div id="outline-container-org31467d5" class="outline-2">
+<h2 id="org31467d5">Definition</h2>
+<div class="outline-text-2" id="text-org31467d5">
 <p>
 Consider variables with values in \((0,\infty)\) and let us introduce the following notation
 inductively:
@@ -107,13 +107,13 @@ are called the <i>convergents</i> of \(x\).
 </div>
 </div>
 
-<div id="outline-container-org571a750" class="outline-2">
-<h2 id="org571a750">Properties</h2>
-<div class="outline-text-2" id="text-org571a750">
+<div id="outline-container-orgb1168d5" class="outline-2">
+<h2 id="orgb1168d5">Properties</h2>
+<div class="outline-text-2" id="text-orgb1168d5">
 </div>
-<div id="outline-container-orga81630a" class="outline-3">
-<h3 id="orga81630a">Uniqueness and Non-uniqueness</h3>
-<div class="outline-text-3" id="text-orga81630a">
+<div id="outline-container-org7560e29" class="outline-3">
+<h3 id="org7560e29">Uniqueness and Non-uniqueness</h3>
+<div class="outline-text-3" id="text-org7560e29">
 <p>
 Let \(a_0,\ldots,a_n\) be <i>admissible integers</i> and \(z_{n+1}\geq 1\) a real number. Let
 \(a'_0,\ldots,a'_n,z'_{n+1}\) be another bunch of integers with the same characteristics. Assume
@@ -180,9 +180,9 @@ that for our application in continued fractions there is always a limit.
 </div>
 </div>
 
-<div id="outline-container-orgfef9a27" class="outline-3">
-<h3 id="orgfef9a27">Recursive Formulas</h3>
-<div class="outline-text-3" id="text-orgfef9a27">
+<div id="outline-container-org901db98" class="outline-3">
+<h3 id="org901db98">Recursive Formulas</h3>
+<div class="outline-text-3" id="text-org901db98">
 <p>
 Let \(x\geq0\) and \(x=[a_0,a_1,\ldots,a_n,z_{n+1}]\) be its continued fraction expansion with
 remainder \(z_{n+1}\) (which is guaranteed to be at least \(1\)). Moreover let
@@ -190,7 +190,7 @@ remainder \(z_{n+1}\) (which is guaranteed to be at least \(1\)). Moreover let
 </p>
 
 <p>
-<a id="orgb823fb8"></a>
+<a id="org6d5b52d"></a>
 \[
   x = \frac{z_{n+1}p_n + p_{n-1}}{z_{n+1}q_n + q_{n-1}} .
 \]
@@ -201,7 +201,7 @@ and the convergents can be recursively defined by:
 </p>
 
 <p>
-<a id="org09fc501"></a>
+<a id="org2be3d0e"></a>
 \[\begin{align*}
   p_{n+1} = a_{n+1}p_n + p_{n-1} , \\
   q_{n+1} = a_{n+1}q_n + q_{n-1} ,
@@ -223,7 +223,7 @@ Corollary:
 </p>
 
 <p>
-<a id="org92668b5"></a>
+<a id="org71f4aca"></a>
 \[ p_n q_{n-1} - p_{n-1} q_n = (-1)^n . \]
 </p>
 
@@ -238,11 +238,11 @@ Just subtract two consecutive convergents from each other to see this. This dire
 <h3 id="error-estimate-section">Error Estimates</h3>
 <div class="outline-text-3" id="text-error-estimate-section">
 <p>
-From the <a href="#orgb823fb8">representation formula</a> of \(x\) together with the <a href="#org92668b5">coprimness</a> of \(p_n\) and \(q_n\) we see
+From the <a href="#org6d5b52d">representation formula</a> of \(x\) together with the <a href="#org71f4aca">coprimness</a> of \(p_n\) and \(q_n\) we see
 </p>
 
 <p>
-<a id="org8f9d371"></a>
+<a id="orgce7bccc"></a>
 \[
   x - \frac{p_n}{q_n} = \frac{(-1)^{n+1}}{q_n(z_{n+1}q_n+q_{n-1})} .
 \]
@@ -261,17 +261,17 @@ implies
 </p>
 
 <p>
-Remark: <a href="#org8f9d371">The formula</a> on the error explains very clearly why it is said that the golden ratio
+Remark: <a href="#orgce7bccc">The formula</a> on the error explains very clearly why it is said that the golden ratio
 \([1,1,1,\ldots]\) is the hardest to approximate irrational number. Small coefficients in the
-continued fraction expansion lead to small values for \(q_n\) (by the <a href="#org09fc501">recursion formula</a>) and hence to
+continued fraction expansion lead to small values for \(q_n\) (by the <a href="#org2be3d0e">recursion formula</a>) and hence to
 a big error.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org9ab683b" class="outline-3">
-<h3 id="org9ab683b">Best Approximation Property</h3>
-<div class="outline-text-3" id="text-org9ab683b">
+<div id="outline-container-org7c8887d" class="outline-3">
+<h3 id="org7c8887d">Best Approximation Property</h3>
+<div class="outline-text-3" id="text-org7c8887d">
 <p>
 A rational \(p/q\) is called a <i>best approximation</i> of \(x\) if no other rational with smaller
 denominator approximates \(x\) better or equally well.
@@ -282,7 +282,7 @@ Each convergent of \(x\) is a best approximations (but not necessarily the other
 </p>
 
 <p>
-PROOF: By the <a href="#orgb823fb8">representation formula</a> for \(x\) we see that any real number \(y\) between \(x\) and
+PROOF: By the <a href="#org6d5b52d">representation formula</a> for \(x\) we see that any real number \(y\) between \(x\) and
 \(p_n/q_n\) can be written as:
 </p>
 
@@ -302,7 +302,7 @@ is bigger than \(q_n\).
 What is with the other side of \(x\)? It is actually equally usefull to just show a stronger
 statement. In fact, all these rationals on \(p_n/q_n\)​'s side of \(x\) have \([a_0,\ldots,a_n,a]\) for some
 \(a>a_{n+1}\) as their convergent. This shows that their denominator is even larger than \(q_{n+1}\)
-(use <a href="#org09fc501">recursive formula</a> for the convergents to see this). This shows that any rational between
+(use <a href="#org2be3d0e">recursive formula</a> for the convergents to see this). This shows that any rational between
 \(p_n/q_n\) and \(p_{n+1}/q_{n+1}\) as denominator which is larger than \(q_{n+1}\). QED.
 </p>
 </div>
@@ -336,7 +336,7 @@ PROOF: Let
 </p>
 
 <p>
-By the <a href="#orga81630a">non-uniqueness</a> for rationals we may choose whether we want \(n\) to be odd or even. We will use
+By the <a href="#org7560e29">non-uniqueness</a> for rationals we may choose whether we want \(n\) to be odd or even. We will use
 this freedom soon. By the assumption of the theorem there is a \(z>1\) such that:
 </p>
 
@@ -347,7 +347,7 @@ this freedom soon. By the assumption of the theorem there is a \(z>1\) such that
 </p>
 
 <p>
-Compare this with the <a href="#org8f9d371">error estimate</a> for convergents to get a motivation for this weird formula. As
+Compare this with the <a href="#orgce7bccc">error estimate</a> for convergents to get a motivation for this weird formula. As
 said we may choose the parity of \(n\) so that
 </p>
 
@@ -356,7 +356,7 @@ said we may choose the parity of \(n\) so that
 </p>
 
 <p>
-has the same sign as \(x-p/q\). Hence (just recall how we got the <a href="#org8f9d371">error estimate</a> for the
+has the same sign as \(x-p/q\). Hence (just recall how we got the <a href="#orgce7bccc">error estimate</a> for the
 convergents)
 </p>
 
@@ -373,9 +373,9 @@ which shows that \(p/q\) is a convergent of \(x\). QED.
 </div>
 </div>
 
-<div id="outline-container-org08c841b" class="outline-2">
-<h2 id="org08c841b">Some Code!</h2>
-<div class="outline-text-2" id="text-org08c841b">
+<div id="outline-container-org6945f5b" class="outline-2">
+<h2 id="org6945f5b">Some Code!</h2>
+<div class="outline-text-2" id="text-org6945f5b">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">from</span> fractions <span class="org-keyword">import</span> Fraction
 <span class="org-keyword">from</span> numbers <span class="org-keyword">import</span> Number, Integral, Rational
@@ -455,7 +455,7 @@ Let us demonstrate these functions on \(\pi\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org909d897"><span class="org-variable-name">pi10</span> <span class="org-operator">=</span> compute_cfrac(math.pi, 10)
+<pre class="src src-python" id="org3bd917c"><span class="org-variable-name">pi10</span> <span class="org-operator">=</span> compute_cfrac(math.pi, 10)
 <span class="org-builtin">print</span>(f<span class="org-string">"&#960; = </span>{pi10}<span class="org-string">"</span>)
 
 <span class="org-builtin">print</span>(<span class="org-string">"</span><span class="org-constant">\n</span><span class="org-string">Convergents of &#960;:"</span>)
@@ -464,7 +464,7 @@ eval_cfrac(<span class="org-operator">*</span>pi10[:<span class="org-operator">-
 </pre>
 </div>
 
-<pre class="example" id="org5c1bc64">
+<pre class="example" id="org8f77266">
 π = [3, 7, 15, 1, 292, 1, 1, 1, 2, 1, 3.93464231529632]
 
 Convergents of π:

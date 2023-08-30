@@ -27,9 +27,9 @@
 The code in this file is available via <code class="src src-python"><span class="org-keyword">import</span> utils</code> (after tangling).
 </p>
 
-<div id="outline-container-org8d84ed5" class="outline-2">
-<h2 id="org8d84ed5">Pure Python</h2>
-<div class="outline-text-2" id="text-org8d84ed5">
+<div id="outline-container-org0a1509e" class="outline-2">
+<h2 id="org0a1509e">Pure Python</h2>
+<div class="outline-text-2" id="text-org0a1509e">
 <p>
 The following class can be used to print colored text to the (ipython) terminal:
 </p>
@@ -59,15 +59,15 @@ The commutator:
 </div>
 </div>
 
-<div id="outline-container-org16b3be9" class="outline-2">
-<h2 id="org16b3be9">Sage</h2>
-<div class="outline-text-2" id="text-org16b3be9">
+<div id="outline-container-org97342d1" class="outline-2">
+<h2 id="org97342d1">Sage</h2>
+<div class="outline-text-2" id="text-org97342d1">
 <p>
 The Pauli matrices implemented in sage
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgeb34b7c"><span class="org-comment-delimiter"># </span><span class="org-comment">Pauli matrices:</span>
+<pre class="src src-sage" id="orga51400d"><span class="org-comment-delimiter"># </span><span class="org-comment">Pauli matrices:</span>
 <span class="org-variable-name">Id</span> <span class="org-operator">=</span> matrix.identity(2)
 <span class="org-variable-name">X</span> <span class="org-operator">=</span> matrix([[0, 1], [1, 0]])
 <span class="org-variable-name">Y</span> <span class="org-operator">=</span> matrix([[0, <span class="org-operator">-</span>i], [i, 0]])
@@ -83,7 +83,7 @@ The Pauli Rotations
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org107f4b1"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+<pre class="src src-sage" id="org4cb1dda"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 <span class="org-variable-name">Rz</span> <span class="org-operator">=</span> matrix([[exp(<span class="org-operator">-</span>i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2), 0], [0, exp(i<span class="org-operator">*</span>theta<span class="org-operator">/</span>2)]])
 <span class="org-variable-name">Rx</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2)], [<span class="org-operator">-</span>i<span class="org-operator">*</span>sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
 <span class="org-variable-name">Ry</span> <span class="org-operator">=</span> matrix([[cos(theta<span class="org-operator">/</span>2), <span class="org-operator">-</span>sin(theta<span class="org-operator">/</span>2)], [sin(theta<span class="org-operator">/</span>2), cos(theta<span class="org-operator">/</span>2)]])
@@ -96,7 +96,7 @@ from bit-strings:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgf4e8e26"><span class="org-keyword">def</span> <span class="org-function-name">kron</span>(A1, <span class="org-operator">*</span>As):
+<pre class="src src-sage" id="orgaa55134"><span class="org-keyword">def</span> <span class="org-function-name">kron</span>(A1, <span class="org-operator">*</span>As):
     <span class="org-doc">"""Generalize TensorProduct to one and more then two arguments."""</span>
     <span class="org-variable-name">P</span> <span class="org-operator">=</span> A1
     <span class="org-keyword">for</span> A <span class="org-keyword">in</span> As:
