@@ -1946,7 +1946,7 @@ might change in the future of course).
   _, Pz1 = fz1.eigenmatrix_right()
   _, Pz2 = fz2.eigenmatrix_right()
 
-  # Assable U:
+  # Assemble U:
   U1 = Pz1.H * P1
   U2 = Pz2.H * P2
   U = U1.stack(U2).H.simplify_full()
@@ -2006,10 +2006,210 @@ From this we can easily read out the eigenbasis:
   \ket{1, -1} &= \frac{1}{2}(\sqrt{3}\ket{000} - \ket{011})
 \end{align*}
 
-** TODO Exercise 7.29
+** WIP Exercise 7.29 (Spontaneous emission)
+The spontaneous emission rate (7.112) can be derived from (7.110)–(7.111) by the following
+steps.
 
-** TODO Exercise 7.30
+1. Integrate
 
-** TODO Exercise 7.31
+   $$
+   \frac{1}{(2\pi c)^3} \, \frac{8\pi}{3} \int_0^\infty \omega^2 p_{\mathrm{decay}} \dd \omega ,
+   $$
 
-** TODO Exercise 7.32
+   where the $8\pi/3$ comes from summing over polarizations and integrating over the solid
+   angle $\dd\Omega$, and $\omega^2/(2\pi c)^3$ comes from the mode density in
+   three-dimensional space. (Hint: you may want to extend the lower limit of the integral
+   to $-\infty$.)
+2. Differentiate the result with respect to $t$, to obtain $\gamma_{\mathrm{rad}}$.
+
+The form of $g^2$ is a result of quantum electrodynamics; taking this for granted, the
+remainder of the calculation as presented here really stems from just the Jaynes–Cummings
+interaction. Again, we see how considering its properties in the single atom, single
+photon regime gives us a fundamental property of atoms, without resorting to perturbation
+theory!
+
+- Remark :: According to the [[https://www.michaelnielsen.org/qcqi/errata/errata/errata.html][errata]], the corrected formula for $p_{\mathrm{decay}}$ is
+
+  $$
+  p_{\mathrm{decay}} = g^2 \, \frac{4\sin(2\inv(\omega-\omega_0)t)}{(\omega - \omega_0)^2} .
+  $$
+
+*** Discussion
+No matter how I look at this exercise the integral is just infinite for me. Ignoring the
+sine for a moment the integrand looks essentially like this:
+
+$$
+  \frac{\omega}{(\omega-\omega_0)^2}
+$$
+
+which behaves like $\omega\inv$ at infinity. But this integrates to infinity (for all ways
+to define the integral I know). The sine does not really change anything here because it
+goes into the integral in its squared form. This only slows down the convergence of
+$\lim_{a\to\infty}\int_0^a\ldots\dd\omega$ since it is $1/2$ on average. But the integral
+is still infinite.
+
+Therefore I think that something is wrong with the formulas. At the moment I do not know
+what and I didn't have time to investigate.
+
+** Exercise 7.30 (Electronic state lifetimes)
+A calculation similar to that for γred can be done to estimate the lifetimes expected for
+electronic transitions, that is, those which involve energy level changes
+$\Delta\,n\neq0$. For such transitions, the relevant interaction couples the atom’s
+electric dipole moment to the electromagnetic field, giving
+
+$$
+  g^2_{\mathrm{ed}}
+  = \frac{\omega_0^2}{2\hbar\omega\epsilon_0} \, \abs{\bra{0}\vec{\mu}_{\mathrm{ed}}\ket{1}}^2 .
+$$
+
+This gives a spontaneous emission rate
+
+$$
+  \gamma_{\mathrm{red}}^{\mathrm{ed}}
+  = \frac{\omega_0^3\abs{\bra{0}\vec{\mu}_{\mathrm{ed}}\ket{1}}^2}{3\pi\hbar\epsilon_0c^3} .
+$$
+
+Give a value for $\gamma_{\mathrm{red}}^{\mathrm{ed}}$, taking
+$\abs{\bra{0}\vec{\mu}_{\mathrm{ed}}\ket{1}}^2\approx\,qa_0$, where $q$ is the electric
+charge, and $a_0$ the Bohr radius, and assuming
+$\omega_0/2\pi\approx10^{15}\mathrm{Hz}$. The result show how much faster electronic
+states can decay compared with hyperﬁne states.
+
+*** Solution
+That is just plugging in numbers so let us write a convenience function
+
+#+name: exercise-7.30-1
+#+begin_src sage
+  def make_gamma(which: str):
+      """For exercise 7.30."""
+      eps0, _, _ = physical_constants["vacuum electric permittivity"]
+      c, _, _ = physical_constants["speed of light in vacuum"]
+      hbar, _, _ = physical_constants["reduced Planck constant"]
+      mu_B, _, _ = physical_constants["Bohr magneton"]
+
+      a0, _, _ = physical_constants["Bohr radius"]
+      q, _, _ = physical_constants["elementary charge"]
+
+      pi = pi_numeric
+
+      def hyperfine(omega_0):
+          return (omega_0^3 * mu_B^2) / (3*pi*hbar*eps0*c^5)
+
+      def electronic(omega_0):
+          return (omega_0^3 * (q*a0)^2) / (3*pi*hbar*eps0*c^3)
+
+      if which == 'hyperfine':
+          return hyperfine
+      elif which == 'electronic':
+          return electronic
+      else:
+          raise exception("Wrong key.")
+
+
+  gamma_hyperfine = make_gamma('hyperfine')
+  gamma_electronic = make_gamma('electronic')
+#+end_src
+
+Let us plug in the values:
+
+Plugging in the relevant values for $\omega_0$ for each case we get:
+
+#+begin_src sage :results replace :tangle no
+  hyperfine = gamma_hyperfine(2*pi.n()*1e10)
+  electronic = gamma_electronic(2*pi.n()*1e15)
+
+  print(f"hyperfine  = {hyperfine:0.5} (1/sec)")
+  print(f"electronic = {electronic:0.5} (1/sec)")
+  print(f"ratio      = {hyperfine / electronic:0.5}")
+#+end_src
+
+#+RESULTS:
+: hyperfine  = 1.0011E-12 (1/sec)
+: electronic = 7.5198E+7 (1/sec)
+: ratio      = 1.3313E-20
+
+Hence life time of the electronic state is 20 orders of magnitude shorter than that of the
+hyperfine state.
+
+In case you wonder why the hyperfine value is not around $10^{-15}\mathrm{Hz}$ as in the
+book on page 316: you would get this value if you remove the factor $2\pi$.
+
+** Exercise 7.31
+Construct a Hadamard gate from $R_x$ and $R_y$ rotations.
+
+*** Solution
+This is not hard to accomplish in the rotation formalism for the Pauli matrices and
+rotations. First of all note that
+
+$$
+  H = \frac{1}{\sqrt{2}} (X + Z) .
+$$
+
+That is $H$ corresponds to the vector $\vec{h}=(\hat{x}+\hat{z})/\sqrt{2}$, where
+$\hat{x}=(1,0,0)$ and $\hat{z}=(0,0,1)$. Note that a rotation around $\hat{y}$ by an angle
+$-\pi/4$ rotates $\hat{x}$ into $\vec{h}$. This suggests that
+
+$$
+  H = R_y(\pi/4) \cdot X \cdot R_y(-\pi/4) .
+$$
+
+We can check this by sage:
+
+#+begin_src sage :results replace :tangle no
+  angle = -pi/4
+  HH = (Ry.subs(theta=angle) * X * Ry.subs(theta=-angle));
+  HH.simplify_full()
+#+end_src
+
+#+RESULTS:
+: [ 1/2*sqrt(sqrt(2) + 2)*sqrt(-sqrt(2) + 2)                               1/2*sqrt(2)]
+: [                              1/2*sqrt(2) -1/2*sqrt(sqrt(2) + 2)*sqrt(-sqrt(2) + 2)]
+
+At the time of writing this I couldn't (easily) convince sage that
+
+: 1/2*sqrt(sqrt(2) + 2)*sqrt(-sqrt(2) + 2)
+
+is just =1/2*sqrt(2)=. But it is easy enough to see it ourselfs. Now combining this with
+$X=\ii\,R_x(\pi)$ we see that
+
+$$
+  \ii H = R_y(\pi/4) \cdot R_x(\pi) \cdot R_y(-\pi/4) .
+$$
+
+The global phase is not observable so we accomplished what we wanted.
+
+** Exercise 7.32
+Show that the circuit in Figure 7.14 is equivalent (up to relative phases) to a =CNOT=
+gate, with the phonon state as the control qubit.
+
+*** Proof
+First of all recall that the =CZ= gate is symmetric in the sense that the =CZ= with
+control and target somewhere is the same as the =CZ= gate where control and target are
+swapped. We take advantage of this and consider the phonon state as the control so that
+the y-rotations conjugate the =Z= gate. The claim follows if we can show that
+
+$$
+  R_y(-\pi/2) \cdot Z \cdot R_y(\pi/2)
+$$
+
+is the $X$ gate up to a global phase. In fact this is easy to see by the rotation
+formalism for the pauli matrices. A rotation around the y-axis of angle $-\pi/2$ moves the
+z-axis to the negative x-axis. This suggests that
+
+$$
+  R_y(-\pi/2) \cdot Z \cdot R_y(\pi/2) = -X
+$$
+
+This can easily be verified by sage:
+
+#+begin_src sage :results replace :tangle no
+  assert Ry.subs(theta=-pi/2) * Z * Ry.subs(theta=pi/2) == -X
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+As already said this implies that the depicted circuit indeed implements =CNOT= with the
+control at the phonon state and a global phase factor of $-1$. Moreover, if the angle
+rotation was $\pi/2$ instead of $-\pi/2$ the phase factor would be $1$.
