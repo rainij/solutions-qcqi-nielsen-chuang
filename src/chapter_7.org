@@ -2150,7 +2150,7 @@ $\hat{x}=(1,0,0)$ and $\hat{z}=(0,0,1)$. Note that a rotation around $\hat{y}$ b
 $-\pi/4$ rotates $\hat{x}$ into $\vec{h}$. This suggests that
 
 $$
-  H = R_y(\pi/4) \cdot X \cdot R_y(-\pi/4) .
+  H = R_y(-\pi/4) \cdot X \cdot R_y(\pi/4) .
 $$
 
 We can check this by sage:
@@ -2213,3 +2213,237 @@ This can easily be verified by sage:
 As already said this implies that the depicted circuit indeed implements =CNOT= with the
 control at the phonon state and a global phase factor of $-1$. Moreover, if the angle
 rotation was $\pi/2$ instead of $-\pi/2$ the phase factor would be $1$.
+
+** Exercise 7.33 (Magnetic resonance)
+Show that (7.128) simplifies to become (7.129). What laboratory frame Hamiltonian gives
+rise to the rotating frame Hamiltonian (7.135)?
+
+- Remark :: I was a bit puzzled by the purpose of the second part of the exercise. But
+  reading on in the chapter I think found the purpose. I think that the RF electronics of
+  the apparatus can be used to not only generate magnetic fields like
+
+  $$ B_1(\cos(\omega t) \hat{x} + \sin(\omega t) \hat{y}) , $$
+
+  but more general fields of the form
+
+  $$ B_1(f_1(t) \hat{x} + f_2(t) \hat{y}) , $$
+
+  at least for /certain/ functions $f_1$ and $f_2$. A Hamiltonian of the form
+  $H^{\RF}=g_1(t)X+g_2(t)Y$ can then be used to implement X- and Y-rotations. For example
+  to do a X-rotation during time interval $[t_1,t_2]$ you set $g_2(t)=0$ and
+  $g_1(t)=\mathrm{const}\neq0$ during that time.
+
+*** Proof
+To see that (7.128) simplifies to (7.129) it suffices to recall the product rule of
+differentiation:
+
+$$
+  \ii\partial_t \left(e^{\ii\omega Zt/2} \ket{\chi(t)} \right)
+  = \ii\left(\partial_t e^{\ii\omega Zt/2} \right) \ket{\chi(t)} + \ii e^{\ii\omega Zt/2} \ket{\dot{\chi}(t)}
+  = -\frac{1}{2}\omega Z e^{\ii\omega Zt/2} \ket{\chi(t)} + e^{\ii\omega Zt/2} H\ket{\chi(t)} .
+$$
+
+Plugging in $\ket{\varphi(t)}=\exp(\ii\omega\,Zt/2)\ket{\chi(t)}$ yields the claim. We
+also note at this point that (7.130):
+
+$$
+  R_z(-\omega t) \, X \, R_z(\omega t) = \cos(\omega t) X - \sin(\omega t) Y
+$$
+
+directly follows from the [[file:chapter_4.org::thm-pauli-rotations-as-3d-rotations][fundamental theorem]] on Pauli rotations. In the following let
+$c$, $s$ and let $H^{\RF}=g_1(t)X+g_2(t)Y$. Again by the fundamental theorem:
+
+$$
+  R_z(\omega t) H^{\RF} R_z(-\omega t) = (cg_1 - sg_2) X + (sg_1 + cg_2) Y .
+$$
+
+That is, for the laboratory frame Hamiltonian on the RHS the rotating frame Hamiltonian is
+as desired. The special case $g_1=1$, $g_0$ was considered in the book. QED.
+
+** TODO Exercises 7.34 - 7.37
+I am still struggling to understand chapter 7.7.2. Some things appear contradictory to
+me. Other things are at the moment too vague to comprehend for me. Finally I think that I
+am missing some physics background here.
+
+** Exercise 7.38 (Refocusing)
+Explicitly show that (7.150)
+
+$$
+  R_{x1}^2 \, e^{-\ii Z_1 at} \, R_{x1}^2 = - e^{-\ii Z_1 at}
+$$
+
+is true (use the anti-commutativity of the Pauli matrices).
+
+- Remark :: I corrected a tiny error in the exercise. The original formulation had the
+  minus sign missing in front of the term $e^{-\ii Z_1 at}$ on the RHS. Alternatively one
+  could just add the standard phrase about equality /up to a global phase/.
+
+*** Proof
+First of all, recall that
+
+$$
+  R_x^2 = R_x(\pi/2)^2 = R_x(\pi) = -\ii X .
+$$
+
+The commutator relations imply $XZX=-Z$. The claim now follows from $Xe^{A}X=e^{XAX}$,
+which holds for any matrix $A$. QED.
+
+** Exercise 7.39 (Three-dimensional refocusing)
+What set of pulses can be used to refocus evolution under /any/ single spin Hamiltonian
+$H^{\sys}=\sum_kc_k\sigma_k$ where $\sigma_k\in\{X,Y,Z\}$ (acting on qubit $k$)?
+
+*** Proof
+Let $K$ be the set of all qubits and let $S\subseteq\,K$. Assume that we want to refocus
+the evolution to
+
+$$
+  H_S = \sum_{k\in S} c_k \sigma_k ,
+$$
+
+Note that $S$ could be the empty set, which implies $H_S=0$. The commutator relations of
+the Pauli matrices imply $XZX=-X$ and $YZY=-Z$ as well as the variations where $X$, $Y$,
+and $Z$ are cyclicitly permutated. Define
+
+$$
+  R_k = \begin{cases}
+    R_{xk} & \text{if } \sigma_k = Y, \\
+    R_{yk} & \text{if } \sigma_k = X, \\
+    R_{xk} \text{ or } R_{yk} & \text{if } \sigma_k = Z. \end{cases}
+$$
+
+Use this to define
+
+$$
+  U = \prod_{k\in K\backslash S} R_k^2 .
+$$
+
+Note that $U^\dagger=(-1)^{\abs{K\backslash S}}U$ (because $R_x^2=-\ii\,X$, etc.). From
+the mentioned properties $XZX=-X$, etc., we deduce
+
+$$
+  e^{-\ii H_S t} = e^{-\ii H^{\sys} t/2} \, U \, e^{-\ii H^{\sys} t/2} \, U ,
+$$
+
+which is the desired refocusing. QED.
+
+** Exercise 7.40 (Refocusing dipolar interactions)
+Give a sequence of pulses which can be used to turn two spin dipolar coupling $H_{1,2}^{\mathrm{D}}$
+into the much simpler form of (7.138), $cZ_1Z_2$ (for some constant $c$).
+
+*** Solution
+The Hamiltonian $H^{\mathrm{D}}_{1,2}$ is a special case of a Hamiltonian of the Form
+
+$$
+  H_0 = \sum_{ij} \alpha_{ij} \sigma_i^{(1)} \sigma_j^{(2)} ,
+$$
+
+where $\sigma_i,\sigma_j\in\{X,Y,Z\}$. Let $R_z=R_z(\pi/2)$. Note that
+$R_z^2=R_yR_x^2R_y^\dagger$, which means that $R_z$ can indeed be realized by RF-pulses
+(see e.g. [[file:chapter_4.org::thm-pauli-rotations-as-3d-rotations][here]]). We have /up to a global phase/
+
+$$
+  e^{-\ii H_1 t} = e^{-\ii H_0 t/2} R_{z1}^2 e^{-\ii H_0 t/2} R_{z1}^2
+$$
+
+for $H_1=Z_1(\alpha_{31}X_2+\alpha_{32}Y_2+\alpha_{33}Z_2)$. Similarly
+
+$$
+  e^{-\ii H_2 t} = e^{-\ii H_1 t/2} R_{z2}^2 e^{-\ii H_1 t/2} R_{z2}^2
+$$
+
+for $H_2=\alpha_33Z_1Z_2$. Putting everything together:
+
+\begin{align*}
+  e^{-\ii \alpha_{33}Z_1Z_2 t} &=
+    \left(e^{-\ii H_0 t/4} R_{z1}^2 e^{-\ii H_0 t/4} R_{z1}^2 \right) R_{z2}^2
+    \left(e^{-\ii H_0 t/4} R_{z1}^2 e^{-\ii H_0 t/4} R_{z1}^2\right) R_{z2}^2 \\
+  &= e^{-\ii H_0 t/4} R_{y1}R_{x1}^2R_{y1}^\dagger e^{-\ii H_0 t/4} R_{y1}R_{x1}^2R_{y1}^\dagger
+    R_{y2}R_{x2}^2R_{y2}^\dagger
+    e^{-\ii H_0 t/4} R_{y1}R_{x1}^2R_{y1}^\dagger e^{-\ii H_0 t/4} R_{y1}R_{x1}^2R_{y1}^\dagger
+    R_{y2}R_{x2}^2R_{y2}^\dagger .
+\end{align*}
+
+This is a relatively straightforward solution. Might be interesting to check whether there
+is a simpler solution in the sense that less terms are involved.
+
+** Exercise 7.41 (NMR =CNOT=)
+
+Give an explicit sequence of single qubit rotations which realize a =CNOT= between two
+spins evolving under the Hamiltonian of (7.147):
+
+$$
+  H^{\sys} = aZ_1 + bZ_2 + cZ_1Z_2 .
+$$
+
+You may start with (7.46),
+
+$$
+  C(X) = H_2 C(Z) H_2
+$$
+
+but the result can be simplified to reduce the number of single qubit rotations.
+
+*** Solution
+Recall that
+
+\begin{align*}
+  Z \otimes Z &= \diag(+1, -1, -1, +1), \\
+  Z \otimes 1 &= \diag(+1, +1, -1, -1), \\
+  1 \otimes Z &= \diag(+1, -1, +1, -1).
+\end{align*}
+
+Hence
+
+<<exercise-7.41-1>>
+$$
+  C(Z) = e^{-\ii Z_1Z_2 \pi/2} \cdot e^{\ii Z_1 \pi/2} \cdot e^{\ii Z_2 \pi/2} .
+$$
+
+Therefore we have
+
+$$
+  C(X) = H_2 C(Z) H_2 = H_2 e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) H_2 ,
+$$
+
+where
+
+$$
+  t_c = \frac{\pi}{2c}, \quad t_a = t_c(a-c), \quad t_b = t_c(b-c).
+$$
+
+Note that $R_z$ commutes with =CZ=. Because of this, and of $R_z^4=I$ we have
+
+<<exercise-7.41-2>>
+$$
+  C(X) = (H_2 R_{z2}^2) \cdot e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) \cdot (R_{z2}^2 H_2) .
+$$
+
+Because of the [[file:chapter_4.org::thm-pauli-rotations-as-3d-rotations][fundamental theorem]] on Pauli rotations we have (up to a global phase)
+
+$$
+  H = R_y^{-1/2} R_x^2 R_y^{1/2}, \quad R_z(\theta) = R_y\inv R_x(\theta) R_y .
+$$
+
+Hence, using $XR_yX=R_y\inv$,
+
+$$
+  H R_{z}^2 = R_y^{-1/2} R_x^2 R_y^{1/2} R_y\inv R_x^2 R_y
+  = R_y^{-1/2} R_x^2 R_y^{-1/2} R_x^2 R_y
+  = R_y^{-1/2} R_y^{1/2} R_y
+  = R_y .
+$$
+
+Plugging this into [[exercise-7.41-2][what we already have]]:
+
+$$
+  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) \cdot R_{y2}\inv .
+$$
+
+Recall $R_z(\theta)=R_y\inv R_x(\theta) R_y$ from above. Hence
+
+$$
+  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{y1}\inv R_{x1}(t_a)R_{y1} R_{y2}\inv R_{x2}(t_b) .
+$$
+
+We arrived at a reasonable implementation of the controlled not-gate using only RF-pulses
+and the evolution of the system Hamiltonian.
