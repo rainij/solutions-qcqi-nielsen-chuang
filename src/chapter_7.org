@@ -3,16 +3,39 @@
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
 #+property: header-args:sage :session *sage-chapter-7* :tangle chapter_7.sage
+# python session just for qiskit since sage integers dont work well with qiskit:
+#+property: header-args:python :session *python-chapter-7* :tangle no
+
 
 #+toc: headlines 2
 
 * Setup
 ** Imports
+#+name: imports-chapter-7-1
 #+begin_src sage
   from scipy.constants import physical_constants, pi as pi_numeric
 
   from utils import commutator as com
-  from utils_sage import Id, X, Y, Z, H, Ry, Rz, kron, bra, ket
+  from utils_sage import Id, X, Y, Z, H, Rx, Ry, Rz, CX, kron, bra, ket
+#+end_src
+
+For circuit drawings (python, not tangled):
+
+#+name: imports-chapter-7-2
+#+begin_src python
+  from qiskit.circuit import QuantumCircuit, Gate
+#+end_src
+
+# Hidden imports
+
+#+begin_src python :exports none
+  Rx = Gate("Rx", 1, [])
+  Ry = Gate("Ry", 1, [])
+
+  Rxd = Gate("Rx^†", 1, [])
+  Ryd = Gate("Ry^†", 1, [])
+
+  sqrtZZ = Gate("sqrt(ZZ)", 2, [])
 #+end_src
 
 ** Harmonic Oscillator
@@ -1903,7 +1926,7 @@ Before we go on let us define two auxiliary functions.
 
 We first calculate the eigenvalues and the corresponding diagonalization matrix for
 $F^2$. By default sage does not normalize $P$, that is why we have to use
-src_py{column_normalized} to make $P$ into a unitary matrix.
+src_python{column_normalized} to make $P$ into a unitary matrix.
 
 #+begin_src sage :results replace :tangle no
   D, P = F2.eigenmatrix_right()
@@ -2396,26 +2419,26 @@ Hence
 
 <<exercise-7.41-1>>
 $$
-  C(Z) = e^{-\ii Z_1Z_2 \pi/2} \cdot e^{\ii Z_1 \pi/2} \cdot e^{\ii Z_2 \pi/2} .
+  C(Z) = -\sqrt{i} \cdot e^{-\ii Z_1Z_2 \pi/4} \cdot e^{\ii Z_1 \pi/4} \cdot e^{\ii Z_2 \pi/4} .
 $$
 
-Therefore we have
+We ignore the global phase $-\sqrt{i}$ in the following. Therefore we have
 
 $$
-  C(X) = H_2 C(Z) H_2 = H_2 e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) H_2 ,
+  C(X) = H_2 C(Z) H_2 = H_2 e^{-\ii H^{\sys} t_c} R_{z1}(\theta_a) R_{z2}(\theta_b) H_2 ,
 $$
 
 where
 
 $$
-  t_c = \frac{\pi}{2c}, \quad t_a = t_c(a-c), \quad t_b = t_c(b-c).
+  t_c = \frac{\pi}{4c}, \quad \theta_a = 2t_c(c-a), \quad \theta_b = 2t_c(c-a).
 $$
 
 Note that $R_z$ commutes with =CZ=. Because of this, and of $R_z^4=I$ we have
 
 <<exercise-7.41-2>>
 $$
-  C(X) = (H_2 R_{z2}^2) \cdot e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) \cdot (R_{z2}^2 H_2) .
+  C(X) = (H_2 R_{z2}^2) \cdot e^{-\ii H^{\sys} t_c} R_{z1}(\theta_a) R_{z2}(\theta_b) \cdot (R_{z2}^2 H_2) .
 $$
 
 Because of the [[file:chapter_4.org::thm-pauli-rotations-as-3d-rotations][fundamental theorem]] on Pauli rotations we have (up to a global phase)
@@ -2436,14 +2459,588 @@ $$
 Plugging this into [[exercise-7.41-2][what we already have]]:
 
 $$
-  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{z1}(t_a) R_{z2}(t_b) \cdot R_{y2}\inv .
+  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{z1}(\theta_a) R_{z2}(\theta_b) \cdot R_{y2}\inv .
 $$
 
 Recall $R_z(\theta)=R_y\inv R_x(\theta) R_y$ from above. Hence
 
 $$
-  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{y1}\inv R_{x1}(t_a)R_{y1} R_{y2}\inv R_{x2}(t_b) .
+  C(X) = R_{y2} \cdot e^{-\ii H^{\sys} t_c} R_{y1}\inv R_{x1}(\theta_a)R_{y1} R_{y2}\inv R_{x2}(\theta_b) .
 $$
 
 We arrived at a reasonable implementation of the controlled not-gate using only RF-pulses
 and the evolution of the system Hamiltonian.
+
+** Exercise 7.42 (Permutations for temporal labeling)
+Give a quantum circuit to accomplish the permutations $P$ and $P^\dagger$ necessary to
+transform
+
+$$ \rho_1 = \diag(a, b, c, d) $$
+
+of (7.153) to
+
+$$ \rho_2 = \diag(a, c, d, b) $$
+
+of (7.154).
+
+*** Solution
+The permutation has to map
+
+$$
+  \rho_1 = a\proj{0} + b\proj{1} + c\proj{2} + d\proj{3}
+$$
+
+to
+
+$$
+  \rho_2 = a\proj{0} + b\proj{3} + c\proj{1} + d\proj{2} .
+$$
+
+Hence, in cycle notation we must have
+
+$$
+  P = (0)(1, 3, 2) .
+$$
+
+We can implement permutations via =SWAP= gates. Swap gates correspond to permutations
+which act on exaclty two elements, like $(1,2)$ (swapping $1$ and $2$). One way to
+decompose cycles into swaps is best demonstrated on an example:
+
+$$
+  (0, 1, 2, 3, 4) = (3, 4) \cdot (2, 3) \cdot (1, 2) \cdot (0, 1) .
+$$
+
+Here /composition/ (the $\cdot$) acts from left to right (that is, $(3,4)$ is applied
+first, and $(0,1)$ is applied last). This ordering is a typical convention in the theory
+of permutation groups and it nicely corresponds to the order in which we write down the
+action of circuits.
+
+We have
+
+$$
+  P = (0)(1,3,2) = (2,3) \cdot (1,3) .
+$$
+
+This is the corresponding circuit for $P$:
+
+#+RESULTS[e4b194602d0768053c7671253a415f9e09d11244]: exercise-7.42-circuit
+:
+: q_0: ──────
+:
+: q_1: ────X─
+:          │
+: q_2: ─X──┼─
+:       │  │
+: q_3: ─X──X─
+:
+
+#+name: exercise-7.42-circuit
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(4)
+
+  qc.swap(2, 3)
+  qc.swap(1, 3)
+
+  qc.draw()
+#+end_src
+
+** Exercise 7.43 (Permutations for logical labeling)
+Give a quantum circuit to accomplish the permutations $P$ necessary to transform
+
+$$
+  \rho = \delta I + \alpha \, \diag(6, 2, 2, -2, 2, -2, -2, -6)
+    \approx \left( \delta_1 + 2 \alpha_1 Z \right)^{\otimes 3}
+$$
+
+of (7.163) to
+
+$$
+  \rho' = P \rho P^\dagger = \delta I + \alpha \, \diag(6, -2, -2, -2, -6, 2, 2, 6)
+$$
+
+of (7.165).
+
+*** Solution
+Before we begin, let us quickly verify that the appoximation for $\rho$ is valid. Let us
+start at the RHS. Under the assumption that $\alpha_1\ll\delta_1$ (let us justify this
+later) we have
+
+$$
+  \left( \delta_1 + 2 \alpha_1 Z \right)^{\otimes 3} \approx
+  \delta_1^3 + 2\alpha_1\delta_1^2\left(Z_1 + Z_2 + Z_3\right) .
+$$
+
+Setting $\delta=\delta_1^3=2^{-3}$ (it must be this value due to the trace condition),
+$\alpha=2\alpha_1\delta_1^2=\alpha_1/2$ we obtain the LHS. Note that our assumption
+$\alpha_1\ll\delta_1$ is consistent with the assumption from the book
+($\alpha\ll\delta$).
+
+#+name: exercise-7.43-1
+#+begin_src sage :results replace :tangle no :cache yes
+  Z1 = kron(Z, Id, Id)
+  Z2 = kron(Id, Z, Id)
+  Z3 = kron(Id, Id, Z)
+
+  assert 2*(Z1 + Z2 + Z3) == matrix.diagonal([6, 2, 2, -2, 2, -2, -2, -6])
+  "PASSED"
+#+end_src
+
+#+RESULTS[33dcdf8124dda5b61747b029273137c01532a718]: exercise-7.43-1
+: 'PASSED'
+
+Let's get back to the exercise. /One/ permutation which does what we want is (in cycle
+notation)
+
+$$
+  P = (1, 6)(2, 5)(4, 7) .
+$$
+
+This can immidiately be implemented by three swap operations:
+
+#+RESULTS[f20fd73f97a84cea1c37c94fe9d3c0eca9573f45]: exercise-7.43-circuit
+#+begin_example
+
+q_0: ─────────
+
+q_1: ─X───────
+      │
+q_2: ─┼──X────
+      │  │
+q_3: ─┼──┼────
+      │  │
+q_4: ─┼──┼──X─
+      │  │  │
+q_5: ─┼──X──┼─
+      │     │
+q_6: ─X─────┼─
+            │
+q_7: ───────X─
+
+#+end_example
+
+#+name: exercise-7.43-circuit
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(8)
+
+  qc.swap(1, 6)
+  qc.swap(2, 5)
+  qc.swap(4, 7)
+
+  qc.draw()
+#+end_src
+
+** TODO Exercise 7.44 (Logical labeling for $n$ spins)
+Suppose we have a system of $n$ nearly identical spins of Zeeman frequency $\omega$ in
+thermal equilibrium at temperature $T$ with state $\rho$. What is the largest effective
+pure state that you can construct from $\rho$ using logical labeling? (Hint: take
+advantage of states whose labels have Hamming weight of $n/2$.)
+
+** TODO Exercise 7.45 (State tomography with NMR)
+Let the voltage measurement
+
+$$
+  V_k(t) = V_0 \trace{e^{-\ii Ht}M_k \rho M_k^\dagger e^{\ii Ht}(\ii X_k + Y_k)}
+$$
+
+be the result of experiment $k$.  Show that for two spins, nine experiments, with $M_0=I$,
+$M_1=R_{x1}$, $M_2=R_{y2}$, $M3_=R_{x2}$, $M_4=R_{x2}R_{x1}$, $M_5=R_{x2}R_{y1}$
+etc. provide sufﬁcient data from which $\rho$ can be reconstructed.
+
+** TODO Exercise 7.46
+How many experiments are sufﬁcient for three spins? Necessary?
+
+** Exercise 7.47 (NMR =CNOT= gate)
+Verify that the circuit shown in the top left of Figure 7.19
+
+#+RESULTS[0622d34d01f447d072b0c60668b841234cf2934d]: exercise-7.47-circuit
+:            ┌───────────┐
+: q_0: ──────┤0          ├──────
+:      ┌────┐│  sqrt(ZZ) │┌────┐
+: q_1: ┤ Rx ├┤1          ├┤ Ry ├
+:      └────┘└───────────┘└────┘
+
+performs a =CNOT= gate, up to
+single qubit phases; that is, it acts properly on classical input states, and furthermore
+can be turned into a proper =CNOT= gate by applying additional single qubit $R_z$
+rotations. Give another circuit using the same building blocks to realize a proper =CNOT=
+gate.
+
+<<remark-exercise-7.47>>
+- Remark :: There is an error in the original exercise. With $H=2\pi\hbar JZ_1Z_2$ the
+  evolution in the middle should be
+
+  $$
+  e^{-\ii H / (4\hbar J)}
+  $$
+
+  (which equals $\sqrt{Z_1Z_2}=\diag(1,\ii,\ii,1)$). That is, the divisor in the exponent
+  should be $4$ and not $2$ (otherwise the assertion of the exercise is just wrong).
+
+#+name: exercise-7.47-circuit
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  qc.append(Rx, [1])
+  qc.append(sqrtZZ, [0, 1])
+  qc.append(Ry, [1])
+
+  qc.draw()
+#+end_src
+
+*** Solution
+An easy way to check the first assertion is to plug it into sage.
+
+#+name: exercise-7.47-1
+#+begin_src sage
+  sqrtZZ = matrix([
+    [1, 0, 0, 0],
+    [0, i, 0, 0],
+    [0, 0, i, 0],
+    [0, 0, 0, 1],
+  ])
+
+  rx = Rx.subs(theta=pi/2)
+  ry = Ry.subs(theta=pi/2)
+  rz = Rz.subs(theta=pi/2)
+
+  cx_ex747 = kron(Id, ry) * sqrtZZ * kron(Id, rx.H)
+#+end_src
+
+Checking that the circuit implements =CX= up to /single/ qubit phase flips:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert cx_ex747 == matrix([
+      [ 1, 0, 0, 0],
+      [ 0, I, 0, 0],
+      [ 0, 0, 0,-1],
+      [ 0, 0, I, 0],
+  ])
+  "PASSED"
+#+end_src
+
+#+RESULTS[50ddaa9dcb1f216248248a5eae96a4dfb1175ae1]:
+: 'PASSED'
+
+Observe that the phase of the the image of $\ket{ij}$ is off by $\ii^{i+j}$. This is the
+same as the action of $S\otimes S$ (using the phase gate $S=\sqrt{Z}$) and can be
+neutralised by its adjoint. Note that $R_z=S$ up to a /global/ phase.
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert -i * cx_ex747 * kron(rz.H, rz.H) == CX
+  "PASSED"
+#+end_src
+
+#+RESULTS[a91a4e02ec92e446c0944fa688a0fb80df5c4299]:
+: 'PASSED'
+
+Note that
+
+$$
+  R_z = R_y\inv R_x R_y .
+$$
+
+Hence the following circuit actually implements the =CNOT= gate:
+
+<<link-exercise-7.47-circuit-2>>
+#+RESULTS[e33e308a0274fc062c5453a52bef2d4e6ebce9cd]: exercise-7.47-circuit-2
+:      ┌──────┐┌──────┐┌────┐      ┌───────────┐
+: q_0: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├──────┤0          ├──────
+:      ├──────┤├──────┤├────┤┌────┐│  sqrt(ZZ) │┌────┐
+: q_1: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├┤ Rx ├┤1          ├┤ Ry ├
+:      └──────┘└──────┘└────┘└────┘└───────────┘└────┘
+
+#+name: exercise-7.47-circuit-2
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  for i in [0, 1]:
+      qc.append(Ryd, [i])
+      qc.append(Rxd, [i])
+      qc.append(Ry, [i])
+
+  qc.append(Rx, [1])
+  qc.append(sqrtZZ, [0, 1])
+  qc.append(Ry, [1])
+
+  qc.draw()
+#+end_src
+
+** Exercise 7.48
+Verify that the circuit
+
+#+RESULTS[9149f7c3fba32cba9b16b4483d7134c784112f78]: exercise-7.48-circuit
+:      ┌────┐┌───────────┐
+: q_0: ┤ Rx ├┤0          ├──────
+:      ├────┤│  sqrt(ZZ) │┌────┐
+: q_1: ┤ Rx ├┤1          ├┤ Ry ├
+:      └────┘└───────────┘└────┘
+
+shown in the bottom left of Figure 7.19 creates the Bell state
+$(\ket{00}-\ket{11})/\sqrt{2}$ as advertised.
+
+- Remark :: The same remark as in [[remark-exercise-7.47][exercise 7.47]] applies here too.
+
+#+name: exercise-7.48-circuit
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  qc.append(Rx, [0])
+  qc.append(Rx, [1])
+  qc.append(sqrtZZ, [0, 1])
+  qc.append(Ry, [1])
+
+  qc.draw()
+#+end_src
+
+*** Solution
+That is easily verified by sage:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  U = kron(Id, ry.H) * sqrtZZ * kron(rx, rx)
+  assert U * ket('00') == (ket('00') - ket('11')) / sqrt(2)
+  "PASSED"
+#+end_src
+
+#+RESULTS[72402ff06d75a6d7ada976cfd1773283c654a5c4]:
+: 'PASSED'
+
+** Exercise 7.49 (NMR swap gate)
+An important chemical application of NMR is measurement of connectivity of spins,
+i.e. what protons, carbons, and phosphorus atoms are nearest neighbors in a molecule. One
+pulse sequence to do this is known as INADEQUATE (incredible natural abundance double
+quantum transfer experiment – the art of NMR is full of wonderfully creative acronyms).
+In the language of quantum computation, it can be understood as simply trying to apply a
+=CNOT= between any two resonances; if the =CNOT= works, the two nuclei must be
+neighbors. Another building block which is used in sequences such as TOCSY (total
+correlation spectroscopy) is a swap operation, but not quite in the perfect form we can
+describe simply with quantum gates! Construct a quantum circuit using only
+$e^{-\ii\,H/(4\hbar\,J)}$, $R_x$ , and $R_y$ operations to implement a swap gate (you may
+start from the circuit in Figure 1.7).
+
+- Remark :: The same remark as in [[remark-exercise-7.47][exercise 7.47]] applies here too.
+
+*** Solution
+A =SWAP= gate can be implemented in terms of three =CNOT= gates:
+
+#+RESULTS[3c6102d9fb3fd85c49a05181a332112f003d3f06]: exercise-7.49-circuit
+:           ┌───┐
+: q_0: ──■──┤ X ├──■──
+:      ┌─┴─┐└─┬─┘┌─┴─┐
+: q_1: ┤ X ├──■──┤ X ├
+:      └───┘     └───┘
+
+#+name: exercise-7.49-circuit
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  qc.cx(0, 1)
+  qc.cx(1, 0)
+  qc.cx(0, 1)
+
+  qc.draw()
+#+end_src
+
+In exercise 7.47 [[link-exercise-7.47-circuit-2][we have seen]] how to implement a single =CNOT=. So let us glue together
+three of those:
+
+#+RESULTS[f31d5632b4a87bf7fe91ae6068ac5d19bf9e3c22]: exercise-7.49-circuit-2
+#+begin_example
+     ┌──────┐┌──────┐┌────┐      ┌───────────┐┌──────┐┌──────┐ ┌────┐ ┌────┐»
+q_0: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├──────┤0          ├┤ Ry^† ├┤ Rx^† ├─┤ Ry ├─┤ Rx ├»
+     ├──────┤├──────┤├────┤┌────┐│  sqrt(ZZ) │└┬────┬┘├──────┤┌┴────┴┐├────┤»
+q_1: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├┤ Rx ├┤1          ├─┤ Ry ├─┤ Ry^† ├┤ Rx^† ├┤ Ry ├»
+     └──────┘└──────┘└────┘└────┘└───────────┘ └────┘ └──────┘└──────┘└────┘»
+«     ┌───────────┐ ┌────┐ ┌──────┐┌──────┐┌────┐┌───────────┐
+«q_0: ┤0          ├─┤ Ry ├─┤ Ry^† ├┤ Rx^† ├┤ Ry ├┤0          ├──────
+«     │  sqrt(ZZ) │┌┴────┴┐├──────┤└┬────┬┘├────┤│  sqrt(ZZ) │┌────┐
+«q_1: ┤1          ├┤ Ry^† ├┤ Rx^† ├─┤ Ry ├─┤ Rx ├┤1          ├┤ Ry ├
+«     └───────────┘└──────┘└──────┘ └────┘ └────┘└───────────┘└────┘
+#+end_example
+
+There are two places with $R_yR_y^\dagger$ which can be ommitted. But otherwise I see no
+/obvious/ way to make the circuit simpler.
+
+#+name: exercise-7.49-circuit-2
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  def append_cx(a):
+      for i in [0, 1]:
+          qc.append(Ryd, [i])
+          qc.append(Rxd, [i])
+          qc.append(Ry, [i])
+
+      qc.append(Rx, [a])
+      qc.append(sqrtZZ, [0, 1])
+      qc.append(Ry, [a])
+
+  append_cx(1)
+  append_cx(0)
+  append_cx(1)
+
+  qc.draw(fold=80)
+#+end_src
+
+** Exercise 7.50
+Find quantum circuits using just single qubit rotations and $e^{-\ii\,H/(4\hbar\,J)}$ to
+implement the oracle $O$ for $x_0\in\{0,1,2\}$.
+
+- Remark :: The same remark as in [[remark-exercise-7.47][exercise 7.47]] applies here too.
+
+*** Solutions
+Let us first define all relevant gates
+
+#+name: exercise-7.50-1
+#+begin_src sage
+  rx1 = kron(rx, Id)
+  rx2 = kron(Id, rx)
+
+  ry1 = kron(ry, Id)
+  ry2 = kron(Id, ry)
+
+  rz1 = kron(rz, Id)
+  rz2 = kron(Id, rz)
+
+  O1 = matrix.diagonal([-1,+1,+1,+1])
+  O2 = matrix.diagonal([+1,-1,+1,+1])
+  O3 = matrix.diagonal([+1,+1,-1,+1])
+  O4 = matrix.diagonal([+1,+1,+1,-1])
+
+  # This is what is called 'P' in the book:
+  PGrov  = matrix.diagonal([+1,-1,-1,-1])
+#+end_src
+
+<<exercise-7.50-typo-in-book>>
+First of all we note that the book made a mistake by swapping the formulas for the oracle
+and the other projector. Correct would for example these ones:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert O4 == -i * ry1 * rx1 * ry1.H * ry2 * rx2 * ry2.H * sqrtZZ
+  assert PGrov == i * ry1 * rx1.H * ry1.H * ry2 * rx2.H * ry2.H * sqrtZZ
+  "PASSED"
+#+end_src
+
+#+RESULTS[5058af3f19f2888fa9be8a21f3bafa1b477493c3]:
+: 'PASSED'
+
+It is not hard to see that one can implement all oracles using
+$\sqrt{Z_1Z_2}=e^{-\ii\,H/(4\hbar\,J)}$ and the single qubit Z-rotations (by 90 degrees):
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert O1 == -i * rz1 * rz2 * sqrtZZ
+  assert O2 == rz1.H * rz2 * sqrtZZ
+  assert O3 == rz1 * rz2.H * sqrtZZ
+  assert O4 == -i * rz1.H * rz2.H * sqrtZZ
+  "PASSED"
+#+end_src
+
+#+RESULTS[62bae81d09b7730cdcff3f9c20909b24660505b3]:
+: 'PASSED'
+
+Hence, using $R_z=R_y^\dagger\,R_x\,R_y$ we can replace the two Z-rotations by six RF
+pulses, making them implementable in the framework of NMR quantum computation:
+
+<<exercise-7.50-oracle-impl>>
+\begin{align*}
+  O_1 &= R_{y1}^\dagger R_{x1} R_{y1} R_{y2}^\dagger R_{x2} R_{y2} \cdot \sqrt{Z_1Z_2} , \\
+  O_2 &= R_{y1}^\dagger R_{x1}^\dagger R_{y1} R_{y2}^\dagger R_{x2} R_{y2} \cdot \sqrt{Z_1Z_2} , \\
+  O_3 &= R_{y1}^\dagger R_{x1} R_{y1} R_{y2}^\dagger R_{x2}^\dagger R_{y2} \cdot \sqrt{Z_1Z_2} , \\
+  O_4 &= R_{y1}^\dagger R_{x1}^\dagger R_{y1} R_{y2}^\dagger R_{x2}^\dagger R_{y2} \cdot \sqrt{Z_1Z_2} .
+\end{align*}
+
+Note that the main text (but take into account the [[exercise-7.50-typo-in-book][typo-fix]] from above) got a slightly
+different formula for $O_4$. The difference could be explained by usage of a different
+formula for expressing Z-rotations as RF-pulses: $R_z=R_yR_x^{\dagger}R_y^\dagger$.
+
+** Exercise 7.51
+Show that the Grover iteration can be simplified, by canceling adjacent single qubit
+rotations appropriately, to obtain an implemenation for $G$ (for all possible cases of
+$x_0$) which uses only 8 RF pulses.
+
+- Remark :: The original exercise contained explicit formulas for $G$, but they were
+  incorrectly assigned to the values of $x_0$. I did not write down the corrected versions
+  since there are different possibilities anyway.
+
+*** Solution
+Recall that the Grover operator is given by (for $i\in\{0,1,2,3\}$)
+
+$$
+  G_i = H_1H_2 \cdot P \cdot H_1H_2 \cdot O_i ,
+$$
+
+where $O_i$ can be implemented by [[exercise-7.50-oracle-impl][the formulas]] from exercise 7.50, the Hadamard gates by
+$H=R_x^2R_y$, and $P$ by (e.g.)
+
+$$
+  P = R_{y1} R_{x1}^\dagger R_{y1}^\dagger R_{y2} R_{x2}^\dagger R_{y2}^\dagger \cdot \sqrt{Z_1Z_2} .
+$$
+
+$P$ and $O_i$ need 6 RF pulses each, the Hadamard gates need 3 each, so in total we need
+/a priori/ 24 RF pulses. Let us demonstrate for the example of $H_1H_2\,P$ and
+$H_1H_2\,O_1$ how to reduce this to 8 pulses. Let us first look at at $H_1H_2\,O_1$:
+
+$$
+  H_1 H_2 O_1 = (R_{x1}^2 R_{y1} R_{y1}^\dagger R_{x1} R_{y1})_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+$$
+
+Here $(\ldots)_2$ contains the same content as $(\ldots)_1$ just everything adapted for
+the second qubit. Clearly $R_{y1}R_{y1}^\dagger=1$ and then we can use
+$R_{x1}^3=R_{x1}^\dagger$ to obtain
+
+$$
+  H_1 H_2 O_1 = (R_{x1}^\dagger R_{y1})_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+$$
+
+Now look at $H_1H_2\,P$:
+
+$$
+  H_1 H_2 P = (R_{x1}^2 R_{y1} R_{y1} R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+$$
+
+The obvious thing to do is
+
+$$
+  H_1 H_2 P = (R_{x1}^2 R_{y1}^2 R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+$$
+
+But there is another trick we can use (recall that $X=R_x^2$, $Y=R_y^2$):
+
+$$
+  X R_y(\theta) = R_y(-\theta) X, \quad Y R_x(\theta) = R_x(-\theta) Y .
+$$
+
+Hence (using $(R_y^2)^\dagger=R_y^2$ in addition):
+
+\begin{align*}
+  H_1 H_2 P &= (R_{y1}^2 R_{x1} R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} \\
+  &= (R_{x1}^\dagger R_{y1})_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+\end{align*}
+
+The following sage code contains the solutions for all four cases:
+
+#+begin_src sage
+  HH = kron(H, H)
+
+  G1 = HH * PGrov * HH * O1
+  G2 = HH * PGrov * HH * O2
+  G3 = HH * PGrov * HH * O3
+  G4 = HH * PGrov * HH * O4
+
+  g1 =  1 * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ
+  g2 = -i * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1   * ry1 * rx2.H * ry2 * sqrtZZ
+  g3 = -i * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1.H * ry1 * rx2   * ry2 * sqrtZZ
+  g4 =  1 * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1   * ry1 * rx2   * ry2 * sqrtZZ
+#+end_src
+
+Verifying:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert g1 == G1
+  assert g2 == G2
+  assert g3 == G3
+  assert g4 == G4
+  "PASSED"
+#+end_src
+
+#+RESULTS[8c77fca9ee19d7ae598997bc1fb600ab4309b5fd]:
+: 'PASSED'

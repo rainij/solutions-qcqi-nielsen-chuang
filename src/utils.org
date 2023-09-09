@@ -42,6 +42,9 @@ The Pauli matrices implemented in sage
 
   # Hadamard matrix
   H = matrix([[1, 1], [1, -1]]) / sqrt(2)
+
+  # Phase gate
+  S = matrix([[1, 0], [0, i]])
 #+end_src
 
 The Pauli Rotations
@@ -82,4 +85,25 @@ from bit-strings:
   def bra(bits: str) -> matrix:
       """If bits is a string of '0' and '1' this returns <bits|."""
       return ket(bits).H
+#+end_src
+
+Projection operators
+
+#+name: projection-operators
+#+begin_src sage
+  e0 = matrix(ket('0'))
+  e1 = matrix(ket('1'))
+
+  P0 = e0.H * e0
+  P1 = e1.H * e1
+#+end_src
+
+Some multi-qubit gates:
+
+#+name: multi-qubit-gates
+#+begin_src sage
+  # Controlled Pauli gates
+  CX = kron(P0, Id) + kron(P1, X)
+  CY = kron(P0, Id) + kron(P1, Y)
+  CZ = kron(P0, Id) + kron(P1, Z)
 #+end_src
