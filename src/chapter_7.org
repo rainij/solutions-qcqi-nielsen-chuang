@@ -2993,17 +2993,13 @@ $$
 
 Now look at $H_1H_2\,P$:
 
-$$
-  H_1 H_2 P = (R_{x1}^2 R_{y1} R_{y1} R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
-$$
+\begin{align*}
+  H_1 H_2 P &= (R_{x1}^2 R_{y1} R_{y1} R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} \\
+  &= (R_{x1}^2 R_{y1}^2 R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
+\end{align*}
 
-The obvious thing to do is
-
-$$
-  H_1 H_2 P = (R_{x1}^2 R_{y1}^2 R_{x1}^\dagger R_{y1}^\dagger)_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
-$$
-
-But there is another trick we can use (recall that $X=R_x^2$, $Y=R_y^2$):
+Here we did the obvious simplification $R_yR_y=R_y^2$. But there is another trick we can
+use (recall that $X=R_x^2$, $Y=R_y^2$):
 
 $$
   X R_y(\theta) = R_y(-\theta) X, \quad Y R_x(\theta) = R_x(-\theta) Y .
@@ -3016,25 +3012,27 @@ Hence (using $(R_y^2)^\dagger=R_y^2$ in addition):
   &= (R_{x1}^\dagger R_{y1})_1 \cdot (\ldots)_2 \cdot \sqrt{Z_1Z_2} .
 \end{align*}
 
-The following sage code contains the solutions for all four cases:
+Let us write down and verify also the other three variants. To be sufficiently certain
+that we made no errors in our calcations let's set up sage for the task:
 
 #+begin_src sage
   HH = kron(H, H)
 
+  # The grover iterator for all four cases. PGrov is the P from the latex formulas
   G1 = HH * PGrov * HH * O1
   G2 = HH * PGrov * HH * O2
   G3 = HH * PGrov * HH * O3
   G4 = HH * PGrov * HH * O4
+#+end_src
 
+The following code contains all four implementations and verifies them:
+
+#+begin_src sage :results replace :tangle no :cache yes
   g1 =  1 * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ
   g2 = -i * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1   * ry1 * rx2.H * ry2 * sqrtZZ
   g3 = -i * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1.H * ry1 * rx2   * ry2 * sqrtZZ
   g4 =  1 * rx1.H * ry1 * rx2.H * ry2 * sqrtZZ * rx1   * ry1 * rx2   * ry2 * sqrtZZ
-#+end_src
 
-Verifying:
-
-#+begin_src sage :results replace :tangle no :cache yes
   assert g1 == G1
   assert g2 == G2
   assert g3 == G3
@@ -3042,5 +3040,5 @@ Verifying:
   "PASSED"
 #+end_src
 
-#+RESULTS[8c77fca9ee19d7ae598997bc1fb600ab4309b5fd]:
+#+RESULTS[dd0fcbcf1f4bbffc39016127783de551680f5598]:
 : 'PASSED'
