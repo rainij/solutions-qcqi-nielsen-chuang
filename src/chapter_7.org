@@ -2413,20 +2413,50 @@ Show that the spherical average of $H_{1,2}^{\mathrm{D}}$ over $\hat{n}$ is zero
 Actually I do /not/ get that the average is zero! I am not sure if I misunderstand the
 exercise, did a mistake in my calculations, or if there is actually an error in the book.
 
-** TODO Exercises 7.36 (Thermal equilibrium NMR state)
+** Exercises 7.36 (Thermal equilibrium NMR state)
 For $n=1$ show that the thermal equilibrium state is
 
 $$
-  \rho \approx 1 - \frac{\hbar\omega}{2k_BT} Z ,
+  \rho \approx \frac{1}{2} - \frac{\hbar\omega}{4k_BT} \, Z ,
 $$
 
 and for $n=2$ (and $\omega_A\approx4\omega_B$),
 
 $$
-  \rho \approx 1 - \frac{\hbar\omega_B}{4k_BT} \diag(5,3,-3,-5) .
+  \rho \approx \frac{1}{4} - \frac{\hbar\omega_B}{8k_BT} \, \diag(5,3,-3,-5) .
 $$
 
-** TODO Exercises 7.37 (NMR spectrum of coupled spins)
+- Remark :: The originally provided formulas from the book are not correct. They already
+  violate the trace condition $\trace{\rho}=1$. Above I replaced them by formulas I
+  obtained in the solution below.
+
+*** Solution
+Recall that the thermal equilibrium state is approximately
+$\rho\approx2^{-n}(1-\beta\,H)$. For $n=1$ we have $H_1=2^{-1}\hbar\omega\,Z$. Hence
+
+$$
+  \rho_1 = 2\inv \left(1 - \frac{\hbar\omega}{2k_BT} Z \right) .
+$$
+
+For $n=2$ with $\omega_A=4\omega_B$ we have
+
+$$
+  H_2 = \frac{4\hbar\omega_B}{2} Z_1 + \frac{\hbar\omega_B}{2} Z_2 .
+$$
+
+Let us briefly note that
+
+$$
+  4Z_1 + Z_2 = 4 \, \diag(1,1,-1,-1) + \diag(1,-1,1,-1) = \diag(5,3,-3,-5) .
+$$
+
+Hence
+
+$$
+  \rho_2 = \frac{1}{4} \left( 1 - \frac{\hbar \omega_B}{2k_BT} \, \diag(5,3,-3,-5) \right) .
+$$
+
+** Exercises 7.37 (NMR spectrum of coupled spins)
 Calculate $V(t)$ for $H=JZ_1Z_2$ and
 
 $$
@@ -2436,6 +2466,36 @@ $$
 How many lines would there be in the spectrum of the ﬁrst spin if the Hamiltonian were
 $H=JZ_1(Z_2+Z_3+Z_4)$ (with a similar initial density matrix) and what would their
 relative magnitudes be?
+
+*** Solution
+First of all we have
+
+$$
+  \rho = \frac{1}{4} [1 - \beta\hbar\omega_0(-X_1 + Z_2)] .
+$$
+
+Replacing $J$ by $J/2$ we can reuse the results obtained in [[#exercise-7.45][exercise 7.45]] (I solved it
+earlier than this exercise). With the notation from there we have
+
+$$
+  F := U^\dagger (\sigma_1^- + \sigma_2^-) U = \sigma_1^- \cos(Jt) + \sigma_2^- \cos(Jt) +
+    \sigma_1^- Z_2 \ii\sin(Jt) + Z_1 \sigma_2^- \ii\sin(Jt).
+$$
+
+Only the first term in $F=\sigma_1^-\cos(Jt)+\ldots$ actually observes the $X_1$ (the
+first spin in $\rho$). Therefore we have two peaks, corresponding to $\pm\,J$ in the
+spectrum (Note: $\cos(Jt)=(e^{\ii\,Jt}+e^{-\ii\,Jt})/2$).
+
+If I am not mistaken this shouldn't change much with more the general Hamiltonian from the
+second part of the exercise. It only changes $F$ to
+
+$$
+  F' = \sigma_1^- \cos(Jt)^3 + \ldots = \sigma_1^- 2^{-3}(
+  e^{3\ii tJ} + 3e^{\ii tJ} + 3e^{-\ii tJ} + e^{-3\ii tJ} )  + \ldots
+$$
+
+where the rest contained in the dots does not observe $X_1$. Hence we see peaks at
+$\pm\,J$ and $\pm\,3J$ and the former are three times as pronounced.
 
 ** Exercise 7.38 (Refocusing)
 Explicitly show that (7.150)
@@ -2778,11 +2838,15 @@ q_7: ───────X─
   qc.draw()
 #+end_src
 
-** TODO Exercise 7.44 (Logical labeling for $n$ spins)
+** SKIP Exrcise 7.44 (Logical labeling for $n$ spins)
 Suppose we have a system of $n$ nearly identical spins of Zeeman frequency $\omega$ in
 thermal equilibrium at temperature $T$ with state $\rho$. What is the largest effective
 pure state that you can construct from $\rho$ using logical labeling? (Hint: take
 advantage of states whose labels have Hamming weight of $n/2$.)
+
+*** Discussion
+I do not know how this exercise is meant. Not sure what state $\rho$ they mean and how
+$\omega$ is relevant here.
 
 ** Exercise 7.45 (State tomography with NMR)
 :PROPERTIES:
@@ -2808,7 +2872,7 @@ $$
   H = \frac{\omega_1}{2} Z_1 + \frac{\omega_2}{2} Z_2 + \frac{J_{12}}{2} Z_1 Z_2 .
 $$
 
-Let $U_1$, $U_2$, and $U_{12}$ be the evolution operators of the three summads
+Let $U_1$, $U_2$, and $U_{12}$ be the evolution operators of the three summands
 (e.g. $U_1(t)=\exp(-\ii\omega_1\,Z_1t/2)$). Note that these three operators commute and
 their product is $\exp(-\ii\,Ht)$. From the section [[#chapter-7-state-tomography][on state tomography]] we directly deduce
 
@@ -2846,6 +2910,7 @@ Then we get
 
 Expressing $R_z(-2\theta)$ as $\cos(\theta)+\ii\sin(\theta)Z$ we obtain
 
+<<exercise-7.45-vt>>
 $$
   V_k(t) = V_0 \trace{M_k\rho M_k^\dagger \cdot (
     \sigma_1^- \cdot \cos(J_{12}t)e^{\ii\omega_1 t} + \sigma_2^- \cdot \cos(J_{12}t)e^{\ii\omega_2 t} +
@@ -2868,8 +2933,31 @@ are already sufficient to see all 15 terms. There are certainly other (small) se
 experiments which also see all 15 terms. I didn't check if fewer than four experiments are
 sufficient.
 
-** TODO Exercise 7.46
-How many experiments are sufﬁcient for three spins? Necessary?
+** WIP Exercise 7.46
+How many experiments are sufficient for three spins? Necessary?
+
+*** Sketch of a solution
+In this case the Hamiltonian looks as follows
+
+$$
+  H = \frac{\omega_1}{2} Z_1 + \frac{\omega_2}{2} Z_2 + \frac{\omega_3}{2} Z_3 +
+    \frac{J_{12}}{2} Z_1 Z_2 +
+    \frac{J_{13}}{2} Z_1 Z_3 +
+    \frac{J_{23}}{2} Z_2 Z_3 .
+$$
+
+The precedure and the results of [[*Exercise 7.45 (State tomography with NMR)][exercise 7.45]] can be adapted (or reused) to get a formula
+for $V(t)$ analogous to [[exercise-7.45-vt][the one]] obtained there. This formula determines which of the terms
+$A_1B_2C_3$, with $A,B,C\in\{I,X,Y,Z\}$, of $\rho$ are observed by $V(t)$. Moreover, it is
+also clear how RF-pulses like $R_{x3}$, $R_{y2}$, etc. change which terms are observed.
+
+It is now straightforward to write a short script which just tries out all possible
+combinations of 90° pulses and looks which sets of experiments are sufficient to determine
+all coefficients of $\rho$ (in the Pauli basis).
+
+So far I was not inclined to write such a script since the end result does not interest me
+strong enough so far. On the other hand I also do not know if there is a nice analytical
+way to determine a minimial set of experiments.
 
 ** Exercise 7.47 (NMR =CNOT= gate)
 Verify that the circuit shown in the top left of Figure 7.19
