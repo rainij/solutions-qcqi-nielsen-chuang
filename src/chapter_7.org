@@ -172,6 +172,124 @@ In some of the exercises I just ignore this error. In other exercises I try to c
 the error by swapping zeros and ones. In any case, if I do not ignore the error I say so
 within the exercise.
 
+** On magnetization readout and state tomography
+:PROPERTIES:
+:CUSTOM_ID: chapter-7-state-tomography
+:END:
+The treatment of the magnetization readout in the book looks a bit odd to me. On the one
+hand I wonder why in (7.143) only one qubit is involved. On the other hand there is an
+inconsistency in [[#exercise-7.45][exercise 7.45]]. In short: I didn't understand a lot of things.
+
+In the following I present an alternative to the chapters /magnetization readout/ within
+section 7.7.2, and /state tomography/ within section 7.7.4. It is based on
+[cite:@Lee2002].
+
+Let $\sigma_k^{-}=(X_k+\ii Y_k)/2$ be the Pauli lowering operator for spin $k$. For a
+Hamiltonian $H$ let $U(t)=e^{-\ii\,Ht}$ be its evolution operator. Let us write $U$ for
+$U(t)$. The free induction decay signal is given by (for some non-zero constant $V_0$)
+
+$$
+  V(t) = V_0 \trace{U\rho U^\dagger \sum_k\sigma_k^-} .
+$$
+
+The /main/ difference to (7.143) is the sum over /all/ spins. Using cyclicity property of
+traces we get
+
+$$
+  V(t) = V_0 \trace{\rho \cdot \underbrace{U^\dagger \sum_k\sigma_k^- U}_{=:A}} .
+$$
+
+Let us consider the single-spin case now. In this case the system Hamiltonian is
+$H=\frac{\omega}{2}Z$. Using the following sage code ...
+
+#+begin_src sage
+  w, t = SR.var('ω t', domain='real')
+  U1 = matrix.diagonal([exp(-i*w*t/2), exp(+i*w*t/2)])
+
+  sm = (X + i*Y) / 2
+  sp = (X - i*Y) / 2
+#+end_src
+
+... it is easy to find a formula for $A$:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert U1.H * sm * U1 == e^(I*t*w) * sm
+  "PASSED"
+#+end_src
+
+#+RESULTS[87a95a83784ec97e35bd6828e0e747d45c65ec19]:
+: 'PASSED'
+
+That is (for $H=\frac{\omega}{2}Z$):
+
+$$
+  U^\dagger \sigma^- U = e^{\ii \omega t} \sigma^- .
+$$
+
+Hence for the single spin case we have the following signal
+
+<<free-induction-decay-single-spin>>
+$$
+  V_1(t) = V_0 \trace{\rho\sigma^-} e^{\ii \omega t} .
+$$
+
+This also explains why this signal is Fourier transformed. In fact, the fourier transform
+would be a delta distribution at $\omega$. For actual measurements one would expect a
+sharp peak at $\omega$. Unfortunately I didn't get this valuable insight from the book.
+
+How do we use this formula to obtain $\rho$? Recall that any mixed state can be
+represented as
+
+$$
+  \rho = \frac{1}{2} I + r_x X + r_y Y + r_z Z
+$$
+
+for some real vector $\vec{r}=(r_x,r_y,r_z)$ with $\norm{\vec{r}}\leq1$ (the state is pure
+if the norm is exactly one). The task is to determine $\vec{r}$. Plugging this into [[free-induction-decay-single-spin][the
+formula]] above and using the orthogonality of the Pauli matrices with respect to the
+scalar product $A,B\mapsto\trace{A^\dagger\cdot\,B}$ we get
+
+$$
+  V_1(t) = V_0 (r_x + \ii r_y) e^{\ii\omega t} .
+$$
+
+Pretending that we know $V_0$ this is enough to obtain $r_x$ and $r_y$. How do we obtain
+$r_z$? This can be accomplished by evolving $\rho$ by $R_x$ or $R_y$, that is, an RF pulse
+by 90 degrees around X or Y. For a unitary $M$ let us define
+
+$$
+  V^M(t) = V_0 \trace{U M\rho M^\dagger U^\dagger \sum_k\sigma_k^-} .
+$$
+
+Hence
+
+$$
+  V_1^M(t) = V_0 \trace{(M \rho M^\dagger) \sigma^-} e^{\ii \omega t} .
+$$
+
+Note that
+
+$$
+  R_x X R_x^\dagger = X, \quad R_x Y R_x^\dagger = Z, \quad R_x Z R_x^\dagger = -Y ,
+$$
+
+and
+
+$$
+  R_y X R_y^\dagger = -Z, \quad R_y Y R_y^\dagger = Y, \quad R_y Z R_y^\dagger = X .
+$$
+
+Hence
+
+\begin{align*}
+  V_1^{I}(t) &= (r_x + \ii r_y) e^{\ii\omega t} , \\
+  V_1^{R_x}(t) &= (r_x - \ii r_z) e^{\ii\omega t} , \\
+  V_1^{R_y}(t) &= (r_z + \ii r_y) e^{\ii\omega t} .
+\end{align*}
+
+We see that two of the three experiments corresponding to $\{I,R_x,R_y\}$ are sufficient
+to determine $\rho$ via state tomography.
+
 * Exercises
 ** Exercise 7.1
 Using the fact that $x$ and $p$ do not commute, and that in fact $[x,p]=\ii\,\hbar$,
@@ -2635,16 +2753,89 @@ thermal equilibrium at temperature $T$ with state $\rho$. What is the largest ef
 pure state that you can construct from $\rho$ using logical labeling? (Hint: take
 advantage of states whose labels have Hamming weight of $n/2$.)
 
-** TODO Exercise 7.45 (State tomography with NMR)
+** Exercise 7.45 (State tomography with NMR)
+:PROPERTIES:
+:CUSTOM_ID: exercise-7.45
+:END:
 Let the voltage measurement
 
 $$
-  V_k(t) = V_0 \trace{e^{-\ii Ht}M_k \rho M_k^\dagger e^{\ii Ht}(\ii X_k + Y_k)}
+  V_k^M(t) = V_0 \trace{e^{-\ii Ht}M_k \rho M_k^\dagger e^{\ii Ht}(\sigma_1^-+\sigma_2^-)}
 $$
 
 be the result of experiment $k$.  Show that for two spins, nine experiments, with $M_0=I$,
-$M_1=R_{x1}$, $M_2=R_{y2}$, $M3_=R_{x2}$, $M_4=R_{x2}R_{x1}$, $M_5=R_{x2}R_{y1}$
+$M_1=R_{x1}$, $M_2=R_{y2}$, $M_3=R_{x2}$, $M_4=R_{x2}R_{x1}$, $M_5=R_{x2}R_{y1}$
 etc. provide sufﬁcient data from which $\rho$ can be reconstructed.
+
+- Remark :: I adjusted the formula for $V_k(t)$ according to my own section [[#chapter-7-state-tomography][on state
+  tomography]].
+
+*** Solution
+The system Hamiltonian looks as follows
+
+$$
+  H = \frac{\omega_1}{2} Z_1 + \frac{\omega_2}{2} Z_2 + \frac{J_{12}}{2} Z_1 Z_2 .
+$$
+
+Let $U_1$, $U_2$, and $U_{12}$ be the evolution operators of the three summads
+(e.g. $U_1(t)=\exp(-\ii\omega_1\,Z_1t/2)$). Note that these three operators commute and
+their product is $\exp(-\ii\,Ht)$. From the section [[#chapter-7-state-tomography][on state tomography]] we directly deduce
+
+$$
+  V_k(t) = V_0 \trace{M_k\rho M_k^\dagger \cdot U_{12}^\dagger
+    ( \sigma_1^- e^{\ii\omega t} + \sigma_2^- e^{\ii\omega t} )U_{12}} .
+$$
+
+The next simplifications are done via sage.
+
+#+begin_src sage
+  J12 = SR.var('J12', domain='real')
+
+  # The factor e^(1/2*i*J12*t) is just there to simplify the expressions
+  U12 = matrix.diagonal([exp(-i*J12*t/2), exp(+i*J12*t/2)])
+  U12 = e^(1/2*i*J12*t) * CX * kron(Id, U12) * CX
+
+  sm1 = kron(sm, Id)
+  sp1 = kron(sp, Id)
+
+  sm2 = kron(Id, sm)
+  sp2 = kron(Id, sp)
+#+end_src
+
+Then we get
+
+#+begin_src sage :results replace :tangle no :cache yes
+  assert U12.H * sm1 * U12 == kron(sm, Rz.subs(theta=-2*J12*t))
+  assert U12.H * sm2 * U12 == kron(Rz.subs(theta=-2*J12*t), sm)
+  "PASSED"
+#+end_src
+
+#+RESULTS[091ca660596867ba73276a3608ce8726489a87f0]:
+: 'PASSED'
+
+Expressing $R_z(-2\theta)$ as $\cos(\theta)+\ii\sin(\theta)Z$ we obtain
+
+$$
+  V_k(t) = V_0 \trace{M_k\rho M_k^\dagger \cdot (
+    \sigma_1^- \cdot \cos(J_{12}t)e^{\ii\omega_1 t} + \sigma_2^- \cdot \cos(J_{12}t)e^{\ii\omega_2 t} +
+    \sigma_1^- Z_2 \cdot \ii\sin(J_{12}t)e^{\ii\omega_1 t} + Z_1 \sigma_2^- \cdot \ii\sin(J_{12}t)e^{\ii\omega_2 t} )} .
+$$
+
+Recall that any mixed state on two qubits can be represented as $\frac{1}{4}I$ plus a sum
+of $A_{i}$ and $A_1B_2$ where $A,B$ are Pauli matrices and $i\in{1,2}$ denotes on which
+qubit it acts. By orthogonality of the Pauli matrices (and $\sigma^-=X+\ii\,Y$)
+$\trace{\rho\sigma_1}$ "sees" the $X_1$ and $Y_1$ terms. Similary $\trace{\rho\sigma_2}$
+sees $X_2$, $Y_2$, $\trace{\rho\sigma_1Z_2}$ sees $X_1Z_2$, $Y_1Z_2$ and
+$\trace{\rho\sigma_2Z_1}$ sees $Z_1X_2$, $Z_1Y_2$. Therefore only one experiment can
+already see eight of the 15 relevant terms. Moreover the four experiments
+
+$$
+  M_k \in \{I, R_{x1}, R_{x2}, R_{y1}\}
+$$
+
+are already sufficient to see all 15 terms. There are certainly other (small) sets of
+experiments which also see all 15 terms. I didn't check if fewer than four experiments are
+sufficient.
 
 ** TODO Exercise 7.46
 How many experiments are sufﬁcient for three spins? Necessary?
@@ -2652,7 +2843,7 @@ How many experiments are sufﬁcient for three spins? Necessary?
 ** Exercise 7.47 (NMR =CNOT= gate)
 Verify that the circuit shown in the top left of Figure 7.19
 
-#+RESULTS[0622d34d01f447d072b0c60668b841234cf2934d]: exercise-7.47-circuit
+#+RESULTS[b269db8349ce0346b44a1614c4ec22a1f5cedaca]: exercise-7.47-circuit
 :            ┌───────────┐
 : q_0: ──────┤0          ├──────
 :      ┌────┐│  sqrt(ZZ) │┌────┐
@@ -2666,15 +2857,24 @@ rotations. Give another circuit using the same building blocks to realize a prop
 gate.
 
 <<remark-exercise-7.47>>
-- Remark :: There is an error in the original exercise. With $H=2\pi\hbar JZ_1Z_2$ the
-  evolution in the middle should be
+- Remark :: There is an error in the original exercise. With $H=2\pi\hbar JZ_1Z_2$ we
+  would have
 
   $$
-  e^{-\ii H / (4\hbar J)}
+  e^{-\ii H / (2\hbar J)} = -I .
   $$
 
-  (which equals $\sqrt{Z_1Z_2}=\diag(1,\ii,\ii,1)$). That is, the divisor in the exponent
-  should be $4$ and not $2$ (otherwise the assertion of the exercise is just wrong).
+  This does not really do anything. Instead a more useful operation is
+
+  $$
+  e^{-\ii H / (8\hbar J)} = \diag(e^{-\ii\pi/4}, e^{\ii\pi/4}, e^{\ii\pi/4}, e^{-\ii\pi/4}) .
+  $$
+
+  Note that this equals $\sqrt{Z_1Z_2}=\diag(1,\ii,\ii,1)$ up to a global phase. Since
+  $\sqrt{Z_1Z_2}$ is easier to handle via symbolic computation we use it in calculations.
+
+  Probably this error is just a typo since defining $H=2\inv\pi\hbar\,JZ_1Z_2$ would also
+  resolve the issue.
 
 #+name: exercise-7.47-circuit
 #+begin_src python :results replace :exports results :cache yes
@@ -3042,3 +3242,7 @@ The following code contains all four implementations and verifies them:
 
 #+RESULTS[dd0fcbcf1f4bbffc39016127783de551680f5598]:
 : 'PASSED'
+
+* References
+
+#+print_bibliography:
