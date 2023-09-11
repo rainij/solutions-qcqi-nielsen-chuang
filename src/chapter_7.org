@@ -16,7 +16,7 @@
   from scipy.constants import physical_constants, pi as pi_numeric
 
   from utils import commutator as com
-  from utils_sage import Id, X, Y, Z, H, Rx, Ry, Rz, CX, kron, bra, ket
+  from utils_sage import Id, X, Y, Z, H, Rx, Ry, Rz, CX, CZ, SWAP, kron, bra, ket
 #+end_src
 
 For circuit drawings (python, not tangled):
@@ -31,11 +31,20 @@ For circuit drawings (python, not tangled):
 #+begin_src python :exports none
   Rx = Gate("Rx", 1, [])
   Ry = Gate("Ry", 1, [])
+  Rz = Gate("Rz", 1, [])
 
   Rxd = Gate("Rx^†", 1, [])
   Ryd = Gate("Ry^†", 1, [])
+  Rzd = Gate("Rz^†", 1, [])
 
   sqrtZZ = Gate("sqrt(ZZ)", 2, [])
+#+end_src
+
+** Preparations
+Some code we rely on
+
+#+begin_src sage
+  w, t = SR.var('ω t', domain='real')
 #+end_src
 
 ** Harmonic Oscillator
@@ -203,7 +212,6 @@ Let us consider the single-spin case now. In this case the system Hamiltonian is
 $H=\frac{\omega}{2}Z$. Using the following sage code ...
 
 #+begin_src sage
-  w, t = SR.var('ω t', domain='real')
   U1 = matrix.diagonal([exp(-i*w*t/2), exp(+i*w*t/2)])
 
   sm = (X + i*Y) / 2
@@ -3361,6 +3369,159 @@ The following code contains all four implementations and verifies them:
 
 #+RESULTS[dd0fcbcf1f4bbffc39016127783de551680f5598]:
 : 'PASSED'
+
+** Exercise 7.52 (Universality of Heisenberg Hamiltonian)
+Show that a swap operation $U$ can be implemented by turning on $J(t)$ for an appropriate
+amount of time in the Heisenberg coupling Hamiltonian of (7.174), to obtain
+
+$$
+  U = e^{-\ii \pi (X_1X_2 + Y_1Y_2 + Z_1Z_2)/4} .
+$$
+
+The $\sqrt{\mathrm{SWAP}}$ gate obtained by turning on the interaction for half this time
+is universal; compute this transform and show how to obtain a =CNOT= gate by composing it
+with single qubit operations.
+
+*** Solution
+Let us first define the Heisenberg Hamiltonian in sage.
+
+#+name: exercise-7.52-1
+#+begin_src sage :results replace
+  Z1 = kron(Z, Id)
+  Z2 = kron(Id, Z)
+
+  X1 = kron(X, Id)
+  X2 = kron(Id, X)
+
+  Y1 = kron(Y, Id)
+  Y2 = kron(Id, Y)
+
+  # Weird: I think Heis0 is better candidate to implement SWAP:
+  #Heis0 = X1*X2 + Y1*Y2
+  Hberg = X1*X2 + Y1*Y2 + Z1*Z2
+  Hberg
+#+end_src
+
+#+RESULTS:
+: [ 1  0  0  0]
+: [ 0 -1  2  0]
+: [ 0  2 -1  0]
+: [ 0  0  0  1]
+
+As we can see the primary action happens on the subspace spanned by $\ket{01}$,
+$\ket{10}$. Let us define the time evolution operator now:
+
+#+name: exercise-7.52-2
+#+begin_src sage :results replace
+  Hberg0 = matrix.diagonal([1, 1, -3, 1])
+
+  V = matrix([
+    [1, 0, 0, 0],
+    [0, 1/sqrt(2), 1/sqrt(2), 0], # Note the *hidden* Hadamard gate here
+    [0, 1/sqrt(2), -1/sqrt(2),0],
+    [0, 0, 0, 1],
+  ])
+
+  assert Hberg0 == V * Hberg * V.H
+
+  # Sometimes sage does not exponentiate certain matrices (even diagonal ones). Therefore
+  # this workaround. It should define e^(-i*Hberg*t):
+  Uberg = V.H * matrix.diagonal([exp(-i*h*t) for h in Hberg0.diagonal()]) * V
+
+  Uberg
+#+end_src
+
+#+RESULTS:
+: [                     e^(-I*t)                             0                             0                             0]
+: [                            0  1/2*e^(3*I*t) + 1/2*e^(-I*t) -1/2*e^(3*I*t) + 1/2*e^(-I*t)                             0]
+: [                            0 -1/2*e^(3*I*t) + 1/2*e^(-I*t)  1/2*e^(3*I*t) + 1/2*e^(-I*t)                             0]
+: [                            0                             0                             0                      e^(-I*t)]
+
+This code shows that letting it evolve for $t=\pi/4$ actually implements the =SWAP= gate:
+
+#+begin_src sage :tangle no :results replace
+  a = -(1/2*I - 1/2)*sqrt(2)
+  assert Uberg.subs(t=pi/4) / a == SWAP
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+It remains to show that $\sqrt{\mathrm{SWAP}}$ together with single qubit rotations can be
+used to implement =CNOT=. Note that it suffices to implement =CZ= since
+$C(X)=X_2C(Z)X_2$. My strategy to find the relevant gates is to somehow produce a
+"diagonal"-gate (see below) and then use Z-rotations only to construct =CZ= (which is
+diagonal). A priori it is not clear that this leads to the goal but it limits the search
+space which is good for manually playing around. Let us define $\sqrt{\mathrm{SWAP}}$
+separately:
+
+#+name: exercise-7.52-3
+#+begin_src sage :results replace
+  sqrtSWAP = matrix([
+    [2,   0,   0, 0],
+    [0, 1+i, 1-i, 0],
+    [0, 1-i, 1+i, 0],
+    [0,   0,   0, 2],
+  ]) / 2
+
+  assert sqrtSWAP^2 == SWAP
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+One way to produce a diagonal gate (which still features a non-trival interaction between
+the two gates) is as follows (I was a bit surprised that it was so easy):
+
+#+begin_src sage :results replace :tangle no
+  sqrtSWAP * Z1 * sqrtSWAP
+#+end_src
+
+#+RESULTS:
+: [ 1  0  0  0]
+: [ 0  I  0  0]
+: [ 0  0 -I  0]
+: [ 0  0  0 -1]
+
+Now this is done it is straightforward to find the Z-rotations which turn this into =CZ=:
+
+#+begin_src sage :results replace :tangle no
+  assert rz1 * rz2.H * sqrtSWAP * Z1 * sqrtSWAP == CZ
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+To summarize, this is how a =CX= gate can be implemented using the square root of the
+=SWAP= gate:
+
+
+#+name: exercise-7.52-circuit-1
+#+begin_src python :results replace :exports results :cache yes
+  qc = QuantumCircuit(2)
+
+  sqrtSWAPGate = Gate("sqrt(SWAP)", 2, [])
+
+  qc.x(1)
+  qc.append(sqrtSWAPGate, [0, 1])
+  qc.z(0)
+  qc.append(sqrtSWAPGate, [0, 1])
+  qc.append(Rz, [0])
+  qc.append(Rzd, [1])
+  qc.x(1)
+
+  qc.draw()
+#+end_src
+
+#+RESULTS[6ad58102f580467e1968c0c06578f6e92a22e809]: exercise-7.52-circuit-1
+:           ┌─────────────┐┌───┐┌─────────────┐ ┌────┐
+: q_0: ─────┤0            ├┤ Z ├┤0            ├─┤ Rz ├──────
+:      ┌───┐│  sqrt(SWAP) │└───┘│  sqrt(SWAP) │┌┴────┴┐┌───┐
+: q_1: ┤ X ├┤1            ├─────┤1            ├┤ Rz^† ├┤ X ├
+:      └───┘└─────────────┘     └─────────────┘└──────┘└───┘
 
 * References
 
