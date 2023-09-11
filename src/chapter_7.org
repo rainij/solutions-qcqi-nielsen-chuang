@@ -3450,7 +3450,7 @@ This code shows that letting it evolve for $t=\pi/4$ actually implements the =SW
 
 It remains to show that $\sqrt{\mathrm{SWAP}}$ together with single qubit rotations can be
 used to implement =CNOT=. Note that it suffices to implement =CZ= since
-$C(X)=X_2C(Z)X_2$. My strategy to find the relevant gates is to somehow produce a
+$C(X)=H_2C(Z)H_2$. My strategy to find the relevant gates is to somehow produce a
 "diagonal"-gate (see below) and then use Z-rotations only to construct =CZ= (which is
 diagonal). A priori it is not clear that this leads to the goal but it limits the search
 space which is good for manually playing around. Let us define $\sqrt{\mathrm{SWAP}}$
@@ -3498,6 +3498,12 @@ Now this is done it is straightforward to find the Z-rotations which turn this i
 To summarize, this is how a =CX= gate can be implemented using the square root of the
 =SWAP= gate:
 
+#+RESULTS[0bd8bced3b4b5aa922368ed0cc944994bdea992d]: exercise-7.52-circuit-1
+:           ┌─────────────┐┌───┐┌─────────────┐ ┌────┐
+: q_0: ─────┤0            ├┤ Z ├┤0            ├─┤ Rz ├──────
+:      ┌───┐│  sqrt(SWAP) │└───┘│  sqrt(SWAP) │┌┴────┴┐┌───┐
+: q_1: ┤ H ├┤1            ├─────┤1            ├┤ Rz^† ├┤ H ├
+:      └───┘└─────────────┘     └─────────────┘└──────┘└───┘
 
 #+name: exercise-7.52-circuit-1
 #+begin_src python :results replace :exports results :cache yes
@@ -3505,23 +3511,16 @@ To summarize, this is how a =CX= gate can be implemented using the square root o
 
   sqrtSWAPGate = Gate("sqrt(SWAP)", 2, [])
 
-  qc.x(1)
+  qc.h(1)
   qc.append(sqrtSWAPGate, [0, 1])
   qc.z(0)
   qc.append(sqrtSWAPGate, [0, 1])
   qc.append(Rz, [0])
   qc.append(Rzd, [1])
-  qc.x(1)
+  qc.h(1)
 
   qc.draw()
 #+end_src
-
-#+RESULTS[6ad58102f580467e1968c0c06578f6e92a22e809]: exercise-7.52-circuit-1
-:           ┌─────────────┐┌───┐┌─────────────┐ ┌────┐
-: q_0: ─────┤0            ├┤ Z ├┤0            ├─┤ Rz ├──────
-:      ┌───┐│  sqrt(SWAP) │└───┘│  sqrt(SWAP) │┌┴────┴┐┌───┐
-: q_1: ┤ X ├┤1            ├─────┤1            ├┤ Rz^† ├┤ X ├
-:      └───┘└─────────────┘     └─────────────┘└──────┘└───┘
 
 * References
 
