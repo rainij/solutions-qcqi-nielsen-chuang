@@ -33,42 +33,42 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0253c5e">Setup</a>
+<li><a href="#org8ab6e4e">Setup</a>
 <ul>
-<li><a href="#org271a2e8">Python Libraries</a></li>
-<li><a href="#org6878c13">Bra-Ket</a></li>
-<li><a href="#org25422c1">The Trace and the Partial Trace</a></li>
+<li><a href="#org018b101">Python Libraries</a></li>
+<li><a href="#org98c47ba">Bra-Ket</a></li>
+<li><a href="#org728caba">The Trace and the Partial Trace</a></li>
 </ul>
 </li>
-<li><a href="#orgab6cdd0">Exercises</a>
+<li><a href="#org7dc75a7">Exercises</a>
 <ul>
-<li><a href="#org40be767">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</a></li>
-<li><a href="#orge852dd3">Exercise 2.72 (Bloch sphere for mixed states)</a></li>
-<li><a href="#org2fe8700">Exercise 2.73</a></li>
-<li><a href="#orgb94d328">Exercise 2.74</a></li>
-<li><a href="#orged2244b">Exercise 2.75</a></li>
-<li><a href="#org85f753c">Exercise 2.76</a></li>
-<li><a href="#orgec6217b">Exercise 2.77</a></li>
-<li><a href="#orgca84bf4">Exercise 2.78</a></li>
-<li><a href="#orgd834b2d">Exercise 2.79</a></li>
-<li><a href="#orgb7f0fac">Exercise 2.80</a></li>
-<li><a href="#org5fb30eb">Exercise 2.81 (Freedom in purifications)</a></li>
-<li><a href="#org091c1d5">Exercise 2.82</a></li>
+<li><a href="#orgef0a2b9">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</a></li>
+<li><a href="#orga6d8a1c">Exercise 2.72 (Bloch sphere for mixed states)</a></li>
+<li><a href="#org3a56878">Exercise 2.73</a></li>
+<li><a href="#org84bf554">Exercise 2.74</a></li>
+<li><a href="#org63edd43">Exercise 2.75</a></li>
+<li><a href="#org46cdc75">Exercise 2.76</a></li>
+<li><a href="#orgd1076ef">Exercise 2.77</a></li>
+<li><a href="#org24b8289">Exercise 2.78</a></li>
+<li><a href="#orgd05b41e">Exercise 2.79</a></li>
+<li><a href="#org49a126e">Exercise 2.80</a></li>
+<li><a href="#orga54504c">Exercise 2.81 (Freedom in purifications)</a></li>
+<li><a href="#org534e065">Exercise 2.82</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org0253c5e" class="outline-2">
-<h2 id="org0253c5e">Setup</h2>
-<div class="outline-text-2" id="text-org0253c5e">
+<div id="outline-container-org8ab6e4e" class="outline-2">
+<h2 id="org8ab6e4e">Setup</h2>
+<div class="outline-text-2" id="text-org8ab6e4e">
 </div>
-<div id="outline-container-org271a2e8" class="outline-3">
-<h3 id="org271a2e8">Python Libraries</h3>
-<div class="outline-text-3" id="text-org271a2e8">
+<div id="outline-container-org018b101" class="outline-3">
+<h3 id="org018b101">Python Libraries</h3>
+<div class="outline-text-3" id="text-org018b101">
 <div class="org-src-container">
-<pre class="src src-python" id="org41b69aa"><span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> product
+<pre class="src src-python" id="org4414523"><span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> product
 
 <span class="org-keyword">import</span> sympy <span class="org-keyword">as</span> sp
 <span class="org-keyword">from</span> sympy <span class="org-keyword">import</span> Matrix, PermutationMatrix, sqrt
@@ -78,9 +78,9 @@
 </div>
 </div>
 
-<div id="outline-container-org6878c13" class="outline-3">
-<h3 id="org6878c13">Bra-Ket</h3>
-<div class="outline-text-3" id="text-org6878c13">
+<div id="outline-container-org98c47ba" class="outline-3">
+<h3 id="org98c47ba">Bra-Ket</h3>
+<div class="outline-text-3" id="text-org98c47ba">
 <p>
 For convenience we define two functions which map bit-strings to the corresponding bra and ket vectors.
 </p>
@@ -101,9 +101,9 @@ For convenience we define two functions which map bit-strings to the correspondi
 </div>
 </div>
 
-<div id="outline-container-org25422c1" class="outline-3">
-<h3 id="org25422c1">The Trace and the Partial Trace</h3>
-<div class="outline-text-3" id="text-org25422c1">
+<div id="outline-container-org728caba" class="outline-3">
+<h3 id="org728caba">The Trace and the Partial Trace</h3>
+<div class="outline-text-3" id="text-org728caba">
 <p>
 In the following we define the trace for arbitrary square matrices and the partial trace for square
 matrices whose dimension is a power of two. Note that the concept of the partial trace only makes
@@ -113,7 +113,7 @@ the interface simple and since probably nothing else is needed in the context of
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org0d0ed4e"><span class="org-keyword">def</span> <span class="org-function-name">trace</span>(M: Matrix):  <span class="org-comment-delimiter"># </span><span class="org-comment">TODO: what is the correct return type?</span>
+<pre class="src src-python" id="org7d65fbe"><span class="org-keyword">def</span> <span class="org-function-name">trace</span>(M: Matrix):  <span class="org-comment-delimiter"># </span><span class="org-comment">TODO: what is the correct return type?</span>
     <span class="org-doc">"""Returns the sum of the diagonal elements. Requires a square matrix."""</span>
     <span class="org-variable-name">dim</span> <span class="org-operator">=</span> M.shape[0]
     <span class="org-keyword">assert</span> dim <span class="org-operator">==</span> M.shape[1], <span class="org-string">"M must be square"</span>
@@ -168,7 +168,7 @@ As a quick demo let us compute some partial traces of the following matrices:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org8bcfdb1"><span class="org-variable-name">A</span> <span class="org-operator">=</span> Matrix([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
+<pre class="src src-python" id="orgb17869a"><span class="org-variable-name">A</span> <span class="org-operator">=</span> Matrix([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
 <span class="org-variable-name">B</span> <span class="org-operator">=</span> Matrix([[8<span class="org-operator">*</span>i <span class="org-operator">+</span> j <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(8)])
 </pre>
 </div>
@@ -179,7 +179,7 @@ to 63).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgcbdacee"><span class="org-variable-name">A0</span> <span class="org-operator">=</span> Matrix([[5, 9], [21, 25]])
+<pre class="src src-python" id="org18cccf6"><span class="org-variable-name">A0</span> <span class="org-operator">=</span> Matrix([[5, 9], [21, 25]])
 <span class="org-variable-name">B0</span> <span class="org-operator">=</span> Matrix([[9, 13, 17, 21], [41, 45, 49, 53], [73, 77, 81, 85], [105, 109, 113, 117]])
 
 <span class="org-variable-name">A1</span> <span class="org-operator">=</span> Matrix([[10, 12], [18, 20]])
@@ -203,7 +203,7 @@ PASSED
 <p>
 Let us briefly outline a method of computing the partial trace with the help of standard
 <code>sympy</code> functionality. I used this method to quickly calculate the asserted results in the
-<a href="#org7078dc9">listing</a> above - independently of <code>ptrace</code>.
+<a href="#org3b56ed9">listing</a> above - independently of <code>ptrace</code>.
 </p>
 
 <p>
@@ -232,7 +232,7 @@ adjoint operation is needed. The following code shows how simple this is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgbb136c9"><span class="org-variable-name">m1</span> <span class="org-operator">=</span> Permutation(7)(1,4)(3,6)
+<pre class="src src-python" id="orgc52bec3"><span class="org-variable-name">m1</span> <span class="org-operator">=</span> Permutation(7)(1,4)(3,6)
 <span class="org-variable-name">m2</span> <span class="org-operator">=</span> Permutation(3)(1,2)
 
 <span class="org-variable-name">M1</span> <span class="org-operator">=</span> PermutationMatrix(m1).as_explicit()
@@ -253,7 +253,7 @@ Finally, <code>ptrace(B, [0,1])</code> is the same as <code>ptrace(ptrace(B, [1]
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org5c9db95"><span class="org-keyword">assert</span> ptrace(B, [0, 2]) <span class="org-operator">==</span> ptrace(ptrace(B, [2]), [0])  <span class="org-comment-delimiter"># </span><span class="org-comment">easier to do 2 first, then 0 because ...</span>
+<pre class="src src-python" id="org278026a"><span class="org-keyword">assert</span> ptrace(B, [0, 2]) <span class="org-operator">==</span> ptrace(ptrace(B, [2]), [0])  <span class="org-comment-delimiter"># </span><span class="org-comment">easier to do 2 first, then 0 because ...</span>
 <span class="org-keyword">assert</span> ptrace(B, [0, 2]) <span class="org-operator">==</span> ptrace(ptrace(B, [0]), [1])  <span class="org-comment-delimiter"># </span><span class="org-comment">... otherwise needed to adjust indices</span>
 <span class="org-keyword">assert</span> ptrace(B, [2, 0]) <span class="org-operator">==</span> ptrace(ptrace(B, [2]), [0])
 <span class="org-keyword">assert</span> ptrace(B, [0, 1, 2]) <span class="org-operator">==</span> Matrix([[trace(B)]])
@@ -269,22 +269,22 @@ PASSED
 </div>
 </div>
 
-<div id="outline-container-orgab6cdd0" class="outline-2">
-<h2 id="orgab6cdd0">Exercises</h2>
-<div class="outline-text-2" id="text-orgab6cdd0">
+<div id="outline-container-org7dc75a7" class="outline-2">
+<h2 id="org7dc75a7">Exercises</h2>
+<div class="outline-text-2" id="text-org7dc75a7">
 </div>
-<div id="outline-container-org40be767" class="outline-3">
-<h3 id="org40be767">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</h3>
-<div class="outline-text-3" id="text-org40be767">
+<div id="outline-container-orgef0a2b9" class="outline-3">
+<h3 id="orgef0a2b9">Exercise 2.71 (Criterion to decide if a state is mixed or pure)</h3>
+<div class="outline-text-3" id="text-orgef0a2b9">
 <p>
 Let \(\rho\) be a density operator. Show that \(\trace{\rho^2}\leq1\), with equality if and only if
 \(\rho\) is a pure state.
 </p>
 </div>
 
-<div id="outline-container-orgd6ef875" class="outline-4">
-<h4 id="orgd6ef875">Proof</h4>
-<div class="outline-text-4" id="text-orgd6ef875">
+<div id="outline-container-org2a7d6a5" class="outline-4">
+<h4 id="org2a7d6a5">Proof</h4>
+<div class="outline-text-4" id="text-org2a7d6a5">
 <p>
 By the characterization of density operators (Theorem 2.5) there are \(0 < p_i\leq 1\) and orthonormal
 \(\{|\psi_i\rangle\}\) such that:
@@ -315,9 +315,9 @@ that \(\rho\) is pure in that case. QED.
 </div>
 </div>
 
-<div id="outline-container-orge852dd3" class="outline-3">
-<h3 id="orge852dd3">Exercise 2.72 (Bloch sphere for mixed states)</h3>
-<div class="outline-text-3" id="text-orge852dd3">
+<div id="outline-container-orga6d8a1c" class="outline-3">
+<h3 id="orga6d8a1c">Exercise 2.72 (Bloch sphere for mixed states)</h3>
+<div class="outline-text-3" id="text-orga6d8a1c">
 <p>
 The Bloch sphere picture for pure states of a single qubit was introduced in Section 1.2. This
 description has an important generalization to mixed states as follows.
@@ -346,9 +346,9 @@ in Section 1.2.</li>
 </ol>
 </div>
 
-<div id="outline-container-orga953a49" class="outline-4">
-<h4 id="orga953a49">Proof of 1, 3, and 4</h4>
-<div class="outline-text-4" id="text-orga953a49">
+<div id="outline-container-org102e09d" class="outline-4">
+<h4 id="org102e09d">Proof of 1, 3, and 4</h4>
+<div class="outline-text-4" id="text-org102e09d">
 <p>
 The matrix representation of \(\rho\) looks as follows:
 </p>
@@ -427,9 +427,9 @@ the rest of claim 1.
 </div>
 </div>
 
-<div id="outline-container-orgf3858ab" class="outline-4">
-<h4 id="orgf3858ab">Solution to 2</h4>
-<div class="outline-text-4" id="text-orgf3858ab">
+<div id="outline-container-org1111548" class="outline-4">
+<h4 id="org1111548">Solution to 2</h4>
+<div class="outline-text-4" id="text-org1111548">
 <p>
 \(I/2\) is represented by \(\overrightarrow{r}=(0,0,0)\). It corresponds to the ensemble \(\{(1/2,|0\rangle),(1/2,|1\rangle)\}\).
 </p>
@@ -437,9 +437,9 @@ the rest of claim 1.
 </div>
 </div>
 
-<div id="outline-container-org2fe8700" class="outline-3">
-<h3 id="org2fe8700">Exercise 2.73</h3>
-<div class="outline-text-3" id="text-org2fe8700">
+<div id="outline-container-org3a56878" class="outline-3">
+<h3 id="org3a56878">Exercise 2.73</h3>
+<div class="outline-text-3" id="text-org3a56878">
 <p>
 Let \(\rho\) be a density operator. A minimal ensemble for \(\rho\) is an ensemble
 \(\{(p_i, |\psi_i\rangle)\}\) containing a number of elements equal to the rank of \(\rho\). Let
@@ -462,9 +462,9 @@ an inverse.)
 </p>
 </div>
 
-<div id="outline-container-org472a24c" class="outline-4">
-<h4 id="org472a24c">Proof</h4>
-<div class="outline-text-4" id="text-org472a24c">
+<div id="outline-container-org766070f" class="outline-4">
+<h4 id="org766070f">Proof</h4>
+<div class="outline-text-4" id="text-org766070f">
 <p>
 Consider the representation of \(\rho\) by its eigenvectors (with non-zero eigenvalues):
 </p>
@@ -531,9 +531,9 @@ basis on the support of \(\rho\) with respect to the inner product given by
 </div>
 </div>
 
-<div id="outline-container-orgb94d328" class="outline-3">
-<h3 id="orgb94d328">Exercise 2.74</h3>
-<div class="outline-text-3" id="text-orgb94d328">
+<div id="outline-container-org84bf554" class="outline-3">
+<h3 id="org84bf554">Exercise 2.74</h3>
+<div class="outline-text-3" id="text-org84bf554">
 <p>
 Suppose a composite of systems A and B is in the state \(|a\rangle|b\rangle\), where \(|a\rangle\) is a
 pure state of system A, and \(|b\rangle\) is a pure state of system B. Show that the reduced density
@@ -541,9 +541,9 @@ operator of system A alone is a pure state.
 </p>
 </div>
 
-<div id="outline-container-org12fab81" class="outline-4">
-<h4 id="org12fab81">Proof</h4>
-<div class="outline-text-4" id="text-org12fab81">
+<div id="outline-container-org74e5cc1" class="outline-4">
+<h4 id="org74e5cc1">Proof</h4>
+<div class="outline-text-4" id="text-org74e5cc1">
 <p>
 The joint state is indeed a <i>simple</i> tensor product (i.e. a product state):
 </p>
@@ -581,17 +581,17 @@ This is indeed the pure state \(|a\rangle\). QED.
 </div>
 </div>
 
-<div id="outline-container-orged2244b" class="outline-3">
-<h3 id="orged2244b">Exercise 2.75</h3>
-<div class="outline-text-3" id="text-orged2244b">
+<div id="outline-container-org63edd43" class="outline-3">
+<h3 id="org63edd43">Exercise 2.75</h3>
+<div class="outline-text-3" id="text-org63edd43">
 <p>
 For each of the four Bell states, find the reduced density operator for each qubit.
 </p>
 </div>
 
-<div id="outline-container-org258f00c" class="outline-4">
-<h4 id="org258f00c">Solution</h4>
-<div class="outline-text-4" id="text-org258f00c">
+<div id="outline-container-org19c2979" class="outline-4">
+<h4 id="org19c2979">Solution</h4>
+<div class="outline-text-4" id="text-org19c2979">
 <p>
 The four Bell States are given by:
 </p>
@@ -635,18 +635,18 @@ state.
 </div>
 </div>
 
-<div id="outline-container-org85f753c" class="outline-3">
-<h3 id="org85f753c">Exercise 2.76</h3>
-<div class="outline-text-3" id="text-org85f753c">
+<div id="outline-container-org46cdc75" class="outline-3">
+<h3 id="org46cdc75">Exercise 2.76</h3>
+<div class="outline-text-3" id="text-org46cdc75">
 <p>
 Extend the proof of the Schmidt decomposition to the case where A and B may have state spaces of
 different dimensionality.
 </p>
 </div>
 
-<div id="outline-container-org16bd583" class="outline-4">
-<h4 id="org16bd583">Proof</h4>
-<div class="outline-text-4" id="text-org16bd583">
+<div id="outline-container-orgc406459" class="outline-4">
+<h4 id="orgc406459">Proof</h4>
+<div class="outline-text-4" id="text-orgc406459">
 <p>
 Of course one may reuse the proof from the book by utilizing the general form of the singular value
 decompostion for non-square matrices.
@@ -690,9 +690,9 @@ This shows the claim. QED.
 </div>
 </div>
 
-<div id="outline-container-orgec6217b" class="outline-3">
-<h3 id="orgec6217b">Exercise 2.77</h3>
-<div class="outline-text-3" id="text-orgec6217b">
+<div id="outline-container-orgd1076ef" class="outline-3">
+<h3 id="orgd1076ef">Exercise 2.77</h3>
+<div class="outline-text-3" id="text-orgd1076ef">
 <p>
 Suppose ABC is a three component quantum system. Show by example that there are quantum states of
 such systems which can not be written in the form
@@ -710,9 +710,9 @@ vectors of the respective systems.
 </p>
 </div>
 
-<div id="outline-container-org36370d0" class="outline-4">
-<h4 id="org36370d0">Proof</h4>
-<div class="outline-text-4" id="text-org36370d0">
+<div id="outline-container-orgb7af416" class="outline-4">
+<h4 id="orgb7af416">Proof</h4>
+<div class="outline-text-4" id="text-orgb7af416">
 <p>
 Suppose a Schmidt-like decomposition is possible for a state with respect to ABC. Then the reduced
 density operators in A, B and C must have the same set of eigenvalues. Hence, to show that such a
@@ -727,7 +727,7 @@ examples). As output it reports the eigenvalues of the density matrix of each su
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org97e2211"><span class="org-keyword">def</span> <span class="org-function-name">get_eigenvals_of_ABC</span>(state_vector: Matrix):
+<pre class="src src-python" id="orgd8e2bd6"><span class="org-keyword">def</span> <span class="org-function-name">get_eigenvals_of_ABC</span>(state_vector: Matrix):
     <span class="org-doc">"""Calculate eigenvals of subsystems of three-qubit system (for Exercise 2.77)."""</span>
     <span class="org-variable-name">density</span> <span class="org-operator">=</span> state_vector <span class="org-operator">*</span> state_vector.H
     <span class="org-variable-name">DA</span> <span class="org-operator">=</span> ptrace(density, [1, 2])
@@ -757,7 +757,7 @@ cannot be decomposed as required:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org5da2251">get_eigenvals_of_ABC((ket(<span class="org-string">'000'</span>) <span class="org-operator">+</span> ket(<span class="org-string">'010'</span>) <span class="org-operator">+</span> ket(<span class="org-string">'011'</span>)) <span class="org-operator">/</span> sqrt(3))
+<pre class="src src-python" id="orgef01aa4">get_eigenvals_of_ABC((ket(<span class="org-string">'000'</span>) <span class="org-operator">+</span> ket(<span class="org-string">'010'</span>) <span class="org-operator">+</span> ket(<span class="org-string">'011'</span>)) <span class="org-operator">/</span> sqrt(3))
 </pre>
 </div>
 
@@ -775,9 +775,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgca84bf4" class="outline-3">
-<h3 id="orgca84bf4">Exercise 2.78</h3>
-<div class="outline-text-3" id="text-orgca84bf4">
+<div id="outline-container-org24b8289" class="outline-3">
+<h3 id="org24b8289">Exercise 2.78</h3>
+<div class="outline-text-3" id="text-org24b8289">
 <p>
 Prove that a state \(|\psi\rangle\) of a composite system AB is a product state if and only if it has
 Schmidt number 1. Prove that \(|\psi\rangle\) is a product state if and only if \(\rho^A\) (and thus
@@ -785,9 +785,9 @@ Schmidt number 1. Prove that \(|\psi\rangle\) is a product state if and only if 
 </p>
 </div>
 
-<div id="outline-container-org1746efe" class="outline-4">
-<h4 id="org1746efe">Proof</h4>
-<div class="outline-text-4" id="text-org1746efe">
+<div id="outline-container-orge6a1b43" class="outline-4">
+<h4 id="orge6a1b43">Proof</h4>
+<div class="outline-text-4" id="text-orge6a1b43">
 <p>
 A product state is a state which can be represented by a <i>simple</i> tensor product
 \(|\alpha\rangle\otimes|\beta\rangle\). But this is by definition the same as having Schmidt-Rank 1.
@@ -821,9 +821,9 @@ i.e. \(\rho^2=\rho\)) if \(r=1\). This is the same as \(|\psi\rangle\) being a p
 </div>
 </div>
 
-<div id="outline-container-orgd834b2d" class="outline-3">
-<h3 id="orgd834b2d">Exercise 2.79</h3>
-<div class="outline-text-3" id="text-orgd834b2d">
+<div id="outline-container-orgd05b41e" class="outline-3">
+<h3 id="orgd05b41e">Exercise 2.79</h3>
+<div class="outline-text-3" id="text-orgd05b41e">
 <p>
 Consider a composite system consisting of two qubits. Find the Schmidt decompositions of the states
 </p>
@@ -837,9 +837,9 @@ Consider a composite system consisting of two qubits. Find the Schmidt decomposi
 </p>
 </div>
 
-<div id="outline-container-org798563d" class="outline-4">
-<h4 id="org798563d">Solution</h4>
-<div class="outline-text-4" id="text-org798563d">
+<div id="outline-container-orgd462200" class="outline-4">
+<h4 id="orgd462200">Solution</h4>
+<div class="outline-text-4" id="text-orgd462200">
 <p>
 The first state clearly is already represented as Schmidt-Decomposition.
 </p>
@@ -914,9 +914,9 @@ Note that the fact that the eigenvectors can be chosen with real entries simplif
 </div>
 </div>
 
-<div id="outline-container-orgb7f0fac" class="outline-3">
-<h3 id="orgb7f0fac">Exercise 2.80</h3>
-<div class="outline-text-3" id="text-orgb7f0fac">
+<div id="outline-container-org49a126e" class="outline-3">
+<h3 id="org49a126e">Exercise 2.80</h3>
+<div class="outline-text-3" id="text-org49a126e">
 <p>
 Suppose \(|\psi\rangle\) and \(|\varphi\rangle\) are two pure states of a composite quantum system with
 components A and B, with identical Schmidt coefficients. Show that there are unitary transformations
@@ -924,9 +924,9 @@ components A and B, with identical Schmidt coefficients. Show that there are uni
 </p>
 </div>
 
-<div id="outline-container-orgadc17fc" class="outline-4">
-<h4 id="orgadc17fc">Proof</h4>
-<div class="outline-text-4" id="text-orgadc17fc">
+<div id="outline-container-orgedfce80" class="outline-4">
+<h4 id="orgedfce80">Proof</h4>
+<div class="outline-text-4" id="text-orgedfce80">
 <p>
 That \(|\psi\rangle\) and \(|\varphi\rangle\) have the same Schmidt coefficients means that there are
 positive numbers \(\lambda_i\) such that
@@ -947,9 +947,9 @@ unitary operators satisfy the claim.
 </div>
 </div>
 
-<div id="outline-container-org5fb30eb" class="outline-3">
-<h3 id="org5fb30eb">Exercise 2.81 (Freedom in purifications)</h3>
-<div class="outline-text-3" id="text-org5fb30eb">
+<div id="outline-container-orga54504c" class="outline-3">
+<h3 id="orga54504c">Exercise 2.81 (Freedom in purifications)</h3>
+<div class="outline-text-3" id="text-orga54504c">
 <p>
 Let \(|AR_1\rangle\) and \(|AR_2\rangle\) be two purifications of a state \(\rho^A\) to a composite system
 AR. Prove that there exists a unitary transformation \(U_R\) acting on system R such that
@@ -962,9 +962,9 @@ AR. Prove that there exists a unitary transformation \(U_R\) acting on system R 
 </p>
 </div>
 
-<div id="outline-container-org9817606" class="outline-4">
-<h4 id="org9817606">Proof</h4>
-<div class="outline-text-4" id="text-org9817606">
+<div id="outline-container-orgefcd5b7" class="outline-4">
+<h4 id="orgefcd5b7">Proof</h4>
+<div class="outline-text-4" id="text-orgefcd5b7">
 <p>
 Let
 </p>
@@ -1055,9 +1055,9 @@ reasoning for the special case the particular value of the trace was unimportant
 </div>
 </div>
 
-<div id="outline-container-org091c1d5" class="outline-3">
-<h3 id="org091c1d5">Exercise 2.82</h3>
-<div class="outline-text-3" id="text-org091c1d5">
+<div id="outline-container-org534e065" class="outline-3">
+<h3 id="org534e065">Exercise 2.82</h3>
+<div class="outline-text-3" id="text-org534e065">
 <p>
 Suppose \(\{p_i , |\psi_i\rangle\}\) is an ensemble of states generating a density matrix \(\rho\)
 for a quantum system A. Introduce a system R with orthonormal basis \(|i\rangle\).
@@ -1079,9 +1079,9 @@ ensembles always have at least \(r\) (rank) members but might have more, see als
 </p>
 </div>
 
-<div id="outline-container-org2ddd59f" class="outline-4">
-<h4 id="org2ddd59f">Proof of 1</h4>
-<div class="outline-text-4" id="text-org2ddd59f">
+<div id="outline-container-orgaad0ff0" class="outline-4">
+<h4 id="orgaad0ff0">Proof of 1</h4>
+<div class="outline-text-4" id="text-orgaad0ff0">
 <p>
 This was <i>essentially</i> shown in the book right before Exercise 2.79! In the book it was <i>implicitly</i>
 assumed that the \(|\psi\rangle\) are orthonormal (by using the Schmidt-Decomposition of \(\rho\)). But
@@ -1090,9 +1090,9 @@ the proof did not use this fact. QED.
 </div>
 </div>
 
-<div id="outline-container-org5e98ce9" class="outline-4">
-<h4 id="org5e98ce9">Proof of 2</h4>
-<div class="outline-text-4" id="text-org5e98ce9">
+<div id="outline-container-org33bb737" class="outline-4">
+<h4 id="org33bb737">Proof of 2</h4>
+<div class="outline-text-4" id="text-org33bb737">
 <p>
 Recall that:
 </p>
@@ -1163,9 +1163,9 @@ and
 </div>
 </div>
 
-<div id="outline-container-org831cf2f" class="outline-4">
-<h4 id="org831cf2f">Proof of 3</h4>
-<div class="outline-text-4" id="text-org831cf2f">
+<div id="outline-container-org5c46fcd" class="outline-4">
+<h4 id="org5c46fcd">Proof of 3</h4>
+<div class="outline-text-4" id="text-org5c46fcd">
 <p>
 Unfortunately there is a notation clash here. Let us rename the orthonormal set used in part 1 to
 \((|i_0\rangle)\) and the corresponding purified vector to \(|AR_0\rangle\). By exercise 2.81 (freedom
