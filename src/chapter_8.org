@@ -1,0 +1,353 @@
+#+title:  Chapter 8
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:sage :session *sage-chapter-8* :tangle chapter_8.sage
+
+
+#+toc: headlines 2
+
+* Exercises
+** Exercise 8.1 (Unitary evolution as a quantum operation)
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.1
+:END:
+Pure states evolve under unitary transforms as $\ket{\psi}\mapsto\,U\ket{\psi}$. Show
+that, equivalently, we may write $\rho\mapsto\calE(\rho)\equiv\,U\rho\,U^\dagger$,
+for $\rho=\proj{\psi}$.
+
+*** Proof
+**** Preparation
+This is a really basic question and it should actually be obvious /if/ you really
+understand the bra-ket notation (beware however that it might /appear/ to be obvious if
+you merely feel /familiar/ with it).
+
+To give a meaningful solution beyond "it is obvious" we take a step back and recall what
+the [[https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation][bra-ket]] notation actually means. In quantum mechanics we always work on (complex)
+Hilbert spaces. A Hilbert space is a (complex) vector space $\calH$ equipped with a
+[[https://en.wikipedia.org/wiki/Sesquilinear_form][sesquilinear form]], which has to obey certain axioms to be mentioned soon. We denote it by
+
+$$
+  (\ket{\psi}, \ket{\varphi}) .
+$$
+
+A sesquilinear form is a mapping $\calH\times\calH\to\CC$ which is linear in the second
+argument and conjugate-linear in the first argument. For a Hilbert space we require in
+addition that (*positivity*)
+
+$$
+  \forall \ket{\psi} \in \calH\backslash\{0\}: \; (\ket{\psi}, \ket{\psi}) > 0 ,
+$$
+
+and that (*symmetry*)
+
+$$
+  \forall \ket{\psi}, \ket{\varphi} \in \calH : \; (\ket{\psi},\ket{\varphi})
+  = \overline{(\ket{\varphi},\ket{\psi})} .
+$$
+
+(The bar means /complex conjugation/.) Such a sesquilinear form is called a *scalar
+product*. This is what makes a complex /[[https://en.wikipedia.org/wiki/Hilbert_space][Hilbert space]]/, a complex vector space equipped
+with a scalar product. There are also real Hilbert spaces but we do not need them
+here. Note that we are always talking about /finite/ dimensional vector spaces. In case of
+infinite dimensional vector spaces a *[[https://en.wikipedia.org/wiki/Complete_metric_space][completeness]]* axiom is required in addition. (In the
+finite dimensional case this axiom follows automatically from the [[https://en.wikipedia.org/wiki/Completeness_of_the_real_numbers][completeness]] axiom of
+real (and hence complex) numbers).
+
+In the framework of Dirac's bra-ket notation the kets are just the elements of the Hilbert
+space. We already used this in the above introduction. The bras are elements of the /dual
+space/ $\calH^*$ which is just the space of linear maps $\calH\to\CC$. For any
+$\ket{\psi}\in\calH$ an example of such a map is given by
+
+$$
+  \ket{\varphi} \mapsto (\ket{\psi}, \ket{\varphi}) .
+$$
+
+<<exercise-8.1-canonical-iso>>
+In fact, one can prove that any element of $\calH^*$ (that is, any linear map
+$\calH\to\CC$) can be written like this for a /unique/ $\ket{\psi}$. This is called the
+*canonical isomorphism* between $\calH$ and $\calH^*$ (it is called /canonical/ since we
+could define it without knowing anything concrete about our Hilbert space, in other
+words it is definable in the most abstract terms).
+
+This canonical isomorphism actually motivates the bras. A bra $\bra{\psi}\in\calH^*$ is
+the linear map given by
+
+$$
+  \bra{\psi} : \; \ket{\varphi} \mapsto \sprod{\psi}{\varphi} := (\ket{\psi}, \ket{\varphi}) .
+$$
+
+Having said that, terms like
+
+$$
+  \bra{\psi} U \ket{\varphi}
+$$
+
+are the same as
+
+$$
+  \bra{\psi} U \ket{\varphi} = (\bra{\psi}\circ U) \ket{\varphi} = (\ket{\psi}, U\ket{\varphi}) ,
+$$
+
+where $\circ$ denotes the composition of functions ($U$ and $\bra{\psi}$ as linear maps
+are both functions of course). And of course, the bra-ket notation also makes the above
+introduced notation for the scalar product obsolete since basically the bra and the ket
+are the left and right half of the scalar product.
+
+**** The actual proof
+Let us return to the actual exercise. We use the above notation $(\ldots,\ldots)$ for the
+scalar product to make the derivation clearer. Let $U$ be a unitary operator on $\calH$
+and let
+
+$$
+  \rho = \rho_{\ket{\psi}} = \proj{\psi} .
+$$
+
+The task is to calculate $\rho_{U\ket{\psi}}$ and to show that it is equal to
+$\calE(\rho_{\ket{\psi}})$. Note that $\rho$ is a linear map $\calH\to\calH$ given by
+
+$$
+  \rho \ket{\varphi} = \ket{\psi} \sprod{\psi}{\varphi} = (\ket{\psi}, \ket{\varphi}) \ket{\varphi} .
+$$
+
+Hence
+
+\begin{align*}
+  \rho_{U\ket{\psi}} \ket{\varphi} &= (U\ket{\psi}, \ket{\varphi}) U\ket{\psi} \\
+  &= (\ket{\psi}, U^\dagger\ket{\varphi}) U\ket{\psi} \\
+  &= \bra{\psi} U^\dagger \ket{\varphi} U\ket{\psi} \\
+  &= U\ket{\psi} \bra{\psi} U^\dagger \ket{\varphi} \\
+  &= U\rho_{\ket{\psi}} U^\dagger \ket{\varphi} .
+\end{align*}
+
+The first equality follows from the definition of $\rho_{\ket{\psi}}$. The second one
+follows from the definition of the (hermitian) [[https://en.wikipedia.org/wiki/Hermitian_adjoint][adjoint]] operator. The third one is the
+definition of the bras. The fourth equality just moves the complex number
+$\bra{\psi}U\ket{\varphi}$ to the right. The last equation is again the definition of
+$\rho_{\ket{\psi}}$.
+
+Since the above eqation holds for all $\varphi$ we have
+
+$$
+  \rho_{U\ket{\psi}} = U\rho_{\ket{\psi}} U^\dagger .
+$$
+
+QED.
+
+- Remark :: There is another slightly deeper way to see this result. Let us denote the
+  above mentioned [[exercise-8.1-canonical-iso][canonical isomorphism]] by
+
+  $$
+  \iota(\ket{\psi}) = \bra{\psi} .
+  $$
+
+  It is not hard to show that
+
+  $$
+  \iota(U\ket{\psi}) = \iota(\ket{\psi}) U^\dagger = \bra{\psi} U^\dagger .
+  $$
+
+  In fact, the proof is even shorter than the proof of the claim of the exercise. That is,
+  the /canonical/ way to associate a linear mapping $\calH^*\to\calH^*$ with $U$ is the
+  right composition with $U^\dagger$. From this the claim of the exercise follows too.
+
+** Exercise 8.2 (Measurement as a quantum operation)
+Recall from Section 2.2.3 (on page 84) that a quantum measurement with outcomes labeled by
+$m$ is described by a set of measurement operators $M_m$ such that
+$\sum_mM_m^\dagger\,M_m=I$. Let the state of the system immediately before the measurement
+be $\rho$. Show that for $\calE_m(\rho)=M_m\rho\,M_m^\dagger$, the state of the system
+immediately after the measurement is
+
+$$
+  \frac{\calE_m(\rho)}{\trace{\calE_m(\rho)}} .
+$$
+
+Also show that the probability of obtaining this measurement result is
+$p(m)=\trace{\calE_m(\rho)}$.
+
+*** Solution
+Clearly the exercise assumes that we only know the postulates of quantum mechanics for
+/pure/ states as detailed in section 2.2.3 and not the generalization to mixed states as
+detailed in 2.4.1. Otherwise the exercise would be a trivial restatement of the evolution
+and measurement postulates.
+
+Let us first assume that $\rho=\proj{\psi}$ is a pure state (just expressed as a density
+matrix). In order to compute the trace of an operator $\sigma$ we can take /any/
+orthonormal basis $\{e\}$ and have $\trace{\sigma}=\sum_{e}\bra{e}\sigma\ket{e}$. Let
+$\sigma=\proj{\nu}$ with a not necessarily normalized non-zero $\ket{\nu}$. Without loss
+of generality we may assume that $\ket{\nu}/\norm{\nu}$ is part of our chosen ONB (this
+follows from the [[https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process][Gram-Schmidt]] procedure). Hence
+
+<<exercise-8.2-1>>
+$$
+  \trace{\sigma} = \sum_{e} \bra{e}\proj{\nu}\ket{e}
+  = \sprod{\nu}{\nu} \sprod{\nu}{\nu} / \norm{\nu}^2
+  = \norm{\nu}^2 .
+$$
+
+Given a state $\ket{\psi}$ the post measurement state after measuring $m$ is
+$M_m\ket{\psi}/\norm{M_m\ket{\psi}}$. From the reasoning in [[#exercise-8.1][exercise 1]] (that $U$ was a
+unitary operator didn't really matter there) we deduce that the corresponding density
+matrix is
+
+$$
+  \frac{M_m \rho M_m^\dagger}{\norm{M_m\ket{\psi}}^2} .
+$$
+
+Using [[exercise-8.2-1][the equation]] involving $\sigma$ (with $\ket{\nu}=M_m\ket{\psi}$) we see that
+$\norm{M_m\ket{\psi}}^2=\trace{M_m\rho\,M_m^\dagger}$. Hence the post measurement state is
+
+$$
+  \frac{M_m \rho M_m^\dagger}{\trace{M_m\rho M_m^\dagger}} .
+$$
+
+The probability to measure $m$ (and to obtain this state) is
+
+$$
+  p(m) = \norm{M_m\ket{\psi}}^2 = \trace{M_m \rho M_m^\dagger} .
+$$
+
+This concludes the exercise for pure states. Let $\rho$ be a mixed state now. This means
+that there is a decomposition
+
+$$
+  \rho = \sum_j p_j \proj{\psi_j}
+$$
+
+with strictly positive coefficients $p_j$ such that $\sum_jp_j=1$. The ensemble
+interpretation says that having such a mixed state means that, upon measurement, one of
+the pure states $\ket{\psi_j}$ is taken at random with probability $p_j$ and then the
+measurement proceeds as in the pure state case. It is not a-priori clear that this is well
+defined since the decomposition of $\rho$ into pure states is not unique (c.f. Theorem 2.6
+on page 103). But let us ignore this for the moment. We will see that the obtained
+probabilities and the post measurement states are independent of the concrete
+decomposition, hence the problem solves itself.
+
+According to the ensemble interpretation the probability to measure $m$ is
+
+$$
+  p(m) = \sum_j p(m|j) \, p_j = \sum_j \trace{M_m\proj{\psi_j} M_m^\dagger} \, p_j
+  = \trace{M_m \rho M_m^\dagger} .
+$$
+
+Here
+
+$$
+  p(m|j) = \norm{M_m \ket{\psi_j}}^2 = \trace{M_m \proj{\psi_j} M_m^\dagger}
+$$
+
+is the conditioned probability to measure $m$ if we already know that the pure state
+$\psi_j$ was chosen. Suppose we know that we measured $m$. What is the (mixed) state in
+that case? We already know that with (conditioned) probability $p(j|m)$ the post
+measurement state is
+
+$$
+  \frac{M_m\proj{\psi_j} M_m^\dagger}{p(m|j)} .
+$$
+
+But this is an ensemble of pure states! Hence, using $p(m|j)p_j=p(m\cap\,j)=p(j|m)p(m)$,
+the corresponding mixed state is
+
+$$
+  \sum_j p(j|m) \frac{M_m\proj{\psi_j} M_m^\dagger}{p(m|j)}
+  = \frac{1}{p(m)} \sum_j p_j M_m\proj{\psi_j} M_m^\dagger
+  = \frac{M_m\rho M_m^\dagger}{p(m)}
+  = \frac{M_m\rho M_m^\dagger}{\trace{M_m\rho M_m^\dagger}} .
+$$
+
+This concludes the exercise. But let is briefly mention that in case we do /not/ obtain
+the outcome of the measurement the post measurement state is
+
+<<exercise-8.2-measurment-operation>>
+$$
+  \sum_{m,j} p(m|j) p_j \, \frac{M_m \proj{\psi_j} M_m^\dagger}{p(m|j)}
+  = \sum_m M_m \rho M_m^\dagger .
+$$
+
+- Remark :: Together with the conclusions from the actual exercise we can draw the
+  following additional conclusion: If now we somehow obtain the measurement result than
+  [[exercise-8.2-measurment-operation][this sum]] "collapses" into one of its summands (just normalized), with probability
+  $\trace{M_m\rho\,M_m^\dagger}$ for each of them. That is, the measurement can be
+  decomposed into two parts: First the state changes to
+
+  $$
+    \calE(\rho) = \sum_m \calE_m(\rho)
+  $$
+
+  and then (if we obtain the measurement result) the state "collapses" into
+  $\calE_m(\rho)/\trace{\calE_m(\rho)}$ for one of the $m$ with probability
+  $\trace{\calE_m(\rho)}$. So, the first part of the measurement can be expressed in terms
+  of quantum operations. But not the second part (since it is not deterministic and cannot
+  give rise to a mathematical function on density matrices).
+
+** Exercise 8.3
+Our derivation of the operator-sum representation implicitly assumed that the input and
+output spaces for the operation were the same. Suppose a composite system AB initially in
+an unknown quantum state $\rho$ is brought into contact with a composite system CD initially in
+some standard state $\ket{0}$, and the two systems interact according to a unitary interaction
+$U$. After the interaction we discard systems A and D, leaving a state $\rho'$ of system
+BC. Show that the map $\calE(\rho)=\rho'$ satisfies
+
+$$
+  \calE(\rho) = \sum_k E_k \rho E_k^\dagger ,
+$$
+
+for some set of linear operators $E_k$ from the state space of system AB to the state
+space of system BC, and such that $\sum_kE_k^\dagger\,E_k$.
+
+*** Proof
+Basically we do the same as the book for the special case of equal input and output
+space. According to the exercise we have
+
+$$
+  \calE(\rho) = \ptrace{AD}{U \rho \otimes \proj{0} U^\dagger} .
+$$
+
+Let $\{e_k\}$ be an orthonormal basis of AD. Hence
+
+$$
+  \calE(\rho) = \sum_k \bra{e_k} U \rho \otimes \proj{0} U^\dagger \ket{e_k} .
+$$
+
+Thus, defining $E_k=\bra{e_k}U\ket{0}$, we have
+
+$$
+  \calE(\rho) = \sum_k E_k \rho E_k^\dagger .
+$$
+
+That is, $\calE$ has the required form. We only have to show the completeness property
+$J:=\sum_kE_k^\dagger\,E_k=I_{AB}$. Note that $J=J^\dagger$ is self-adjoint and
+positive-definite. Let $\rho$ be arbitrary and consider
+
+$$
+  1 = \ptrace{BC}{\calE(\rho)} = \sum_k \ptrace{BC}{E_k\rho E_k^\dagger}
+  = \sum_k \ptrace{AB}{E_k^\dagger E_k \rho}
+  = \ptrace{AB}{J^\dagger \rho} .
+$$
+
+Here we used the well-known /cyclicity property/ of the trace (which also holds for
+(matching) rectangular matrices). Thus
+
+<<exercise-8.3-1>>
+$$
+  \forall \rho : \; \trace{(J-I)^\dagger \rho} = 0 .
+$$
+
+Here the quantification runs over all density operators (hermitian, positive definite,
+trace 1).
+
+- Remark :: In case you wonder why I take the adjoint of $J$. We have that
+  $S,T\mapsto\trace{S^\dagger\,T}$ turns the matrix space $\CC^{n\times\?n}$ into a
+  complex Hilbert space. See e.g. the definition of a Hilbert-Schmidt operator on
+  [[https://en.wikipedia.org/wiki/Hilbert%E2%80%93Schmidt_operator][wikipedia]] (it is about infinite dimensional spaces but just note that in finite
+  dimensions every operator is a Hilbert-Schmidt operator). For this exercise it does not
+  directly help us since the quantification [[exercise-8.3-1][above]] is /not/ over all
+  $\rho\in\CC^{n\times\?n}$. But still nice to know 😉.
+
+Considering all rank-1 density matrices $\rho=\proj{\psi}$ we deduce
+
+$$
+  \forall \ket{\psi} : \; \trace{(J-I)^\dagger \proj{\psi}} = \bra{\psi} (J-I)^\dagger \ket{\psi} = 0 .
+$$
+
+But this can only be true (for all normalized $\ket{\psi}$) if $J=I$. QED.
