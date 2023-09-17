@@ -350,4 +350,262 @@ $$
   \forall \ket{\psi} : \; \trace{(J-I)^\dagger \proj{\psi}} = \bra{\psi} (J-I)^\dagger \ket{\psi} = 0 .
 $$
 
-But this can only be true (for all normalized $\ket{\psi}$) if $J=I$. QED.
+(The first equality can either be seen by the cyclicity property of the trace or by using
+an ONB which involves $\psi$ (but normalized) as one of its elements) But this can only be
+true (for all normalized $\ket{\psi}$) if $J=I$. QED.
+
+** Exercise 8.4 (Measurement)
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.4
+:END:
+Suppose we have a single qubit principal system, interacting with a single qubit
+environment through the transform
+
+$$
+  U = P_0 \otimes I + P_1 \otimes X
+$$
+
+where $X$ is the usual Pauli matrix (acting on the environment), and $P_0\equiv\proj{0}$,
+$P_1\equiv\proj{1}$ are projectors (acting on the system). Give the quantum operation for
+this process, in the operator-sum representation, assuming the environment starts in the
+state $\ket{0}$.
+
+*** Solution
+Note that $U$ is nothing else than the =CNOT= gate. Let us label the environment by E. One
+way to define the operation elements is
+
+\begin{align*}
+  E_0 &= \bra{0_E} U \ket{0_E} = P_0 \sprod{0_E}{0_E} + P_1 \bra{0_E}X\ket{0_E} = P_0 , \\
+  E_1 &= \bra{1_E} U \ket{0_E} = P_0 \sprod{1_E}{0_E} + P_1 \bra{1_E}X\ket{0_E} = P_1 .
+\end{align*}
+
+(The $\ket{0_E}$ to the right of $U$ comes from the initial state of the environment.)
+Hence
+
+$$
+  \calE(\rho) = P_0 \rho P_0 + P_1 \rho P_1 = \begin{bmatrix} \rho_{00} & 0 \\ 0 & \rho_{11} \end{bmatrix} .
+$$
+
+That is, this operation acts like the first part of a measurement. It describes the state
+after a measurement in the Z-basis if nobody tells us the measurement outcome. Once we get
+the outcome the state "collapses" to one of the two summands (properly normalized of
+course). The respective probabilities are $\rho_{00}$ (for outcome $0$) and $\rho_{11}$
+(for outcome $1$).
+
+** Exercise 8.5 (Spin ﬂips)
+Just as in the previous exercise, but now let
+
+$$
+  U = \frac{1}{\sqrt{2}} \left( X \otimes I + Y \otimes X \right) .
+$$
+
+Give the quantum operation for this process, in the operator-sum representation.
+
+*** Solution
+First of all let us make sure that $U$ really is unitary. We have $U^\dagger=U$, hence
+
+$$
+  U^\dagger U = U^2 = \frac{1}{2} \left( X^2 \otimes I + Y^2 \otimes X^2 + (XY+YX)\otimes X \right) = I .
+$$
+
+Hence $U$ is indeed unitary. One way to define the operation elements is as follows:
+
+\begin{align*}
+  E_0 &= \bra{0_E} U \ket{0_E} = X \sprod{0_E}{0_E} + Y \bra{0_E}X\ket{0_E} = X , \\
+  E_1 &= \bra{1_E} U \ket{0_E} = X \sprod{1_E}{0_E} + Y \bra{1_E}X\ket{0_E} = Y .
+\end{align*}
+
+Hence
+
+$$
+  \calE(\rho) = \frac{1}{2} \left(X \rho X + Y \rho Y \right)
+  = \begin{bmatrix} \rho_{11} & 0 \\ 0 & \rho_{00} \end{bmatrix} .
+$$
+
+Interpreting this in the same way as in [[#exercise-8.4][exercise 8.4]] we deduce that $\calE$ corresponds to
+a spin-flip followed by a measurement (without obtaining the measurement outcome).
+
+** Exercise 8.6 (Composition of quantum operations)
+Suppose $\calE$ and $\calF$ are quantum operations on the same quantum system. Show that
+the composition $\calF\circ\calE$ is a quantum operation, in the sense that it has an
+operator-sum representation. State and prove an extension of this result to the case where
+$\calE$ and $\calF$ do not necessarily have the same input and output spaces.
+
+*** Proof
+Suppose
+
+\begin{align*}
+  \calE(\rho) &= \sum_i E_i \rho E_i^\dagger , \\
+  \calF(\rho) &= \sum_j F_j \rho F_j^\dagger .
+\end{align*}
+
+Then
+
+\begin{align*}
+  \calF \circ \calE(\rho) = \sum_{ij} F_j E_i \rho E_i^\dagger F_j^\dagger .
+\end{align*}
+
+This suggests to use all the $F_jE_i$ as operation elements of the composition. That
+$\calF\circ\calE$ is indeed a quantum operation now follows from
+
+$$
+  \sum_{ij} E_i^\dagger F_j^\dagger F_j E_i = \sum_i E_i^\dagger E_i = I .
+$$
+
+The proof directly generalizes (without any change) to the case where $\calE:A\to\?B$ and
+$\calF:B\to\?C$. QED.
+
+** Exercise 8.7
+Suppose that instead of doing a projective measurement on the combined principal system
+and environment we had performed a general measurement described by measurement operators
+$\{M_m\}$. Find operator-sum representations for the corresponding quantum operations
+$\{\calE_m\}$ on the principal system, and show that the respective measurement
+probabilities are $\trace{\calE_m(\rho)}$.
+
+*** Solution
+Let $\sigma=\sum_jq_j\proj{j}$ be the state of the environment E. The generalized
+operations look as follows
+
+$$
+  \calE_m(\rho) = \ptrace{E}{M_m U \rho\otimes\sigma U^\dagger M_m^\dagger} .
+$$
+
+According to the posutulates the probability to measure $m$, after an evolution with $U$,
+is
+
+$$
+  p(m) = \trace{M_m U \rho\otimes\sigma U^\dagger M_m^\dagger} = \trace{\calE_m(\rho)} .
+$$
+
+Here we use the property $\trace{\ptrace{E}{A}}=\trace{A}$ of the partial trace. The
+post-measurement state for the whole system is is
+
+$$
+  \frac{M_m U \rho\otimes\sigma U^\dagger M_m^\dagger}{p(m)} ,
+$$
+
+and for the principal system it is
+
+$$
+  \ptrace{E}{\frac{M_m U \rho\otimes\sigma U^\dagger M_m^\dagger}{p(m)}}
+  = \frac{\calE_m(\rho)}{\trace{\calE_m(\rho)}} .
+$$
+
+It is not hard to see that for any choice of an ONB $\{e_k\}$ on E the operators
+
+$$
+  E_{jk} = \sqrt{q_j} \bra{e_k} M_m U \ket{j}
+$$
+
+are elements for the operation $\calE_m$, which also satisfy
+$\sum\?E_{jk}^\dagger\?E_{jk}\leq\?I$:
+
+$$
+  \sum_{jk} E_{jk}^\dagger E_{jk}
+  = \sum_{jk} q_j \bra{j}U^\dagger M_m^\dagger \ket{e_k} \bra{e_k} M_m U \ket{j}
+  = \sum_j q_j \bra{j}U^\dagger M_m^\dagger M_m U \ket{j}
+  \leq \sum_j q_j \bra{j}U^\dagger U \ket{j}
+  = \sum_j q_j = I .
+$$
+
+** Exercise 8.8 (Non-trace-preserving quantum operations)
+Explain how to construct a unitary operator for a system–environment model of a
+non-trace-preserving quantum operation, by introducing an extra operator, $E_\infty$, into the
+set of operation elements $E_k$, chosen so that when summing over the complete set of $k$,
+including $k=\infty$, one obtains $\sum_kE_k^\dagger\?E_k=I$.
+
+*** Solution
+Let us define
+
+$$
+  E_\infty = \sqrt{I - \sum_k E_k^\dagger E_k} .
+$$
+
+Clearly $E_\infty^\dagger=E_\infty$ and
+
+$$
+  \sum_k' E_k^\dagger E_k = I .
+$$
+
+Here and in the following we let $\sum_k'$ denote the sum over all $k$ including
+$k=\infty$. On the other hand $\sum_k$ excludes $k=\infty$.
+
+As in the book consider an environment described by a Hilbert space which has a basis
+$\{\ket{e_k}\}$ (including $k=\infty$). Define $U$ by
+
+$$
+  U \ket{\psi} \ket{e_0} \equiv \sum_k' E_k \ket{\psi} \ket{e_k}
+$$
+
+and unitary extension to the full system - exactly as in the book. Consider the following
+projection defined on E:
+
+$$
+  P = I_E - \proj{e_\infty} .
+$$
+
+We shall prove that
+
+$$
+  \calE(\rho) = \ptrace{E}{PU \rho\otimes \proj{e_0} U^\dagger P} .
+$$
+
+In fact, the RHS equals
+
+$$
+  \ptrace{E}{\sum_{kl}' E_k \rho E_l^\dagger \otimes P \ket{e_k}\bra{e_l} P}
+  = \ptrace{E}{\sum_{kl} E_k \rho E_l^\dagger \otimes \ket{e_k}\bra{e_l} }
+  = \sum_{k} E_k \rho E_k^\dagger
+  = \calE(\rho)
+$$
+
+as desired.
+
+** Exercise 8.9 (Measurement model)
+If we are given a set of quantum operations $\{\calE_m\}$ such that $\sum_m\calE_m$ is
+trace-preserving, then it is possible to construct a measurement model giving rise to this
+set of quantum operations. For each $m$, let $E_{mk}$ be a set of operation elements for
+$\calE_m$. Introduce an environmental system, E, with an orthonormal basis $\ket{m,k}$ in
+one-to-one correspondence with the set of indices for the operation elements. Analogously
+to the earlier construction, define an operator $U$ such that
+
+$$
+  U \ket{\psi} \ket{e_0} = \sum_{mk} E_{mk} \ket{\psi} \ket{m,k} .
+$$
+
+Next, deﬁne projectors $P_m=\sum_k\proj{m,k}$ on the environmental system, E.  Show that
+performing $U$ on $\rho\otimes\proj{e_0}$, then measuring $P_m$ gives $m$ with probability
+$\trace{\calE_m(\rho)}$, and the corresponding post-measurement state of the principal
+system is $\calE_m(\rho)/\trace{\calE_m(\rho)}$.
+
+*** Solution
+That $U$ can be extended to a unitary operator can be seen as in the other cases of
+constructing an environment model. We have
+
+\begin{align*}
+  \ptrace{E}{P_m U \rho \otimes \proj{e_0} U^\dagger P_m}
+  &= \ptrace{E}{\sum_{m,k,l} E_{mk}\rho E_{ml}^\dagger \otimes \ket{m,k}\bra{m,l}} \\
+  &= \sum_{m,k} E_{mk}\rho E_{mk}^\dagger \\
+  &= \calE_m(\rho) .
+\end{align*}
+
+Hence, using $\trace{\ptrace{E}{\ldots}}=\trace{\ldots}$, the probability to measure $m$
+after applying $U$ to $\rho\otimes\proj{e_0}$ is
+
+$$
+  p(m) = \trace{P_m U \rho \otimes \proj{e_0} U^\dagger P_m} = \trace{\calE_m(\rho)} .
+$$
+
+The post-measurement state of the whole system is
+
+$$
+  \frac{P_m U \rho \otimes \proj{e_0} U^\dagger P_m}{p(m)} .
+$$
+
+Taking the partial trace of the environment yields the post-measurement state of the
+principal system
+
+$$
+  \frac{\ptrace{E}{P_m U \rho \otimes \proj{e_0} U^\dagger P_m}}{p(m)}
+  = \frac{\calE_m(\rho)}{\trace{\calE_m(\rho)}} .
+$$
