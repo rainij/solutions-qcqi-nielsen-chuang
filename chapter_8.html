@@ -21,9 +21,11 @@
 \newcommand{\calH}{\mathcal{H}}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\norm}[1]{\|#1\|}
-\newcommand{\sprod}[2]{\langle#1|#2\rangle} % scalar product
+\newcommand{\sprod}[2]{\langle#1|#2\rangle} % deprecated, use braket instead.
+\newcommand{\braket}[2]{\langle#1|#2\rangle} % scalar product
 \newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
 \newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\rank}[1]{\mathrm{rank}\left(#1\right)}
 \newcommand{\floor}[1]{\lfloor#1\rfloor}
 \newcommand{\ceil}[1]{\lceil#1\rceil}
 \newcommand{\bra}[1]{\langle#1|}
@@ -37,26 +39,28 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc76a360">Exercises</a>
+<li><a href="#orgbef2b55">Exercises</a>
 <ul>
 <li><a href="#exercise-8.1">Exercise 8.1 (Unitary evolution as a quantum operation)</a></li>
-<li><a href="#orgc17e5ec">Exercise 8.2 (Measurement as a quantum operation)</a></li>
-<li><a href="#orgbde7759">Exercise 8.3</a></li>
+<li><a href="#org06e2d0f">Exercise 8.2 (Measurement as a quantum operation)</a></li>
+<li><a href="#org5c4f2b9">Exercise 8.3</a></li>
 <li><a href="#exercise-8.4">Exercise 8.4 (Measurement)</a></li>
-<li><a href="#org3c1249f">Exercise 8.5 (Spin ﬂips)</a></li>
-<li><a href="#org37093e8">Exercise 8.6 (Composition of quantum operations)</a></li>
-<li><a href="#org2157d12">Exercise 8.7</a></li>
-<li><a href="#org839d0d0">Exercise 8.8 (Non-trace-preserving quantum operations)</a></li>
-<li><a href="#org926616c">Exercise 8.9 (Measurement model)</a></li>
+<li><a href="#org46621b0">Exercise 8.5 (Spin ﬂips)</a></li>
+<li><a href="#org1013820">Exercise 8.6 (Composition of quantum operations)</a></li>
+<li><a href="#orga5bc636">Exercise 8.7</a></li>
+<li><a href="#org85d0d0d">Exercise 8.8 (Non-trace-preserving quantum operations)</a></li>
+<li><a href="#orgc1b1bd9">Exercise 8.9 (Measurement model)</a></li>
+<li><a href="#exercise-8.10">Exercise 8.10</a></li>
+<li><a href="#org35fad54">Exercise 8.11</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgc76a360" class="outline-2">
-<h2 id="orgc76a360">Exercises</h2>
-<div class="outline-text-2" id="text-orgc76a360">
+<div id="outline-container-orgbef2b55" class="outline-2">
+<h2 id="orgbef2b55">Exercises</h2>
+<div class="outline-text-2" id="text-orgbef2b55">
 </div>
 <div id="outline-container-exercise-8.1" class="outline-3">
 <h3 id="exercise-8.1">Exercise 8.1 (Unitary evolution as a quantum operation)</h3>
@@ -68,13 +72,13 @@ for \(\rho=\proj{\psi}\).
 </p>
 </div>
 
-<div id="outline-container-org73ef16a" class="outline-4">
-<h4 id="org73ef16a">Proof</h4>
-<div class="outline-text-4" id="text-org73ef16a">
+<div id="outline-container-orgc396cf4" class="outline-4">
+<h4 id="orgc396cf4">Proof</h4>
+<div class="outline-text-4" id="text-orgc396cf4">
 </div>
-<div id="outline-container-org1ca4db3" class="outline-5">
-<h5 id="org1ca4db3">Preparation</h5>
-<div class="outline-text-5" id="text-org1ca4db3">
+<div id="outline-container-org695ffd1" class="outline-5">
+<h5 id="org695ffd1">Preparation</h5>
+<div class="outline-text-5" id="text-org695ffd1">
 <p>
 This is a really basic question and it should actually be obvious <i>if</i> you really
 understand the bra-ket notation (beware however that it might <i>appear</i> to be obvious if
@@ -141,12 +145,13 @@ space</i> \(\calH^*\) which is just the space of linear maps \(\calH\to\CC\). Fo
 </p>
 
 <p>
-<a id="org29e77bd"></a>
-In fact, one can prove that any element of \(\calH^*\) (that is, any linear map
-\(\calH\to\CC\)) can be written like this for a <i>unique</i> \(\ket{\psi}\). This is called the
-<b>canonical isomorphism</b> between \(\calH\) and \(\calH^*\) (it is called <i>canonical</i> since we
-could define it without knowing anything concrete about our Hilbert space, in other
-words it is definable in the most abstract terms).
+<a id="orgc4d22eb"></a> In fact, one can prove that any element of \(\calH^*\) (that
+is, any linear map \(\calH\to\CC\)) can be written like this for a <i>unique</i>
+\(\ket{\psi}\). This is called the <b>canonical isomorphism</b> between \(\calH\) and \(\calH^*\) (it
+is called <i>canonical</i> since we could define it without knowing anything concrete about our
+Hilbert space, in other words it is definable in the most abstract terms). Note that the
+canonical isomorphism \(\iota\) is <i>conjugate</i> linear, that is,
+\(\iota(\lambda\ket{\psi})=\bra{\psi}\lambda^*\).
 </p>
 
 <p>
@@ -189,9 +194,9 @@ are the left and right half of the scalar product.
 </div>
 </div>
 
-<div id="outline-container-orgfb5166a" class="outline-5">
-<h5 id="orgfb5166a">The actual proof</h5>
-<div class="outline-text-5" id="text-orgfb5166a">
+<div id="outline-container-orgc44c97a" class="outline-5">
+<h5 id="orgc44c97a">The actual proof</h5>
+<div class="outline-text-5" id="text-orgc44c97a">
 <p>
 Let us return to the actual exercise. We use the above notation \((\ldots,\ldots)\) for the
 scalar product to make the derivation clearer. Let \(U\) be a unitary operator on \(\calH\)
@@ -252,7 +257,7 @@ QED.
 <dl class="org-dl">
 <dt>Remark</dt><dd><p>
 There is another slightly deeper way to see this result. Let us denote the
-above mentioned <a href="#org29e77bd">canonical isomorphism</a> by
+above mentioned <a href="#orgc4d22eb">canonical isomorphism</a> by
 </p>
 
 <p>
@@ -262,7 +267,8 @@ above mentioned <a href="#org29e77bd">canonical isomorphism</a> by
 </p>
 
 <p>
-It is not hard to show that
+It is not hard to show and extension of the conjugate-linearity property of the
+canonical isomorphism:
 </p>
 
 <p>
@@ -282,9 +288,9 @@ right composition with \(U^\dagger\). From this the claim of the exercise follow
 </div>
 </div>
 
-<div id="outline-container-orgc17e5ec" class="outline-3">
-<h3 id="orgc17e5ec">Exercise 8.2 (Measurement as a quantum operation)</h3>
-<div class="outline-text-3" id="text-orgc17e5ec">
+<div id="outline-container-org06e2d0f" class="outline-3">
+<h3 id="org06e2d0f">Exercise 8.2 (Measurement as a quantum operation)</h3>
+<div class="outline-text-3" id="text-org06e2d0f">
 <p>
 Recall from Section 2.2.3 (on page 84) that a quantum measurement with outcomes labeled by
 \(m\) is described by a set of measurement operators \(M_m\) such that
@@ -305,9 +311,9 @@ Also show that the probability of obtaining this measurement result is
 </p>
 </div>
 
-<div id="outline-container-org9672ad3" class="outline-4">
-<h4 id="org9672ad3">Solution</h4>
-<div class="outline-text-4" id="text-org9672ad3">
+<div id="outline-container-org76af2c8" class="outline-4">
+<h4 id="org76af2c8">Solution</h4>
+<div class="outline-text-4" id="text-org76af2c8">
 <p>
 Clearly the exercise assumes that we only know the postulates of quantum mechanics for
 <i>pure</i> states as detailed in section 2.2.3 and not the generalization to mixed states as
@@ -325,7 +331,7 @@ follows from the <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_pro
 </p>
 
 <p>
-<a id="org75702e7"></a>
+<a id="org76b51ba"></a>
 \[
   \trace{\sigma} = \sum_{e} \bra{e}\proj{\nu}\ket{e}
   = \sprod{\nu}{\nu} \sprod{\nu}{\nu} / \norm{\nu}^2
@@ -347,7 +353,7 @@ matrix is
 </p>
 
 <p>
-Using <a href="#org75702e7">the equation</a> involving \(\sigma\) (with \(\ket{\nu}=M_m\ket{\psi}\)) we see that
+Using <a href="#org76b51ba">the equation</a> involving \(\sigma\) (with \(\ket{\nu}=M_m\ket{\psi}\)) we see that
 \(\norm{M_m\ket{\psi}}^2=\trace{M_m\rho\,M_m^\dagger}\). Hence the post measurement state is
 </p>
 
@@ -443,7 +449,7 @@ the outcome of the measurement the post measurement state is
 </p>
 
 <p>
-<a id="org4dd03de"></a>
+<a id="org2e86958"></a>
 \[
   \sum_{m,j} p(m|j) p_j \, \frac{M_m \proj{\psi_j} M_m^\dagger}{p(m|j)}
   = \sum_m M_m \rho M_m^\dagger .
@@ -454,7 +460,7 @@ the outcome of the measurement the post measurement state is
 <dt>Remark</dt><dd><p>
 Together with the conclusions from the actual exercise we can draw the
 following additional conclusion: If now we somehow obtain the measurement result than
-<a href="#org4dd03de">this sum</a> "collapses" into one of its summands (just normalized), with probability
+<a href="#org2e86958">this sum</a> "collapses" into one of its summands (just normalized), with probability
 \(\trace{M_m\rho\,M_m^\dagger}\) for each of them. That is, the measurement can be
 decomposed into two parts: First the state changes to
 </p>
@@ -477,9 +483,9 @@ give rise to a mathematical function on density matrices).
 </div>
 </div>
 
-<div id="outline-container-orgbde7759" class="outline-3">
-<h3 id="orgbde7759">Exercise 8.3</h3>
-<div class="outline-text-3" id="text-orgbde7759">
+<div id="outline-container-org5c4f2b9" class="outline-3">
+<h3 id="org5c4f2b9">Exercise 8.3</h3>
+<div class="outline-text-3" id="text-org5c4f2b9">
 <p>
 Our derivation of the operator-sum representation implicitly assumed that the input and
 output spaces for the operation were the same. Suppose a composite system AB initially in
@@ -501,9 +507,9 @@ space of system BC, and such that \(\sum_kE_k^\dagger\,E_k\).
 </p>
 </div>
 
-<div id="outline-container-org52ea347" class="outline-4">
-<h4 id="org52ea347">Proof</h4>
-<div class="outline-text-4" id="text-org52ea347">
+<div id="outline-container-orgd33967f" class="outline-4">
+<h4 id="orgd33967f">Proof</h4>
+<div class="outline-text-4" id="text-orgd33967f">
 <p>
 Basically we do the same as the book for the special case of equal input and output
 space. According to the exercise we have
@@ -555,7 +561,7 @@ Here we used the well-known <i>cyclicity property</i> of the trace (which also h
 </p>
 
 <p>
-<a id="org2f51533"></a>
+<a id="org3bc8fe4"></a>
 \[
   \forall \rho : \; \trace{(J-I)^\dagger \rho} = 0 .
 \]
@@ -572,7 +578,7 @@ trace 1).
 complex Hilbert space. See e.g. the definition of a Hilbert-Schmidt operator on
 <a href="https://en.wikipedia.org/wiki/Hilbert%E2%80%93Schmidt_operator">wikipedia</a> (it is about infinite dimensional spaces but just note that in finite
 dimensions every operator is a Hilbert-Schmidt operator). For this exercise it does not
-directly help us since the quantification <a href="#org2f51533">above</a> is <i>not</i> over all
+directly help us since the quantification <a href="#org3bc8fe4">above</a> is <i>not</i> over all
 \(\rho\in\CC^{n\times\?n}\). But still nice to know 😉.</dd>
 </dl>
 
@@ -617,9 +623,9 @@ state \(\ket{0}\).
 </p>
 </div>
 
-<div id="outline-container-org49c8cb6" class="outline-4">
-<h4 id="org49c8cb6">Solution</h4>
-<div class="outline-text-4" id="text-org49c8cb6">
+<div id="outline-container-org79bbad1" class="outline-4">
+<h4 id="org79bbad1">Solution</h4>
+<div class="outline-text-4" id="text-org79bbad1">
 <p>
 Note that \(U\) is nothing else than the <code>CNOT</code> gate. Let us label the environment by E. One
 way to define the operation elements is
@@ -652,9 +658,9 @@ course). The respective probabilities are \(\rho_{00}\) (for outcome \(0\)) and 
 </div>
 </div>
 
-<div id="outline-container-org3c1249f" class="outline-3">
-<h3 id="org3c1249f">Exercise 8.5 (Spin ﬂips)</h3>
-<div class="outline-text-3" id="text-org3c1249f">
+<div id="outline-container-org46621b0" class="outline-3">
+<h3 id="org46621b0">Exercise 8.5 (Spin ﬂips)</h3>
+<div class="outline-text-3" id="text-org46621b0">
 <p>
 Just as in the previous exercise, but now let
 </p>
@@ -670,9 +676,9 @@ Give the quantum operation for this process, in the operator-sum representation.
 </p>
 </div>
 
-<div id="outline-container-orgd0a5e82" class="outline-4">
-<h4 id="orgd0a5e82">Solution</h4>
-<div class="outline-text-4" id="text-orgd0a5e82">
+<div id="outline-container-org3656a4a" class="outline-4">
+<h4 id="org3656a4a">Solution</h4>
+<div class="outline-text-4" id="text-org3656a4a">
 <p>
 First of all let us make sure that \(U\) really is unitary. We have \(U^\dagger=U\), hence
 </p>
@@ -711,9 +717,9 @@ a spin-flip followed by a measurement (without obtaining the measurement outcome
 </div>
 </div>
 
-<div id="outline-container-org37093e8" class="outline-3">
-<h3 id="org37093e8">Exercise 8.6 (Composition of quantum operations)</h3>
-<div class="outline-text-3" id="text-org37093e8">
+<div id="outline-container-org1013820" class="outline-3">
+<h3 id="org1013820">Exercise 8.6 (Composition of quantum operations)</h3>
+<div class="outline-text-3" id="text-org1013820">
 <p>
 Suppose \(\calE\) and \(\calF\) are quantum operations on the same quantum system. Show that
 the composition \(\calF\circ\calE\) is a quantum operation, in the sense that it has an
@@ -722,9 +728,9 @@ operator-sum representation. State and prove an extension of this result to the 
 </p>
 </div>
 
-<div id="outline-container-org06b2914" class="outline-4">
-<h4 id="org06b2914">Proof</h4>
-<div class="outline-text-4" id="text-org06b2914">
+<div id="outline-container-orgdbd429d" class="outline-4">
+<h4 id="orgdbd429d">Proof</h4>
+<div class="outline-text-4" id="text-orgdbd429d">
 <p>
 Suppose
 </p>
@@ -761,9 +767,9 @@ The proof directly generalizes (without any change) to the case where \(\calE:A\
 </div>
 </div>
 
-<div id="outline-container-org2157d12" class="outline-3">
-<h3 id="org2157d12">Exercise 8.7</h3>
-<div class="outline-text-3" id="text-org2157d12">
+<div id="outline-container-orga5bc636" class="outline-3">
+<h3 id="orga5bc636">Exercise 8.7</h3>
+<div class="outline-text-3" id="text-orga5bc636">
 <p>
 Suppose that instead of doing a projective measurement on the combined principal system
 and environment we had performed a general measurement described by measurement operators
@@ -773,9 +779,9 @@ probabilities are \(\trace{\calE_m(\rho)}\).
 </p>
 </div>
 
-<div id="outline-container-org68defd5" class="outline-4">
-<h4 id="org68defd5">Solution</h4>
-<div class="outline-text-4" id="text-org68defd5">
+<div id="outline-container-org5137213" class="outline-4">
+<h4 id="org5137213">Solution</h4>
+<div class="outline-text-4" id="text-org5137213">
 <p>
 Let \(\sigma=\sum_jq_j\proj{j}\) be the state of the environment E. The generalized
 operations look as follows
@@ -848,9 +854,9 @@ are elements for the operation \(\calE_m\), which also satisfy
 </div>
 </div>
 
-<div id="outline-container-org839d0d0" class="outline-3">
-<h3 id="org839d0d0">Exercise 8.8 (Non-trace-preserving quantum operations)</h3>
-<div class="outline-text-3" id="text-org839d0d0">
+<div id="outline-container-org85d0d0d" class="outline-3">
+<h3 id="org85d0d0d">Exercise 8.8 (Non-trace-preserving quantum operations)</h3>
+<div class="outline-text-3" id="text-org85d0d0d">
 <p>
 Explain how to construct a unitary operator for a system–environment model of a
 non-trace-preserving quantum operation, by introducing an extra operator, \(E_\infty\), into the
@@ -859,9 +865,9 @@ including \(k=\infty\), one obtains \(\sum_kE_k^\dagger\?E_k=I\).
 </p>
 </div>
 
-<div id="outline-container-org53d5ec1" class="outline-4">
-<h4 id="org53d5ec1">Solution</h4>
-<div class="outline-text-4" id="text-org53d5ec1">
+<div id="outline-container-orgcce76ca" class="outline-4">
+<h4 id="orgcce76ca">Solution</h4>
+<div class="outline-text-4" id="text-orgcce76ca">
 <p>
 Let us define
 </p>
@@ -939,9 +945,9 @@ as desired.
 </div>
 </div>
 
-<div id="outline-container-org926616c" class="outline-3">
-<h3 id="org926616c">Exercise 8.9 (Measurement model)</h3>
-<div class="outline-text-3" id="text-org926616c">
+<div id="outline-container-orgc1b1bd9" class="outline-3">
+<h3 id="orgc1b1bd9">Exercise 8.9 (Measurement model)</h3>
+<div class="outline-text-3" id="text-orgc1b1bd9">
 <p>
 If we are given a set of quantum operations \(\{\calE_m\}\) such that \(\sum_m\calE_m\) is
 trace-preserving, then it is possible to construct a measurement model giving rise to this
@@ -965,9 +971,9 @@ system is \(\calE_m(\rho)/\trace{\calE_m(\rho)}\).
 </p>
 </div>
 
-<div id="outline-container-orgf91bb3d" class="outline-4">
-<h4 id="orgf91bb3d">Solution</h4>
-<div class="outline-text-4" id="text-orgf91bb3d">
+<div id="outline-container-orgacf3367" class="outline-4">
+<h4 id="orgacf3367">Solution</h4>
+<div class="outline-text-4" id="text-orgacf3367">
 <p>
 That \(U\) can be extended to a unitary operator can be seen as in the other cases of
 constructing an environment model. We have
@@ -1011,6 +1017,260 @@ principal system
   \frac{\ptrace{E}{P_m U \rho \otimes \proj{e_0} U^\dagger P_m}}{p(m)}
   = \frac{\calE_m(\rho)}{\trace{\calE_m(\rho)}} .
 \]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-8.10" class="outline-3">
+<h3 id="exercise-8.10">Exercise 8.10</h3>
+<div class="outline-text-3" id="text-exercise-8.10">
+<p>
+Give a proof of Theorem 8.3 based on the freedom in the operator-sum representation, as
+follows. Let \(\{E_j\}\) be a set of operation elements for \(\calE\). Define a matrix
+\(W_{jk}=\trace{E_j^\dagger\?E_k}\). Show that the matrix \(W\) is Hermitian and of rank at
+most \(d^2\), and thus there is unitary matrix \(u\) such that \(uWu^\dagger\) is diagonal with
+at most \(d^2\) non-zero entries. Use \(u\) to deﬁne a new set of at most \(d^2\) non-zero
+operation elements \(\{F_j\}\) for \(\calE\).
+</p>
+</div>
+
+<div id="outline-container-org296907a" class="outline-4">
+<h4 id="org296907a">Proof 1</h4>
+<div class="outline-text-4" id="text-org296907a">
+<p>
+The statement is a direct consequence of the proof of Kraus's Theorem as given in the book
+(Theorem 8.1). Recall that the diagonalization of \(\sigma\)
+</p>
+
+<p>
+\[
+  \sigma = \sum_{k=1}^M \proj{s_k}
+\]
+</p>
+
+<p>
+is used to define the operation elements by
+</p>
+
+<p>
+\[
+  E_k \ket{\psi} = \braket{\tilde{\psi}}{s_k}
+\]
+</p>
+
+<p>
+That is, there are precisely \(M\) elements to be defined. How large can \(M\) be? Recall that
+\(\sigma\) is a density matrix on the Hilbert space \(\calH_R\otimes\calH_Q\) of the joint
+system \(RQ\). By assumption \(d=\dim(\calH_Q)\) and by construction
+\(\dim(\calH_R)=\dim(\calH_Q)=d\). Hence
+</p>
+
+<p>
+\[
+  \dim(\calH_R\otimes\calH_Q) = d^2 .
+\]
+</p>
+
+<p>
+Hence \(\sigma\in\CC^{d^2\times\?d^2}\) and therefore \(M\leq\?d^2\). QED.
+</p>
+</div>
+</div>
+
+<div id="outline-container-exercise-8.10-proof-2" class="outline-4">
+<h4 id="exercise-8.10-proof-2">Proof 2</h4>
+<div class="outline-text-4" id="text-exercise-8.10-proof-2">
+<p>
+The matrix \(W\) is hermitian because
+</p>
+
+<p>
+\[
+  W_{kj}^* = \trace{E_k^\dagger E_j}^*
+  = \trace{(E_k^\dagger E_j)^\dagger}
+  = \trace{E_j^\dagger E_k}
+  = W_{jk} .
+\]
+</p>
+
+<p>
+Let \(\calH\) be the \(d\)​-dimensional Hilbert space on which the \(E_k\) operate. Recall that
+</p>
+
+<p>
+\[
+  A, B \mapsto \trace{A^\dagger B}
+\]
+</p>
+
+<p>
+is a scalar product on the \(d^2\)​-dimensional space of linear operators on \(\calH\) (see
+<a href="https://en.wikipedia.org/wiki/Hilbert%E2%80%93Schmidt_operator">Hilbert-Schmidt space</a>). It turns it into a Hilbert space. The claim that
+\(\rank{W}\leq\?d^2\) thus follows from the following lemma (with \(N=d^2\)).
+</p>
+
+<p>
+<a id="orgc324c14"></a>
+</p>
+<dl class="org-dl">
+<dt>Lemma</dt><dd><p>
+Let \(\{v_j\}_{j=1..M}\) be a bunch of vectors of an \(N\)​-dimensional complex
+Hilbert space \(V\) and define
+</p>
+
+<p>
+\[
+  W_{jk} = \braket{v_j}{v_k} .
+  \]
+</p>
+
+<p>
+Then \(\rank{W}\leq\?N\).
+</p>
+
+<dl class="org-dl">
+<dt>Proof</dt><dd><p>
+Let \(\{b_n\}_{n=1..N}\) be an ONB of \(V\). Hence there are unique numbers
+\(A_{jn}\in\CC\) such that
+</p>
+
+<p>
+\[
+    v_j = \sum_{n=1}^N A_{jn} b_n .
+    \]
+</p>
+
+<p>
+Interpreted as a matrix we have \(A\in\CC^{M\times\?N}\), hence (the rank is always at
+most the minimum of the two dimensions)
+</p>
+
+<p>
+\[ \rank{A} \leq \min(M, N) \leq N . \]
+</p>
+
+<p>
+Consider
+</p>
+
+<p>
+\[
+    W_{jk} = \braket{v_j}{v_k} = \sum_{nm} A_{jn}^* A_{km} \braket{b_n}{b_m}
+    = \sum_n A_{jn}^* A_{kn}
+    = (AA^\dagger)_{kj}
+    \]
+</p>
+
+<p>
+Hence
+</p>
+
+<p>
+\[ W = \left(AA^\dagger \right)^\top \]
+</p>
+
+<p>
+Recall that transposition and conjugation does not change the rank of a
+matrix. Moreover \(\rank{AB}\leq\min(\rank{A},\rank{B})\) for any two matrices
+\(A,B\). The last thing follows easily from the characterization of the rank as the
+dimension of the image of a linear mapping. Hence
+</p>
+
+<p>
+\[
+    \rank{W} \leq \rank{A} \leq N .
+    \]
+</p>
+
+<p>
+QED.
+</p></dd>
+</dl></dd>
+</dl>
+
+<p>
+Let \(M\) be the number of elements. Hence \(W\in\CC^{M\times\?M}\). Since \(W\) is hermitian
+there is a uniatry matrix \(u\in\CC^{M\times\?M}\) such that
+</p>
+
+<p>
+\[
+  D = u W u^\dagger
+\]
+</p>
+
+<p>
+is diagonal. Observe that
+</p>
+
+<p>
+\[
+  D_{jk} = \sum_{mn} u_{jm} W_{mn} u_{kn}^*
+  = \trace{\left(\sum_m u_{jm}^* E_m \right)^\dagger \left( \sum_n u_{kn}^* E_n \right)} .
+\]
+</p>
+
+<p>
+Hence defining \(F_k=\sum_nu_{kn}^*E_n\) we have
+</p>
+
+<p>
+\[
+  D_{jk} = \trace{F_j^\dagger F_k} .
+\]
+</p>
+
+<p>
+We note two things:
+</p>
+
+<ul class="org-ul">
+<li>Since \(D\) is diagonal the \(F_j\) are actual orthogonal with respect to the
+Hilbert-Schmidt scalar product.</li>
+<li>Since \(\rank{D}=\rank{W}\leq\?d^2\) only at most \(d^2\) of the \(F_j\) are non-zero
+(\(\trace{F^\dagger\?F}=0\) implies \(F=0\)).</li>
+</ul>
+
+<p>
+This concludes the proof. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org35fad54" class="outline-3">
+<h3 id="org35fad54">Exercise 8.11</h3>
+<div class="outline-text-3" id="text-org35fad54">
+<p>
+Suppose \(\calE\) is a quantum operation mapping a \(d\)​-dimensional input space to a
+\(d'\)​-dimensional output space. Show that \(\calE\) can be described using a set of at most
+\(dd'\) operation elements \(\{E_k\}\).
+</p>
+</div>
+
+<div id="outline-container-orga45d0f6" class="outline-4">
+<h4 id="orga45d0f6">Proof</h4>
+<div class="outline-text-4" id="text-orga45d0f6">
+<p>
+With a minor adaption we can reduce this to <a href="#exercise-8.10-proof-2">one of the proofs</a> of <a href="#exercise-8.10">exercise 8.10</a>. Let
+</p>
+
+<p>
+\[
+  d_1 = \max(d, d') .
+\]
+</p>
+
+<p>
+Then \(E_k\in\CC^{d\times\?d'}\). By padding with zeros we can interpret the \(E_k\) as
+elements of a \(dd'\)​-dimensional subspace \(V\) of \(\CC^{d_1\times\?d_1}\). Note that this
+does not affect the definition of \(W\).
+</p>
+
+<p>
+Now the proof of the special case \(d=d'\) goes through as is. The crucial thing to note is
+that the <a href="#orgc324c14">lemma</a> has to be applied with \(N=dd'\) and the just defined Hilbert space \(V\). QED.
 </p>
 </div>
 </div>
