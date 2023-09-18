@@ -63,12 +63,13 @@ $$
   \ket{\varphi} \mapsto (\ket{\psi}, \ket{\varphi}) .
 $$
 
-<<exercise-8.1-canonical-iso>>
-In fact, one can prove that any element of $\calH^*$ (that is, any linear map
-$\calH\to\CC$) can be written like this for a /unique/ $\ket{\psi}$. This is called the
-*canonical isomorphism* between $\calH$ and $\calH^*$ (it is called /canonical/ since we
-could define it without knowing anything concrete about our Hilbert space, in other
-words it is definable in the most abstract terms).
+<<exercise-8.1-canonical-iso>> In fact, one can prove that any element of $\calH^*$ (that
+is, any linear map $\calH\to\CC$) can be written like this for a /unique/
+$\ket{\psi}$. This is called the *canonical isomorphism* between $\calH$ and $\calH^*$ (it
+is called /canonical/ since we could define it without knowing anything concrete about our
+Hilbert space, in other words it is definable in the most abstract terms). Note that the
+canonical isomorphism $\iota$ is /conjugate/ linear, that is,
+$\iota(\lambda\ket{\psi})=\bra{\psi}\lambda^*$.
 
 This canonical isomorphism actually motivates the bras. A bra $\bra{\psi}\in\calH^*$ is
 the linear map given by
@@ -141,7 +142,8 @@ QED.
   \iota(\ket{\psi}) = \bra{\psi} .
   $$
 
-  It is not hard to show that
+  It is not hard to show and extension of the conjugate-linearity property of the
+  canonical isomorphism:
 
   $$
   \iota(U\ket{\psi}) = \iota(\ket{\psi}) U^\dagger = \bra{\psi} U^\dagger .
@@ -609,3 +611,155 @@ $$
   \frac{\ptrace{E}{P_m U \rho \otimes \proj{e_0} U^\dagger P_m}}{p(m)}
   = \frac{\calE_m(\rho)}{\trace{\calE_m(\rho)}} .
 $$
+
+** Exercise 8.10
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.10
+:END:
+Give a proof of Theorem 8.3 based on the freedom in the operator-sum representation, as
+follows. Let $\{E_j\}$ be a set of operation elements for $\calE$. Define a matrix
+$W_{jk}=\trace{E_j^\dagger\?E_k}$. Show that the matrix $W$ is Hermitian and of rank at
+most $d^2$, and thus there is unitary matrix $u$ such that $uWu^\dagger$ is diagonal with
+at most $d^2$ non-zero entries. Use $u$ to deﬁne a new set of at most $d^2$ non-zero
+operation elements $\{F_j\}$ for $\calE$.
+
+*** Proof 1
+The statement is a direct consequence of the proof of Kraus's Theorem as given in the book
+(Theorem 8.1). Recall that the diagonalization of $\sigma$
+
+$$
+  \sigma = \sum_{k=1}^M \proj{s_k}
+$$
+
+is used to define the operation elements by
+
+$$
+  E_k \ket{\psi} = \braket{\tilde{\psi}}{s_k}
+$$
+
+That is, there are precisely $M$ elements to be defined. How large can $M$ be? Recall that
+$\sigma$ is a density matrix on the Hilbert space $\calH_R\otimes\calH_Q$ of the joint
+system $RQ$. By assumption $d=\dim(\calH_Q)$ and by construction
+$\dim(\calH_R)=\dim(\calH_Q)=d$. Hence
+
+$$
+  \dim(\calH_R\otimes\calH_Q) = d^2 .
+$$
+
+Hence $\sigma\in\CC^{d^2\times\?d^2}$ and therefore $M\leq\?d^2$. QED.
+
+*** Proof 2
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.10-proof-2
+:END:
+The matrix $W$ is hermitian because
+
+$$
+  W_{kj}^* = \trace{E_k^\dagger E_j}^*
+  = \trace{(E_k^\dagger E_j)^\dagger}
+  = \trace{E_j^\dagger E_k}
+  = W_{jk} .
+$$
+
+Let $\calH$ be the $d$​-dimensional Hilbert space on which the $E_k$ operate. Recall that
+
+$$
+  A, B \mapsto \trace{A^\dagger B}
+$$
+
+is a scalar product on the $d^2$​-dimensional space of linear operators on $\calH$ (see
+[[https://en.wikipedia.org/wiki/Hilbert%E2%80%93Schmidt_operator][Hilbert-Schmidt space]]). It turns it into a Hilbert space. The claim that
+$\rank{W}\leq\?d^2$ thus follows from the following lemma (with $N=d^2$).
+
+<<exercise-8.10-lemma>>
+- Lemma :: Let $\{v_j\}_{j=1..M}$ be a bunch of vectors of an $N$​-dimensional complex
+  Hilbert space $V$ and define
+
+  $$
+  W_{jk} = \braket{v_j}{v_k} .
+  $$
+
+  Then $\rank{W}\leq\?N$.
+
+  - Proof :: Let $\{b_n\}_{n=1..N}$ be an ONB of $V$. Hence there are unique numbers
+    $A_{jn}\in\CC$ such that
+
+    $$
+    v_j = \sum_{n=1}^N A_{jn} b_n .
+    $$
+
+    Interpreted as a matrix we have $A\in\CC^{M\times\?N}$, hence (the rank is always at
+    most the minimum of the two dimensions)
+
+    $$ \rank{A} \leq \min(M, N) \leq N . $$
+
+    Consider
+
+    $$
+    W_{jk} = \braket{v_j}{v_k} = \sum_{nm} A_{jn}^* A_{km} \braket{b_n}{b_m}
+    = \sum_n A_{jn}^* A_{kn}
+    = (AA^\dagger)_{kj}
+    $$
+
+    Hence
+
+    $$ W = \left(AA^\dagger \right)^\top $$
+
+    Recall that transposition and conjugation does not change the rank of a
+    matrix. Moreover $\rank{AB}\leq\min(\rank{A},\rank{B})$ for any two matrices
+    $A,B$. The last thing follows easily from the characterization of the rank as the
+    dimension of the image of a linear mapping. Hence
+
+    $$
+    \rank{W} \leq \rank{A} \leq N .
+    $$
+
+    QED.
+
+Let $M$ be the number of elements. Hence $W\in\CC^{M\times\?M}$. Since $W$ is hermitian
+there is a uniatry matrix $u\in\CC^{M\times\?M}$ such that
+
+$$
+  D = u W u^\dagger
+$$
+
+is diagonal. Observe that
+
+$$
+  D_{jk} = \sum_{mn} u_{jm} W_{mn} u_{kn}^*
+  = \trace{\left(\sum_m u_{jm}^* E_m \right)^\dagger \left( \sum_n u_{kn}^* E_n \right)} .
+$$
+
+Hence defining $F_k=\sum_nu_{kn}^*E_n$ we have
+
+$$
+  D_{jk} = \trace{F_j^\dagger F_k} .
+$$
+
+We note two things:
+
+- Since $D$ is diagonal the $F_j$ are actual orthogonal with respect to the
+  Hilbert-Schmidt scalar product.
+- Since $\rank{D}=\rank{W}\leq\?d^2$ only at most $d^2$ of the $F_j$ are non-zero
+  ($\trace{F^\dagger\?F}=0$ implies $F=0$).
+
+This concludes the proof. QED.
+
+** Exercise 8.11
+Suppose $\calE$ is a quantum operation mapping a $d$​-dimensional input space to a
+$d'$​-dimensional output space. Show that $\calE$ can be described using a set of at most
+$dd'$ operation elements $\{E_k\}$.
+
+*** Proof
+With a minor adaption we can reduce this to [[#exercise-8.10-proof-2][one of the proofs]] of [[#exercise-8.10][exercise 8.10]]. Let
+
+$$
+  d_1 = \max(d, d') .
+$$
+
+Then $E_k\in\CC^{d\times\?d'}$. By padding with zeros we can interpret the $E_k$ as
+elements of a $dd'$​-dimensional subspace $V$ of $\CC^{d_1\times\?d_1}$. Note that this
+does not affect the definition of $W$.
+
+Now the proof of the special case $d=d'$ goes through as is. The crucial thing to note is
+that the [[exercise-8.10-lemma][lemma]] has to be applied with $N=dd'$ and the just defined Hilbert space $V$. QED.
