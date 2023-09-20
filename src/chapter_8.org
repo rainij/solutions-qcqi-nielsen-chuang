@@ -8,7 +8,25 @@
 #+toc: headlines 2
 
 * Setup
+** Imports
+#+name: imports-chapter-8-1
+#+begin_src sage
+  from utils_sage import Id, X, Y, Z, delta, eps, inner
+#+end_src
+
+Let us set up some variables
+
+#+name: global-variables
+#+begin_src sage
+  p, g = SR.var('p g', domain='positive')
+
+  # We want to use p as a probability, not sure if this does anything, but looks useful:
+  assume(p <= 1)
+  assume(g <= 1)
+#+end_src
+
 ** Bloch sphere representation
+*** Derivation of the formula for $M_{jk}$ and $c_k$
 For convenience I provide a derivation of formulas (8.91) and (8.92) for the
 representation of a quantum operation on a single-qubit principal system:
 
@@ -170,6 +188,84 @@ $$
 $$
 
 which yields the remaining terms in the formula for $M$. QED.
+
+*** Sage code
+The following function implements $M$ and $c$ from the previous section in sage.
+
+#+name: single-qubit-operation-elements-bloch
+#+begin_src sage
+  def affine(*Es):
+      """Maps a list of single-qubit operation elements to their Bloch-representation
+
+      Args:
+          Es: A list of single qubit operation elements, trace preserving.
+
+      Returns:
+          M, c: as in formulas (8.91) and (8.92)
+      """
+      N = len(Es)
+
+      assert N != 0, "Need at least one operation element"
+      assert all([len(E) == 4 for E in Es]), "Need 4 coefficients for each Ei"
+
+      alpha = [E[0] for E in Es]
+      bs = [E[1:4] for E in Es]
+
+      M = [[sum(
+            bs[l][j] * bs[l][k].conjugate() + bs[l][j].conjugate() * bs[l][k]
+            + delta(j, k) * alpha[l] * alpha[l].conjugate()
+            - delta(j, k) * sum(bs[l][p] * bs[l][p].conjugate() for p in range(3))
+            + I * sum(eps(j, k, p)*(alpha[l]*bs[l][p].conjugate() - alpha[l].conjugate()*bs[l][p])
+                      for p in range(3))
+          for l in range(N)) for k in range(3)] for j in range(3)]
+
+      c = [sum(sum(sum(
+               2*i * eps(j, p, k) * bs[l][j] * bs[l][p].conjugate()
+             for p in range(3)) for j in range(3)) for l in range(N))
+           for k in range(3)]
+
+      return simplify(matrix(M)), simplify(vector(c))
+
+
+  def toPauli(M):
+      """Takes a 2x2 matrix and returns its coefficients in the Pauli-Basis (I,X,Y,Z)."""
+      assert M.dimensions() == (2, 2), "Expected a two dimensional matrix"
+      return [inner(p/2, M) for p in [Id, X, Y, Z]]
+#+end_src
+
+Now we are prepared to consider the examples from the book. First let us consider the
+*bit-flip*:
+
+#+begin_src sage :tangle no :results replace
+  E0 = sqrt(p) * Id
+  E1 = sqrt(1-p) * X
+
+  M, c = affine(*[toPauli(E) for E in [E0, E1]])
+
+  assert M == matrix.diagonal([1, 2*p-1, 2*p-1])
+  assert c == vector([0, 0, 0])
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+Next consider the *amplitude damping*:
+
+#+begin_src sage :tangle no :results replace
+  E0 = matrix.diagonal([1, sqrt(1-g)])
+  E1 = matrix([[0, sqrt(g)], [0, 0]])
+
+  M, c = affine(*[toPauli(E) for E in [E0, E1]])
+  M = M.expand()
+
+  assert M == matrix.diagonal([sqrt(1-g), sqrt(1-g), 1-g])
+  assert c == vector([0, 0, g])
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
 
 * Exercises
 ** Exercise 8.1 (Unitary evolution as a quantum operation)

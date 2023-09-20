@@ -114,3 +114,35 @@ Some multi-qubit gates:
     [0, 0, 0, 1],
   ])
 #+end_src
+
+Hilbert-Schmidt inner product:
+
+#+name: hilbert-schmidt
+#+begin_src sage
+  def inner(A, B):
+      """Hilbert-Schmidt inner product"""
+      return (A.H * B).trace()
+#+end_src
+
+Kronecker delta and friends:
+
+#+name: kronecker-delta-and-friends
+#+begin_src sage
+  def sgn(i):
+      """Signum function."""
+      if i == 0:
+          return 0
+
+      return +1 if i > 0 else -1
+
+
+  def delta(i, j):
+      """Kronecker delta."""
+      return 1 if i == j else 0
+
+
+  def eps(i, j, k):
+      """Levi-Civita symbol."""
+      assert all(s in [0, 1, 2] for s in [i, j, k]), "Only arguments from 0, 1, 2 are allowed"
+      return (j - i) * (k - j) * (k - i) / 2
+#+end_src

@@ -4,7 +4,7 @@
 TANGLE_PY := chapter_2 chapter_3 chapter_4 chapter_5 chapter_6
 TANGLE_PY += appendix_2
 TANGLE_PY += continued_fractions utils
-TANGLE_SAGE := chapter_7
+TANGLE_SAGE := chapter_7 chapter_8
 TANGLE_SAGE += utils
 
 THIS_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
