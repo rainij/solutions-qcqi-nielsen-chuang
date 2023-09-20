@@ -7,6 +7,170 @@
 
 #+toc: headlines 2
 
+* Setup
+** Bloch sphere representation
+For convenience I provide a derivation of formulas (8.91) and (8.92) for the
+representation of a quantum operation on a single-qubit principal system:
+
+\begin{align*}
+  M_{jk} &= \sum_l \left[
+    a_{lj} a_{lk}^* + a_{lj}^* a_{lk} +
+    \left(\abs{\alpha_l}^2 - \sum_p \abs{a_{lp}}^2 \right) \delta_{jk} +
+    \ii \sum_p \epsilon_{jkp} (\alpha_l a_{lp}^* - \alpha_l^* a_{lp})
+  \right] , \\
+  c_k &= 2 \ii \sum_l \sum_{jp} \epsilon_{jpk} a_{lj} a_{lp}^* .
+\end{align*}
+
+Here we assume that the operation elements look as follows:
+
+$$
+  E_l = \alpha_l + \sum_{k=1}^3 a_{lk} \sigma_k ,
+$$
+
+and satisfy the trace-preserving property $\sum_lE_l^\dagger\?E_l=1$ (here and in the
+following I write scalars in place of multiples of the identity matrix). Let
+
+$$
+  \rho = \frac{1}{2} (1 + r_k \sigma_k) .
+$$
+
+Throughout this section (about Bloch sphere) let us apply a variant of *Einsteins
+summation convention*. Whenever a free index appears twice in a /product expression/ we
+sum over it. For example, the above formula for $\rho$ means
+
+$$
+  \rho = \frac{1}{2} (1 + \sum_k r_k \sigma_k) .
+$$
+
+As a special case we implicitly read $\abs{x_i}^2$ as $x_ix_i^*$ and hence imply summation
+over $i$ in case of a square of an absolute value too. Let us start by considering the
+trace-preserving condition
+
+$$
+  1 = E_l^\dagger E_l = (\alpha_l^* + a_{lp}^*\sigma_p) (\alpha_l + a_{lp}\sigma_q)
+  = \abs{\alpha_l}^2 + \alpha_l^* a_{lp} \sigma_p + \alpha_l a_{lp}^* \sigma_p + a_{lp}^*a_{lp} \sigma_p \sigma_q .
+$$
+
+Note that $\sigma_p\sigma_q=\ii\epsilon_{pqk}\sigma_k+\delta_{pq}$. Hence
+
+$$
+  1 = \abs{\alpha_l}^2 + \abs{a_{lp}}^2 +
+    2\Re(\alpha_la_{lk}^*)\sigma_k + \ii\epsilon_{pqk} a_{lp}^* a_{lq} \sigma_k .
+$$
+
+We can deduce the two constraints the coefficients $\alpha$ and $a$ have to satisfy in
+order for the trace-preserving property to hold (we use here that the Pauli operators
+together with the identity are a (orthonormal) basis of $\CC^{2\times2}$):
+
+<<trace-preserving-condition-1>>
+$$
+  \abs{\alpha_l}^2 + \abs{a_{lp}}^2 = 1 ,
+$$
+
+and
+
+<<trace-preserving-condition-2>>
+$$
+  \forall k: \; \ii\epsilon_{pqk} a_{lp}^* a_{lq} = -2\Re(\alpha_la_{lk}^*) .
+$$
+
+Now consider
+
+$$
+  2 \calE(\rho) =
+  2 E_l \rho E_l^\dagger = (\alpha_l + a_{lp}\sigma_p) (1 + r_k \sigma_k) (\alpha_l^* + a_{lq}^*\sigma_q)
+  =: I_1 + I_2 ,
+$$
+
+where the $I_1$ corresponds to the $1$ in the middle factor and $I_2$ to the $r_k\sigma_k$
+in the middle factor. In case you wonder: the factor of $2$ at the front should make the
+expression a bit simpler by avoiding numerous factors $1/2$ in the following.
+
+\begin{align*}
+  I_1 &= \abs{\alpha_l}^2 + \alpha_l a_{lp}^* \sigma_p + \alpha_l^* a_{lp} \sigma_p +
+    a_{lp}a_{lq}^* \sigma_p\sigma_q \\
+  &= \abs{\alpha_l}^2 + \abs{a_{lp}}^2 + 2\Re(\alpha_la_{lk}^*)\sigma_k
+    + \ii\epsilon_{pqk} a_{lp} a_{lq}^* \sigma_k \\
+  &= 1 + 2\ii \epsilon_{pqk} a_{lp} a_{lq}^* \sigma_k .
+\end{align*}
+
+For the last equality we used the [[trace-preserving-condition-1][first]] and [[trace-preserving-condition-2][second]] formula for the
+trace-preservation. Since $I_1$ contains the part of $2\calE(\rho)=1+r_k'\sigma_k$ which
+does not depend on on the $r_k$ we already proved the formula for $c_k$. The treatment of
+$I_2$ is a bit more involved.
+
+\begin{align*}
+  I_2 &= \abs{\alpha_l}^2 r_k \sigma_k +
+    \alpha_l a_{lp}^* r_k \sigma_k\sigma_p + \alpha_l^* a_{lp} r_k \sigma_p\sigma_k +
+    a_{lp} a_{lq}^* r_k \sigma_p \sigma_k \sigma_q \\
+  &= \abs{\alpha_l}^2 r_k \sigma_k +
+    \alpha_l a_{lp}^* r_k (\ii\epsilon_{kpj}\sigma_j + \delta_{kp}) +
+    \alpha_l^* a_{lp} r_k (-\ii\epsilon_{kpj}\sigma_j + \delta_{kp}) +
+    a_{lp} a_{lq}^* r_k \sigma_p \sigma_k \sigma_q \\
+  &=: I_{20} + I_{21} + I_{22} .
+\end{align*}
+
+Here $I_{22}$ stands for the last summand (the product of three Paulis), $I_{21}$ stands for
+the two commands involving the $\delta_{kp}$. Finally $I_{20}$ is the rest. Note that
+$I_{20}$ already corresponds to terms appearing in the formula for $M_{jk}$ and hence
+needs no further treatment. We have
+
+$$
+  I_{21} = \alpha_l a_{lk}^* r_k + \alpha_l^* a_{lk} r_k
+  = 2 \Re(\alpha_l a_{lk}^*) r_k .
+$$
+
+Note that this term cannot have any possible correspondence in $M$ (or $c$). Hence we
+expect it to be cancelled by $I_{22}$. Therefore let us finally consider $I_{22}$. Note
+that
+
+$$
+  \sigma_p \sigma_k \sigma_q = - \sigma_p \sigma_q \sigma_k + 2 \sigma_p \delta_{qk} .
+$$
+
+Hence
+
+$$
+  I_{22} = (- a_{lp} a_{lq}^* \sigma_p\sigma_q) r_k\sigma_k + 2 a_{lp} a_{lk}^* r_k \sigma_p
+  =: J_1 + J_2 .
+$$
+
+Moreover
+
+$$
+  J_1 = (-\abs{a_{lp}}^2 - \ii\epsilon_{pqs}a_{lp}a_{lq}^* \sigma_s) r_k\sigma_k
+  = -\abs{a_{lp}}^2 r_k\sigma_k - \ii\epsilon_{pqk}a_{lp}a_{lq}^* -
+    \ii \epsilon_{pqs} a_{lp}a_{lq}^* \sigma_s (r_p \sigma_p + r_q \sigma_q)
+  =: J_{10} + J_{11} + J_{12} .
+$$
+
+For the second equality I splitted the summation over $k$ into $k=s$ and $k\neq\?s$ (this
+leads to a tiny clash with out summation convention but shouldn't be a major hurdle for
+understanding the calculations). Note that $J_{10}$ corresponds to a term in $M$, so with
+this one we are done. By [[trace-preserving-condition-2][trace-preservation]] we have that
+
+$$
+  J_{11} + I_{21} = 0 ,
+$$
+
+which is the awaited cancellation for $I_{21}$. So these terms are also done. Recall that
+the only still open terms are $J_{12}$ and $J_2$. We will go on with the former.
+
+$$
+  J_{12} = -\ii a_{lp} a_{lq}^* \left( \epsilon_{pqs}
+    \left[ r_p \ii \epsilon_{spq}\sigma_q + r_q \ii \epsilon_{sqp}\sigma_p \right] \right)
+  = a_{lp} a_{lq}^* (r_p\sigma_q - r_q \sigma_p) .
+$$
+
+This can be nicely combined with $J_2$:
+
+$$
+  J_{12} + J_2 = a_{lp} a_{lq}^* r_p \sigma_q + a_{lp} a_{lq}^* r_q \sigma_p
+  = a_{lk} a_{lj}^* r_k \sigma_j + a_{lj} a_{lk}^* r_k \sigma_j ,
+$$
+
+which yields the remaining terms in the formula for $M$. QED.
+
 * Exercises
 ** Exercise 8.1 (Unitary evolution as a quantum operation)
 :PROPERTIES:
@@ -394,7 +558,7 @@ the outcome the state "collapses" to one of the two summands (properly normalize
 course). The respective probabilities are $\rho_{00}$ (for outcome $0$) and $\rho_{11}$
 (for outcome $1$).
 
-** Exercise 8.5 (Spin ﬂips)
+** Exercise 8.5 (Spin flips)
 Just as in the previous exercise, but now let
 
 $$
