@@ -1,7 +1,7 @@
 from sage.all import SR, sqrt, matrix, vector
 
 from utils_sage import Id, X, Y, Z
-from chapter_8_sage import p, g, affine, toPauli
+from chapter_8_sage import p, g, affine, toPauli, make_qop1d_matrix_4d
 
 
 def test_toPauli():
@@ -22,6 +22,10 @@ def test_affine_bitflip():
     assert M == matrix.diagonal([1, 2*p-1, 2*p-1])
     assert c == vector([0, 0, 0])
 
+    # Represantation as linear map RR^4 to RR^4:
+    M4 = make_qop1d_matrix_4d([E0, E1])
+    assert M4 == matrix.diagonal([1, 1, 2*p-1, 2*p-1])
+
 
 def test_affine_amplitude_damping():
     E0 = matrix.diagonal([1, sqrt(1-g)])
@@ -32,3 +36,12 @@ def test_affine_amplitude_damping():
 
     assert M == matrix.diagonal([sqrt(1-g), sqrt(1-g), 1-g])
     assert c == vector([0, 0, g])
+
+    # Represantation as linear map RR^4 to RR^4:
+    M4 = make_qop1d_matrix_4d([E0, E1])
+    assert M4 == matrix([
+        [1,         0,         0,   0],
+        [0, sqrt(1-g),         0,   0],
+        [0,         0, sqrt(1-g),   0],
+        [g,         0,         0, 1-g],
+    ])
