@@ -39,45 +39,49 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgda03afc">Setup</a>
+<li><a href="#org9723cf7">Setup</a>
 <ul>
-<li><a href="#org35500bd">Imports</a></li>
-<li><a href="#orgbe438b8">Bloch sphere representation</a></li>
+<li><a href="#org881531e">Imports</a></li>
+<li><a href="#orgd3443e1">Bloch sphere representation</a></li>
 </ul>
 </li>
-<li><a href="#org4954b86">Exercises</a>
+<li><a href="#org25a4536">Exercises</a>
 <ul>
 <li><a href="#exercise-8.1">Exercise 8.1 (Unitary evolution as a quantum operation)</a></li>
-<li><a href="#org9c53e59">Exercise 8.2 (Measurement as a quantum operation)</a></li>
-<li><a href="#org615bb38">Exercise 8.3</a></li>
+<li><a href="#orgfcbdb87">Exercise 8.2 (Measurement as a quantum operation)</a></li>
+<li><a href="#org4fa0187">Exercise 8.3</a></li>
 <li><a href="#exercise-8.4">Exercise 8.4 (Measurement)</a></li>
-<li><a href="#org58629f3">Exercise 8.5 (Spin flips)</a></li>
-<li><a href="#orge92af2e">Exercise 8.6 (Composition of quantum operations)</a></li>
-<li><a href="#org868e7f7">Exercise 8.7</a></li>
-<li><a href="#orge6bdd6f">Exercise 8.8 (Non-trace-preserving quantum operations)</a></li>
-<li><a href="#orge5aae60">Exercise 8.9 (Measurement model)</a></li>
+<li><a href="#org4c2e2dc">Exercise 8.5 (Spin flips)</a></li>
+<li><a href="#org27a8644">Exercise 8.6 (Composition of quantum operations)</a></li>
+<li><a href="#orga391753">Exercise 8.7</a></li>
+<li><a href="#org9f44ae8">Exercise 8.8 (Non-trace-preserving quantum operations)</a></li>
+<li><a href="#orgc643424">Exercise 8.9 (Measurement model)</a></li>
 <li><a href="#exercise-8.10">Exercise 8.10</a></li>
-<li><a href="#orgf71485d">Exercise 8.11</a></li>
-<li><a href="#orgb260e97"><span class="todo WIP">WIP</span> Exercise 8.12</a></li>
-<li><a href="#orgba54f90">Exercise 8.13</a></li>
-<li><a href="#orgac57078">Exercise 8.14</a></li>
-<li><a href="#orgd1b9c70">Exercise 8.15</a></li>
+<li><a href="#org60ddb69">Exercise 8.11</a></li>
+<li><a href="#org70c4779"><span class="todo WIP">WIP</span> Exercise 8.12</a></li>
+<li><a href="#org3184480">Exercise 8.13</a></li>
+<li><a href="#org2bbbf57">Exercise 8.14</a></li>
+<li><a href="#org687fcd0">Exercise 8.15</a></li>
 <li><a href="#exercise-8.16">Exercise 8.16</a></li>
+<li><a href="#org463adc0">Exercise 8.17</a></li>
+<li><a href="#orgfcbe06c">Exercise 8.18</a></li>
+<li><a href="#org9c8f128">Exercise 8.19</a></li>
+<li><a href="#org59d3b80">Exercise 8.20 (Circuit model for amplitude damping)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgda03afc" class="outline-2">
-<h2 id="orgda03afc">Setup</h2>
-<div class="outline-text-2" id="text-orgda03afc">
+<div id="outline-container-org9723cf7" class="outline-2">
+<h2 id="org9723cf7">Setup</h2>
+<div class="outline-text-2" id="text-org9723cf7">
 </div>
-<div id="outline-container-org35500bd" class="outline-3">
-<h3 id="org35500bd">Imports</h3>
-<div class="outline-text-3" id="text-org35500bd">
+<div id="outline-container-org881531e" class="outline-3">
+<h3 id="org881531e">Imports</h3>
+<div class="outline-text-3" id="text-org881531e">
 <div class="org-src-container">
-<pre class="src src-sage" id="org9d4be42"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> Id, X, Y, Z, delta, eps, inner
+<pre class="src src-sage" id="org86cc489"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> Id, X, Y, Z, delta, eps, inner
 </pre>
 </div>
 
@@ -86,7 +90,7 @@ Let us set up some variables
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgec2860f"><span class="org-variable-name">p</span>, <span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'p g'</span>, domain<span class="org-operator">=</span><span class="org-string">'positive'</span>)
+<pre class="src src-sage" id="orgc219dda"><span class="org-variable-name">p</span>, <span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'p g'</span>, domain<span class="org-operator">=</span><span class="org-string">'positive'</span>)
 <span class="org-variable-name">x</span>, <span class="org-variable-name">y</span>, <span class="org-variable-name">z</span>, <span class="org-variable-name">e</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'x y z e'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 <span class="org-variable-name">u</span>, <span class="org-variable-name">v</span>, <span class="org-variable-name">w</span>, <span class="org-variable-name">s</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'u v w s'</span>, domain<span class="org-operator">=</span><span class="org-string">'complex'</span>)
 
@@ -97,10 +101,9 @@ assume(g <span class="org-operator">&lt;=</span> 1)
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgbe438b8" class="outline-3">
-<h3 id="orgbe438b8">Bloch sphere representation</h3>
-<div class="outline-text-3" id="text-orgbe438b8">
+<div id="outline-container-orgd3443e1" class="outline-3">
+<h3 id="orgd3443e1">Bloch sphere representation</h3>
+<div class="outline-text-3" id="text-orgd3443e1">
 </div>
 <div id="outline-container-chapter-8-bloch-M-c" class="outline-4">
 <h4 id="chapter-8-bloch-M-c">Derivation of the formula for \(M_{jk}\) and \(c_k\)</h4>
@@ -183,7 +186,7 @@ together with the identity are a (orthonormal) basis of \(\CC^{2\times2}\)):
 </p>
 
 <p>
-<a id="org9c92a6e"></a>
+<a id="org433b7f8"></a>
 \[
   \abs{\alpha_l}^2 + \abs{a_{lp}}^2 = 1 ,
 \]
@@ -194,7 +197,7 @@ and
 </p>
 
 <p>
-<a id="orgfed231a"></a>
+<a id="org0483f27"></a>
 \[
   \forall k: \; \ii\epsilon_{pqk} a_{lp}^* a_{lq} = -2\Re(\alpha_la_{lk}^*) .
 \]
@@ -227,7 +230,7 @@ expression a bit simpler by avoiding numerous factors \(1/2\) in the following.
 \end{align*}
 
 <p>
-For the last equality we used the <a href="#org9c92a6e">first</a> and <a href="#orgfed231a">second</a> formula for the
+For the last equality we used the <a href="#org433b7f8">first</a> and <a href="#org0483f27">second</a> formula for the
 trace-preservation. Since \(I_1\) contains the part of \(2\calE(\rho)=1+r_k'\sigma_k\) which
 does not depend on on the \(r_k\) we already proved the formula for \(c_k\). The treatment of
 \(I_2\) is a bit more involved.
@@ -298,7 +301,7 @@ Moreover
 For the second equality I splitted the summation over \(k\) into \(k=s\) and \(k\neq\?s\) (this
 leads to a tiny clash with out summation convention but shouldn't be a major hurdle for
 understanding the calculations). Note that \(J_{10}\) corresponds to a term in \(M\), so with
-this one we are done. By <a href="#orgfed231a">trace-preservation</a> we have that
+this one we are done. By <a href="#org0483f27">trace-preservation</a> we have that
 </p>
 
 <p>
@@ -337,15 +340,15 @@ which yields the remaining terms in the formula for \(M\). QED.
 </div>
 </div>
 
-<div id="outline-container-org24d1844" class="outline-4">
-<h4 id="org24d1844">Sage code</h4>
-<div class="outline-text-4" id="text-org24d1844">
+<div id="outline-container-org1c6e49f" class="outline-4">
+<h4 id="org1c6e49f">Sage code</h4>
+<div class="outline-text-4" id="text-org1c6e49f">
 <p>
 The following function implements \(M\) and \(c\) from the previous section in sage.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org6f31043"><span class="org-keyword">def</span> <span class="org-function-name">affine</span>(<span class="org-operator">*</span>Es):
+<pre class="src src-sage" id="org13e8361"><span class="org-keyword">def</span> <span class="org-function-name">affine</span>(<span class="org-operator">*</span>Es):
     <span class="org-doc">"""Maps a list of single-qubit operation elements to their Bloch-representation</span>
 
 <span class="org-doc">    Args:</span>
@@ -397,7 +400,7 @@ Now we are prepared to consider the examples from the book. First let us conside
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org365aefe"><span class="org-variable-name">E0</span> <span class="org-operator">=</span> sqrt(p) <span class="org-operator">*</span> Id
+<pre class="src src-sage" id="org1bb7203"><span class="org-variable-name">E0</span> <span class="org-operator">=</span> sqrt(p) <span class="org-operator">*</span> Id
 <span class="org-variable-name">E1</span> <span class="org-operator">=</span> sqrt(1<span class="org-operator">-</span>p) <span class="org-operator">*</span> X
 
 <span class="org-variable-name">M</span>, <span class="org-variable-name">c</span> <span class="org-operator">=</span> affine(<span class="org-operator">*</span>[toPauli(E) <span class="org-keyword">for</span> E <span class="org-keyword">in</span> [E0, E1]])
@@ -407,11 +410,6 @@ Now we are prepared to consider the examples from the book. First let us conside
 <span class="org-string">"PASSED"</span>
 </pre>
 </div>
-
-<pre class="example">
-'PASSED'
-</pre>
-
 
 <pre class="example">
 'PASSED'
@@ -449,7 +447,7 @@ Pauli-operators \((I,X,Y,Z)\).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org8c56f50"><span class="org-comment-delimiter"># </span><span class="org-comment">A generalized density matrix and an arbitrary operator E:</span>
+<pre class="src src-sage" id="orgf93f7f2"><span class="org-comment-delimiter"># </span><span class="org-comment">A generalized density matrix and an arbitrary operator E:</span>
 <span class="org-variable-name">rho_gen</span> <span class="org-operator">=</span> (e <span class="org-operator">+</span> x<span class="org-operator">*</span>X <span class="org-operator">+</span> y<span class="org-operator">*</span>Y <span class="org-operator">+</span> z<span class="org-operator">*</span>Z)
 <span class="org-variable-name">E_gen</span> <span class="org-operator">=</span> s<span class="org-operator">*</span>Id <span class="org-operator">+</span> u<span class="org-operator">*</span>X <span class="org-operator">+</span> v<span class="org-operator">*</span>Y <span class="org-operator">+</span> w<span class="org-operator">*</span>Z
 
@@ -466,7 +464,7 @@ The corresponding matrix is given by
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org3111e93"><span class="org-keyword">def</span> <span class="org-function-name">make_qop1d_matrix_4d</span>(Es):
+<pre class="src src-sage" id="org1570f6e"><span class="org-keyword">def</span> <span class="org-function-name">make_qop1d_matrix_4d</span>(Es):
     <span class="org-doc">"""Return the matrix representation on RR^4 of the operation given by the</span>
 <span class="org-doc">    elements. Works for non-trace-preserving operations too."""</span>
     <span class="org-variable-name">bs</span> <span class="org-operator">=</span> matrix.identity(4)
@@ -478,9 +476,9 @@ The corresponding matrix is given by
 </div>
 </div>
 
-<div id="outline-container-org4954b86" class="outline-2">
-<h2 id="org4954b86">Exercises</h2>
-<div class="outline-text-2" id="text-org4954b86">
+<div id="outline-container-org25a4536" class="outline-2">
+<h2 id="org25a4536">Exercises</h2>
+<div class="outline-text-2" id="text-org25a4536">
 </div>
 <div id="outline-container-exercise-8.1" class="outline-3">
 <h3 id="exercise-8.1">Exercise 8.1 (Unitary evolution as a quantum operation)</h3>
@@ -492,13 +490,13 @@ for \(\rho=\proj{\psi}\).
 </p>
 </div>
 
-<div id="outline-container-orgea9512a" class="outline-4">
-<h4 id="orgea9512a">Proof</h4>
-<div class="outline-text-4" id="text-orgea9512a">
+<div id="outline-container-orgd2b299f" class="outline-4">
+<h4 id="orgd2b299f">Proof</h4>
+<div class="outline-text-4" id="text-orgd2b299f">
 </div>
-<div id="outline-container-org9e18da6" class="outline-5">
-<h5 id="org9e18da6">Preparation</h5>
-<div class="outline-text-5" id="text-org9e18da6">
+<div id="outline-container-org6df373e" class="outline-5">
+<h5 id="org6df373e">Preparation</h5>
+<div class="outline-text-5" id="text-org6df373e">
 <p>
 This is a really basic question and it should actually be obvious <i>if</i> you really
 understand the bra-ket notation (beware however that it might <i>appear</i> to be obvious if
@@ -565,7 +563,7 @@ space</i> \(\calH^*\) which is just the space of linear maps \(\calH\to\CC\). Fo
 </p>
 
 <p>
-<a id="org8bca372"></a> In fact, one can prove that any element of \(\calH^*\) (that
+<a id="orgf961379"></a> In fact, one can prove that any element of \(\calH^*\) (that
 is, any linear map \(\calH\to\CC\)) can be written like this for a <i>unique</i>
 \(\ket{\psi}\). This is called the <b>canonical isomorphism</b> between \(\calH\) and \(\calH^*\) (it
 is called <i>canonical</i> since we could define it without knowing anything concrete about our
@@ -614,9 +612,9 @@ are the left and right half of the scalar product.
 </div>
 </div>
 
-<div id="outline-container-org8755f16" class="outline-5">
-<h5 id="org8755f16">The actual proof</h5>
-<div class="outline-text-5" id="text-org8755f16">
+<div id="outline-container-orgd11093f" class="outline-5">
+<h5 id="orgd11093f">The actual proof</h5>
+<div class="outline-text-5" id="text-orgd11093f">
 <p>
 Let us return to the actual exercise. We use the above notation \((\ldots,\ldots)\) for the
 scalar product to make the derivation clearer. Let \(U\) be a unitary operator on \(\calH\)
@@ -677,7 +675,7 @@ QED.
 <dl class="org-dl">
 <dt>Remark</dt><dd><p>
 There is another slightly deeper way to see this result. Let us denote the
-above mentioned <a href="#org8bca372">canonical isomorphism</a> by
+above mentioned <a href="#orgf961379">canonical isomorphism</a> by
 </p>
 
 <p>
@@ -708,9 +706,9 @@ right composition with \(U^\dagger\). From this the claim of the exercise follow
 </div>
 </div>
 
-<div id="outline-container-org9c53e59" class="outline-3">
-<h3 id="org9c53e59">Exercise 8.2 (Measurement as a quantum operation)</h3>
-<div class="outline-text-3" id="text-org9c53e59">
+<div id="outline-container-orgfcbdb87" class="outline-3">
+<h3 id="orgfcbdb87">Exercise 8.2 (Measurement as a quantum operation)</h3>
+<div class="outline-text-3" id="text-orgfcbdb87">
 <p>
 Recall from Section 2.2.3 (on page 84) that a quantum measurement with outcomes labeled by
 \(m\) is described by a set of measurement operators \(M_m\) such that
@@ -731,9 +729,9 @@ Also show that the probability of obtaining this measurement result is
 </p>
 </div>
 
-<div id="outline-container-orgc5883d6" class="outline-4">
-<h4 id="orgc5883d6">Solution</h4>
-<div class="outline-text-4" id="text-orgc5883d6">
+<div id="outline-container-org83f85e1" class="outline-4">
+<h4 id="org83f85e1">Solution</h4>
+<div class="outline-text-4" id="text-org83f85e1">
 <p>
 Clearly the exercise assumes that we only know the postulates of quantum mechanics for
 <i>pure</i> states as detailed in section 2.2.3 and not the generalization to mixed states as
@@ -751,7 +749,7 @@ follows from the <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_pro
 </p>
 
 <p>
-<a id="org7a1f08a"></a>
+<a id="org0bf5e93"></a>
 \[
   \trace{\sigma} = \sum_{e} \bra{e}\proj{\nu}\ket{e}
   = \sprod{\nu}{\nu} \sprod{\nu}{\nu} / \norm{\nu}^2
@@ -773,7 +771,7 @@ matrix is
 </p>
 
 <p>
-Using <a href="#org7a1f08a">the equation</a> involving \(\sigma\) (with \(\ket{\nu}=M_m\ket{\psi}\)) we see that
+Using <a href="#org0bf5e93">the equation</a> involving \(\sigma\) (with \(\ket{\nu}=M_m\ket{\psi}\)) we see that
 \(\norm{M_m\ket{\psi}}^2=\trace{M_m\rho\,M_m^\dagger}\). Hence the post measurement state is
 </p>
 
@@ -869,7 +867,7 @@ the outcome of the measurement the post measurement state is
 </p>
 
 <p>
-<a id="orgdc29775"></a>
+<a id="orgc7f013c"></a>
 \[
   \sum_{m,j} p(m|j) p_j \, \frac{M_m \proj{\psi_j} M_m^\dagger}{p(m|j)}
   = \sum_m M_m \rho M_m^\dagger .
@@ -880,7 +878,7 @@ the outcome of the measurement the post measurement state is
 <dt>Remark</dt><dd><p>
 Together with the conclusions from the actual exercise we can draw the
 following additional conclusion: If now we somehow obtain the measurement result than
-<a href="#orgdc29775">this sum</a> "collapses" into one of its summands (just normalized), with probability
+<a href="#orgc7f013c">this sum</a> "collapses" into one of its summands (just normalized), with probability
 \(\trace{M_m\rho\,M_m^\dagger}\) for each of them. That is, the measurement can be
 decomposed into two parts: First the state changes to
 </p>
@@ -903,9 +901,9 @@ give rise to a mathematical function on density matrices).
 </div>
 </div>
 
-<div id="outline-container-org615bb38" class="outline-3">
-<h3 id="org615bb38">Exercise 8.3</h3>
-<div class="outline-text-3" id="text-org615bb38">
+<div id="outline-container-org4fa0187" class="outline-3">
+<h3 id="org4fa0187">Exercise 8.3</h3>
+<div class="outline-text-3" id="text-org4fa0187">
 <p>
 Our derivation of the operator-sum representation implicitly assumed that the input and
 output spaces for the operation were the same. Suppose a composite system AB initially in
@@ -927,9 +925,9 @@ space of system BC, and such that \(\sum_kE_k^\dagger\,E_k\).
 </p>
 </div>
 
-<div id="outline-container-org768fbd6" class="outline-4">
-<h4 id="org768fbd6">Proof</h4>
-<div class="outline-text-4" id="text-org768fbd6">
+<div id="outline-container-org6752aa8" class="outline-4">
+<h4 id="org6752aa8">Proof</h4>
+<div class="outline-text-4" id="text-org6752aa8">
 <p>
 Basically we do the same as the book for the special case of equal input and output
 space. According to the exercise we have
@@ -981,7 +979,7 @@ Here we used the well-known <i>cyclicity property</i> of the trace (which also h
 </p>
 
 <p>
-<a id="org1e1b03d"></a>
+<a id="orgeea741f"></a>
 \[
   \forall \rho : \; \trace{(J-I)^\dagger \rho} = 0 .
 \]
@@ -998,7 +996,7 @@ trace 1).
 complex Hilbert space. See e.g. the definition of a Hilbert-Schmidt operator on
 <a href="https://en.wikipedia.org/wiki/Hilbert%E2%80%93Schmidt_operator">wikipedia</a> (it is about infinite dimensional spaces but just note that in finite
 dimensions every operator is a Hilbert-Schmidt operator). For this exercise it does not
-directly help us since the quantification <a href="#org1e1b03d">above</a> is <i>not</i> over all
+directly help us since the quantification <a href="#orgeea741f">above</a> is <i>not</i> over all
 \(\rho\in\CC^{n\times\?n}\). But still nice to know 😉.</dd>
 </dl>
 
@@ -1043,9 +1041,9 @@ state \(\ket{0}\).
 </p>
 </div>
 
-<div id="outline-container-org9202806" class="outline-4">
-<h4 id="org9202806">Solution</h4>
-<div class="outline-text-4" id="text-org9202806">
+<div id="outline-container-org4479cba" class="outline-4">
+<h4 id="org4479cba">Solution</h4>
+<div class="outline-text-4" id="text-org4479cba">
 <p>
 Note that \(U\) is nothing else than the <code>CNOT</code> gate. Let us label the environment by E. One
 way to define the operation elements is
@@ -1078,9 +1076,9 @@ course). The respective probabilities are \(\rho_{00}\) (for outcome \(0\)) and 
 </div>
 </div>
 
-<div id="outline-container-org58629f3" class="outline-3">
-<h3 id="org58629f3">Exercise 8.5 (Spin flips)</h3>
-<div class="outline-text-3" id="text-org58629f3">
+<div id="outline-container-org4c2e2dc" class="outline-3">
+<h3 id="org4c2e2dc">Exercise 8.5 (Spin flips)</h3>
+<div class="outline-text-3" id="text-org4c2e2dc">
 <p>
 Just as in the previous exercise, but now let
 </p>
@@ -1096,9 +1094,9 @@ Give the quantum operation for this process, in the operator-sum representation.
 </p>
 </div>
 
-<div id="outline-container-org1293d33" class="outline-4">
-<h4 id="org1293d33">Solution</h4>
-<div class="outline-text-4" id="text-org1293d33">
+<div id="outline-container-org77d3c99" class="outline-4">
+<h4 id="org77d3c99">Solution</h4>
+<div class="outline-text-4" id="text-org77d3c99">
 <p>
 First of all let us make sure that \(U\) really is unitary. We have \(U^\dagger=U\), hence
 </p>
@@ -1137,9 +1135,9 @@ a spin-flip followed by a measurement (without obtaining the measurement outcome
 </div>
 </div>
 
-<div id="outline-container-orge92af2e" class="outline-3">
-<h3 id="orge92af2e">Exercise 8.6 (Composition of quantum operations)</h3>
-<div class="outline-text-3" id="text-orge92af2e">
+<div id="outline-container-org27a8644" class="outline-3">
+<h3 id="org27a8644">Exercise 8.6 (Composition of quantum operations)</h3>
+<div class="outline-text-3" id="text-org27a8644">
 <p>
 Suppose \(\calE\) and \(\calF\) are quantum operations on the same quantum system. Show that
 the composition \(\calF\circ\calE\) is a quantum operation, in the sense that it has an
@@ -1148,9 +1146,9 @@ operator-sum representation. State and prove an extension of this result to the 
 </p>
 </div>
 
-<div id="outline-container-orgac8a441" class="outline-4">
-<h4 id="orgac8a441">Proof</h4>
-<div class="outline-text-4" id="text-orgac8a441">
+<div id="outline-container-org2603dbf" class="outline-4">
+<h4 id="org2603dbf">Proof</h4>
+<div class="outline-text-4" id="text-org2603dbf">
 <p>
 Suppose
 </p>
@@ -1187,9 +1185,9 @@ The proof directly generalizes (without any change) to the case where \(\calE:A\
 </div>
 </div>
 
-<div id="outline-container-org868e7f7" class="outline-3">
-<h3 id="org868e7f7">Exercise 8.7</h3>
-<div class="outline-text-3" id="text-org868e7f7">
+<div id="outline-container-orga391753" class="outline-3">
+<h3 id="orga391753">Exercise 8.7</h3>
+<div class="outline-text-3" id="text-orga391753">
 <p>
 Suppose that instead of doing a projective measurement on the combined principal system
 and environment we had performed a general measurement described by measurement operators
@@ -1199,9 +1197,9 @@ probabilities are \(\trace{\calE_m(\rho)}\).
 </p>
 </div>
 
-<div id="outline-container-org7c2bfcb" class="outline-4">
-<h4 id="org7c2bfcb">Solution</h4>
-<div class="outline-text-4" id="text-org7c2bfcb">
+<div id="outline-container-org7978c6a" class="outline-4">
+<h4 id="org7978c6a">Solution</h4>
+<div class="outline-text-4" id="text-org7978c6a">
 <p>
 Let \(\sigma=\sum_jq_j\proj{j}\) be the state of the environment E. The generalized
 operations look as follows
@@ -1274,9 +1272,9 @@ are elements for the operation \(\calE_m\), which also satisfy
 </div>
 </div>
 
-<div id="outline-container-orge6bdd6f" class="outline-3">
-<h3 id="orge6bdd6f">Exercise 8.8 (Non-trace-preserving quantum operations)</h3>
-<div class="outline-text-3" id="text-orge6bdd6f">
+<div id="outline-container-org9f44ae8" class="outline-3">
+<h3 id="org9f44ae8">Exercise 8.8 (Non-trace-preserving quantum operations)</h3>
+<div class="outline-text-3" id="text-org9f44ae8">
 <p>
 Explain how to construct a unitary operator for a system–environment model of a
 non-trace-preserving quantum operation, by introducing an extra operator, \(E_\infty\), into the
@@ -1285,9 +1283,9 @@ including \(k=\infty\), one obtains \(\sum_kE_k^\dagger\?E_k=I\).
 </p>
 </div>
 
-<div id="outline-container-org9fea155" class="outline-4">
-<h4 id="org9fea155">Solution</h4>
-<div class="outline-text-4" id="text-org9fea155">
+<div id="outline-container-org7709051" class="outline-4">
+<h4 id="org7709051">Solution</h4>
+<div class="outline-text-4" id="text-org7709051">
 <p>
 Let us define
 </p>
@@ -1365,9 +1363,9 @@ as desired.
 </div>
 </div>
 
-<div id="outline-container-orge5aae60" class="outline-3">
-<h3 id="orge5aae60">Exercise 8.9 (Measurement model)</h3>
-<div class="outline-text-3" id="text-orge5aae60">
+<div id="outline-container-orgc643424" class="outline-3">
+<h3 id="orgc643424">Exercise 8.9 (Measurement model)</h3>
+<div class="outline-text-3" id="text-orgc643424">
 <p>
 If we are given a set of quantum operations \(\{\calE_m\}\) such that \(\sum_m\calE_m\) is
 trace-preserving, then it is possible to construct a measurement model giving rise to this
@@ -1391,9 +1389,9 @@ system is \(\calE_m(\rho)/\trace{\calE_m(\rho)}\).
 </p>
 </div>
 
-<div id="outline-container-org4e86fe0" class="outline-4">
-<h4 id="org4e86fe0">Solution</h4>
-<div class="outline-text-4" id="text-org4e86fe0">
+<div id="outline-container-orgab75fa1" class="outline-4">
+<h4 id="orgab75fa1">Solution</h4>
+<div class="outline-text-4" id="text-orgab75fa1">
 <p>
 That \(U\) can be extended to a unitary operator can be seen as in the other cases of
 constructing an environment model. We have
@@ -1455,9 +1453,9 @@ operation elements \(\{F_j\}\) for \(\calE\).
 </p>
 </div>
 
-<div id="outline-container-orgcd7d70f" class="outline-4">
-<h4 id="orgcd7d70f">Proof 1</h4>
-<div class="outline-text-4" id="text-orgcd7d70f">
+<div id="outline-container-orgffc8262" class="outline-4">
+<h4 id="orgffc8262">Proof 1</h4>
+<div class="outline-text-4" id="text-orgffc8262">
 <p>
 The statement is a direct consequence of the proof of Kraus's Theorem as given in the book
 (Theorem 8.1). Recall that the diagonalization of \(\sigma\)
@@ -1531,7 +1529,7 @@ is a scalar product on the \(d^2\)​-dimensional space of linear operators on \
 </p>
 
 <p>
-<a id="orga1a9ac4"></a>
+<a id="org370a24c"></a>
 </p>
 <dl class="org-dl">
 <dt>Lemma</dt><dd><p>
@@ -1659,9 +1657,9 @@ This concludes the proof. QED.
 </div>
 </div>
 
-<div id="outline-container-orgf71485d" class="outline-3">
-<h3 id="orgf71485d">Exercise 8.11</h3>
-<div class="outline-text-3" id="text-orgf71485d">
+<div id="outline-container-org60ddb69" class="outline-3">
+<h3 id="org60ddb69">Exercise 8.11</h3>
+<div class="outline-text-3" id="text-org60ddb69">
 <p>
 Suppose \(\calE\) is a quantum operation mapping a \(d\)​-dimensional input space to a
 \(d'\)​-dimensional output space. Show that \(\calE\) can be described using a set of at most
@@ -1669,9 +1667,9 @@ Suppose \(\calE\) is a quantum operation mapping a \(d\)​-dimensional input sp
 </p>
 </div>
 
-<div id="outline-container-org667cadb" class="outline-4">
-<h4 id="org667cadb">Proof</h4>
-<div class="outline-text-4" id="text-org667cadb">
+<div id="outline-container-orgc97e258" class="outline-4">
+<h4 id="orgc97e258">Proof</h4>
+<div class="outline-text-4" id="text-orgc97e258">
 <p>
 With a minor adaption we can reduce this to <a href="#exercise-8.10-proof-2">one of the proofs</a> of <a href="#exercise-8.10">exercise 8.10</a>. Let
 </p>
@@ -1690,21 +1688,21 @@ does not affect the definition of \(W\).
 
 <p>
 Now the proof of the special case \(d=d'\) goes through as is. The crucial thing to note is
-that the <a href="#orga1a9ac4">lemma</a> has to be applied with \(N=dd'\) and the just defined Hilbert space \(V\). QED.
+that the <a href="#org370a24c">lemma</a> has to be applied with \(N=dd'\) and the just defined Hilbert space \(V\). QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb260e97" class="outline-3">
-<h3 id="orgb260e97"><span class="todo WIP">WIP</span> Exercise 8.12</h3>
-<div class="outline-text-3" id="text-orgb260e97">
+<div id="outline-container-org70c4779" class="outline-3">
+<h3 id="org70c4779"><span class="todo WIP">WIP</span> Exercise 8.12</h3>
+<div class="outline-text-3" id="text-org70c4779">
 <p>
 Why can we assume that \(O\) has determinant \(1\) in the decomposition (8.93)?
 </p>
 
 <p>
-<a id="org338d2b7"></a>
+<a id="org4ffbea1"></a>
 </p>
 <dl class="org-dl">
 <dt>Remark</dt><dd>In <i>a sense</i> my solution below solves the exercise. But I have the vague
@@ -1715,9 +1713,9 @@ have the feeling that it should not be so hard, but I still do not see it.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org5e30cda" class="outline-4">
-<h4 id="org5e30cda">Maybe not a solution</h4>
-<div class="outline-text-4" id="text-org5e30cda">
+<div id="outline-container-org57b7c53" class="outline-4">
+<h4 id="org57b7c53">Maybe not a solution</h4>
+<div class="outline-text-4" id="text-org57b7c53">
 <p>
 As a real orthogonal matrix \(O\) has \(\det(O)=\pm1\). To see this recall that the
 determinant is the product of all eigenvalues which are <i>complex</i> number of modulus 1 for
@@ -1733,17 +1731,17 @@ by \(-S\). Of course this we destroy the property that \(S\) is positive.
 </div>
 </div>
 
-<div id="outline-container-orgba54f90" class="outline-3">
-<h3 id="orgba54f90">Exercise 8.13</h3>
-<div class="outline-text-3" id="text-orgba54f90">
+<div id="outline-container-org3184480" class="outline-3">
+<h3 id="org3184480">Exercise 8.13</h3>
+<div class="outline-text-3" id="text-org3184480">
 <p>
 Show that unitary transformations correspond to rotations of the Bloch sphere.
 </p>
 </div>
 
-<div id="outline-container-orgbf78d52" class="outline-4">
-<h4 id="orgbf78d52">Solution</h4>
-<div class="outline-text-4" id="text-orgbf78d52">
+<div id="outline-container-org459f073" class="outline-4">
+<h4 id="org459f073">Solution</h4>
+<div class="outline-text-4" id="text-org459f073">
 <p>
 Probably the idea is to prove it via the findings of the section (probably using the
 formulas for \(M_{jk}\) and \(c_k\)). Why else would this problem be in this chapter? But I
@@ -1755,16 +1753,16 @@ On the other hand we already know that claim and used it in earlier chapters. Th
 only sketch the proof. Essentially the problem is equivalent to <a href="chapter_4.html#exercise-4-6">exercise 4.6</a>. To see this
 recall that every unitary operator is equal to some rotation \(R_{\hat{n}}(\theta)\) around
 some axis and some angle - up to a global phase. I have also made a small discussion for
-the (easy) step to generalize the statement of the exercise to density matrix in <a href="chapter_4.html#orgb77f151">chapter
+the (easy) step to generalize the statement of the exercise to density matrix in <a href="chapter_4.html#org48af00a">chapter
 4</a>.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgac57078" class="outline-3">
-<h3 id="orgac57078">Exercise 8.14</h3>
-<div class="outline-text-3" id="text-orgac57078">
+<div id="outline-container-org2bbbf57" class="outline-3">
+<h3 id="org2bbbf57">Exercise 8.14</h3>
+<div class="outline-text-3" id="text-org2bbbf57">
 <p>
 Show that \(\det(S)\) (From the polar decomposition of \(M=OS\)) need not be positive.
 </p>
@@ -1798,15 +1796,15 @@ hole would be that the exercise is somehow meant in some other way going away fr
 polar decomposition.
 </p></li>
 <li>The second reason is that I believe that \(\det(M)\geq0\) always holds. See also my
-<a href="#org338d2b7">remark</a> in exercise 8.12. If this is true I do not see any way to interpret the
+<a href="#org4ffbea1">remark</a> in exercise 8.12. If this is true I do not see any way to interpret the
 exercise in a way such that <i>not positive</i> means <i>strictly negative</i>.</li>
 </ul></dd>
 </dl>
 </div>
 
-<div id="outline-container-orga9289b2" class="outline-4">
-<h4 id="orga9289b2">Solution</h4>
-<div class="outline-text-4" id="text-orga9289b2">
+<div id="outline-container-org06fd40f" class="outline-4">
+<h4 id="org06fd40f">Solution</h4>
+<div class="outline-text-4" id="text-org06fd40f">
 <p>
 For the <i>bit-flip</i> (\(E_0=\sqrt{p}I\), \(E_1=\sqrt{1-p}X\)) we have
 </p>
@@ -1818,7 +1816,7 @@ For the <i>bit-flip</i> (\(E_0=\sqrt{p}I\), \(E_1=\sqrt{1-p}X\)) we have
 </p>
 
 <p>
-(and \(c=0\)). See chapter 8.3.3 or look into my <a href="#orgf2f46af">sage code</a>. Clearly for \(p=1/2\) we have
+(and \(c=0\)). See chapter 8.3.3 or look into my <a href="#org8a1c74f">sage code</a>. Clearly for \(p=1/2\) we have
 \(\det(M)=0\). In that case \(S=\sqrt{M^\dagger\?M}=M\) (and you could choose \(O=I\)). Hence
 also \(\det(S)=0\).
 </p>
@@ -1826,9 +1824,9 @@ also \(\det(S)=0\).
 </div>
 </div>
 
-<div id="outline-container-orgd1b9c70" class="outline-3">
-<h3 id="orgd1b9c70">Exercise 8.15</h3>
-<div class="outline-text-3" id="text-orgd1b9c70">
+<div id="outline-container-org687fcd0" class="outline-3">
+<h3 id="org687fcd0">Exercise 8.15</h3>
+<div class="outline-text-3" id="text-org687fcd0">
 <p>
 Suppose a projective measurement is performed on a single qubit in the basis \(\ket{+}\),
 \(\ket{-}\), where \(\ket{\pm}=(\ket{0}\pm\ket{1})/\sqrt{2}\). In the event that we are
@@ -1847,9 +1845,9 @@ Illustrate this transformation on the Bloch sphere.
 </p>
 </div>
 
-<div id="outline-container-orga75f19c" class="outline-4">
-<h4 id="orga75f19c">Solution</h4>
-<div class="outline-text-4" id="text-orga75f19c">
+<div id="outline-container-orgef157c7" class="outline-4">
+<h4 id="orgef157c7">Solution</h4>
+<div class="outline-text-4" id="text-orgef157c7">
 <p>
 We reduce this to a known problem by transforming the operation into a phase-flip. This
 has the advantage that we already know what it does in the Bloch-sphere, and even if not,
@@ -1920,9 +1918,9 @@ by a rotation and a displacement.
 </p>
 </div>
 
-<div id="outline-container-orgf74cc36" class="outline-4">
-<h4 id="orgf74cc36">Solution</h4>
-<div class="outline-text-4" id="text-orgf74cc36">
+<div id="outline-container-org9b37311" class="outline-4">
+<h4 id="org9b37311">Solution</h4>
+<div class="outline-text-4" id="text-org9b37311">
 <p>
 Before delivering an example I find it instructive to discover what violations are even
 possible from dropping the trace preservation property. Hence the solution is divided into
@@ -1930,9 +1928,9 @@ two parts.
 </p>
 </div>
 
-<div id="outline-container-org3915f36" class="outline-5">
-<h5 id="org3915f36">What does still hold?</h5>
-<div class="outline-text-5" id="text-org3915f36">
+<div id="outline-container-org5da5669" class="outline-5">
+<h5 id="org5da5669">What does still hold?</h5>
+<div class="outline-text-5" id="text-org5da5669">
 <p>
 Let \(E\) be an <i>arbitrary</i> linear operator on \(\CC^2\) and let us consider the following
 quantum operation
@@ -2081,7 +2079,7 @@ determinant is always non-negative:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgf618095"><span class="org-variable-name">E</span> <span class="org-operator">=</span> s<span class="org-operator">*</span>Id <span class="org-operator">+</span> u<span class="org-operator">*</span>X <span class="org-operator">+</span> v<span class="org-operator">*</span>Y <span class="org-operator">+</span> w<span class="org-operator">*</span>Z
+<pre class="src src-sage" id="org0e4aba0"><span class="org-variable-name">E</span> <span class="org-operator">=</span> s<span class="org-operator">*</span>Id <span class="org-operator">+</span> u<span class="org-operator">*</span>X <span class="org-operator">+</span> v<span class="org-operator">*</span>Y <span class="org-operator">+</span> w<span class="org-operator">*</span>Z
 <span class="org-variable-name">M</span> <span class="org-operator">=</span> make_qop1d_matrix_4d([E])
 factor(det(M))
 </pre>
@@ -2110,9 +2108,9 @@ too complicated to see a pattern (or to use <code>factor</code>).
 </div>
 </div>
 
-<div id="outline-container-org40d444a" class="outline-5">
-<h5 id="org40d444a">Example</h5>
-<div class="outline-text-5" id="text-org40d444a">
+<div id="outline-container-org10b3e32" class="outline-5">
+<h5 id="org10b3e32">Example</h5>
+<div class="outline-text-5" id="text-org10b3e32">
 <p>
 We have seen in the first part of the solution that non-trace-preserving operation can at
 least be interpreted in \(\RR^4\). I also conjectured that this representation has
@@ -2167,6 +2165,296 @@ deformation of the Bloch sphere, followed by a rotation and a displacement. Othe
 determinant would be non-negative (as is the case in \(\RR^4\)).
 </p>
 </div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org463adc0" class="outline-3">
+<h3 id="org463adc0">Exercise 8.17</h3>
+<div class="outline-text-3" id="text-org463adc0">
+<p>
+Verify (8.101) as follows. Define
+</p>
+
+<p>
+\[
+  \calE(A) = \frac{A + XAX + YAY + ZAZ}{4} ,
+\]
+</p>
+
+<p>
+and show that
+</p>
+
+<p>
+\[
+  \calE(I) = I; \quad \calE(X) = \calE(Y) = \calE(Z) = 0 .
+\]
+</p>
+
+<p>
+Now use the Bloch sphere representation for single qubit density matrices to verify
+(8.101).
+</p>
+</div>
+
+<div id="outline-container-org5aa5397" class="outline-4">
+<h4 id="org5aa5397">Solution</h4>
+<div class="outline-text-4" id="text-org5aa5397">
+<p>
+This is almost to simple to justify but let me try my best. The claim \(\calE(I)=I\) follows
+from \(X^2=Y^2=Z^2=I\). That \(\calE(N)=0\) for any Pauli matrix \(N\) follows from the fact
+that \(NMN=-M\) if \(M\) and \(N\) are different Pauli matrices and \(NMN=N\) otherwise.
+</p>
+
+<p>
+Finally, that \(\calE(\rho)=I/2\) for any density matrix follows from linearity of \(\calE\)
+and the fact that any density matrix can be written as
+</p>
+
+<p>
+\[
+  \rho = \frac{1}{2} (I + x X + y Y + z Z)
+\]
+</p>
+
+<p>
+for \(x,y,z\in\RR\) (see <a href="chapter_2.html#exercise-2.72">exercise 2.72</a>).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfcbe06c" class="outline-3">
+<h3 id="orgfcbe06c">Exercise 8.18</h3>
+<div class="outline-text-3" id="text-orgfcbe06c">
+<p>
+For \(k\geq1\) show that \(\trace{\rho^k}\) is never increased by the action of the
+depolarizing channel.
+</p>
+</div>
+
+<div id="outline-container-orge1f1891" class="outline-4">
+<h4 id="orge1f1891">Proof</h4>
+<div class="outline-text-4" id="text-orge1f1891">
+<p>
+Recall that in a suitable orthonormal basis every density matrix is represented by a
+diagonal matrix
+</p>
+
+<p>
+\[
+  \diag(q_1,\ldots,q_d)
+\]
+</p>
+
+<p>
+with \(\sum_jq_j=1\) and \(q_j\geq0\). Hence
+</p>
+
+<p>
+\[
+  \trace{\rho^k} = f_k(q)
+\]
+</p>
+
+<p>
+where
+</p>
+
+<p>
+\[
+  f_k(q) = \sum_{j=1}^d q_j^k .
+\]
+</p>
+
+<p>
+Observe that \(f_k\) is a strictly convex function, that is
+</p>
+
+<p>
+\[
+  f_k(\lambda q + (1-\lambda) q') < \lambda f_k(q) + (1-\lambda) f_k(q')
+\]
+</p>
+
+<p>
+for all \(\lambda\in(0,1)\) and \(q\neq\?q'\) (and \(\sum_jq_j=1\) and \(q_j\geq0\), and similarly
+for \(q'\)). This follows from the convexity of the scalar valued function \(x\mapsto\?x^k\),
+which in turn follows from the positivity of the second derivatives (on the domain of
+definition). By the method of <a href="https://en.wikipedia.org/wiki/Lagrange_multiplier">Lagrange multipliers</a> we easily see that
+</p>
+
+<p>
+\[
+  q^\min = (1/d,\ldots,1/d)
+\]
+</p>
+
+<p>
+is the unique minimum of \(f_k\). Now we are prepared to prove the claim. In fact:
+</p>
+
+<p>
+\[
+  \trace{\calE(\rho)} = f_k(pq^\min + (1-p)q) \leq p f_k(q^\min) + (1-p) f_k(q)
+  \leq f_k(q) = \trace{\rho} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9c8f128" class="outline-3">
+<h3 id="org9c8f128">Exercise 8.19</h3>
+<div class="outline-text-3" id="text-org9c8f128">
+<p>
+Find an operator-sum representation for a generalized depolarizing channel acting on a
+\(d\)​-dimensional Hilbert space.
+</p>
+</div>
+
+<div id="outline-container-org2b38ee1" class="outline-4">
+<h4 id="org2b38ee1">Solution</h4>
+<div class="outline-text-4" id="text-org2b38ee1">
+<p>
+We will define \(d^2\) operation elements
+</p>
+
+<p>
+\[
+  E_{mn} = \frac{1}{d} P_m Q_n \text{ for } m,n \in \{0,1,\ldots,d-1\}
+\]
+</p>
+
+<p>
+which implement the operation \(\calE(\rho)=I/d\). Hence by scaling with \(\sqrt{p}\) and
+adding an additional element \(\sqrt{1-p}I\) we can implement the depolarizing channel. In
+the following let \(\rho=\sum_{ij}\rho_{ij}\ket{i}\bra{j}\). For \(n\in\{0,\ldots,d-1\}\)
+define
+</p>
+
+<p>
+\[
+  Q_n \ket{j} = e^{2\pi\ii nj/d} \ket{j} .
+\]
+</p>
+
+<p>
+Observe that
+</p>
+
+<p>
+\[
+  \sum_n Q_n \ket{j}\bra{k} Q_n^\dagger = d \delta_{jk} .
+\]
+</p>
+
+<p>
+Hence
+</p>
+
+<p>
+\[
+  \rho' = \frac{1}{d} \, \sum_n Q_n \rho Q_n^\dagger = \sum_j \rho_{jj} \proj{j} .
+\]
+</p>
+
+<p>
+Next, for \(n\in\{0,\ldots,d-1\}\) define
+</p>
+
+<p>
+\[
+  P_n\ket{j} = \sum_j \ket{n+j} ,
+\]
+</p>
+
+<p>
+where the sum \(n+j\) is interpreted modulo \(d\). Hence the \(P_n\) are cyclic permutations.
+</p>
+
+<p>
+\[
+  \frac{1}{d} \sum_n P_n \rho' P_n^\dagger
+  = \frac{1}{d} \sum_{jn} \rho_{jj} \ket{n+j}\braket{j}{j}\bra{n+j}
+  = \frac{1}{d} I .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org59d3b80" class="outline-3">
+<h3 id="org59d3b80">Exercise 8.20 (Circuit model for amplitude damping)</h3>
+<div class="outline-text-3" id="text-org59d3b80">
+<p>
+Show that the circuit in Figure 8.13 models the amplitude damping quantum operation, with
+\(\sin(\theta/2)^2=\gamma\).
+</p>
+
+<pre class="example">
+               ┌───┐
+𝜌_in: ────■────┤ X ├
+      ┌───┴───┐└─┬─┘
+ |0&gt;: ┤ Ry(θ) ├──■──
+      └───────┘
+</pre>
+</div>
+
+
+<div id="outline-container-org1e1ead1" class="outline-4">
+<h4 id="org1e1ead1">Solution</h4>
+<div class="outline-text-4" id="text-org1e1ead1">
+<p>
+Let \(B'\) be the action of the circuit:
+</p>
+
+\begin{align*}
+  B' &= (I \otimes P_0 + X \otimes P_1) \cdot (P_0 \otimes I + P_1 \otimes R_y(\theta)) \\
+  &= P_0 \otimes P_0 + P_1 \otimes P_0 R_y(\theta) + XP_0 \otimes P_1 + XP_1 \otimes P_1 R_y(\theta) .
+\end{align*}
+
+<p>
+Let \(\ket{\psi}=a\ket{0}+b\ket{1}\). Then
+</p>
+
+<p>
+\[
+  B' \ket{\psi}\ket{0} = a \ket{00} + bc\ket{10} + 0 + bs\ket{01}
+  = a\ket{00} + b(c\ket{10} + s\ket{01}) ,
+\]
+</p>
+
+<p>
+where \(c=\cos(\theta/2)\) and \(s=\sin(\theta/2)\). Thus
+</p>
+
+\begin{align*}
+  E_0 \ket{\psi} = \bra{0_E} B' \ket{\psi}\ket{0_E} &= a\ket{0} + bc\ket{1} \\
+  E_1 \ket{\psi} = \bra{1_E} B' \ket{\psi}\ket{0_E} &= bs\ket{0} \\
+\end{align*}
+
+<p>
+In other words, using \(s=\sqrt{\gamma}\) and \(c=\sqrt{1-\gamma}\), we have
+</p>
+
+\begin{align*}
+  E_0 &= \begin{bmatrix} 1 & 0 \\ 0 & \sqrt{1-\gamma} \end{bmatrix} , \\
+  E_1 &= \begin{bmatrix} 0 & \sqrt{\gamma} \\ 0 & 0 \end{bmatrix} .
+\end{align*}
+
+<p>
+This is as desired.
+</p>
 </div>
 </div>
 </div>
