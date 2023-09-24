@@ -3,7 +3,8 @@
 #+setupfile: ./inc/setupfile.org
 #+include: ./inc/latex-macros.org
 #+property: header-args:sage :session *sage-chapter-8* :tangle chapter_8.sage
-
+# python session just for qiskit since sage integers dont work well with qiskit:
+#+property: header-args:python :session *python-chapter-7* :tangle no
 
 #+toc: headlines 2
 
@@ -25,6 +26,12 @@ Let us set up some variables
   # We want to use p as a probability, not sure if this does anything, but looks useful:
   assume(p <= 1)
   assume(g <= 1)
+#+end_src
+
+# Hidden imports
+#+name: imports-chapter-7-2
+#+begin_src python :exports none
+  from qiskit.circuit import QuantumCircuit, QuantumRegister, Parameter as Param
 #+end_src
 
 ** Bloch sphere representation
@@ -260,9 +267,6 @@ Now we are prepared to consider the examples from the book. First let us conside
 #+end_src
 
 #+RESULTS: sage-bit-flip
-: 'PASSED'
-
-#+RESULTS:
 : 'PASSED'
 
 Next consider the *amplitude damping*:
@@ -1306,7 +1310,7 @@ determinant is always non-negative:
   factor(det(M))
 #+end_src
 
-#+RESULTS[f0410405cc09c57bb8f535542e044932c95081a9]:
+#+RESULTS[f0410405cc09c57bb8f535542e044932c95081a9]: proof-positive-det-single-element
 : (s^2 - u^2 - v^2 - w^2)^2*(conjugate(s)^2 - conjugate(u)^2 - conjugate(v)^2 - conjugate(w)^2)^2
 
 So for $\calE(\rho)=E\rho\?E^\dagger$ with an arbitrary $E=s+uX+vY+wZ$ we have
@@ -1356,3 +1360,186 @@ If we project this into the three dimensional Bloch-space the corresponding matr
 $\diag(1,1,-1)$, which has a negative determinant. Hence it cannot be represented as a
 deformation of the Bloch sphere, followed by a rotation and a displacement. Otherwise the
 determinant would be non-negative (as is the case in $\RR^4$).
+
+** Exercise 8.17
+Verify (8.101) as follows. Define
+
+$$
+  \calE(A) = \frac{A + XAX + YAY + ZAZ}{4} ,
+$$
+
+and show that
+
+$$
+  \calE(I) = I; \quad \calE(X) = \calE(Y) = \calE(Z) = 0 .
+$$
+
+Now use the Bloch sphere representation for single qubit density matrices to verify
+(8.101).
+
+*** Solution
+This is almost to simple to justify but let me try my best. The claim $\calE(I)=I$ follows
+from $X^2=Y^2=Z^2=I$. That $\calE(N)=0$ for any Pauli matrix $N$ follows from the fact
+that $NMN=-M$ if $M$ and $N$ are different Pauli matrices and $NMN=N$ otherwise.
+
+Finally, that $\calE(\rho)=I/2$ for any density matrix follows from linearity of $\calE$
+and the fact that any density matrix can be written as
+
+$$
+  \rho = \frac{1}{2} (I + x X + y Y + z Z)
+$$
+
+for $x,y,z\in\RR$ (see [[file:chapter_2.org::#exercise-2.72][exercise 2.72]]).
+
+** Exercise 8.18
+For $k\geq1$ show that $\trace{\rho^k}$ is never increased by the action of the
+depolarizing channel.
+
+*** Proof
+Recall that in a suitable orthonormal basis every density matrix is represented by a
+diagonal matrix
+
+$$
+  \diag(q_1,\ldots,q_d)
+$$
+
+with $\sum_jq_j=1$ and $q_j\geq0$. Hence
+
+$$
+  \trace{\rho^k} = f_k(q)
+$$
+
+where
+
+$$
+  f_k(q) = \sum_{j=1}^d q_j^k .
+$$
+
+Observe that $f_k$ is a strictly convex function, that is
+
+$$
+  f_k(\lambda q + (1-\lambda) q') < \lambda f_k(q) + (1-\lambda) f_k(q')
+$$
+
+for all $\lambda\in(0,1)$ and $q\neq\?q'$ (and $\sum_jq_j=1$ and $q_j\geq0$, and similarly
+for $q'$). This follows from the convexity of the scalar valued function $x\mapsto\?x^k$,
+which in turn follows from the positivity of the second derivatives (on the domain of
+definition). By the method of [[https://en.wikipedia.org/wiki/Lagrange_multiplier][Lagrange multipliers]] we easily see that
+
+$$
+  q^\min = (1/d,\ldots,1/d)
+$$
+
+is the unique minimum of $f_k$. Now we are prepared to prove the claim. In fact:
+
+$$
+  \trace{\calE(\rho)} = f_k(pq^\min + (1-p)q) \leq p f_k(q^\min) + (1-p) f_k(q)
+  \leq f_k(q) = \trace{\rho} .
+$$
+
+QED.
+
+** Exercise 8.19
+Find an operator-sum representation for a generalized depolarizing channel acting on a
+$d$​-dimensional Hilbert space.
+
+*** Solution
+We will define $d^2$ operation elements
+
+$$
+  E_{mn} = \frac{1}{d} P_m Q_n \text{ for } m,n \in \{0,1,\ldots,d-1\}
+$$
+
+which implement the operation $\calE(\rho)=I/d$. Hence by scaling with $\sqrt{p}$ and
+adding an additional element $\sqrt{1-p}I$ we can implement the depolarizing channel. In
+the following let $\rho=\sum_{ij}\rho_{ij}\ket{i}\bra{j}$. For $n\in\{0,\ldots,d-1\}$
+define
+
+$$
+  Q_n \ket{j} = e^{2\pi\ii nj/d} \ket{j} .
+$$
+
+Observe that
+
+$$
+  \sum_n Q_n \ket{j}\bra{k} Q_n^\dagger = d \delta_{jk} .
+$$
+
+Hence
+
+$$
+  \rho' = \frac{1}{d} \, \sum_n Q_n \rho Q_n^\dagger = \sum_j \rho_{jj} \proj{j} .
+$$
+
+Next, for $n\in\{0,\ldots,d-1\}$ define
+
+$$
+  P_n\ket{j} = \sum_j \ket{n+j} ,
+$$
+
+where the sum $n+j$ is interpreted modulo $d$. Hence the $P_n$ are cyclic permutations.
+
+$$
+  \frac{1}{d} \sum_n P_n \rho' P_n^\dagger
+  = \frac{1}{d} \sum_{jn} \rho_{jj} \ket{n+j}\braket{j}{j}\bra{n+j}
+  = \frac{1}{d} I .
+$$
+
+QED.
+
+** Exercise 8.20 (Circuit model for amplitude damping)
+Show that the circuit in Figure 8.13 models the amplitude damping quantum operation, with
+$\sin(\theta/2)^2=\gamma$.
+
+#+RESULTS[4a1d389d8fc0851cab033ccf5a464e2dc2099460]: exercise-8.20-circuit
+:                ┌───┐
+: 𝜌_in: ────■────┤ X ├
+:       ┌───┴───┐└─┬─┘
+:  |0>: ┤ Ry(θ) ├──■──
+:       └───────┘
+
+
+#+name: exercise-8.20-circuit
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "𝜌_in")
+  qr1 = QuantumRegister(1, "|0>")
+
+  qc = QuantumCircuit(qr0, qr1)
+  params = (Param("θ"),)
+
+  qc.cry(params[0], 0, 1)
+  qc.cx(1, 0)
+
+  qc.draw()
+#+end_src
+
+*** Solution
+Let $B'$ be the action of the circuit:
+
+\begin{align*}
+  B' &= (I \otimes P_0 + X \otimes P_1) \cdot (P_0 \otimes I + P_1 \otimes R_y(\theta)) \\
+  &= P_0 \otimes P_0 + P_1 \otimes P_0 R_y(\theta) + XP_0 \otimes P_1 + XP_1 \otimes P_1 R_y(\theta) .
+\end{align*}
+
+Let $\ket{\psi}=a\ket{0}+b\ket{1}$. Then
+
+$$
+  B' \ket{\psi}\ket{0} = a \ket{00} + bc\ket{10} + 0 + bs\ket{01}
+  = a\ket{00} + b(c\ket{10} + s\ket{01}) ,
+$$
+
+where $c=\cos(\theta/2)$ and $s=\sin(\theta/2)$. Thus
+
+\begin{align*}
+  E_0 \ket{\psi} = \bra{0_E} B' \ket{\psi}\ket{0_E} &= a\ket{0} + bc\ket{1} \\
+  E_1 \ket{\psi} = \bra{1_E} B' \ket{\psi}\ket{0_E} &= bs\ket{0} \\
+\end{align*}
+
+In other words, using $s=\sqrt{\gamma}$ and $c=\sqrt{1-\gamma}$, we have
+
+\begin{align*}
+  E_0 &= \begin{bmatrix} 1 & 0 \\ 0 & \sqrt{1-\gamma} \end{bmatrix} , \\
+  E_1 &= \begin{bmatrix} 0 & \sqrt{\gamma} \\ 0 & 0 \end{bmatrix} .
+\end{align*}
+
+This is as desired.
