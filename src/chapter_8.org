@@ -1543,3 +1543,240 @@ In other words, using $s=\sqrt{\gamma}$ and $c=\sqrt{1-\gamma}$, we have
 \end{align*}
 
 This is as desired.
+
+** Exercise 8.21 (Amplitude damping of a harmonic oscillator)
+Suppose that our principal system, a harmonic oscillator, interacts with an environment,
+modeled as another harmonic oscillator, through the Hamiltonian
+
+$$
+  H = \chi (a^\dagger b + a b^\dagger)
+$$
+
+where $a$ and $b$ are the annihilation operators for the respective harmonic oscillators,
+as deﬁned in Section 7.3.
+
+1) Using $U=\exp(-\ii\?H\tau)$, denoting the eigenstates of $b^\dagger\?b$ as $\ket{k_b}$,
+   and selecting the vacuum state $\ket{0_b}$ as the initial state of the environment, show
+   that the operation elements $E_k=\bra{k_b}U\ket{0_b}$ are found to be
+
+   $$
+   E_k = \sum_{n=k}^\infty \sqrt{\binom{n}{k}} \sqrt{(1-\gamma)^{n-k}\gamma^k} \ket{n-k}\ket{n} ,
+   $$
+
+   where $\gamma=1-\cos(\chi\tau)^2$ is the probability of loosing a single quantum of
+   energy, and states such as $\ket{n}$ are eigenstates of $a^\dagger\?a$.
+2) Show that the operation elements $E_k$ define a trace-preserving quantum operation.
+
+*** Proof of 1
+Recall a [[https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula#An_important_lemma_and_its_application_to_a_special_case_of_the_Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula][lemma]] related to the Baker-Campbell-Hausdorff formula and Lie-Algebras:
+
+$$
+  e^{\lambda G} A e^{-\lambda G} = \sum_n \frac{\lambda^n}{n!} [(G)^n, A] ,
+$$
+
+where $[(G)^n,A]$ is the $n$​-fold commutator. We will apply it to
+$G=a^\dagger\?b+ab^\dagger$ and $A=a$. We have
+
+$$
+  [G, a] = -b \text{ and } [G, b] = -a .
+$$
+
+In particular $[(G)^2,A]=A$ for $A\in\{a,b\}$. Hence (with $\lambda=-\ii\chi\tau$,
+and abbreviating $\theta=\chi\tau$)
+
+$$
+  U a U^\dagger = \sum_n \frac{\theta^n}{n!} c_n
+$$
+
+where
+
+$$
+  c_n = \begin{cases} i^n a & \text{if } n \text{ is even.} \\ i^n b & \text{else.} \end{cases} .
+$$
+
+Thus, using the Taylor expansion of $\sin$ and $\cos$, we get
+
+$$
+  U a U^\dagger = \cos(\theta) a  + \sin(\theta) b .
+$$
+
+In the following let us abbreviate $c=\cos(\theta)$ and $s=\sin(\theta)$. Observe
+$s^2=\gamma$ and $c^2=1-\gamma$. Using the formula for $UaU^\dagger$ we obtain
+
+$$
+  U \ket{n_a, 0_b} = \frac{1}{\sqrt{n!}} \, U (a^\dagger)^n \ket{0_a, 0_b}
+  = \frac{1}{\sqrt{n!}} \, (ca^\dagger+sb^\dagger)^n U \ket{0_a, 0_b}
+  = \frac{1}{\sqrt{n!}} \, (ca^\dagger+sb^\dagger)^n \ket{0_a, 0_b} .
+$$
+
+Since $a$ and $b$ commute we can use the binomial formula to obtain
+
+$$
+  U \ket{n_a, 0_b} = \frac{1}{\sqrt{n!}} \sum_n \binom{n}{k} (ca^\dagger)^{n-k} (sb^\dagger)^k \ket{0_a,0_b}
+  = \sum_{n\geq k} \sqrt{\binom{n}{k}} c^{n-k} s^k \ket{(n-k)_a,k_b} ,
+$$
+
+which is the claim of part 1. QED.
+
+*** Proof of part 2
+This can be proved in very abstract terms. We just have to use that
+$E_k=\bra{k_b}U\ket{0_b}$ where $U$ is unitary (on the combined system) and
+$\{\ket{k_b}\}$ is an ONB on the environment. In fact (denoting by $Q$ the principal
+system)
+
+$$
+  \sum_k E_k^\dagger E_k = \sum_k \bra{0_b} U^\dagger \proj{k_b} U \ket{0_b}
+  = \bra{0_b} U^\dagger U \ket{0_b} = I_Q .
+$$
+
+This identity characterizes trace-preserving operations. QED.
+
+- Remark :: It wouldn't be hard to directly verify the claim using the closed formula for
+  $E_k$ from this concrete example. Writing
+  $a_{nk}=\sqrt{\binom{n}{k}(1-\gamma)^{n-k}\gamma^k}$ the claim essentially follows from the binomial formula
+
+  $$
+  \sum_{k=0}^n a_{nk}^2 = ((1-\gamma) + \gamma)^n = 1 .
+  $$
+
+** Exercise 8.22 (Amplitude damping of single qubit density matrix)
+For the general single qubit state
+
+$$
+  \rho = \begin{bmatrix} a & b \\ b^* & c \end{bmatrix} .
+$$
+
+show that amplitude damping leads to
+
+$$
+  \calE_{AD}(\rho) = \begin{bmatrix}
+    1 - (1-\gamma)(1-a) & b\sqrt{1-\gamma} \\
+    b^*\sqrt{1-\gamma}  & c(1-\gamma) \end{bmatrix} .
+$$
+
+*** Solution
+The claim essentially follows from this small sage script
+
+#+begin_src sage :tangle no :results replace :cache yes
+  E0 = matrix.diagonal([1, sqrt(1-g)])
+  E1 = matrix([[0, sqrt(g)], [0, 0]])
+
+  a, c = SR.var('a c', domain='real')
+  b = SR.var('b', domain='complex')
+
+  rho = matrix([
+      [a, b],
+      [b.conjugate(), c],
+  ])
+
+  A = simplify(E0*rho*E0.H + E1*rho*E1.H)
+
+  assert A == matrix([
+      [               c*g + a, b*sqrt(1-g)],
+      [sqrt(1-g)*conjugate(b), c*(1-g)]
+  ])
+  "PASSED"
+#+end_src
+
+#+RESULTS[50b46336e486c1bd5cf3c638500a734f4ee18308]:
+: 'PASSED'
+
+The upper left corner looks different to what was stated in the exercise. But using
+$a+c=1$ equality is easily verified.
+
+** Exercise 8.23 (Amplitude damping of dual-rail qubits)
+Suppose that a single qubit state is represented by using two qubits, as
+
+$$
+  \ket{\psi} = a \ket{01} + b \ket{10} .
+$$
+
+Show that $\calE_{AD}\otimes\calE_{AD}$ applied to this state gives a process which can be
+described by the operation elements
+
+\begin{align*}
+  E_0^{\mathrm{dr}} &= \sqrt{1-\gamma} I, \\
+  E_1^{\mathrm{dr}} &= \sqrt{\gamma} \ket{00}\bra{01}, \\
+  E_2^{\mathrm{dr}} &= \sqrt{\gamma} \ket{00}\bra{10},
+\end{align*}
+
+that is, either nothing ($E_0^{\mathrm{dr}}$) happens to the qubit, or the qubit is
+transformed ($E_1^{\mathrm{dr}}$, $E_2^{\mathrm{dr}}$) into the state $\ket{00}$, which is
+orthogonal to $\ket{\psi}$. This is a simple error-detection code, and is also the basis
+for the robustness of the ‘dual-rail’ qubit discussed in Section 7.4.
+
+- Remark :: The original exercise statement contained a small error. It claimed that only
+  two operation elements are needed: $E_0^{\mathrm{dr}}$ and
+  $E_1^{\mathrm{dr}}+E_2^{\mathrm{dr}}$. This is incorrect.
+
+  Moreover the formula for $E_0^{\mathrm{dr}}$ needs a proper interpretation. But we will
+  make it precise in the solution below.
+
+*** Proof
+Let us abbreviate $c=\sqrt{1-\gamma}$ and $s=\sqrt{\gamma}$. Recall the operation elements
+of $\calE_{AD}$:
+
+$$
+  E_0 = \begin{bmatrix} 1 & 0 \\ 0 & c \end{bmatrix}, \quad
+  E_1 = \begin{bmatrix} 0 & s \\ 0 & 0 \end{bmatrix}.
+$$
+
+A set of operation elements for $\calE_{AD}\otimes\calE_{AD}$ is given by the four
+elements $\{E_{ij}:=E_i\otimes\?E_j\}$ which we will write down in the following:
+
+$$
+  E_{00} = \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & c & 0 & 0 \\
+    0 & 0 & c & 0 \\
+    0 & 0 & 0 & c^2 \end{bmatrix}
+$$
+and
+
+$$
+  E_{01} = \begin{bmatrix}
+    0 & s & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & sc \\
+    0 & 0 & 0 & 0 \end{bmatrix}
+$$
+
+and
+
+$$
+  E_{10} = \begin{bmatrix}
+    0 & 0 & s & 0 \\
+    0 & 0 & 0 & sc \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \end{bmatrix}
+$$
+
+and
+
+$$
+  E_{11} = \begin{bmatrix}
+    0 & 0 & 0 & s^2 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \end{bmatrix} .
+$$
+
+Here the rows and columns correspond to the basis
+
+$$ (\ket{00},\ket{01},\ket{10},\ket{11}) $$
+
+in that order. Observe that all four operation elements leave the subspace spanned by the
+first three basis elements invariant. This is important since $\ket{\psi}$ lives in that
+subspace. *With respect to this subspace* we have
+
+\begin{align*}
+  E_{00} &= \proj{00} + c(\proj{01} + \proj{10}) , \\
+  E_{01} &= s \ket{00}\bra{01} , \\
+  E_{10} &= s \ket{00}\bra{10} , \\
+  E_{11} &= 0 .
+\end{align*}
+
+In particular we only need three elements and we have $E_1^{\mathrm{dr}}=E_{01}$ and
+$E_2^{\mathrm{dr}}=E_{10}$. Moreover $E_{00}$ corresponds to $cI$ if we understand $I$ to
+be the identity on the subspace spanned by $\ket{01}$ and $\ket{10}$, which makes sense
+since $\ket{\psi}$ even lives in that space. QED.
