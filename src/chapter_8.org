@@ -12,7 +12,7 @@
 ** Imports
 #+name: imports-chapter-8-1
 #+begin_src sage
-  from utils_sage import Id, X, Y, Z, delta, eps, inner
+  from utils_sage import Id, X, Y, Z, delta, eps, inner, kron, P0, P1
 #+end_src
 
 Let us set up some variables
@@ -1488,20 +1488,23 @@ $$
 QED.
 
 ** Exercise 8.20 (Circuit model for amplitude damping)
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.20
+:END:
 Show that the circuit in Figure 8.13 models the amplitude damping quantum operation, with
 $\sin(\theta/2)^2=\gamma$.
 
-#+RESULTS[4a1d389d8fc0851cab033ccf5a464e2dc2099460]: exercise-8.20-circuit
-:                ┌───┐
-: 𝜌_in: ────■────┤ X ├
-:       ┌───┴───┐└─┬─┘
-:  |0>: ┤ Ry(θ) ├──■──
-:       └───────┘
+#+RESULTS[e0b7f987e2dd275eaf27c7e092996285a70f4941]: exercise-8.20-circuit
+:                  ┌───┐
+: rho_in: ────■────┤ X ├
+:         ┌───┴───┐└─┬─┘
+:    |0>: ┤ Ry(θ) ├──■──
+:         └───────┘
 
 
 #+name: exercise-8.20-circuit
 #+begin_src python :results replace :cache yes :exports results
-  qr0 = QuantumRegister(1, "𝜌_in")
+  qr0 = QuantumRegister(1, "rho_in")
   qr1 = QuantumRegister(1, "|0>")
 
   qc = QuantumCircuit(qr0, qr1)
@@ -1567,7 +1570,10 @@ as deﬁned in Section 7.3.
    energy, and states such as $\ket{n}$ are eigenstates of $a^\dagger\?a$.
 2) Show that the operation elements $E_k$ define a trace-preserving quantum operation.
 
-*** Proof of 1
+- Remark :: I am not really sure why it is /this/ formula for $H$. From the text I would
+  have expected $H=\chi(a^\dagger\?b-ab^\dagger)$. But it doesn't matter for this exercise, both work.
+
+*** Proof of part 1
 Recall a [[https://en.wikipedia.org/wiki/Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula#An_important_lemma_and_its_application_to_a_special_case_of_the_Baker%E2%80%93Campbell%E2%80%93Hausdorff_formula][lemma]] related to the Baker-Campbell-Hausdorff formula and Lie-Algebras:
 
 $$
@@ -1640,6 +1646,9 @@ This identity characterizes trace-preserving operations. QED.
   $$
 
 ** Exercise 8.22 (Amplitude damping of single qubit density matrix)
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.22
+:END:
 For the general single qubit state
 
 $$
@@ -1780,3 +1789,204 @@ In particular we only need three elements and we have $E_1^{\mathrm{dr}}=E_{01}$
 $E_2^{\mathrm{dr}}=E_{10}$. Moreover $E_{00}$ corresponds to $cI$ if we understand $I$ to
 be the identity on the subspace spanned by $\ket{01}$ and $\ket{10}$, which makes sense
 since $\ket{\psi}$ even lives in that space. QED.
+
+** Exercise 8.24 (Spontaneous emission is amplitude damping)
+A single atom coupled to a single mode of electromagnetic radiation undergoes spontaneous
+emission, as was described in Section 7.6.1. To see that this process is just amplitude
+damping, take the unitary operation resulting from the Jaynes–Cummings interaction,
+Equation (7.77), with detuning $\delta=0$, and give the quantum operation resulting from
+tracing over the field.
+
+*** Solution
+The Jaynes-Cummings interaction is /essentially/ given by
+
+$$
+  H = \delta Z + g(a^\dagger \sigma_- + a \sigma_+) ,
+$$
+
+where $Z$, $\sigma_\pm=X\mp\ii\?Y$ act on the two-level atom and $a$, $a^\dagger$ on the
+field (see e.g. equation (7.71)). In the basis $(\ket{00},\ket{01},\ket{10})$ (the right
+qubit is the atom) the Hamiltonian looks as follows:
+
+$$
+  H = \begin{bmatrix}
+    \delta & 0 & 0 \\
+    0 & -\delta & g \\
+    0 & g & \delta \end{bmatrix} .
+$$
+
+Let $U=\exp(-\ii\?H\tau/2)$ and define $c=\cos(g\tau)$, $s=\sin(g\tau)$. For $\delta=0$ we
+have
+
+$$
+  U = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & c & -\ii s \\
+    0 & -\ii s & c \end{bmatrix} .
+$$
+
+Let $\rho_E=\proj{0}$ be the state of the field - the environment - with zero
+photons. Then the following clearly describes spontaneous emission:
+
+$$
+  \calE(\rho) = \ptrace{E}{U \rho_E\otimes\rho U^\dagger} .
+$$
+
+We have to show that this is actually amplitude damping.
+
+#+begin_src sage :results replace :tangle no
+  theta = SR.var('theta', domain='real')
+  b, b1 = SR.var('b b1', domain='complex')
+
+  c = cos(theta)
+  s = sin(theta)
+
+  # NOTE: we add a trivial action on |11>. The point of this is solely to be able to
+  # calculate the partial trace below. The function we use only accepts matrices with
+  # dimensions being a power of 2 (more precisely: Hilbert spaces described by qubits). If a
+  # state would actually be equal to |11> the Jaynes-Cummings interaction would not leave it
+  # invariant. But we can use this as a mathematical trick since the three-dimensional
+  # subspace we consider contains everything we need and is left invariant by the
+  # interaction.
+  U = matrix([
+      [1,    0,    0, 0],
+      [0,    c, -i*s, 0],
+      [0, -i*s,    c, 0],
+      [0,    0,    0, 1],
+  ])
+
+  # An arbitrary mixed state (as input for the operation).
+  # b1 is actually conjugate(b) but this looks ugly and we do not need it.
+  rho = matrix([
+      [p, b],
+      [b1, 1-p],
+  ])
+
+  M = U * kron(P0, rho) * U.H
+
+  # TODO: reimplement for sage
+  from chapter_2 import ptrace
+  from sympy import Matrix
+
+  M = Matrix(M)
+  T = ptrace(M, [1]) # bits are counted from the right.
+  T
+#+end_src
+
+#+RESULTS:
+: Matrix([
+: [p - (p - 1)*sin(theta)**2,           b*cos(theta)],
+: [            b1*cos(theta), -(p - 1)*cos(theta)**2]])
+
+Comparing this with the statement of [[#exercise-8.22][exercise 8.22]] we see that this is indeed amplitude
+damping with $\gamma=s^2=\sin(g\tau)^2$.
+
+** Exercise 8.25
+If we deﬁne the temperature $T$ of a qubit by assuming that in equilibrium the
+probabilities of being in the $\ket{0}$ and $\ket{1}$ states satisfy a Boltzmann
+distribution, that is $p_0=e^{-E_0/k_BT}/\mathcal{Z}$ and $p_1=e^{-E_1/k_BT}/\mathcal{Z}$,
+where $E_0$ is the energy of the state $\ket{0}$, $E_1$ the energy of the state $\ket{1}$,
+and $\mathcal{Z}=e^{-E_0/k_BT}+e^{-E_1/k_BT}$, what temperature describes the state
+$\rho_\infty$?
+
+*** Solution
+By convention we typically assume $E_0\?<\?E_1$ (and we assume those values to be given
+constants). Note that this is equivalent to $p_0\?>\?1/2$. The limit case $E_0=E_1$
+corresponds to $p_0=1/2$. It is easy to see that
+
+$$
+  p_0 = \frac{1}{1 + \exp(-(E_1-E_0)/k_BT)}
+$$
+
+This can be used to get a formula for $T$ in terms of $p=p_0$:
+
+$$
+  T = \frac{E_1 - E_0}{k_B \log(p/(1-p))} .
+$$
+
+This is the temperature of a state $\rho=p\proj{0}+(1-p)\proj{1}$. We have the following
+edge cases:
+
+$$
+  T(p=1) = \lim_{p\to1} T(p) = 0, \quad T(p=1/2) = \lim_{p\to1/2} T(p) = \infty .
+$$
+
+** Exercise 8.26 (Circuit model for phase damping)
+Show that the circuit in Figure 8.15 can be used to model the phase damping quantum
+operation, provided $\theta$ is chosen appropriately.
+
+#+RESULTS[930a50ce732943d0ccbd67a1ed775bd507219e78]: exercise-8.26-circuit
+:
+: rho_in: ────■────
+:         ┌───┴───┐
+:    |0>: ┤ Ry(θ) ├
+:         └───────┘
+
+
+#+name: exercise-8.26-circuit
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "rho_in")
+  qr1 = QuantumRegister(1, "|0>")
+
+  qc = QuantumCircuit(qr0, qr1)
+  params = (Param("θ"),)
+
+  qc.cry(params[0], 0, 1)
+
+  qc.draw()
+#+end_src
+
+*** Proof
+This is similar to [[#exercise-8.20][exercise 8.20]] - just simpler. Let $B$ be the operation of the circuit:
+
+$$
+  B = P_0 \otimes I + P_1 \otimes R_y(\theta) .
+$$
+
+Let $\ket{\psi}=a\ket{0}+b\ket{1}$. Then
+
+$$
+  B\ket{\psi}\ket{0_E} = a \ket{00} b\ket{1} R_y(\theta)\ket{0}
+  = a\ket{00} + b(c\ket{10} + s\ket{11}) ,
+$$
+
+where $c=\cos(\theta)$ and $s=\sin(\theta)$. From here we get
+
+\begin{align*}
+  E_0\ket{\psi} &= \bra{0_E} B \ket{\psi}\ket{0_E} = a \ket{0} + bc\ket{1} , \\
+  E_1\ket{\psi} &= \bra{1_E} B \ket{\psi}\ket{0_E} = bs \ket{1} .
+\end{align*}
+
+In other words:
+
+$$
+  E_0 = \begin{bmatrix} 1 & 0 \\ 0 & c \end{bmatrix}, \quad
+  E_1 = \begin{bmatrix} 0 & 0 \\ 0 & s \end{bmatrix},
+$$
+
+which is phase damping (at least for e.g. $\theta\in[0,\pi/2]$) - as desired. QED.
+
+** TODO Exercise 8.27 (Phase damping = phase ﬂip channel)
+Give the unitary transformation which relates the operation elements of (8.127)–(8.128) to
+those of (8.129)–(8.130); that is, find $u$ such that $\tilde{E}_k=\sum_ju_{kj}E_j$.
+
+** TODO Exercise 8.28 (One =CNOT= phase damping model circuit)
+Show that a single =CNOT= gate can be used as a model for phase damping, if we let the
+initial state of the environment be a mixed state, where the amount of damping is
+determined by the probability of the states in the mixture.
+
+** TODO Exercise 8.29 (Unitality)
+A quantum process $\calE$ is unital if $\calE(I)=I$. Show that the depolarizing and phase
+damping channels are unital, while amplitude damping is not.
+
+** TODO Exercise 8.30 ($T_2\leq2T_1$)
+The $T_2$ phase coherence relaxation rate is just the exponential decay rate of the
+off-diagonal elements in the qubit density matrix, while $T_1$ is the decay rate of the
+diagonal elements (see Equation (7.144)). Amplitude damping has both nonzero $T_1$ and $T_2$
+rates; show that for amplitude damping $T_2=2T_1$. Also show that if amplitude and phase
+damping are both applied then $T_2\leq2T_1$.
+
+** TODO Exercise 8.31 (Exponential sensitivity to phase damping)
+Using (8.126), show that the element $\rho_{nm}=\bra{n}\rho\ket{m}$ in the density matrix of a harmonic
+oscillator decays exponentially as $e^{-\lambda(n-m)^2}$ under the effect of phase damping, for some
+constant $\lambda$.
