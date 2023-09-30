@@ -1966,25 +1966,317 @@ $$
 
 which is phase damping (at least for e.g. $\theta\in[0,\pi/2]$) - as desired. QED.
 
-** TODO Exercise 8.27 (Phase damping = phase ﬂip channel)
+** Exercise 8.27 (Phase damping = phase flip channel)
+:PROPERTIES:
+:CUSTOM_ID: exercise-8.27
+:END:
 Give the unitary transformation which relates the operation elements of (8.127)–(8.128) to
 those of (8.129)–(8.130); that is, find $u$ such that $\tilde{E}_k=\sum_ju_{kj}E_j$.
 
-** TODO Exercise 8.28 (One =CNOT= phase damping model circuit)
+For reference:
+
+$$
+  E_0 = \begin{bmatrix} 1 & 0 \\ 0 & \sqrt{1-\lambda} \end{bmatrix} , \;
+  E_1 = \begin{bmatrix} 0 & 0 \\ 0 & \sqrt{\lambda} \end{bmatrix} .
+$$
+
+and $\tilde{E}_0=\sqrt{\alpha}I$, $\tilde{E}_1=\sqrt{1-\alpha}Z$.
+
+*** Solution 1
+In the following I prove
+
+<<exercise-8.27-1>>
+\begin{align*}
+  \tilde{E}_0 &= \sqrt{\alpha} E_0 + \sqrt{1-\alpha} E_1 , \\
+  \tilde{E}_1 &= \sqrt{1-\alpha} E_0 - \sqrt{\alpha} E_1 ,
+\end{align*}
+
+and briefly show how to come up with precisely this ansatz. Recall that the action of
+phase damping is given by
+
+$$
+  \?\begin{bmatrix} p & b \\ b^* & q \end{bmatrix}
+  \mapsto \begin{bmatrix} p & \sqrt{1-\lambda}\,b \\ \sqrt{1-\lambda}\,b^* & q \end{bmatrix} .
+$$
+
+Phase flip is given by
+
+$$
+  \?\begin{bmatrix} p & b \\ b^* & q \end{bmatrix}
+  \mapsto \begin{bmatrix} p & (2\alpha-1)b \\ (2\alpha-1)b^* & q \end{bmatrix} .
+$$
+
+Hence there is a bijection $[0,1]\to[1/2,1]$ given by
+
+<<exercise-8.27-2>>
+$$ \alpha=(1+\sqrt{1-\lambda})/2 $$
+
+which maps between phase damping and "half of" all phase flips. This already shows that
+phase damping is just phase flip and we already have a formula for $\alpha$. Hence there
+must be a unitary matrix $u$ such that
+
+\begin{align*}
+  \tilde{E}_0 &= u_{00} E_0 + u_{01} E_1 , \\
+  \tilde{E}_1 &= u_{10} E_0 + u_{11} E_1 .
+\end{align*}
+
+By inspecting the matrices it is clear that we /must/ have $u_{00}=\sqrt{\alpha}$ and
+$u_{10}=\sqrt{1-\alpha}$. Since the matrix $u$ is unitary we also must have
+$\abs{u_{01}}=\sqrt{1-\alpha}$ and $\abs{u_{11}}=\sqrt{\alpha}$. Since everything else is
+real we directly conclude that $u_{10}$ and $u_{11}$ have to be real too. By looking at
+the $11$ entries of the operation elements we directly see that $u_{01}$ must be
+positive. Hence by (e.g.) unitarity of $u$ we deduce that $u_{11}$ must be negative. Hence
+the only possible $u$ is the one implicitly given in the [[exercise-8.27-1][above equation]].
+
+Since we already know that $u$ must exist and we also showed that it is unique the
+[[exercise-8.27-1][mentioned equation]] follows.
+
+*** Solution 2
+This is not really a second solution but more like a consistency check for the first
+solution (we all make mistakes so it is best practice to double check things from time to
+time).
+
+The [[exercise-8.27-1][claim]] we have to prove is equivalent to:
+
+\begin{align*}
+  \sqrt{\alpha} &= \sqrt{\alpha} \sqrt{1-\lambda} + \sqrt{1-\alpha} \sqrt{\lambda} , \\
+  -\sqrt{1-\alpha} &= \sqrt{1-\alpha} \sqrt{1-\lambda} - \sqrt{\alpha} \sqrt{\lambda} .
+\end{align*}
+
+In principle there would be four equations (one for each diagonal entry and each
+phase-flip element) but the other two are just trivial. Let us abbreviate
+$c=\sqrt{1-\lambda}$ and $s=\sqrt{\lambda}$. Note that $c,s\in[0,1]$ and $c^2+s^2=1$. The
+first equation is equivalent to
+
+$$
+  \sqrt{\alpha} = \sqrt{\alpha} c + \sqrt{1-\alpha} s .
+$$
+
+Before we go on, recall [[exercise-8.27-2][this formula]] $2\alpha=1+c$. It suffices to show that twice the
+square of the RHS is $2\alpha=1+c$ (squaring only hides the sign but we already see that
+both sides are positive). Let us check this:
+
+\begin{align*}
+  2(\sqrt{\alpha} \, c + \sqrt{1-\alpha} \, s)^2 &= (\sqrt{1+c} \, c + \sqrt{1-c} \, s)^2 \\
+  &= (1+c)c^2 + (1-c)s^2 + 2\sqrt{1-c^2} \, sc \\
+  &= 1 + c(c^2+s^2) \\
+  &= 1 + c .
+\end{align*}
+
+This is as desired. The second equation
+
+$$
+  -\sqrt{1-\alpha} = \sqrt{1-\alpha} c - \sqrt{\alpha} s .
+$$
+
+can also be shown by showing that twice the square of the RHS is equal to
+$2(1-\alpha)=1-c$ (the sign makes no problem since the RHS is at most $\sqrt{1-\alpha}$
+and this only if $c=1$, $s=0$ which implies $\alpha=1$, a special case easily treated
+separately). Let us also check this:
+
+\begin{align*}
+  2(\sqrt{1-\alpha} \, c - \sqrt{\alpha} \, s)^2 &= (\sqrt{1-c} \, c - \sqrt{1+c} \, s)^2 \\
+  &= (1-c)c^2 + (1+c)s^2 - 2\sqrt{1-c^2} \, sc \\
+  &= 1 - c(c^2+s^2) \\
+  &= 1 - c .
+\end{align*}
+
+** Exercise 8.28 (One =CNOT= phase damping model circuit)
 Show that a single =CNOT= gate can be used as a model for phase damping, if we let the
 initial state of the environment be a mixed state, where the amount of damping is
 determined by the probability of the states in the mixture.
 
-** TODO Exercise 8.29 (Unitality)
+*** Solution
+As an intermediate step let us find a solution involving a =CZ= gate instead of a =CNOT=
+gate. It is relatively intuitive how to do this if we recall that phase damping is just
+phase flip ([[#exercise-8.27][exercise 8.27]])
+
+#+RESULTS[8b9bb4418759a8974222b730004e38e57042b39b]: exercise-8.28-circuit-1
+:
+:                rho_in: ─■─
+:                         │
+: p|0><0| + (1-p)|1><1|: ─■─
+:
+
+Here =CZ= gate is to be interpreted as having its control at the environment (it is
+symmetric of course but it helps to imagine it that way). The environment is in the mixed state
+
+$$ \rho_E = p\proj{0} + (1-p)\proj{1} $$
+
+which activates the =CZ= with probability $1-p$ and does nothing otherwise. A similar
+construction was done for the deploarizing channel in figure 8.12. To /rigorously/ prove
+that this actually implements the phase flip let $U$ be the =CZ= gate and consider
+
+\begin{align*}
+  \ptrace{E}{U \rho\otimes\rho_E U^\dagger}
+  &= p \, \ptrace{E}{U \rho\otimes P_0 U^\dagger} + (1-p) \, \ptrace{E}{U \rho\otimes P_1 U^\dagger} \\
+  &= p \, \ptrace{E}{\rho\otimes P_0} + (1-p) \, \ptrace{E}{(Z\rho Z)\otimes P_1} \\
+  &= p \, \rho + (1 - p) \, Z\rho Z .
+\end{align*}
+
+Hence the above circuit implements phase flip. By [[#exercise-8.27][exercise 8.27]] we know that setting
+$p=(1+\sqrt{1-\lambda})/2$ (c.f. [[exercise-8.27-2][solution]] of that exercise) is phase damping with
+parameter $\lambda$.
+
+
+Using the Hadamard gate and $HXH=Z$ the circuit can be converted to a cicuit using a
+=CNOT=:
+
+#+RESULTS[52c921af550981981384a248599e6af61654f59b]: exercise-8.28-circuit-2
+:
+:                rho_in: ───────■───────
+:                        ┌───┐┌─┴─┐┌───┐
+: p|0><0| + (1-p)|1><1|: ┤ H ├┤ X ├┤ H ├
+:                        └───┘└───┘└───┘
+
+Note that we actually do not need the second Hadamard gate since it only acts on the
+environment /after/ the interaction took place. That is, the following circuit implements
+the same operation:
+
+#+RESULTS[b65bf6c4a82ce0f00b8e239340868509c5e89f39]: exercise-8.28-circuit-3
+:
+:                rho_in: ───────■──
+:                        ┌───┐┌─┴─┐
+: p|0><0| + (1-p)|1><1|: ┤ H ├┤ X ├
+:                        └───┘└───┘
+
+The Hadamard gate maps between the eigenbasis $(\ket{0},\ket{1})$ of $Z$ and the
+eigenbasis $(\ket{0},\ket{1})$ of $X$. Hence the following circuit still implements phase
+damping:
+
+#+RESULTS[ca4b07efc50e57effd25279b3fd2bed296c7e566]: exercise-8.28-circuit-4
+:
+:                rho_in: ──■──
+:                        ┌─┴─┐
+: p|+><+| + (1-p)|-><-|: ┤ X ├
+:                        └───┘
+
+That is, the environment is in the state $p\proj{+}+(1-p)\proj{-}$ and the =CNOT= gate has
+its target there.
+
+#+name: exercise-8.28-circuit-1
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "rho_in")
+  qr1 = QuantumRegister(1, "p|0><0| + (1-p)|1><1|")
+
+  qc = QuantumCircuit(qr0, qr1)
+
+  qc.cz(1, 0)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-8.28-circuit-2
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "rho_in")
+  qr1 = QuantumRegister(1, "p|0><0| + (1-p)|1><1|")
+
+  qc = QuantumCircuit(qr0, qr1)
+
+  qc.h(1)
+  qc.cx(0, 1)
+  qc.h(1)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-8.28-circuit-3
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "rho_in")
+  qr1 = QuantumRegister(1, "p|0><0| + (1-p)|1><1|")
+
+  qc = QuantumCircuit(qr0, qr1)
+
+  qc.h(1)
+  qc.cx(0, 1)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-8.28-circuit-4
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "rho_in")
+  qr1 = QuantumRegister(1, "p|+><+| + (1-p)|-><-|")
+
+  qc = QuantumCircuit(qr0, qr1)
+
+  qc.cx(0, 1)
+
+  qc.draw()
+#+end_src
+
+** Exercise 8.29 (Unitality)
 A quantum process $\calE$ is unital if $\calE(I)=I$. Show that the depolarizing and phase
 damping channels are unital, while amplitude damping is not.
 
-** TODO Exercise 8.30 ($T_2\leq2T_1$)
+*** Solution
+This is a straightforward exercise. So let us mainly mention one thing. Some formulas like
+this one for the depolarizing channel
+
+$$
+  \calE_{DC}(\rho) = p d\inv I  + (1-p)\rho
+$$
+
+only holds for /density/ matrices. In that case we have to plug in $d\inv\?I$ and not $I$:
+
+$$
+  \calE_{DC}(d\inv I) = (p + (1-p)) d\inv I = d\inv I .
+$$
+
+For the phase damping let us show the claim on the (slightly) more general phase flip
+operation ([[#exercise-8.27][exercise 8.27]]). We use the a formula based on operation elements where the
+above remark does not apply:
+
+$$
+  \calE_{PF}(I) = p I^3 + (1-p) ZIZ = p I + (1-p) I = I .
+$$
+
+Finally consider amplitude damping with $E_0=\diag(1,c)$ and $E_1=s\ket{0}\bra{1}$ where
+$c,s\geq0$ with $c^2+s^2=1$ (moreover we assume that $c\neq1$ to avoid the identity
+operation which is indeed unital):
+
+$$
+  \calE_{AD}(I) = E_0E_0^\dagger + E_1E_1^\dagger = \diag(1,c^2) + \diag(s^2, 0) = \diag(1+s^2,c^2) \neq I
+$$
+
+** Exercise 8.30 ($T_2\leq2T_1$)
 The $T_2$ phase coherence relaxation rate is just the exponential decay rate of the
 off-diagonal elements in the qubit density matrix, while $T_1$ is the decay rate of the
 diagonal elements (see Equation (7.144)). Amplitude damping has both nonzero $T_1$ and $T_2$
 rates; show that for amplitude damping $T_2=2T_1$. Also show that if amplitude and phase
 damping are both applied then $T_2\leq2T_1$.
+
+*** Proof
+Recall the general equation for the relaxation from (7.144):
+
+$$
+  \?\begin{bmatrix}
+    (p-p_0) e^{-t/T_1} + p_0 & b e^{-t/T_2} \\
+    b^* e^{-t/T_2} & (p_0-p) e^{-t/T_1} + (1-p_0)
+  \?\end{bmatrix} .
+$$
+
+From [[#exercise-8.22][exercise 8.22]] we know
+
+$$
+  \calE_{AD}(\rho) = \?\begin{bmatrix}
+    1 + (1-\gamma)(p-1) & b \sqrt{1-\gamma} \\
+    b^* \sqrt{1-\gamma} & (1-p) (1-\gamma)
+  \?\end{bmatrix} .
+$$
+
+This clearly corresponds to $p_0=1$, $T_2=2T_1$ and an unspecified $t>0$. If we apply
+phase damping in addition we get
+
+$$
+  \calE_{PD}\circ\calE_{AD}(\rho) = \?\begin{bmatrix}
+    1 + (1-\gamma)(p-1) & b \sqrt{(1-\lambda)(1-\gamma)} \\
+    b^* \sqrt{(1-\lambda)(1-\gamma)} & (1-p) (1-\gamma)
+  \?\end{bmatrix} .
+$$
+
+This clearly only makes the $T_2$​-relaxation faster. In other words $T_2$ gets
+smaller. QED.
 
 ** TODO Exercise 8.31 (Exponential sensitivity to phase damping)
 Using (8.126), show that the element $\rho_{nm}=\bra{n}\rho\ket{m}$ in the density matrix of a harmonic
