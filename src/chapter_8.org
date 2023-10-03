@@ -12,7 +12,8 @@
 ** Imports
 #+name: imports-chapter-8-1
 #+begin_src sage
-  from utils_sage import Id, X, Y, Z, delta, eps, inner, kron, P0, P1
+  from itertools import product
+  from utils_sage import Id, X, Y, Z, delta, eps, inner, trace, kron, P0, P1
 #+end_src
 
 Let us set up some variables
@@ -32,6 +33,15 @@ Let us set up some variables
 #+name: imports-chapter-7-2
 #+begin_src python :exports none
   from qiskit.circuit import QuantumCircuit, QuantumRegister, Parameter as Param
+#+end_src
+
+** Utility code
+#+begin_src sage
+  def make_operation(Es: list[matrix]):
+      """Given a list of Kraus matrix return their quantum operation."""
+      def op(rho):
+          return sum(E * rho * E.H for E in Es)
+      return op
 #+end_src
 
 ** Bloch sphere representation
@@ -301,7 +311,7 @@ Pauli-operators $(I,X,Y,Z)$.
   def qop1d(Es, rho):
       """Take a list of operator elements and apply the quantum operation to the given mixed
       single-qubit state. It returns the result as a vector in RR^4 wrt the Pauli basis."""
-      rho1 = sum(E * rho * E.H for E in Es)
+      rho1 = make_operation(Es)(rho)
       return simplify(vector(toPauli(rho1)))
 #+end_src
 
@@ -2391,3 +2401,314 @@ smaller. QED.
 Using (8.126), show that the element $\rho_{nm}=\bra{n}\rho\ket{m}$ in the density matrix of a harmonic
 oscillator decays exponentially as $e^{-\lambda(n-m)^2}$ under the effect of phase damping, for some
 constant $\lambda$.
+
+** Exercise 8.32
+Explain how to extend quantum process tomography to the case of non-trace-preserving
+quantum operations, such as arise in the study of measurement.
+
+*** Solution
+The procedure explained in the book does not rely on the fact that the operation is
+trace-preserving. The only occasion it appeared was when it was mentioned that $\chi$ has
+$d^4-d^2$ free parameters. In the non-trace-preserving case the $-d^2$ goes away.
+
+** Exercise 8.33 (Specifying a quantum process)
+Suppose that one wished to completely specify an arbitrary single qubit operation $\calE$
+by describing how a set of points on the Bloch sphere $\{\vec{r}_k\}$ transform under
+$\calE$. Prove that the set must contain at least four points.
+
+*** Proof
+First of all recall that the bloch sphere description only applies to trace-preserving
+operations ([[#exercise-8.16][exercise 8.16]]). Therefore let us add the additional resctriction that the
+operation has to be trace preserving.
+
+The claim almost follows from the fact that trace-preserving operations act like affine
+maps in the (three-dimensional) Bloch-space. But it is well known that an affine map on a
+$d$​-dimensional space needs exactly $d+1$ affine-linearly independent points to be
+specified. I say "almost" because not every affine map corresponds to a quantum operation
+(at least I think so). But it still serves as good justification because we have already
+seen that quantum operations give rise to several non-trivial affine maps.
+
+We show that every map (on the Bloch-space) of the form
+
+<<exercise-8.33-1>>
+$$
+  \vec{x} \mapsto RD \vec{x} + \vec{c} ,
+$$
+
+for any rotation matrix $R$ (orthogonal and determinant plus one), diagonal matrix $D$
+with diagonal entries in $0\?<\?d_i\?<\?1-\gamma$, and any vector $\vec{c}$ with
+$\norm{\vec{c}}\leq\gamma$ corresponds to a quantum operation. Here $0\leq\gamma\?<\?1$ is
+an arbitrary parameter. There are more affine maps possible but this is sufficient for our
+purpose.
+
+Note that e.g. mirroring at the $z=0$ plane (a negative determinant map) and the mentioned
+affine maps together generate the group of all invertible affine maps (this is related to
+the polar decomposition of matrices). Hence it is not hard to see that even if we restrict
+the space of possible maps to maps of the [[exercise-8.33-1][above form]] we need at least four points.
+
+Now let us justify the above [[exercise-8.33-1][claim]]. Any rotation $\vec{x}\mapsto\?R\vec{x}$ is possible by
+unitary evolution (keyword: Pauli rotations). The depolarizing channel implements
+$\vec{x}\mapsto\alpha\vec{x}$ for any $\alpha\in(0,1)$. The phase flip can implement an
+operation which shrinks the x- and y-dimension by the same factor. In the same way a
+similar shrinkage of any pair of axes is possible. Hence a mapping
+$\vec{x}\mapsto\?D\vec{x}$ is possible where the diagonal entries just have to satisfy
+$0\?<\?d_i\?<\?1$.
+
+Finally amplitude damping together with a rotation can be used to realize a non-trivial
+$\vec{c}$. Note that amplitude damping also shrinks everything, but not more than by a factor
+$1-\gamma$. This is the reason why we impose the condition $0\?<\?d_i\?<\?1-\gamma$ on the
+realizability of the diagonal entries. QED.
+
+** TODO Exercise 8.34 (Process tomography for two qubits)
+Show that the $\chi_2$ describing the black box operations on two qubits can be expressed
+as
+
+$$
+  \chi_2 = \Lambda_2 \sigma \Lambda_2 ,
+$$
+
+where $\Lambda_2=\Lambda\otimes\Lambda$, $\Lambda$ is as deﬁned in Box 8.5, and $\sigma$ is a
+block matrix of 16 measured density matrices,
+
+$$
+  \sigma = P^\top \left( \sum_{mn} \rho_{mn}\otimes\rho'_{mn} \right)  P
+$$
+
+where $\rho'_{nm}=\calE(\rho_{nm})$, $\rho_{nm}=T_n\proj{00}T_m$, $T_1=I\otimes\?I$,
+$T_2=I\otimes\?X$, $T_3=X\otimes\?I$, $T_4=X\otimes\?X$, and
+$P=I\otimes[(\rho_{00}+\rho_{12}+\rho_{21}+\rho_{33})\otimes\?I]$ is a permutation matrix.
+
+- Remark :: The formula for sigma is equivalent to the one in the book. I find it to be
+  more concise. It follows from the fact that the $\rho_{mn}$ are matrices with zeros
+  every except at the position $(m,n)$.
+
+** Exercise 8.35 (Process tomography example)
+Consider a one qubit black box of unknown dynamics $\calE_1$. Suppose that the following
+four density matrices are obtained from experimental measurements, performed according to
+Equations (8.173)–(8.176):
+
+\begin{align*}
+  \rho_1' &= \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} , \\
+  \rho_2' &= \begin{bmatrix} 0 & \sqrt{1-\gamma} \\ 0 & 0 \end{bmatrix} , \\
+  \rho_3' &= \begin{bmatrix} 0 & 0 \\ \sqrt{1-\gamma} & 0 \end{bmatrix} , \\
+  \rho_4' &= \begin{bmatrix} \gamma & 0 \\ 0 & 1-\gamma \end{bmatrix} .
+\end{align*}
+
+where $\gamma$ is a numerical parameter. From an independent study of each of these
+input–output relations, one could make several important observations: the ground state
+$\ket{0}$ is left invariant by $\calE_1$, the excited state $\ket{1}$ partially decays to
+the ground state, and superposition states are damped. Determine the $\chi$ matrix for
+this process.
+
+- Remark :: I wonder why we should stop at computing the chi matrix. Anyway, let us extend
+  the exercise by the requirement to also compute operation elements for this operation.
+
+*** Solution 1
+Let us first set up two routines to compute $\beta$ and $\lambda$. We specialize those to
+the single qubit case. Moreover we use the basis $(\rho_j)=(P_0, P_0X, XP_0,XP_0X)$ (where
+$P_0=\proj{0}$) for the space where the density matrices live.
+
+#+name: exercise-8.35-1
+#+begin_src sage
+  def compute_beta_835(Es: list[matrix]):
+      """Compute beta for single qubit and specific choice of basis of input matrix space."""
+      rho = [P0, P0*X, X*P0, X*P0*X] # basis
+
+      # As suggested in the text we flatten the space of 4x4 matrices to a 16-dimensional
+      # vector. This turns beta into a 16x16 matrix.
+      beta = matrix.zero(16)
+
+      for m, n in product(range(4), range(4)):
+          for j, k in product(range(4), range(4)):
+              rho_prime = Es[m] * rho[j] * Es[n].H
+              beta[j+4*k, m+4*n] = trace(rho[k].H * rho_prime)
+
+      return beta
+
+
+  def compute_lambda_835(rho_prime):
+      """Compute lambda for single qubit and specific choice of basis of input matrix
+      space."""
+      rho = [P0, P0*X, X*P0, X*P0*X] # basis
+
+      lam = [None for _ in range(16)]
+
+      for j in range(4):
+          for k in range(4):
+              lam[j+4*k] = trace(rho[k].H * rho_prime[j])
+
+      return vector(lam)
+
+
+  def toMatrix_835(vec):
+      """Convert a flattened 4x4 matrix back to matrix representation."""
+      return matrix(SR, 4, 4, lambda m,n: vec[m+4*n])
+#+end_src
+
+The following code computes $\chi$. As a basis for the operation elements we use the
+$\tilde{E}_j$ as in box 8.5: $(I,X,-\ii\?Y,Z)$.
+
+#+name: exercise-8.35-2
+#+begin_src sage
+  rho_prime_835 = [
+      matrix([
+          [1, 0],
+          [0, 0],
+      ]),
+      matrix([
+          [0, sqrt(1-g)],
+          [0, 0],
+      ]),
+      matrix([
+          [0, 0],
+          [sqrt(1-g), 0],
+      ]),
+      matrix([
+          [g, 0],
+          [0, 1-g],
+      ]),
+  ]
+
+  # E-tilde as basis for beta as in box 8.5:
+  beta_835 = compute_beta_835([Id, X, -i*Y, Z])
+  kappa_835 = beta_835.pseudoinverse()
+  assert beta_835 == beta_835 * kappa_835 * beta_835, "kappa is pseudoinverse of beta"
+
+  lam_835 = compute_lambda_835(rho_prime_835)
+  chi_835 = toMatrix_835(kappa_835 * lam_835)
+#+end_src
+
+Let us print $\chi$:
+
+#+begin_src sage :tangle no :results replace :cache yes
+  chi_835
+#+end_src
+
+#+RESULTS[fd8824bc31ed58b7e4dfd66eb6c33ded52985dd4]:
+: [-1/4*g + 1/2*sqrt(-g + 1) + 1/2                               0                               0                           1/4*g]
+: [                              0                           1/4*g                          -1/4*g                               0]
+: [                              0                          -1/4*g                           1/4*g                               0]
+: [                          1/4*g                               0                               0 -1/4*g - 1/2*sqrt(-g + 1) + 1/2]
+
+To obtain the operation elements we have to diagonalize $\chi$.
+
+#+begin_src sage :tangle no :results replace :cache yes
+  D, U = chi_835.eigenmatrix_right()
+  print(f"D (diagonalized chi matrix) = \n{D}")
+  print(f"\nU (columns contain eigenvectors) = \n{U}")
+#+end_src
+
+#+RESULTS[104dde2e610ca9d7d5e9c9d8f4e01763a731fb2e]:
+#+begin_example
+D (diagonalized chi matrix) =
+[-1/2*g + 1          0          0          0]
+[         0          0          0          0]
+[         0          0          0          0]
+[         0          0          0      1/2*g]
+
+U (columns contain eigenvectors) =
+[                          1                           1                           0                           0]
+[                          0                           0                           1                           1]
+[                          0                           0                           1                          -1]
+[-(g + 2*sqrt(-g + 1) - 2)/g  (g - 2*sqrt(-g + 1) - 2)/g                           0                           0]
+#+end_example
+
+There are only two non-zero eigenvalues of the chi-matrix:
+
+$$
+  d_0 = 1 - \frac{g}{2}, \quad d_3 = \frac{g}{4} .
+$$
+
+The corresponding normalized eigenvectors are
+
+$$
+  u_0 = (1, 0, 0, r)/\sqrt{1+r^2}, \quad u_3 = (0, 1, -1, 0)/\sqrt{2} ,
+$$
+
+where $r=g\inv(1-\sqrt{1-g})^2$. This implies the following operation elements:
+
+\begin{align*}
+  E_0 &= \sqrt{\frac{1-\frac{g}{2}}{1+r^2}} \, (I + rZ) , \\
+  E_3 &= \frac{\sqrt{g}}{2} \, (X + \ii Y) .
+\end{align*}
+
+#+name: exercise-8.35-3
+#+begin_src sage
+  r = (1/g)*(1-sqrt(1-g))^2
+  op835 = make_operation([sqrt(1-g/2)*(Id+r*Z)/sqrt(1+r^2), sqrt(g)*(X+i*Y)/2])
+#+end_src
+
+Let us briefly verify that this operation indeed implements the desired operation:
+
+#+begin_src sage :results replace :tangle no :cache yes
+  rho = [P0, P0*X, X*P0, X*P0*X]
+  assert op835(rho[0]) == rho_prime_835[0]
+  assert op835(rho[1]) == rho_prime_835[1]
+  assert op835(rho[2]) == rho_prime_835[2]
+  assert op835(rho[3]) == rho_prime_835[3]
+  "PASSED"
+#+end_src
+
+#+RESULTS[41ca0b83c6ea08f04cd21c39e299f2ad2e585945]:
+: 'PASSED'
+
+*** Solution 2
+In box 8.5 another way to compute the chi-matrix was suggested. It is based on a matrix
+$\Lambda$:
+
+#+name: exercise-8.35-4
+#+begin_src sage
+  Lambda1 = (kron(Z, Id) + kron(X, X)) / 2
+#+end_src
+
+In addition we need the following utility functions. The first one computes the matrix
+
+$$
+  R' := \begin{bmatrix} \rho_1' & \rho_2' \\ \rho_3' & \rho_4' \end{bmatrix} .
+$$
+
+It utilizes the fact that this matrix is just $\sum_j\rho_j\otimes\rho_j'$ for our
+specific choice of $(\rho_j)$. The second one just implements the formula (see (8.179))
+
+$$
+  \chi = \Lambda R' \Lambda .
+$$
+
+#+name: exercise-8.35-5
+#+begin_src sage
+  def compute_rho_prime_matrix_835(rho_primes):
+      rhos = [P0, P0*X, X*P0, X*P0*X]
+      lam = matrix.zero(4)
+
+      for rho, rho_prime in zip(rhos, rho_primes):
+          lam += kron(rho, rho_prime)
+
+      return lam
+
+
+  def compute_chi_via_Lambda_835(rho_primes):
+      return Lambda1 * compute_rho_prime_matrix_835(rho_primes) * Lambda1
+#+end_src
+
+So let us compute $\chi$:
+
+#+name: exercise-8.35-6
+#+begin_src sage
+  # Take rho_prime_835 from solution 1:
+  chi_835_2 = compute_chi_via_Lambda_835(rho_prime_835)
+#+end_src
+
+Let us do a quick check that we got the same thing as in the first solution. Note that
+this is only possible because we used the same bases for the operation elements
+($(I,X,-\ii\?Y,Z)$) and the matrix space where the density matrices live
+($(P_0,P_0X,XP_0,XP_0X)$). Otherwise the number might be completely different of course.
+
+#+begin_src sage :results replace
+  assert chi_835 == chi_835_2
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+The rest is the same as in the first solution.

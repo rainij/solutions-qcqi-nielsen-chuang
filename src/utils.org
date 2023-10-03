@@ -119,9 +119,12 @@ Hilbert-Schmidt inner product:
 
 #+name: hilbert-schmidt
 #+begin_src sage
+  def trace(M):
+      return M.trace()
+
   def inner(A, B):
       """Hilbert-Schmidt inner product"""
-      return (A.H * B).trace()
+      return trace(A.H * B)
 #+end_src
 
 Kronecker delta and friends:

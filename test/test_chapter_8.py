@@ -1,7 +1,7 @@
 from sage.all import SR, sqrt, matrix, vector
 
-from utils_sage import Id, X, Y, Z
-from chapter_8_sage import p, g, affine, toPauli, make_qop1d_matrix_4d
+from utils_sage import Id, X, Y, Z, P0
+from chapter_8_sage import p, g, affine, toPauli, make_qop1d_matrix_4d, op835, rho_prime_835, chi_835, chi_835_2
 
 
 def test_toPauli():
@@ -45,3 +45,13 @@ def test_affine_amplitude_damping():
         [0,         0, sqrt(1-g),   0],
         [g,         0,         0, 1-g],
     ])
+
+
+def test_exercise_835():
+    rho = [P0, P0*X, X*P0, X*P0*X]
+    assert op835(rho[0]) == rho_prime_835[0]
+    assert op835(rho[1]) == rho_prime_835[1]
+    assert op835(rho[2]) == rho_prime_835[2]
+    assert op835(rho[3]) == rho_prime_835[3]
+
+    assert chi_835 == chi_835_2
