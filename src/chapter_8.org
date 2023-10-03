@@ -327,6 +327,9 @@ The corresponding matrix is given by
 #+end_src
 
 ** Process tomography for single qubit
+:PROPERTIES:
+:CUSTOM_ID: chapter-8-process-tomography-single-qubit
+:END:
 I found it highly non-trivial to see equation (8.179)
 
 <<chi-for-single-qubit>>
@@ -377,6 +380,7 @@ $$
 The $\chi_{mn}$ are unknown and our goal is to prove the [[chi-for-single-qubit][above formula]] for them. Now
 consider
 
+<<an-equation-for-lamRplam-1d>>
 \begin{align*}
   \Lambda R' \Lambda &= \frac{1}{4} \sum_{klmn} \chi_{mn} \Lambda (P_{kl} \otimes N_m P_{kl} N_n) \Lambda \\
   &= \frac{1}{4} \sum_{klmnab} \chi_{mn} \, L_a P_{kl} L_b \otimes R_a N_m P_{kl} N_n R_b \\
@@ -2459,7 +2463,7 @@ $\vec{c}$. Note that amplitude damping also shrinks everything, but not more tha
 $1-\gamma$. This is the reason why we impose the condition $0\?<\?d_i\?<\?1-\gamma$ on the
 realizability of the diagonal entries. QED.
 
-** TODO Exercise 8.34 (Process tomography for two qubits)
+** Exercise 8.34 (Process tomography for two qubits)
 Show that the $\chi_2$ describing the black box operations on two qubits can be expressed
 as
 
@@ -2478,9 +2482,63 @@ where $\rho'_{nm}=\calE(\rho_{nm})$, $\rho_{nm}=T_n\proj{00}T_m$, $T_1=I\otimes\
 $T_2=I\otimes\?X$, $T_3=X\otimes\?I$, $T_4=X\otimes\?X$, and
 $P=I\otimes[(\rho_{00}+\rho_{12}+\rho_{21}+\rho_{33})\otimes\?I]$ is a permutation matrix.
 
-- Remark :: The formula for sigma is equivalent to the one in the book. I find it to be
-  more concise. It follows from the fact that the $\rho_{mn}$ are matrices with zeros
-  every except at the position $(m,n)$.
+- Remarks ::
+  - The formula for sigma is equivalent to the one in the book. I find it to be more
+    concise. It follows from the fact that the $\rho_{mn}$ are matrices with zeros every
+    except at the position $(m,n)$.
+  - I /think/ that there is a tiny error in this exercise. I think one should use $P$ to
+    conjugate $\Lambda_2$ so that the formula is as follows:
+
+    $$
+    \chi_2 = P \Lambda_2 P R' P \Lambda_2 P = P \Lambda_2 \sigma \Lambda_2 P ,
+    $$
+
+    where $R'$ is the same as $\sigma$ but without conjugating with $P$.
+
+*** Proof
+I will slightly deviate from the exercise (but still solve it) to get a better insight
+into what is going on. I will change the exercise in the following way:
+
+- I consider $d\geq1$ qubits - generalizing the statement (and actually making it easier to grasp).
+- I define a slightly different $\Lambda_d$ avoiding the $P$.
+
+The task can be reduced to [[#chapter-8-process-tomography-single-qubit][the case]] $d=1$ which I already proved in the introduction to
+this chapter. I reuse the notation from there so please have a look. Let
+
+$$
+  \calE(\rho) = \sum_{mn} \chi_{mn} K_m \rho K_n ,
+$$
+
+where $K_m=\bigotimes_{x=0}^{d-1}N_{m_x}$. Our task is to find $\chi$. Let
+
+$$
+  \tilde{\Lambda}_d = \frac{1}{2^d} \sum_a \bigotimes_{x=0}^{d-1} L_{a_x} \otimes \bigotimes_{x=0}^{d-1} R_{a_x} .
+$$
+
+Then
+
+$$
+  \tilde{\Lambda}_d R' \tilde{\Lambda}_d = \frac{1}{4^d} \sum_{mnab} \chi_{mn}
+    \left[\bigotimes_{x=0}^{d-1} L_{a_x} P_{i_xj_x} L_{b_x} \right]
+    \otimes
+    \left[\bigotimes_{x=0}^{d-1} R_{a_x} N_{m_x} P_{i_xj_x} N_{n_x} R_{b_x}  \right]
+$$
+
+But the RHS is just the tensorized version of a [[an-equation-for-lamRplam-1d][formula]] for the case $d=1$. Hence the LHS
+must equal $\chi$ (note that the tensor-product must be in the right order to not get a
+permuted version of $\chi$).
+
+To see why the permuation matrix $P$ is necessary in the context of the exercise let us
+again consider the case $d=2$. Here we have
+
+\begin{align*}
+  \Lambda_2 &= \sum_a L_{a_1} \otimes R_{a_1} \otimes L_{a_0} \otimes R_{a_0} , \\
+  \tilde{\Lambda}_2 &= \sum_a L_{a_1} \otimes L_{a_0} \otimes R_{a_1} \otimes R_{a_0} .
+\end{align*}
+
+Hence we see that only the two middle operators are swapped. This is the purpose of the
+permuation. We could also leave out the permuation and just replace $\tilde{\Lambda}_2$ by
+$\Lambda_2$, but in that case we would get a permuted version of $\chi$. QED.
 
 ** Exercise 8.35 (Process tomography example)
 Consider a one qubit black box of unknown dynamics $\calE_1$. Suppose that the following
