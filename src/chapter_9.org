@@ -1,0 +1,106 @@
+#+title:  Chapter 9
+#+author: Reinhard Stahn
+#+setupfile: ./inc/setupfile.org
+#+include: ./inc/latex-macros.org
+#+property: header-args:sage :session *sage-chapter-9* :tangle chapter_9.sage
+
+#+toc: headlines 2
+
+* Exercises
+** Exercise 9.1
+What is the trace distance between the probability distribution $(1,0)$ and the probability
+distribution $(1/2,1/2)$? Between $(1/2,1/3,1/6)$ and $(3/4,1/8,1/8)$?
+
+*** Solution
+We have
+
+$$
+  D((1,0), (1/2,1/2)) = \frac{1}{2} ( 1/2 + 1/2 ) = \frac{1}{2} ,
+$$
+
+and
+
+$$
+  D((1/2,1/3,1/6), (3/4,1/8,1/8)) = \frac{1}{2} ( 1/4 + 5/24 + 1/24 ) = \frac{1}{4} .
+$$
+
+** Exercise 9.2
+Show that the trace distance between probability distributions $(p,1-p)$ and $(q,1-q)$ is
+$\abs{p-q}$.
+
+*** Proof
+$$
+  D((p,1-p), (q, 1-q)) = \frac{1}{2} (\abs{p-q} + \abs{1-p-1+q}) = \abs{p-q} .
+$$
+
+QED.
+
+** Exercise 9.3
+What is the fidelity of the probability distributions $(1,0)$ and $(1/2,1/2)$? Of
+$(1/2,1/3,1/6)$ and $(3/4,1/8,1/8)$?
+
+*** Solution
+We have
+
+$$
+  F((1,0), (1/2,1/2)) = \sqrt{1\cdot1/2} + 0 = \sqrt{2\inv}
+$$
+
+and
+
+$$
+  F((1/2,1/3,1/6), (3/4,1/8,1/8)) = \sqrt{3/8} + \sqrt{1/24} + \sqrt{1/48}
+  = \frac{1 + 4\sqrt{2}}{4\sqrt{3}} \approx 0.961 .
+$$
+
+** Exercise 9.4
+:PROPERTIES:
+:CUSTOM_ID: exercise-9.4
+:END:
+Prove (9.3):
+
+$$
+  D(p, q) = \max_S \abs{p(S)-q(S)} = \max_S \abs{\sum_{x\in S} (p_x - q_x)} .
+$$
+
+*** Proof
+Let $J$ be the index set of the probability distribution (I mean: when we write $p_x$ the
+$x$ is from $J$). For a set $S\subset\?J$ let $s$ be its 0-1-encoding, that is, $s_x=1$
+iff $x\in\?S$. Clearly $p(S)=p\cdot s$ if we write $p\cdot\?s=\sum_xp_xs_x$. Let us
+calculate:
+
+\begin{align*}
+  \max_S \abs{p(S) - q(S)} &= \max_s \abs{(p-q)\cdot s} \\
+  &= \max_s \abs{(p-q)\cdot (s - 2\inv)} \\
+  &= \max_t \abs{(p-q)\cdot t} \\
+  &\leq \norm{p-q}_1 \cdot \max \abs{t} \\
+  &= D(p, q) .
+\end{align*}
+
+Here the $\max_t$ runs over all $t$ with $t_x=\pm2\inv$ and $\norm{p-q}_1=D(p,q)$ is the
+L1-norm. For the second equality we used that $\sum_xp_x=\sum_xq_x=1$. Note that the
+inequality is just a basic version of [[https://en.wikipedia.org/wiki/H%C3%B6lder's_inequality][Hölder's inequality]] (which can be seen directly of
+course). Equality clearly holds for
+
+$$
+  t_x = \begin{cases} +2\inv & \text{for } p_x \geq q_x \\ -2\inv & \text{else.} \end{cases} .
+$$
+
+Equivalently (using the bijection $t=s-2\inv$):
+
+$$
+  s_x = \begin{cases} 1 & \text{for } p_x \geq q_x \\ 0 & \text{else.} \end{cases} .
+$$
+
+Note that one could also invert the cases (and treat $p_x=q_x$ arbitrarily) but this
+choice also shows that one can leave out the absolute values from the procedure. QED.
+
+** Exercise 9.5
+Show that the absolute value signs may be removed from Equation (9.3), that is,
+
+$$
+  D(p, q) = \max_S (p(S)-q(S)) = \max_S \left(\sum_{x\in S} (p_x - q_x)\right) .
+$$
+
+*** Proof
+This statement was already proved in the solution of [[#exercise-9.4][exercise 9.4]].
