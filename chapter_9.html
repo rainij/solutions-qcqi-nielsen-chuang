@@ -1,0 +1,242 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 9</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 9</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\jj}{\mathrm{j}}
+\newcommand{\kk}{\mathrm{k}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\inv}{^{-1}}
+\newcommand{\RF}{\mathrm{RF}}
+\newcommand{\sys}{\mathrm{sys}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\sprod}[2]{\langle#1|#2\rangle} % deprecated, use braket instead.
+\newcommand{\braket}[2]{\langle#1|#2\rangle} % scalar product
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\rank}[1]{\mathrm{rank}\left(#1\right)}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\proj}[1]{\ket{#1}\bra{#1}}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\orac}{\mathrm{Orac}}
+\newcommand{\?}{} % sometimes I need just a separator other than whitespace
+\]
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org859d5bc">Exercises</a>
+<ul>
+<li><a href="#org7cb7a83">Exercise 9.1</a></li>
+<li><a href="#orgd5d61f2">Exercise 9.2</a></li>
+<li><a href="#orgc1c20a9">Exercise 9.3</a></li>
+<li><a href="#exercise-9.4">Exercise 9.4</a></li>
+<li><a href="#org1fedef2">Exercise 9.5</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org859d5bc" class="outline-2">
+<h2 id="org859d5bc">Exercises</h2>
+<div class="outline-text-2" id="text-org859d5bc">
+</div>
+<div id="outline-container-org7cb7a83" class="outline-3">
+<h3 id="org7cb7a83">Exercise 9.1</h3>
+<div class="outline-text-3" id="text-org7cb7a83">
+<p>
+What is the trace distance between the probability distribution \((1,0)\) and the probability
+distribution \((1/2,1/2)\)? Between \((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
+</p>
+</div>
+
+<div id="outline-container-org91afdb0" class="outline-4">
+<h4 id="org91afdb0">Solution</h4>
+<div class="outline-text-4" id="text-org91afdb0">
+<p>
+We have
+</p>
+
+<p>
+\[
+  D((1,0), (1/2,1/2)) = \frac{1}{2} ( 1/2 + 1/2 ) = \frac{1}{2} ,
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  D((1/2,1/3,1/6), (3/4,1/8,1/8)) = \frac{1}{2} ( 1/4 + 5/24 + 1/24 ) = \frac{1}{4} .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd5d61f2" class="outline-3">
+<h3 id="orgd5d61f2">Exercise 9.2</h3>
+<div class="outline-text-3" id="text-orgd5d61f2">
+<p>
+Show that the trace distance between probability distributions \((p,1-p)\) and \((q,1-q)\) is
+\(\abs{p-q}\).
+</p>
+</div>
+
+<div id="outline-container-org39286f9" class="outline-4">
+<h4 id="org39286f9">Proof</h4>
+<div class="outline-text-4" id="text-org39286f9">
+<p>
+\[
+  D((p,1-p), (q, 1-q)) = \frac{1}{2} (\abs{p-q} + \abs{1-p-1+q}) = \abs{p-q} .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc1c20a9" class="outline-3">
+<h3 id="orgc1c20a9">Exercise 9.3</h3>
+<div class="outline-text-3" id="text-orgc1c20a9">
+<p>
+What is the fidelity of the probability distributions \((1,0)\) and \((1/2,1/2)\)? Of
+\((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
+</p>
+</div>
+
+<div id="outline-container-orgd46923f" class="outline-4">
+<h4 id="orgd46923f">Solution</h4>
+<div class="outline-text-4" id="text-orgd46923f">
+<p>
+We have
+</p>
+
+<p>
+\[
+  F((1,0), (1/2,1/2)) = \sqrt{1\cdot1/2} + 0 = \sqrt{2\inv}
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  F((1/2,1/3,1/6), (3/4,1/8,1/8)) = \sqrt{3/8} + \sqrt{1/24} + \sqrt{1/48}
+  = \frac{1 + 4\sqrt{2}}{4\sqrt{3}} \approx 0.961 .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-9.4" class="outline-3">
+<h3 id="exercise-9.4">Exercise 9.4</h3>
+<div class="outline-text-3" id="text-exercise-9.4">
+<p>
+Prove (9.3):
+</p>
+
+<p>
+\[
+  D(p, q) = \max_S \abs{p(S)-q(S)} = \max_S \abs{\sum_{x\in S} (p_x - q_x)} .
+\]
+</p>
+</div>
+
+<div id="outline-container-org62b3013" class="outline-4">
+<h4 id="org62b3013">Proof</h4>
+<div class="outline-text-4" id="text-org62b3013">
+<p>
+Let \(J\) be the index set of the probability distribution (I mean: when we write \(p_x\) the
+\(x\) is from \(J\)). For a set \(S\subset\?J\) let \(s\) be its 0-1-encoding, that is, \(s_x=1\)
+iff \(x\in\?S\). Clearly \(p(S)=p\cdot s\) if we write \(p\cdot\?s=\sum_xp_xs_x\). Let us
+calculate:
+</p>
+
+\begin{align*}
+  \max_S \abs{p(S) - q(S)} &= \max_s \abs{(p-q)\cdot s} \\
+  &= \max_s \abs{(p-q)\cdot (s - 2\inv)} \\
+  &= \max_t \abs{(p-q)\cdot t} \\
+  &\leq \norm{p-q}_1 \cdot \max \abs{t} \\
+  &= D(p, q) .
+\end{align*}
+
+<p>
+Here the \(\max_t\) runs over all \(t\) with \(t_x=\pm2\inv\) and \(\norm{p-q}_1=D(p,q)\) is the
+L1-norm. For the second equality we used that \(\sum_xp_x=\sum_xq_x=1\). Note that the
+inequality is just a basic version of <a href="https://en.wikipedia.org/wiki/H%C3%B6lder's_inequality">Hölder's inequality</a> (which can be seen directly of
+course). Equality clearly holds for
+</p>
+
+<p>
+\[
+  t_x = \begin{cases} +2\inv & \text{for } p_x \geq q_x \\ -2\inv & \text{else.} \end{cases} .
+\]
+</p>
+
+<p>
+Equivalently (using the bijection \(t=s-2\inv\)):
+</p>
+
+<p>
+\[
+  s_x = \begin{cases} 1 & \text{for } p_x \geq q_x \\ 0 & \text{else.} \end{cases} .
+\]
+</p>
+
+<p>
+Note that one could also invert the cases (and treat \(p_x=q_x\) arbitrarily) but this
+choice also shows that one can leave out the absolute values from the procedure. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1fedef2" class="outline-3">
+<h3 id="org1fedef2">Exercise 9.5</h3>
+<div class="outline-text-3" id="text-org1fedef2">
+<p>
+Show that the absolute value signs may be removed from Equation (9.3), that is,
+</p>
+
+<p>
+\[
+  D(p, q) = \max_S (p(S)-q(S)) = \max_S \left(\sum_{x\in S} (p_x - q_x)\right) .
+\]
+</p>
+</div>
+
+<div id="outline-container-orgbee65ee" class="outline-4">
+<h4 id="orgbee65ee">Proof</h4>
+<div class="outline-text-4" id="text-orgbee65ee">
+<p>
+This statement was already proved in the solution of <a href="#exercise-9.4">exercise 9.4</a>.
+</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.8)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
