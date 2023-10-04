@@ -38,7 +38,7 @@ Let us set up some variables
 ** Utility code
 #+begin_src sage
   def make_operation(Es: list[matrix]):
-      """Given a list of Kraus matrix return their quantum operation."""
+      """Given a list of operation elements return their quantum operation."""
       def op(rho):
           return sum(E * rho * E.H for E in Es)
       return op
@@ -330,17 +330,17 @@ The corresponding matrix is given by
 :PROPERTIES:
 :CUSTOM_ID: chapter-8-process-tomography-single-qubit
 :END:
-I found it highly non-trivial to see equation (8.179)
+I found it highly non-trivial to verify equation (8.179)
 
 <<chi-for-single-qubit>>
 $$
   \chi = \Lambda \begin{bmatrix} \rho'_0 & \rho'_1 \\ \rho'_2 & \rho'_3 \end{bmatrix} \Lambda
 $$
 
-in Box 8.5 on process tomography for a single qubit. For later reference let us call the
-matrix in the middle $R'$ (Note that I shifted the indices my one - this makes matters
-slightly simpler). Therefore I try to prove it here in a way which is hopefully systematic
-enough to gain some insight. Recall that
+in Box 8.5 on process tomography for a single qubit. Therefore I try to prove it here in a
+way which is hopefully systematic enough to gain some insight. For later reference let us
+call the matrix in the middle $R'$ (Note that I shifted the indices my one - this makes
+matters slightly simpler). Recall that
 
 $$
   \Lambda = \frac{1}{2} (Z\otimes I + X \otimes X) .
