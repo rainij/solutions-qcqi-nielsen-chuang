@@ -39,35 +39,71 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org859d5bc">Exercises</a>
+<li><a href="#orge32078d">Setup</a>
 <ul>
-<li><a href="#org7cb7a83">Exercise 9.1</a></li>
-<li><a href="#orgd5d61f2">Exercise 9.2</a></li>
-<li><a href="#orgc1c20a9">Exercise 9.3</a></li>
+<li><a href="#org8bd95cb">Imports</a></li>
+</ul>
+</li>
+<li><a href="#orgc6a9397">Exercises</a>
+<ul>
+<li><a href="#org663a349">Exercise 9.1</a></li>
+<li><a href="#org772d6d2">Exercise 9.2</a></li>
+<li><a href="#org8f7a37c">Exercise 9.3</a></li>
 <li><a href="#exercise-9.4">Exercise 9.4</a></li>
-<li><a href="#org1fedef2">Exercise 9.5</a></li>
+<li><a href="#orgb7a5129">Exercise 9.5</a></li>
+<li><a href="#orgb5c2f46">Exercise 9.6</a></li>
+<li><a href="#orga14723b">Exercise 9.7</a></li>
+<li><a href="#orgb66c4b0">Exercise 9.8 (Convexity of the trace distance)</a></li>
+<li><a href="#exercise-9.9">Exercise 9.9 (Existence of fixed points)</a></li>
+<li><a href="#exercise-9.10">Exercise 9.10</a></li>
+<li><a href="#orgcadbd7f">Exercise 9.11</a></li>
+<li><a href="#orgba6266d">Exercise 9.12</a></li>
+<li><a href="#org06293ef">Exercise 9.13</a></li>
+<li><a href="#orgd44d11f"><span class="todo TODO">TODO</span> Exercise 9.14</a></li>
+<li><a href="#org72ac004"><span class="todo TODO">TODO</span> Exercise 9.15</a></li>
+<li><a href="#org99b1370"><span class="todo TODO">TODO</span> Exercise 9.16</a></li>
+<li><a href="#org6700caf"><span class="todo TODO">TODO</span> Exercise 9.17</a></li>
+<li><a href="#org44df379"><span class="todo TODO">TODO</span> Exercise 9.18</a></li>
+<li><a href="#orgb56061e"><span class="todo TODO">TODO</span> Exercise 9.19</a></li>
+<li><a href="#org52fc8e1"><span class="todo TODO">TODO</span> Exercise 9.20</a></li>
+<li><a href="#org037a31c"><span class="todo TODO">TODO</span> Exercise 9.21</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org859d5bc" class="outline-2">
-<h2 id="org859d5bc">Exercises</h2>
-<div class="outline-text-2" id="text-org859d5bc">
+<div id="outline-container-orge32078d" class="outline-2">
+<h2 id="orge32078d">Setup</h2>
+<div class="outline-text-2" id="text-orge32078d">
 </div>
-<div id="outline-container-org7cb7a83" class="outline-3">
-<h3 id="org7cb7a83">Exercise 9.1</h3>
-<div class="outline-text-3" id="text-org7cb7a83">
+<div id="outline-container-org8bd95cb" class="outline-3">
+<h3 id="org8bd95cb">Imports</h3>
+<div class="outline-text-3" id="text-org8bd95cb">
+<div class="org-src-container">
+<pre class="src src-sage" id="org56ee5a9"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc6a9397" class="outline-2">
+<h2 id="orgc6a9397">Exercises</h2>
+<div class="outline-text-2" id="text-orgc6a9397">
+</div>
+<div id="outline-container-org663a349" class="outline-3">
+<h3 id="org663a349">Exercise 9.1</h3>
+<div class="outline-text-3" id="text-org663a349">
 <p>
 What is the trace distance between the probability distribution \((1,0)\) and the probability
 distribution \((1/2,1/2)\)? Between \((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
 </p>
 </div>
 
-<div id="outline-container-org91afdb0" class="outline-4">
-<h4 id="org91afdb0">Solution</h4>
-<div class="outline-text-4" id="text-org91afdb0">
+<div id="outline-container-org73a90d7" class="outline-4">
+<h4 id="org73a90d7">Solution</h4>
+<div class="outline-text-4" id="text-org73a90d7">
 <p>
 We have
 </p>
@@ -91,18 +127,18 @@ and
 </div>
 </div>
 
-<div id="outline-container-orgd5d61f2" class="outline-3">
-<h3 id="orgd5d61f2">Exercise 9.2</h3>
-<div class="outline-text-3" id="text-orgd5d61f2">
+<div id="outline-container-org772d6d2" class="outline-3">
+<h3 id="org772d6d2">Exercise 9.2</h3>
+<div class="outline-text-3" id="text-org772d6d2">
 <p>
 Show that the trace distance between probability distributions \((p,1-p)\) and \((q,1-q)\) is
 \(\abs{p-q}\).
 </p>
 </div>
 
-<div id="outline-container-org39286f9" class="outline-4">
-<h4 id="org39286f9">Proof</h4>
-<div class="outline-text-4" id="text-org39286f9">
+<div id="outline-container-org1bc29ea" class="outline-4">
+<h4 id="org1bc29ea">Proof</h4>
+<div class="outline-text-4" id="text-org1bc29ea">
 <p>
 \[
   D((p,1-p), (q, 1-q)) = \frac{1}{2} (\abs{p-q} + \abs{1-p-1+q}) = \abs{p-q} .
@@ -116,18 +152,18 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgc1c20a9" class="outline-3">
-<h3 id="orgc1c20a9">Exercise 9.3</h3>
-<div class="outline-text-3" id="text-orgc1c20a9">
+<div id="outline-container-org8f7a37c" class="outline-3">
+<h3 id="org8f7a37c">Exercise 9.3</h3>
+<div class="outline-text-3" id="text-org8f7a37c">
 <p>
 What is the fidelity of the probability distributions \((1,0)\) and \((1/2,1/2)\)? Of
 \((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
 </p>
 </div>
 
-<div id="outline-container-orgd46923f" class="outline-4">
-<h4 id="orgd46923f">Solution</h4>
-<div class="outline-text-4" id="text-orgd46923f">
+<div id="outline-container-org40fe1c2" class="outline-4">
+<h4 id="org40fe1c2">Solution</h4>
+<div class="outline-text-4" id="text-org40fe1c2">
 <p>
 We have
 </p>
@@ -166,9 +202,9 @@ Prove (9.3):
 </p>
 </div>
 
-<div id="outline-container-org62b3013" class="outline-4">
-<h4 id="org62b3013">Proof</h4>
-<div class="outline-text-4" id="text-org62b3013">
+<div id="outline-container-orgc0ffa64" class="outline-4">
+<h4 id="orgc0ffa64">Proof</h4>
+<div class="outline-text-4" id="text-orgc0ffa64">
 <p>
 Let \(J\) be the index set of the probability distribution (I mean: when we write \(p_x\) the
 \(x\) is from \(J\)). For a set \(S\subset\?J\) let \(s\) be its 0-1-encoding, that is, \(s_x=1\)
@@ -215,9 +251,9 @@ choice also shows that one can leave out the absolute values from the procedure.
 </div>
 </div>
 
-<div id="outline-container-org1fedef2" class="outline-3">
-<h3 id="org1fedef2">Exercise 9.5</h3>
-<div class="outline-text-3" id="text-org1fedef2">
+<div id="outline-container-orgb7a5129" class="outline-3">
+<h3 id="orgb7a5129">Exercise 9.5</h3>
+<div class="outline-text-3" id="text-orgb7a5129">
 <p>
 Show that the absolute value signs may be removed from Equation (9.3), that is,
 </p>
@@ -229,14 +265,509 @@ Show that the absolute value signs may be removed from Equation (9.3), that is,
 </p>
 </div>
 
-<div id="outline-container-orgbee65ee" class="outline-4">
-<h4 id="orgbee65ee">Proof</h4>
-<div class="outline-text-4" id="text-orgbee65ee">
+<div id="outline-container-orgcf25279" class="outline-4">
+<h4 id="orgcf25279">Proof</h4>
+<div class="outline-text-4" id="text-orgcf25279">
 <p>
 This statement was already proved in the solution of <a href="#exercise-9.4">exercise 9.4</a>.
 </p>
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgb5c2f46" class="outline-3">
+<h3 id="orgb5c2f46">Exercise 9.6</h3>
+<div class="outline-text-3" id="text-orgb5c2f46">
+<p>
+What is the trace distance between the density operators
+</p>
+
+<p>
+\[
+  \frac{3}{4}\proj{0} + \frac{1}{4}\proj{1} ; \;
+  \frac{2}{3}\proj{0} + \frac{1}{3}\proj{1} ?
+\]
+</p>
+
+<p>
+Between:
+</p>
+
+<p>
+\[
+  \frac{3}{4}\proj{0} + \frac{1}{4}\proj{1} ; \;
+  \frac{2}{3}\proj{+} + \frac{1}{3}\proj{-} ?
+\]
+</p>
+
+<p>
+(Recall that \(\ket{\pm}=(\ket{0}\pm\ket{1})/\sqrt{2}\).)
+</p>
 </div>
-<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.8)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
+
+<div id="outline-container-orgcf8b04c" class="outline-4">
+<h4 id="orgcf8b04c">Solution</h4>
+<div class="outline-text-4" id="text-orgcf8b04c">
+<p>
+For the commuting pair of density operators we have
+</p>
+
+<p>
+\[
+  D_1 = \frac{1}{2} \left(\abs{\frac{3}{4}-\frac{2}{3}} + \abs{\frac{1}{4}-\frac{1}{3}}\right)
+  = \frac{1}{12} .
+\]
+</p>
+
+<p>
+Let us consider the second, more interesting example. To compute \(D_2=D(\rho,\sigma)\) we
+could compute the eigenvalues \(\lambda_i\) of \(\rho-\sigma\). We then have
+\(D_2=(\abs{\lambda_1}+\abs{\lambda_2})/2\).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-variable-name">plus</span> <span class="org-operator">=</span> matrix((ket(<span class="org-string">'0'</span>) <span class="org-operator">+</span> ket(<span class="org-string">'1'</span>))<span class="org-operator">/</span>sqrt(2))
+<span class="org-variable-name">minus</span> <span class="org-operator">=</span> matrix((ket(<span class="org-string">'0'</span>) <span class="org-operator">-</span> ket(<span class="org-string">'1'</span>))<span class="org-operator">/</span>sqrt(2))
+
+<span class="org-variable-name">rho</span> <span class="org-operator">=</span> matrix([[3<span class="org-operator">/</span>4, 0], [0, 1<span class="org-operator">/</span>4]])
+<span class="org-variable-name">sigma</span> <span class="org-operator">=</span> (2<span class="org-operator">/</span>3)<span class="org-operator">*</span>plus.H<span class="org-operator">*</span>plus <span class="org-operator">+</span> (1<span class="org-operator">/</span>3)<span class="org-operator">*</span>minus.H<span class="org-operator">*</span>minus
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">To compute the distance we essentially have to compute the eigenvalues of rho - sigma</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">(and add their absolute values).</span>
+<span class="org-variable-name">A</span> <span class="org-operator">=</span> rho <span class="org-operator">-</span> sigma
+<span class="org-keyword">assert</span> A.eigenvalues() <span class="org-operator">==</span> [<span class="org-operator">-</span>1<span class="org-operator">/</span>12<span class="org-operator">*</span>sqrt(13), 1<span class="org-operator">/</span>12<span class="org-operator">*</span>sqrt(13)]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Just for fun: In this special case you can extract the relevant information from the</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">A.H*A since this one is already diagonal.</span>
+<span class="org-variable-name">A2</span> <span class="org-operator">=</span> A.H <span class="org-operator">*</span> A
+<span class="org-keyword">assert</span> A2 <span class="org-operator">==</span> (13<span class="org-operator">/</span>144) <span class="org-operator">*</span> matrix.diagonal([1, 1])
+<span class="org-string">"PASSED"</span>
+</pre>
+</div>
+
+<pre class="example">
+'PASSED'
+</pre>
+
+
+<p>
+Hence
+</p>
+
+<p>
+\[
+  D_2 = \frac{\sqrt{13}}{12} .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga14723b" class="outline-3">
+<h3 id="orga14723b">Exercise 9.7</h3>
+<div class="outline-text-3" id="text-orga14723b">
+<p>
+Show that for any states \(\rho\) and \(\sigma\), one may write \(\rho-\sigma=Q-S\), where \(Q\)
+and \(S\) are positive operators with support on orthogonal vector spaces. (Hint: use the
+spectral decomposition \(\rho-\sigma=UDU^\dagger\), and split the diagonal matrix \(D\) into
+positive and negative parts. This fact will continue to be useful later.)
+</p>
+</div>
+
+<div id="outline-container-orgfa00fca" class="outline-4">
+<h4 id="orgfa00fca">Proof</h4>
+<div class="outline-text-4" id="text-orgfa00fca">
+<p>
+The exercise already outlines what to do. I just make it <i>a little bit</i> more precise. Let
+\(D=\diag(\ldots,d_i,\ldots)\) be a diagonalization of \(\rho-\sigma\):
+</p>
+
+<p>
+\[
+  \rho - \sigma = U D U^\dagger
+\]
+</p>
+
+<p>
+Now rewrite \(D\) in terms of two other diagonal matrices
+</p>
+
+<p>
+\[
+  D = D_Q - D_S
+\]
+</p>
+
+<p>
+where \((D_Q)_{ii}=d_i\) if \(d_i\?>0\) and \((D_S)_{ii}=-d_i\) if \(d_i\?<0\) (and zeros
+everywhere else). Now define
+</p>
+
+<p>
+\[
+  Q = U D_Q U^\dagger, \; S = U D_S U^\dagger .
+\]
+</p>
+
+<p>
+Clearly \(Q\) and \(S\) are two positive operators with \(\rho-\sigma=Q-S\) with orthogonal
+support. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb66c4b0" class="outline-3">
+<h3 id="orgb66c4b0">Exercise 9.8 (Convexity of the trace distance)</h3>
+<div class="outline-text-3" id="text-orgb66c4b0">
+<p>
+Show that the trace distance is convex in its first input,
+</p>
+
+<p>
+\[
+  D\left(\sum_i p_i \rho_i, \sum_i p_i \sigma_i \right)
+  \leq \sum_i p_i D(\rho_i, \sigma_i) .
+\]
+</p>
+</div>
+
+<div id="outline-container-org272faa3" class="outline-4">
+<h4 id="org272faa3">Proof</h4>
+<div class="outline-text-4" id="text-org272faa3">
+<p>
+This directly follows from strong convexity with \(q_i=p_i\), using \(D(p,p)=0\). QED.
+</p>
+
+<p>
+<a id="orged3b3c8"></a>
+But in my opinion this result is actually misleading. The book emphasizes the fact that
+\(D\) is a metric, but actually it corresponds to a <i>norm</i> on the matrix space:
+</p>
+
+<p>
+\[
+  \norm{\rho}_{S_1} = \trace{\abs{\rho}} .
+\]
+</p>
+
+<p>
+We have \(D(\rho,\sigma)=2\inv\norm{\rho-\sigma}_{S_1}\). This is a so called <a href="https://en.wikipedia.org/wiki/Schatten_norm"><i>Schatten
+norm</i></a>. The Schatten classes are the natural analog of the \(L^p\)​-spaces for operators on
+Hilbert spaces. The above norm corresponds to \(p=1\). The Hilbert-Schmidt inner product
+corresponds to a Schatten norm too, here \(p=2\).
+</p>
+
+<p>
+As for any norm we have the following more general result (of course one has to prove that
+the Schatten norm is actually a norm, but this is trivial based on what we already know
+about \(D\))
+</p>
+
+<p>
+\[
+  D\left(\sum_i a_i \rho_i, \sum_i a_i \sigma_i \right) = 2\inv\norm{\sum_i a_i(\rho_i-\sigma_i)}_{S_1}
+  \leq 2\inv\sum_i \abs{a_i} \norm{\rho_i-\sigma_i}_{S_1} = \sum_i \abs{a_i} D(\rho_i,\sigma_i)
+\]
+</p>
+
+<p>
+Here the \(a_i\) could be <i>any</i> complex numbers. It doesn't even matter that the operators
+are density operators - it could be any matrices. And as said, this is just an abstract
+property of norms in general. The <i>strong</i> convexity result is different in the way that
+it really relies on special properties of this particular norm and the concrete arguments
+it is applied to (density operators, numbers which are probabilities).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-9.9" class="outline-3">
+<h3 id="exercise-9.9">Exercise 9.9 (Existence of fixed points)</h3>
+<div class="outline-text-3" id="text-exercise-9.9">
+<p>
+Schauder’s ﬁxed point theorem is a classic result from mathematics that implies that any
+continuous map on a convex, compact subset of a Hilbert space has a fixed point. Use
+Schauder’s fixed point theorem to prove that any trace-preserving quantum operation
+\(\calE\) has a fixed point, that is, \(\rho\) such that \(\calE(\rho)=\rho\).
+</p>
+</div>
+
+<div id="outline-container-org075b7e0" class="outline-4">
+<h4 id="org075b7e0">Proof</h4>
+<div class="outline-text-4" id="text-org075b7e0">
+<p>
+Just for definiteness let me recall my favorite version of Schauder's fixed point
+theorem. There are various specializations and generalizations. In my oppinion the
+following version hits the sweet spot in terms of generality and simplicity. The main
+difference to the version mentioned in the exercise is that it gets rid of the <i>totally
+irrelevant</i> property that the sourrounding space is a <i>Hilbert</i> space. There are
+generalizations to more abstract settings but this might distract too much.
+</p>
+
+<dl class="org-dl">
+<dt>Theorem (Schauder's fixed point theorem)</dt><dd>Let \(V\) be a Banach space and \(K\subset\?V\)
+a compact and convex set. Let \(f:K\to\?K\) be continuous. Then \(f\) has a fixed point
+\(x=f(x)\).</dd>
+</dl>
+
+<p>
+In our setting we have \(f=\calE\), \(V=\CC^{d\times d}\) and \(K\) is the set of density
+matrices (c.f. Theorem 2.5):
+</p>
+
+<p>
+\[
+  K = \{ \rho \in \CC^{d\times d} \; | \; \rho\geq0 , \trace{\rho} = 1 \} .
+\]
+</p>
+
+<p>
+\(K\) is clearly a closed set (if \((\rho_n)\) are density matrices with a limit
+\(\rho_n\to\rho\) then the limit is also a density matrix). To show that it is compact it
+suffices to show that \(K\) is bounded (in finite dimensional vector spaces <i>compact</i> is the
+same as <i>bounded and closed</i> - <a href="https://en.wikipedia.org/wiki/Heine%E2%80%93Borel_theorem">Heine-Borel</a>). Recall that the operator norm of a hermitian
+matrix is equal to the <i>spectral radius</i> - the maximum of the absolute values of its
+eigenvalues (search for the relation of the <i>spectral radius</i> to the operator norm on any
+decent resource on any of those topics, try e.g. <a href="https://en.wikipedia.org/wiki/Operator_norm">wikipedia</a>). Since the spectral radius is
+at most \(1\) the claim follows. Hence \(K\) is indeed compact.
+</p>
+
+<p>
+Convexity is also a well-known property of \(K\). In fact, the density matrices are just the
+convex closure of the projection operators (this is just a mathematician's reformulation
+of the definition of density matrices as ensembles of pure states).
+</p>
+
+<p>
+Since \(\calE\) is trace-preserving we have \(\calE(K)\subseteq\?K\).
+</p>
+
+<p>
+By the representation by Kraus matrices a quantum operation extends to a linear operator
+on \(\CC^{d\times\?d}\). In finite dimensions <i>linearity</i> implies <i>continuity</i> (I didn't
+find a dedicated resource on that, just have a look into <a href="https://en.wikipedia.org/wiki/Bounded_operator">bounded operators</a>). In particular
+\(\calE:K\to\?K\) is continuous.
+</p>
+
+<p>
+The preconditions of Schauder's theorem are satisfied. Hence \(\calE\) has a fixed
+point. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-9.10" class="outline-3">
+<h3 id="exercise-9.10">Exercise 9.10</h3>
+<div class="outline-text-3" id="text-exercise-9.10">
+<p>
+Suppose \(\calE\) is a <i>strictly contractive</i> trace-preserving quantum operation, that is,
+for any \(\rho\) and \(\sigma\), \(D(\calE(\rho),\calE(\sigma))\?<\?D(\rho,\sigma)\). Show that
+\(\calE\) has a unique fixed point.
+</p>
+</div>
+
+<div id="outline-container-orgd3b8176" class="outline-4">
+<h4 id="orgd3b8176">Proof</h4>
+<div class="outline-text-4" id="text-orgd3b8176">
+<p>
+We already know from <a href="#exercise-9.9">exercise 9.9</a> that there must be one fixed point \(\rho_0\). Suppose
+there was a second one \(\rho_1\neq\rho_0\). Then
+</p>
+
+<p>
+\[
+  D(\rho_0,\rho_1) = D(\calE(\rho_0),\calE(\rho_1)) < D(\rho_0,\rho_1) .
+\]
+</p>
+
+<p>
+The equality from the fixed point property. The inequality is the strict
+contractivity. But this inequality is a contradiction to the fact that \(d\?<\?d\) cannot
+hold for any real number \(d\)! Hence the claim that there was a second fixed point is
+wrong. QED.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd><p>
+The result is related to <a href="https://en.wikipedia.org/wiki/Banach_fixed-point_theorem">Banach's fixed point theorem</a>. At least in finite
+dimensions a strictly contractive map is already <i>uniformly</i> contractive. That is, there
+exists a \(\lambda\?<1\) such that
+</p>
+
+<p>
+\[ D(\calE(\rho),\calE(\sigma)) < \lambda D(\rho,\sigma) \]
+</p>
+
+<p>
+for all \(\rho\), \(\sigma\). This can be easily seen by assuming the contrary and
+considering a sequence \((\rho_n,\sigma_n)\) which violates the inequality for
+\(\lambda=1-n\inv\) (also use the compactness of \(K\) to single out a converging
+sub-sequence). Hence Banach's fixed point theorem applies and even yields a procedure
+which converges exponentially fast to the unique fixed point.
+</p></dd>
+</dl>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcadbd7f" class="outline-3">
+<h3 id="orgcadbd7f">Exercise 9.11</h3>
+<div class="outline-text-3" id="text-orgcadbd7f">
+<p>
+Suppose \(\calE\) is a trace-preserving quantum operation for which there exists a density
+operator \(\rho_0\) and a trace-preserving quantum operation \(\calE'\) such that
+</p>
+
+<p>
+\[
+  \calE(\rho) = p \rho_0 + (1-p) \calE'(\rho) ,
+\]
+</p>
+
+<p>
+for some \(p\), \(0\?<\?p\leq1\). Physically, this means that with probability \(p\) the input
+state is thrown out and replaced with the fixed state \(\rho_0\), while with probability
+\(1-p\) the operation \(\calE'\) occurs. Use joint convexity to show that \(\calE\) is a
+strictly contractive quantum operation, and thus has a unique fixed point.
+</p>
+</div>
+
+<div id="outline-container-org87ec5b3" class="outline-4">
+<h4 id="org87ec5b3">Proof</h4>
+<div class="outline-text-4" id="text-org87ec5b3">
+<p>
+By strong contractivity (or just basic properties of <i>any</i> norm - see my <a href="#orged3b3c8">extensive
+commentary</a> to exercise 9.8) we have
+</p>
+
+<p>
+\[
+  D(\calE(\rho),\calE(\sigma)) \leq p D(\rho_0,\rho_0) + (1-p) D(\calE'(\rho),\calE'(\sigma))
+  \leq 0 + (1-p) D(\rho,\sigma) .
+\]
+</p>
+
+<p>
+Hence the operation is strictly contractive. By <a href="#exercise-9.10">exercise 9.10</a> there exists a unique fixed
+point. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgba6266d" class="outline-3">
+<h3 id="orgba6266d">Exercise 9.12</h3>
+<div class="outline-text-3" id="text-orgba6266d">
+<p>
+Consider the depolarizing channel introduced in Section 8.3.4 on page 378,
+\(\calE(\rho)=pI/2+(1-p)\rho\). For arbitrary \(\rho\) and \(\sigma\) find
+\(D(\calE(\rho),\calE(\sigma))\) using the Bloch representation, and prove explicitly that
+the map \(\calE\) is strictly contractive, that is,
+\(D(\calE(\rho),\calE(\sigma))\?<\?D(\rho,\sigma)\).
+</p>
+</div>
+
+<div id="outline-container-org5dbb764" class="outline-4">
+<h4 id="org5dbb764">Solution</h4>
+<div class="outline-text-4" id="text-org5dbb764">
+<p>
+Of course one could use the fact that the depolarizing channel acts like
+</p>
+
+<p>
+\[
+  (x,y,z) \mapsto (1-p)(x,y,z)
+\]
+</p>
+
+<p>
+on the Bloch space together with the fact that this identification is an isometry - up to
+a factor of \(2\) (see equation (9.20)). But it also easily follows from <i>just plugging
+stuff into other stuff</i>:
+</p>
+
+<p>
+\[
+  D(\calE(\rho),\calE(\sigma)) = 2\inv \norm{pI/2 + (1-p)\rho - pI/2 - (1-p)\sigma}_{S_1}
+  = 2\inv (1-p) \norm{\rho-\sigma}_{S_1} = (1-p) D(\rho,\sigma) .
+\]
+</p>
+
+<p>
+Of course it is also not hard to see that \(I/2\) is the fixed point and that the
+depolarizing channel contracts every other state towards it exponentially fast.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org06293ef" class="outline-3">
+<h3 id="org06293ef">Exercise 9.13</h3>
+<div class="outline-text-3" id="text-org06293ef">
+<p>
+Show that the bit flip channel (Section 8.3.3) is contractive but not strictly
+contractive. Find the set of fixed points for the bit flip channel.
+</p>
+</div>
+
+<div id="outline-container-orge0d9f53" class="outline-4">
+<h4 id="orge0d9f53">Solution</h4>
+<div class="outline-text-4" id="text-orge0d9f53">
+<p>
+The bit flip channel is given by the following Kraus operators
+</p>
+
+<p>
+\[
+  E_0 = \sqrt{p} \, I , \; E_1 = \sqrt{1-p} \, X .
+\]
+</p>
+
+<p>
+The action on the Bloch sphere is easily seen to be (use \(XNX=-N\) for \(N\) being \(Y\) or
+\(Z\), and \(XXX=X\)):
+</p>
+
+<p>
+\[
+  (x,y,z) \mapsto (x, (2p-1)y, (2p-1)z) .
+\]
+</p>
+
+<p>
+Hence, if we are in the non-trivial case, \(p\neq1\), the set of fixed points is given by
+\(\{2\inv(1+xX)\,|\,x\in[-1,1]\}\) (we only consider density matrices). In the trivial case
+the bit flip is just the identity operation.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd44d11f" class="outline-3">
+<h3 id="orgd44d11f"><span class="todo TODO">TODO</span> Exercise 9.14</h3>
+</div>
+<div id="outline-container-org72ac004" class="outline-3">
+<h3 id="org72ac004"><span class="todo TODO">TODO</span> Exercise 9.15</h3>
+</div>
+<div id="outline-container-org99b1370" class="outline-3">
+<h3 id="org99b1370"><span class="todo TODO">TODO</span> Exercise 9.16</h3>
+</div>
+<div id="outline-container-org6700caf" class="outline-3">
+<h3 id="org6700caf"><span class="todo TODO">TODO</span> Exercise 9.17</h3>
+</div>
+<div id="outline-container-org44df379" class="outline-3">
+<h3 id="org44df379"><span class="todo TODO">TODO</span> Exercise 9.18</h3>
+</div>
+<div id="outline-container-orgb56061e" class="outline-3">
+<h3 id="orgb56061e"><span class="todo TODO">TODO</span> Exercise 9.19</h3>
+</div>
+<div id="outline-container-org52fc8e1" class="outline-3">
+<h3 id="org52fc8e1"><span class="todo TODO">TODO</span> Exercise 9.20</h3>
+</div>
+<div id="outline-container-org037a31c" class="outline-3">
+<h3 id="org037a31c"><span class="todo TODO">TODO</span> Exercise 9.21</h3>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.9)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
