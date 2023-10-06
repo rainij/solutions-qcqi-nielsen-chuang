@@ -6,6 +6,13 @@
 
 #+toc: headlines 2
 
+* Setup
+** Imports
+#+name: imports-chapter-9-1
+#+begin_src sage
+  from utils_sage import ket
+#+end_src
+
 * Exercises
 ** Exercise 9.1
 What is the trace distance between the probability distribution $(1,0)$ and the probability
@@ -104,3 +111,295 @@ $$
 
 *** Proof
 This statement was already proved in the solution of [[#exercise-9.4][exercise 9.4]].
+
+** Exercise 9.6
+What is the trace distance between the density operators
+
+$$
+  \frac{3}{4}\proj{0} + \frac{1}{4}\proj{1} ; \;
+  \frac{2}{3}\proj{0} + \frac{1}{3}\proj{1} ?
+$$
+
+Between:
+
+$$
+  \frac{3}{4}\proj{0} + \frac{1}{4}\proj{1} ; \;
+  \frac{2}{3}\proj{+} + \frac{1}{3}\proj{-} ?
+$$
+
+(Recall that $\ket{\pm}=(\ket{0}\pm\ket{1})/\sqrt{2}$.)
+
+*** Solution
+For the commuting pair of density operators we have
+
+$$
+  D_1 = \frac{1}{2} \left(\abs{\frac{3}{4}-\frac{2}{3}} + \abs{\frac{1}{4}-\frac{1}{3}}\right)
+  = \frac{1}{12} .
+$$
+
+Let us consider the second, more interesting example. To compute $D_2=D(\rho,\sigma)$ we
+could compute the eigenvalues $\lambda_i$ of $\rho-\sigma$. We then have
+$D_2=(\abs{\lambda_1}+\abs{\lambda_2})/2$.
+
+#+begin_src sage :results replace :tangle no
+  plus = matrix((ket('0') + ket('1'))/sqrt(2))
+  minus = matrix((ket('0') - ket('1'))/sqrt(2))
+
+  rho = matrix([[3/4, 0], [0, 1/4]])
+  sigma = (2/3)*plus.H*plus + (1/3)*minus.H*minus
+
+  # To compute the distance we essentially have to compute the eigenvalues of rho - sigma
+  # (and add their absolute values).
+  A = rho - sigma
+  assert A.eigenvalues() == [-1/12*sqrt(13), 1/12*sqrt(13)]
+
+  # Just for fun: In this special case you can extract the relevant information from the
+  # A.H*A since this one is already diagonal.
+  A2 = A.H * A
+  assert A2 == (13/144) * matrix.diagonal([1, 1])
+  "PASSED"
+#+end_src
+
+#+RESULTS:
+: 'PASSED'
+
+Hence
+
+$$
+  D_2 = \frac{\sqrt{13}}{12} .
+$$
+
+** Exercise 9.7
+Show that for any states $\rho$ and $\sigma$, one may write $\rho-\sigma=Q-S$, where $Q$
+and $S$ are positive operators with support on orthogonal vector spaces. (Hint: use the
+spectral decomposition $\rho-\sigma=UDU^\dagger$, and split the diagonal matrix $D$ into
+positive and negative parts. This fact will continue to be useful later.)
+
+*** Proof
+The exercise already outlines what to do. I just make it /a little bit/ more precise. Let
+$D=\diag(\ldots,d_i,\ldots)$ be a diagonalization of $\rho-\sigma$:
+
+$$
+  \rho - \sigma = U D U^\dagger
+$$
+
+Now rewrite $D$ in terms of two other diagonal matrices
+
+$$
+  D = D_Q - D_S
+$$
+
+where $(D_Q)_{ii}=d_i$ if $d_i\?>0$ and $(D_S)_{ii}=-d_i$ if $d_i\?<0$ (and zeros
+everywhere else). Now define
+
+$$
+  Q = U D_Q U^\dagger, \; S = U D_S U^\dagger .
+$$
+
+Clearly $Q$ and $S$ are two positive operators with $\rho-\sigma=Q-S$ with orthogonal
+support. QED.
+
+** Exercise 9.8 (Convexity of the trace distance)
+Show that the trace distance is convex in its first input,
+
+$$
+  D\left(\sum_i p_i \rho_i, \sum_i p_i \sigma_i \right)
+  \leq \sum_i p_i D(\rho_i, \sigma_i) .
+$$
+
+*** Proof
+This directly follows from strong convexity with $q_i=p_i$, using $D(p,p)=0$. QED.
+
+<<exercise-9.8-remark-on-norms-in-general>>
+But in my opinion this result is actually misleading. The book emphasizes the fact that
+$D$ is a metric, but actually it corresponds to a /norm/ on the matrix space:
+
+$$
+  \norm{\rho}_{S_1} = \trace{\abs{\rho}} .
+$$
+
+We have $D(\rho,\sigma)=2\inv\norm{\rho-\sigma}_{S_1}$. This is a so called [[https://en.wikipedia.org/wiki/Schatten_norm][/Schatten
+norm/]]. The Schatten classes are the natural analog of the $L^p$​-spaces for operators on
+Hilbert spaces. The above norm corresponds to $p=1$. The Hilbert-Schmidt inner product
+corresponds to a Schatten norm too, here $p=2$.
+
+As for any norm we have the following more general result (of course one has to prove that
+the Schatten norm is actually a norm, but this is trivial based on what we already know
+about $D$)
+
+$$
+  D\left(\sum_i a_i \rho_i, \sum_i a_i \sigma_i \right) = 2\inv\norm{\sum_i a_i(\rho_i-\sigma_i)}_{S_1}
+  \leq 2\inv\sum_i \abs{a_i} \norm{\rho_i-\sigma_i}_{S_1} = \sum_i \abs{a_i} D(\rho_i,\sigma_i)
+$$
+
+Here the $a_i$ could be /any/ complex numbers. It doesn't even matter that the operators
+are density operators - it could be any matrices. And as said, this is just an abstract
+property of norms in general. The /strong/ convexity result is different in the way that
+it really relies on special properties of this particular norm and the concrete arguments
+it is applied to (density operators, numbers which are probabilities).
+
+** Exercise 9.9 (Existence of fixed points)
+:PROPERTIES:
+:CUSTOM_ID: exercise-9.9
+:END:
+Schauder’s ﬁxed point theorem is a classic result from mathematics that implies that any
+continuous map on a convex, compact subset of a Hilbert space has a fixed point. Use
+Schauder’s fixed point theorem to prove that any trace-preserving quantum operation
+$\calE$ has a fixed point, that is, $\rho$ such that $\calE(\rho)=\rho$.
+
+*** Proof
+Just for definiteness let me recall my favorite version of Schauder's fixed point
+theorem. There are various specializations and generalizations. In my oppinion the
+following version hits the sweet spot in terms of generality and simplicity. The main
+difference to the version mentioned in the exercise is that it gets rid of the /totally
+irrelevant/ property that the sourrounding space is a /Hilbert/ space. There are
+generalizations to more abstract settings but this might distract too much.
+
+- Theorem (Schauder's fixed point theorem) :: Let $V$ be a Banach space and $K\subset\?V$
+  a compact and convex set. Let $f:K\to\?K$ be continuous. Then $f$ has a fixed point
+  $x=f(x)$.
+
+In our setting we have $f=\calE$, $V=\CC^{d\times d}$ and $K$ is the set of density
+matrices (c.f. Theorem 2.5):
+
+$$
+  K = \{ \rho \in \CC^{d\times d} \; | \; \rho\geq0 , \trace{\rho} = 1 \} .
+$$
+
+$K$ is clearly a closed set (if $(\rho_n)$ are density matrices with a limit
+$\rho_n\to\rho$ then the limit is also a density matrix). To show that it is compact it
+suffices to show that $K$ is bounded (in finite dimensional vector spaces /compact/ is the
+same as /bounded and closed/ - [[https://en.wikipedia.org/wiki/Heine%E2%80%93Borel_theorem][Heine-Borel]]). Recall that the operator norm of a hermitian
+matrix is equal to the /spectral radius/ - the maximum of the absolute values of its
+eigenvalues (search for the relation of the /spectral radius/ to the operator norm on any
+decent resource on any of those topics, try e.g. [[https://en.wikipedia.org/wiki/Operator_norm][wikipedia]]). Since the spectral radius is
+at most $1$ the claim follows. Hence $K$ is indeed compact.
+
+Convexity is also a well-known property of $K$. In fact, the density matrices are just the
+convex closure of the projection operators (this is just a mathematician's reformulation
+of the definition of density matrices as ensembles of pure states).
+
+Since $\calE$ is trace-preserving we have $\calE(K)\subseteq\?K$.
+
+By the representation by Kraus matrices a quantum operation extends to a linear operator
+on $\CC^{d\times\?d}$. In finite dimensions /linearity/ implies /continuity/ (I didn't
+find a dedicated resource on that, just have a look into [[https://en.wikipedia.org/wiki/Bounded_operator][bounded operators]]). In particular
+$\calE:K\to\?K$ is continuous.
+
+The preconditions of Schauder's theorem are satisfied. Hence $\calE$ has a fixed
+point. QED.
+
+** Exercise 9.10
+:PROPERTIES:
+:CUSTOM_ID: exercise-9.10
+:END:
+Suppose $\calE$ is a /strictly contractive/ trace-preserving quantum operation, that is,
+for any $\rho$ and $\sigma$, $D(\calE(\rho),\calE(\sigma))\?<\?D(\rho,\sigma)$. Show that
+$\calE$ has a unique fixed point.
+
+*** Proof
+We already know from [[#exercise-9.9][exercise 9.9]] that there must be one fixed point $\rho_0$. Suppose
+there was a second one $\rho_1\neq\rho_0$. Then
+
+$$
+  D(\rho_0,\rho_1) = D(\calE(\rho_0),\calE(\rho_1)) < D(\rho_0,\rho_1) .
+$$
+
+The equality from the fixed point property. The inequality is the strict
+contractivity. But this inequality is a contradiction to the fact that $d\?<\?d$ cannot
+hold for any real number $d$! Hence the claim that there was a second fixed point is
+wrong. QED.
+
+- Remark :: The result is related to [[https://en.wikipedia.org/wiki/Banach_fixed-point_theorem][Banach's fixed point theorem]]. At least in finite
+  dimensions a strictly contractive map is already /uniformly/ contractive. That is, there
+  exists a $\lambda\?<1$ such that
+
+  $$ D(\calE(\rho),\calE(\sigma)) < \lambda D(\rho,\sigma) $$
+
+  for all $\rho$, $\sigma$. This can be easily seen by assuming the contrary and
+  considering a sequence $(\rho_n,\sigma_n)$ which violates the inequality for
+  $\lambda=1-n\inv$ (also use the compactness of $K$ to single out a converging
+  sub-sequence). Hence Banach's fixed point theorem applies and even yields a procedure
+  which converges exponentially fast to the unique fixed point.
+
+** Exercise 9.11
+Suppose $\calE$ is a trace-preserving quantum operation for which there exists a density
+operator $\rho_0$ and a trace-preserving quantum operation $\calE'$ such that
+
+$$
+  \calE(\rho) = p \rho_0 + (1-p) \calE'(\rho) ,
+$$
+
+for some $p$, $0\?<\?p\leq1$. Physically, this means that with probability $p$ the input
+state is thrown out and replaced with the fixed state $\rho_0$, while with probability
+$1-p$ the operation $\calE'$ occurs. Use joint convexity to show that $\calE$ is a
+strictly contractive quantum operation, and thus has a unique fixed point.
+
+*** Proof
+By strong contractivity (or just basic properties of /any/ norm - see my [[exercise-9.8-remark-on-norms-in-general][extensive
+commentary]] to exercise 9.8) we have
+
+$$
+  D(\calE(\rho),\calE(\sigma)) \leq p D(\rho_0,\rho_0) + (1-p) D(\calE'(\rho),\calE'(\sigma))
+  \leq 0 + (1-p) D(\rho,\sigma) .
+$$
+
+Hence the operation is strictly contractive. By [[#exercise-9.10][exercise 9.10]] there exists a unique fixed
+point. QED.
+
+** Exercise 9.12
+Consider the depolarizing channel introduced in Section 8.3.4 on page 378,
+$\calE(\rho)=pI/2+(1-p)\rho$. For arbitrary $\rho$ and $\sigma$ find
+$D(\calE(\rho),\calE(\sigma))$ using the Bloch representation, and prove explicitly that
+the map $\calE$ is strictly contractive, that is,
+$D(\calE(\rho),\calE(\sigma))\?<\?D(\rho,\sigma)$.
+
+*** Solution
+Of course one could use the fact that the depolarizing channel acts like
+
+$$
+  (x,y,z) \mapsto (1-p)(x,y,z)
+$$
+
+on the Bloch space together with the fact that this identification is an isometry - up to
+a factor of $2$ (see equation (9.20)). But it also easily follows from /just plugging
+stuff into other stuff/:
+
+$$
+  D(\calE(\rho),\calE(\sigma)) = 2\inv \norm{pI/2 + (1-p)\rho - pI/2 - (1-p)\sigma}_{S_1}
+  = 2\inv (1-p) \norm{\rho-\sigma}_{S_1} = (1-p) D(\rho,\sigma) .
+$$
+
+Of course it is also not hard to see that $I/2$ is the fixed point and that the
+depolarizing channel contracts every other state towards it exponentially fast.
+
+** Exercise 9.13
+Show that the bit flip channel (Section 8.3.3) is contractive but not strictly
+contractive. Find the set of fixed points for the bit flip channel.
+
+*** Solution
+The bit flip channel is given by the following Kraus operators
+
+$$
+  E_0 = \sqrt{p} \, I , \; E_1 = \sqrt{1-p} \, X .
+$$
+
+The action on the Bloch sphere is easily seen to be (use $XNX=-N$ for $N$ being $Y$ or
+$Z$, and $XXX=X$):
+
+$$
+  (x,y,z) \mapsto (x, (2p-1)y, (2p-1)z) .
+$$
+
+Hence, if we are in the non-trivial case, $p\neq1$, the set of fixed points is given by
+$\{2\inv(1+xX)\,|\,x\in[-1,1]\}$ (we only consider density matrices). In the trivial case
+the bit flip is just the identity operation.
+
+** TODO Exercise 9.14
+** TODO Exercise 9.15
+** TODO Exercise 9.16
+** TODO Exercise 9.17
+** TODO Exercise 9.18
+** TODO Exercise 9.19
+** TODO Exercise 9.20
+** TODO Exercise 9.21
