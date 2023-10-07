@@ -395,11 +395,183 @@ Hence, if we are in the non-trivial case, $p\neq1$, the set of fixed points is g
 $\{2\inv(1+xX)\,|\,x\in[-1,1]\}$ (we only consider density matrices). In the trivial case
 the bit flip is just the identity operation.
 
-** TODO Exercise 9.14
-** TODO Exercise 9.15
-** TODO Exercise 9.16
-** TODO Exercise 9.17
-** TODO Exercise 9.18
-** TODO Exercise 9.19
-** TODO Exercise 9.20
-** TODO Exercise 9.21
+** Exercise 9.14 (Invariance of fidelity under unitary transforms)
+Prove (9.61),
+
+$$
+  F(U\rho U^\dagger, U\rho U^\dagger) = F(\rho, \sigma) ,
+$$
+
+by using the fact that for any positive operator $A$,
+$\sqrt{UAU^\dagger}=U\sqrt{A}U^\dagger$.
+
+*** Proof
+Recall that the spectral theorem implies $f(UAU^\dagger)=Uf(A)U^\dagger$ for any
+continuous function $f$ defined on the spectrum of $A$ and any unitary $U$. Actually this
+/functional calculus/ is typically defined by a formula like
+
+$$
+  f(A) = V f(D) V^\dagger
+$$
+
+where $D=V^\dagger\?AV$ is the diagonalization of $A$ and $f(D)$ is just applied
+entry-wise. So it is no surprise that the claimed formula
+$\sqrt{UAU^\dagger}=U\sqrt{A}U^\dagger$ holds. But let us come back to the exercise:
+
+\begin{align*}
+  F(U\rho U^\dagger, U\rho U^\dagger)
+  &= \trace{\sqrt{U\rho^{1/2}U^\dagger U\sigma U^\dagger U \rho^{1/2} U^\dagger}} \\
+  &= \trace{\sqrt{U\rho^{1/2} \sigma \rho^{1/2} U^\dagger}} \\
+  &= \trace{U\sqrt{\rho^{1/2} \sigma \rho^{1/2}}U^\dagger} \\
+  &= \trace{\sqrt{\rho^{1/2} \sigma \rho^{1/2}}} \\
+  &= F(\rho, \sigma) .
+\end{align*}
+
+For the first equality we applied the hint to $\sqrt{\rho}$. For the third equality we
+applied it to $\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$. Finally we applied
+$\trace{UAU^\dagger}=\trace{AU^\dagger\?U}=\trace{A}$, using the cyclicity property of the
+trace. QED.
+
+** Exercise 9.15
+Show that
+
+$$
+  F(\rho,\sigma) = \max_{\ket{\varphi}} \abs{\braket{\psi}{\varphi}} ,
+$$
+
+where $\ket{\psi}$ is any /fixed/ purification of $\rho$, and the maximization is over all
+purifications of $\sigma$.
+
+*** Proof
+To prove this we just need a minor modification of the proof of Theorem 9.4. So recall
+the proof given in the book. To give a bit of relevant context recall that
+
+$$
+  \ket{\psi} = (U_R \otimes \sqrt{\rho} U_Q) \ket{m}
+$$
+
+is a purification of $\rho$ (and we have a similar formula for $\ket{\varphi}$). It is not
+hard to check that /any/ unitary $U_R$ and $U_Q$ give rise to a purification. This is just
+a direct computation (hint: use $\ptrace{R}{A}=\sum_i\bra{i_R}U_R^\dagger\?AU_R\ket{i_R}$
+to compute the partial trace). That /any/ purification on =RQ= has this form follows from
+[[file:chapter_2.org::#exercise-2.81][exercise 2.81]], but this is not really important here.
+
+Fixing $\ket{\psi}$ more or less means that we also fix $U_R$, $U_Q$. Actually, they are
+not really unique but we cannot easily tell which combinations are allowed so let us just
+assume they are fixed. On the other hand we are free to choose $V_R$ and $V_Q$ in any way
+because $\ket{\varphi}$ can be chosen freely. Let
+
+$$
+  U = V_Q V_R^\dagger U_R U_Q^\dagger ,
+$$
+
+as in the book. Note one subtle thing here: the operators /must/ be treated as matrices
+here since they originally operate on different spaces (but this is explained in the book
+of course).
+
+According to the book to obtain equality in $F(\rho,\sigma)=\abs{\braket{\psi}{\varphi}}$
+we have to accomplish that $U=V^\dagger$ where $\abs{\sqrt{\rho}\sqrt{\sigma}}V$ is the
+polar decomposition of $\sqrt{\rho}\sqrt{\sigma}$. But this can easily be done by choosing
+e.g. $V_R=I$ and
+
+$$
+  V_Q = V^\dagger U_Q U_R^\dagger,
+$$
+
+where $V$ is expressed as a matrix with respect to the basis $(\ket{i_Q})_i$. QED.
+
+** Exercise 9.16 (The Hilbert–Schmidt inner product and entanglement)
+Suppose =R= and =Q= are two quantum systems with the same Hilbert space. Let $(\ket{i_R})$
+and $(\ket{i_Q})$ be orthonormal basis sets for =R= and =Q=. Let $A$ be an operator on =R=
+and $B$ an operator on =Q=. Define $\ket{m}=\sum_i\ket{i_R}\ket{i_Q}$. Show that
+
+$$
+  \trace{A^\dagger B} = \bra{m} A\otimes B \ket{m} ,
+$$
+
+where the multiplication on the left hand side is of matrices, and it is understood that
+the matrix elements of $A$ are taken with respect to the basis $(\ket{i_R})$ and those for
+$B$ with respect to the basis $(\ket{i_Q})$.
+
+*** Proof
+This is just a short calculation
+
+\begin{align*}
+  \bra{m} A\otimes B \ket{m}
+  &= \sum_{ij} \bra{i_R,i_Q} A \otimes B \ket{j_R,j_Q} \\
+  &= \sum_{ij} \bra{i_R}A\ket{j_R} \cdot \bra{i_Q}B\ket{j_Q} \\
+  &= \sum_{ij} A_{ij} B_{ij} \\
+  &= \trace{A^\dagger B} .
+\end{align*}
+
+QED.
+
+** Exercise 9.17
+Show that $0\leq\?A(\rho,\sigma)\leq\pi/2$, with equality in the first inequality if and
+only if $\rho=\sigma$.
+
+*** Proof
+The first claim follows from the fact that $\arccos:[0,1]\to[0,\pi/2]$ is a strictly
+decreasing bijection and that $F$ has values in $[0,1]$. The second assertion follows from
+the fact that $F(\rho,\sigma)=1$ iff $\rho=\sigma$ by Uhlmann's theorem. QED.
+
+** Exercise 9.18 (Contractivity of the angle)
+Let $\calE$ be a trace-preserving quantum operation. Show that
+
+$$
+  A(\calE(\rho), \calE(\sigma)) \leq A(\rho, \sigma) .
+$$
+
+*** Proof
+This is a direct corollary of the monotonicity of the fidelity (Theorem 9.6) and the fact
+that $\arccos:[0,1]\to[0,\pi/2]$ is decreasing (and $F(\rho,\sigma)\in[0,1]$). QED.
+
+** Exercise 9.19 (Joint concavity of fidelity)
+:PROPERTIES:
+:CUSTOM_ID: exercise-9.19
+:END:
+Prove that the ﬁdelity is /jointly concave/,
+
+$$
+  F\left(\sum_ip_i\rho_i, \sum_ip_i\sigma_i\right) \geq \sum_i p_i F(\rho_i, \sigma_i) .
+$$
+
+*** Proof
+Follows from strict concavity with $q_i=p_i$. QED.
+
+** Exercise 9.20 (Concavity of fidelity)
+Prove that the ﬁdelity is concave in the first entry,
+
+$$
+  F\left(\sum_ip_i\rho_i, \sigma\right) \geq \sum_i p_i F(\rho_i, \sigma) .
+$$
+
+*** Proof
+Follows from [[#exercise-9.19][exercise 9.19]] with $\sigma_i=\sigma$. QED.
+
+** Exercise 9.21
+When comparing pure states and mixed states it is possible to make a stronger statement
+than (9.110) about the relationship between trace distance and fidelity. Prove that
+
+$$
+  1 - F(\ket{\psi}, \sigma)^2 \leq D(\ket{\psi}, \sigma) .
+$$
+
+*** Proof
+The key to the proof is (9.60):
+
+$$
+  F(\ket{\psi}, \rho)^2 = \bra{\psi} \rho \ket{\psi} .
+$$
+
+Let us calculate:
+
+\begin{align*}
+  D(\ket{\psi}, \rho) &= \max_P \trace{P(\proj{\psi}-\rho)} \\
+  &\geq 1 - \trace{\proj{\psi}\rho} \\
+  &= 1 - \bra{\psi} \rho \ket{\psi} \\
+  &= 1 - F(\ket{\psi}, \rho)^2 .
+\end{align*}
+
+In the first line we maximize over all projections. In the second line we set
+$P=\proj{\psi}$. QED.
