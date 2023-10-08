@@ -575,3 +575,65 @@ Let us calculate:
 
 In the first line we maximize over all projections. In the second line we set
 $P=\proj{\psi}$. QED.
+
+** Exercise 9.22 (Chaining property for fidelity measures)
+Suppose $U$ and $V$ are unitary operators, and $\calE$ and $\calF$ are trace-preserving
+quantum operations meant to approximate $U$ and $V$. Letting $d(\cdot,\cdot)$ be any
+metric on the space of density matrices satisfying
+$d(U\rho\?U^\dagger,U\sigma\?U^\dagger)=d(\rho,\sigma)$ for all density matrices $\rho$
+and $\sigma$ and unitary $U$ (such as the angle $\arccos(F(\rho,\sigma))$, define the
+corresponding error $E(U,\calE)$ by
+
+$$
+  E(U, \calE) \equiv \max_{\rho} d(U\rho U^\dagger, \calE(\rho)) ,
+$$
+
+and show that $E(VU,\calF\circ\calE)\leq\?E(U,\calE)+E(V,\calF)$. Thus, to perform a
+quantum computation with high ﬁdelity it sufﬁces to complete each step of the computation
+with high fidelity.
+
+*** Proof
+We have
+
+$$
+  E(VU,\calF\circ\calE) = \max_{\rho} d(VU \rho U^\dagger V^\dagger, \calF(\calE(\rho))) .
+$$
+
+Observe that
+
+\begin{align*}
+  d(VU \rho U^\dagger V^\dagger, \calF(\calE(\rho)))
+  &= d(U \rho U^\dagger, V^\dagger \calF(\calE(\rho)) V) \\
+  &\leq d(U \rho U^\dagger, \calE(\rho))) + d(\calE(\rho), V^\dagger \calF(\calE(\rho)) V) \\
+  &= d(U \rho U^\dagger, \calE(\rho))) + d(V\calE(\rho)V^\dagger, \calF(\calE(\rho))) \\
+  &\leq E(U,\calE) + E(V,\calF) .
+\end{align*}
+
+For the two equalities we used the assumed isometry property of the matric $d$. The first
+inequality is just the triangle inequality. From this the claim directly follows. QED.
+
+** Exercise 9.23
+Show that $\bar{F}=1$ if and only if $\calE(\rho_j)=\rho_j$ for all $j$ such that $p_j\?>\?0$.
+
+*** Proof
+Let us recall the formula for $\bar{F}$:
+
+$$
+  \bar{F} = \sum_j p_j F(\rho_j, \calE(\rho_j))^2 .
+$$
+
+Since $0\leq\?F(\rho_j,\calE(\rho_j))\leq1$, and $0\leq\?p_j\leq1$, and $\sum_jp_j=1$ we
+see that $\bar{F}=1$ is equivalent to
+
+$$
+  \forall j: p_j > 0 \Rightarrow F(\rho_j, \calE(\rho_j)) = 1 .
+$$
+
+On the other hand we already know that $F(\rho,\sigma)=1$ is equivalent to $\rho=\sigma$
+(follows e.g. from Uhlmann's theorem). Hence $\bar{F}=1$ is equivalent to
+
+$$
+  \forall j: p_j > 0 \Rightarrow \rho_j = \calE(\rho_j) .
+$$
+
+QED.
