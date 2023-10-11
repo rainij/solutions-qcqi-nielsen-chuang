@@ -1,0 +1,408 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 10</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 10</h1>\[
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\jj}{\mathrm{j}}
+\newcommand{\kk}{\mathrm{k}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\FT}{\mathcal{F}} % Fourier Transform
+\newcommand{\tto}{\twoheadrightarrow}
+\newcommand{\inv}{^{-1}}
+\newcommand{\RF}{\mathrm{RF}}
+\newcommand{\sys}{\mathrm{sys}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\sprod}[2]{\langle#1|#2\rangle} % deprecated, use braket instead.
+\newcommand{\braket}[2]{\langle#1|#2\rangle} % scalar product
+\newcommand{\ptrace}[2]{\mathrm{tr}_{#1}\left(#2\right)}
+\newcommand{\trace}[1]{\mathrm{tr}\left(#1\right)}
+\newcommand{\rank}[1]{\mathrm{rank}\left(#1\right)}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\bra}[1]{\langle#1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\proj}[1]{\ket{#1}\bra{#1}}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\orac}{\mathrm{Orac}}
+\newcommand{\?}{} % sometimes I need just a separator other than whitespace
+\]
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org3f45efe">Setup</a></li>
+<li><a href="#orga6d97d2">Exercises</a>
+<ul>
+<li><a href="#orga15e795">Exercise 10.1</a></li>
+<li><a href="#org16f208e">Exercise 10.2</a></li>
+<li><a href="#org45aa04d">Exercise 10.3</a></li>
+<li><a href="#orgb9248e5">Exercise 10.4</a></li>
+<li><a href="#org05b6733"><span class="todo TODO">TODO</span> Exercise 10.5</a></li>
+<li><a href="#orge18c692"><span class="todo TODO">TODO</span> Exercise 10.6</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3f45efe" class="outline-2">
+<h2 id="org3f45efe">Setup</h2>
+<div class="outline-text-2" id="text-org3f45efe">
+</div>
+</div>
+<div id="outline-container-orga6d97d2" class="outline-2">
+<h2 id="orga6d97d2">Exercises</h2>
+<div class="outline-text-2" id="text-orga6d97d2">
+</div>
+<div id="outline-container-orga15e795" class="outline-3">
+<h3 id="orga15e795">Exercise 10.1</h3>
+<div class="outline-text-3" id="text-orga15e795">
+<p>
+Verify that the encoding circuit in Figure 10.2 works as claimed.
+</p>
+
+<pre class="example">
+
+|psi&gt;: ──■────■──
+       ┌─┴─┐  │
+|0&gt;_0: ┤ X ├──┼──
+       └───┘┌─┴─┐
+|0&gt;_1: ─────┤ X ├
+            └───┘
+</pre>
+</div>
+
+
+<div id="outline-container-org156d58c" class="outline-4">
+<h4 id="org156d58c">Solution</h4>
+<div class="outline-text-4" id="text-org156d58c">
+<p>
+This is really just observing that the circuit acts like this on the <i>relevant</i> basis
+states
+</p>
+
+\begin{align*}
+  \ket{000} &\mapsto \ket{000} , \\
+  \ket{100} &\mapsto \ket{111} . \\
+\end{align*}
+
+<p>
+The rest follows by linearity.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org16f208e" class="outline-3">
+<h3 id="org16f208e">Exercise 10.2</h3>
+<div class="outline-text-3" id="text-org16f208e">
+<p>
+The action of the bit flip channel can be described by the quantum operation
+\(\calE(\rho)=(1-p)\rho+pX\rho\?X\). Show that this may be given an alternate operator-sum
+representation, as \(\calE(\rho)=(1-2p)\rho+2pP_+\rho\?P_++2pP_-\rho\?P_-\) where \(P_+\) and
+\(P_-\) are projectors onto the \(+1\) and \(-1\) eigenstates of \(X\),
+\((\ket{0}+\ket{1})/\sqrt{2}\) and \((\ket{0}+\ket{1})/\sqrt{2}\) respectively.  This latter
+representation can be understood as a model in which the qubit is left alone with
+probability \(1-2p\), and is ‘measured’ by the environment in the \(\ket{+}\), \(\ket{-}\) basis
+with probability \(2p\).
+</p>
+</div>
+
+<div id="outline-container-org9ab8213" class="outline-4">
+<h4 id="org9ab8213">Proof</h4>
+<div class="outline-text-4" id="text-org9ab8213">
+<p>
+Note that \(X=P_+-P_-\) and \(I=P_++P_-\). Hence
+</p>
+
+<p>
+\[
+  X\rho X = P_+\rho P_+ + P_-\rho P_- - (P_+\rho P_- + P_-\rho P_+)
+  = 2(P_+\rho P_+ + P_-\rho P_-) - I\rho I .
+\]
+</p>
+
+<p>
+Hence
+</p>
+
+<p>
+\[
+  \calE(\rho) = (1 - 2p)\rho + 2p (P_+\rho P_+ + P_-\rho P_-) .
+\]
+</p>
+
+<p>
+QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org45aa04d" class="outline-3">
+<h3 id="org45aa04d">Exercise 10.3</h3>
+<div class="outline-text-3" id="text-org45aa04d">
+<p>
+Show by explicit calculation that measuring \(Z_1Z_2\) followed by \(Z_2Z_3\) is equivalent,
+up to labeling of the measurement outcomes, to measuring the four projectors defined by
+(10.5)–(10.8), in the sense that both procedures result in the same measurement statistics
+and post-measurement states.
+</p>
+</div>
+
+<div id="outline-container-org44c22cf" class="outline-4">
+<h4 id="org44c22cf">Proof</h4>
+<div class="outline-text-4" id="text-org44c22cf">
+<p>
+Let us define the following projectors
+</p>
+
+\begin{align*}
+  P_{ijk} &= \proj{i}\otimes\proj{j}\otimes\proj{k} , \\
+  P_{ijx} &= \proj{i}\otimes\proj{j}\otimes I , \\
+  P_{xij} &= I\otimes \proj{i}\otimes\proj{j} .
+\end{align*}
+
+<p>
+That is, the \(x\) has a special meaning and just stands for the place where the identity
+acts. Define \(P_{ixx}\) etc analogously. Note that e.g. \(P_{ixx}P_{xjx}=P_{ijx}\). Since
+\(Z_1=P_{0xx}-P_{1xx}\), \(Z_2=P_{x0x}-P_{x1x}\), \(Z_3=P_{xx0}-P_{xx1}\) we have the following
+spectral decomposition of the observables we are interested in:
+</p>
+
+\begin{align*}
+  Z_1Z_2 &= P_{00x} + P_{11x} - P_{01x} - P_{10x} , \\
+  Z_2Z_3 &= P_{x00} + P_{x11} - P_{x01} - P_{x10} .
+\end{align*}
+
+<p>
+Let \(P_j\) for \(j=0..3\) be the projectors from (10.5) to (10.8). If we measure for example
+\(+1\) for \(Z_1Z_2\) and \(+1\) for \(Z_2Z_3\) this corresponds to the projection (note: the
+order of the projections is not important due to commutativity)
+</p>
+
+<p>
+\[
+  (+1, +1):\; (P_{00x} + P_{11x})(P_{x00} + P_{x11}) = P_{000} + P_{111} = P_0 .
+\]
+</p>
+
+<p>
+In the same way the other three measurements can be mapped to the \(P_j\) too:
+</p>
+
+\begin{align*}
+  &(+1, -1):\; (P_{00x} + P_{11x})(P_{x01} + P_{x10}) = P_{001} + P_{110} = P_3 , \\
+  &(-1, +1):\; (P_{01x} + P_{10x})(P_{x00} + P_{x11}) = P_{100} + P_{011} = P_1 , \\
+  &(-1, -1):\; (P_{01x} + P_{10x})(P_{x01} + P_{x10}) = P_{101} + P_{010} = P_2 .
+\end{align*}
+
+<p>
+Hence the projectors are the same, just re-labeled. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb9248e5" class="outline-3">
+<h3 id="orgb9248e5">Exercise 10.4</h3>
+<div class="outline-text-3" id="text-orgb9248e5">
+<p>
+Consider the three qubit bit flip code. Suppose we had performed the error syndrome
+measurement by measuring the eight orthogonal projectors corresponding to projections onto
+the eight computational basis states.
+</p>
+
+<ol class="org-ol">
+<li>Write out the projectors corresponding to this measurement, and explain how the
+measurement result can be used to diagnose the error syndrome: either no bits flipped or
+bit number \(j\) flipped, where \(j\) is in the range one to three.</li>
+<li>Show that the recovery procedure works only for computational basis states.</li>
+<li>What is the minimum fidelity for the error-correction procedure?</li>
+</ol>
+</div>
+
+<div id="outline-container-org56e864e" class="outline-4">
+<h4 id="org56e864e">Solution for part 1</h4>
+<div class="outline-text-4" id="text-org56e864e">
+<p>
+The projectors are just \(P_j=\proj{j}\) for \(j=0..7\) (note that the binary representations
+for the numbers from \(0\) to \(7\) are \(000\), \(001\), \(010\), \(011\), \(100\), \(101\), \(110\),
+\(111\)). A corresponding observable distinguishing each projector would be
+\(A=\sum_jj\proj{j}\).
+</p>
+
+<p>
+Recall that the encoded state is \(\ket{\psi}=a\ket{000}+b\ket{111}\). Let \(k=0\), \(k=1\),
+\(k=2\), \(k=3\) denote <i>no error</i>, <i>error in qubit 1, 2, 3</i>, respectively. Let \(M_k\) be the
+set of possible measurements for the given value of \(k\). We have
+</p>
+
+<p>
+<a id="orgf3e5a7b"></a>
+</p>
+\begin{align*}
+  M_0 &= \{0, 7\} , \\
+  M_1 &= \{1, 6\} , \\
+  M_2 &= \{2, 5\} , \\
+  M_3 &= \{4, 3\} .
+\end{align*}
+
+<p>
+Moreover, measuring \(0,1,2,4\) happens with probability \(\abs{a}^2\) and measuring \(7,6,5,3\)
+happens with probability \(\abs{b}^2\) (conditioned on a fixed value for \(j\)). Since the
+four sets are disjoint we can infer the error (the value of \(k\)) from the measurement
+(e.g. measuring \(1\) or \(6\) implies that the error was \(k=1\) (with certainty if only one of
+the three errors "is allowed" to happen)).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdd3690b" class="outline-4">
+<h4 id="orgdd3690b">Solution for part 2</h4>
+<div class="outline-text-4" id="text-orgdd3690b">
+<p>
+If we measure \(j\) and infer the error \(k\) <a href="#orgf3e5a7b">according to the sets</a> \(M_k\) we would correct it
+by applying \(X_k\) to the state. In other words, the following quantum operation \(\calR\)
+performs the syndrome measurement followed by the recovery:
+</p>
+
+\begin{align*}
+  E_0 &= P_0, \\ E_1 &= X_1P_1, \\ E_2 &= X_2P_2, \\ E_3 &= X_3P_3, \\
+  E_4 &= X_3P_4, \\ E_5 &= X_2P_5, \\ E_6 &= X_1P_6, \\ E_7 &= P_7 .
+\end{align*}
+
+<p>
+Note that \(\calR\) is indeed trace-preserving (\(\sum_jE_j^\dagger\?E_j)=I\)). Let again
+\(\ket{\psi}=a\ket{000}+b\ket{111}\). Then (the <i>no error</i> case)
+</p>
+
+<p>
+\[
+  \calR(\ket{\psi}) = \abs{a}^2 \proj{000} + \abs{b}^2 \proj{111} .
+\]
+</p>
+
+<p>
+The same formula holds for \(\ket{\psi}\) replaced by \(X_k\ket{\psi}\) (\(k=1..3\)). Hence, for
+the following noise channel
+</p>
+
+<p>
+\[
+  \calE(\rho) = (1-p)\rho + \sum_{k=1}^3 p_k X_k \rho X_k
+\]
+</p>
+
+<p>
+where \(\sum_kp_k=p\) (trace-preserving), which stands for having at most one bit-flip
+(with probability \(p_k\) at position \(k\)), we have
+</p>
+
+<p>
+\[
+  \calR\circ\calE(\ket{\psi}) = \abs{a}^2 \proj{000} + \abs{b}^2 \proj{111} .
+\]
+</p>
+
+<p>
+Hence the bit-flip error gets indeed corrected, but unwanted side effects happen too. The
+final state after recovery is either \(\ket{000}\) (probability \(\abs{a}^2\)) or \(\ket{111}\)
+(probability \(\abs{b}^2\)). That is the state collapses to a basis state. This is only
+correct if \(\ket{\psi}\) was already in a basis state (\(a=0\) or \(b=0\)) - which is the claim
+of part 2.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5c9d9f5" class="outline-4">
+<h4 id="org5c9d9f5">Solution for part 3</h4>
+<div class="outline-text-4" id="text-org5c9d9f5">
+<p>
+Let us consider two cases:
+</p>
+
+<ol class="org-ol">
+<li>We do not get to know the results of the syndrome measurement.</li>
+<li>We get to know the results of the syndrome measurement.</li>
+</ol>
+
+<p>
+In case 1 the whole error correction procedure is given by \(\calR\) from the solution of
+part 2. Let \(\rho=\calR\circ\calE(\ket{\psi})\). Then
+</p>
+
+<p>
+\[
+  F(\ket{\psi},\rho) = \sqrt{\bra{\psi}\rho\ket{\psi}} = \sqrt{\abs{a}^4 + \abs{b}^4} .
+\]
+</p>
+
+<p>
+Since \(\abs{a}^2+\abs{b}^2=1\) the minimum occurs at \(\abs{a}^2=\abs{b}^2=1/2\). Hence
+\(F\geq1/\sqrt{2}\) in that case.
+</p>
+
+<p>
+In case 2 the post-correction state \(\rho\) is either \(\ket{000}\) (probability \(\abs{a}^2\))
+or \(\ket{111}\) (probability \(\abs{b}^2\)). Hence
+</p>
+
+<p>
+\[
+  F(\ket{\psi},\rho) \in \left\{\sqrt{\braket{\psi}{i_L}\braket{i_L}{\psi}} \; \middle| \; i\in\{0,1\}\right\}
+  = \{\abs{a}, \abs{b}\} ,
+\]
+</p>
+
+<p>
+where the first alternative occurs with probability \(\abs{a}^2\) and the second one with
+\(\abs{b}^2\).
+</p>
+
+<p>
+In both cases the minimial fidelity does not depend on the specifics of the noise model
+and in particular is always bad if \(\abs{a}\) and \(\abs{b}\) are bounded away from \(0\) (or
+equivalently, from \(1\)).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The minimum fidelity of case 1 is the weighted root square mean of the two
+possible fidelities of case 2. The weights are \(\abs{a}^2\) and \(\abs{b}^2\). See e.g.
+<a href="https://en.wikipedia.org/wiki/Generalized_mean">generalized mean</a> on wikipedia for more infos.</dd>
+</dl>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org05b6733" class="outline-3">
+<h3 id="org05b6733"><span class="todo TODO">TODO</span> Exercise 10.5</h3>
+<div class="outline-text-3" id="text-org05b6733">
+<p>
+Show that the syndrome measurement for detecting phase flip errors in the Shor code
+corresponds to measuring the observables \(X_1X_2X_3X_4X_5X_6\) and \(X_4X_5X_6X_7X_8X_9\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge18c692" class="outline-3">
+<h3 id="orge18c692"><span class="todo TODO">TODO</span> Exercise 10.6</h3>
+<div class="outline-text-3" id="text-orge18c692">
+<p>
+Show that recovery from a phase flip on any of the first three qubits may be accomplished
+by applying the operator \(Z_1Z_2Z_3\).
+</p>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.9)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
