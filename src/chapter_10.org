@@ -228,10 +228,89 @@ equivalently, from $1$).
   possible fidelities of case 2. The weights are $\abs{a}^2$ and $\abs{b}^2$. See e.g.
   [[https://en.wikipedia.org/wiki/Generalized_mean][generalized mean]] on wikipedia for more infos.
 
-** TODO Exercise 10.5
+** Exercise 10.5
 Show that the syndrome measurement for detecting phase flip errors in the Shor code
-corresponds to measuring the observables $X_1X_2X_3X_4X_5X_6$ and $X_4X_5X_6X_7X_8X_9$.
+corresponds to measuring the observables $A=X_1X_2X_3X_4X_5X_6$ and
+$B=X_4X_5X_6X_7X_8X_9$.
 
-** TODO Exercise 10.6
+*** Proof
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.5-solution
+:END:
+Let us denote
+
+\begin{align*}
+  \ket{\pi} &= \frac{1}{\sqrt{2}} (\ket{000} + \ket{111}) , \\
+  \ket{\mu} &= \frac{1}{\sqrt{2}} (\ket{000} - \ket{111}) .
+\end{align*}
+
+With this notation the Shor code is given by
+
+\begin{align*}
+  \ket{0_L} &= \ket{\pi\pi\pi} , \\
+  \ket{1_L} &= \ket{\mu\mu\mu} , \\
+\end{align*}
+
+Hence we have the following encoding:
+
+$$
+  \ket{\psi} = \ket{\psi_0} = a\ket{0_L} + b\ket{1_L} = a\ket{\pi\pi\pi} + b\ket{\mu\mu\mu} .
+$$
+
+In this notation a phase flip error is represented naturally. For example a phase flip in
+one of the three qubits in the first block of $\ket{\psi}$ is given by
+
+$$
+  \ket{\psi_1} = a\ket{\mu\pi\pi} + b\ket{\pi\mu\mu} .
+$$
+
+It doesn't matter in which of the three qubits, it always leads to the same state. The
+other two errors (phase flip in the second or third block) are given by
+
+\begin{align*}
+  \ket{\psi_2} &= a\ket{\pi\mu\pi} + b\ket{\mu\pi\mu} , \\
+  \ket{\psi_3} &= a\ket{\pi\pi\mu} + b\ket{\mu\mu\pi} .
+\end{align*}
+
+Now observe that
+
+\begin{align*}
+  X_1X_2X_3 \ket{\pi} &= + \ket{\pi} , \\
+  X_1X_2X_3 \ket{\mu} &= - \ket{\mu} .
+\end{align*}
+
+Hence e.g. measuring a state $\ket{ijk}$ ($i,j,k\in\{\pi,\mu\}$) with respect to $A$
+detects if $i=j$ (measurement result: $+1$) or $i\neq\?j$ (measurement result:
+$+1$). Because of their special structure this translates to $\ket{\psi_k}$. For the four
+errors (first one is /no error/) we get the following measurement results (each with
+certainty):
+
+| $k$ ($\ket{\psi_k}$) | $A$ | $B$ |
+|----------------------+-----+-----|
+|                    0 |  +1 |  +1 |
+|                    1 |  -1 |  +1 |
+|                    2 |  -1 |  -1 |
+|                    3 |  +1 |  -1 |
+
+Hence we can infer the syndrome $k$ (which error occured) from the measurement - as
+desired. QED.
+
+** Exercise 10.6
 Show that recovery from a phase flip on any of the first three qubits may be accomplished
 by applying the operator $Z_1Z_2Z_3$.
+
+*** Proof
+Let us reuse the notation from the [[#exercise-10.5-solution][solution]] of exercise 10.5. Clearly
+
+$$
+  Z_1Z_2Z_3 \ket{\pi} = \ket{\mu} \text{ and } Z_1Z_2Z_3 \ket{\mu} = \ket{\pi} .
+$$
+
+An error in the first three qubits means that the corresponding state is
+$\ket{\psi_1}$. By the above we have:
+
+$$
+  Z_1Z_2Z_3 \ket{\psi_1} = \ket{\psi} .
+$$
+
+QED.
