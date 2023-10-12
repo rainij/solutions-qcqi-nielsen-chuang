@@ -166,7 +166,7 @@ performs the syndrome measurement followed by the recovery:
   E_4 &= X_3P_4, \\ E_5 &= X_2P_5, \\ E_6 &= X_1P_6, \\ E_7 &= P_7 .
 \end{align*}
 
-Note that $\calR$ is indeed trace-preserving ($\sum_jE_j^\dagger\?E_j)=I$). Let again
+Note that $\calR$ is indeed trace-preserving ($\sum_jE_j^\dagger\?E_j)=I$). Recall
 $\ket{\psi}=a\ket{000}+b\ket{111}$. Then (the /no error/ case)
 
 $$
@@ -180,15 +180,17 @@ $$
   \calE(\rho) = (1-p)\rho + \sum_{k=1}^3 p_k X_k \rho X_k
 $$
 
-where $\sum_kp_k=p$ (trace-preserving), which stands for having at most one bit-flip
-(with probability $p_k$ at position $k$), we have
+where $\sum_kp_k=p$ (this implies trace-preservation, but we could more generally assume
+$\ldots\leq\?p$, meaning that with certain probability "something else" happens), which
+stands for having at most one bit-flip (with probability $p_k$ at position $k$), we have
 
 $$
   \calR\circ\calE(\ket{\psi}) = \abs{a}^2 \proj{000} + \abs{b}^2 \proj{111} .
 $$
 
-Hence the bit-flip error gets indeed corrected, but unwanted side effects happen too. The
-final state after recovery is either $\ket{000}$ (probability $\abs{a}^2$) or $\ket{111}$
+(If $\calE$ was not trace-preserving the RHS would have a factor $1-p+\sum_jp_j$.) Hence
+the bit-flip error gets indeed corrected, but unwanted side effects happen too. The final
+state after recovery is either $\ket{000}$ (probability $\abs{a}^2$) or $\ket{111}$
 (probability $\abs{b}^2$). That is the state collapses to a basis state. This is only
 correct if $\ket{\psi}$ was already in a basis state ($a=0$ or $b=0$) - which is the claim
 of part 2.
@@ -226,7 +228,14 @@ equivalently, from $1$).
 
 - Remark :: The minimum fidelity of case 1 is the weighted root square mean of the two
   possible fidelities of case 2. The weights are $\abs{a}^2$ and $\abs{b}^2$. See e.g.
-  [[https://en.wikipedia.org/wiki/Generalized_mean][generalized mean]] on wikipedia for more infos.
+  [[https://en.wikipedia.org/wiki/Generalized_mean][generalized mean]] on wikipedia for more infos. To make this more apparent consider
+  $\sigma=p\proj{0}+(1-p)\proj{1}$ (and $\ket{\psi}=a\ket{0}+b\ket{1}$):
+
+  $$
+  F(\ket{\psi},\sigma) = \sqrt{\bra{\psi}\sigma\ket{\psi}} = \sqrt{p\abs{a}^2+(1-p)\abs{b}^2} .
+  $$
+
+  Here $p$ and $1-p$ are the weights.
 
 ** Exercise 10.5
 Show that the syndrome measurement for detecting phase flip errors in the Shor code
