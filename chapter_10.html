@@ -40,33 +40,67 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf7df812">Setup</a></li>
-<li><a href="#org3059f39">Exercises</a>
+<li><a href="#org79c504c">Setup</a>
 <ul>
-<li><a href="#org1008dda">Exercise 10.1</a></li>
-<li><a href="#org043db65">Exercise 10.2</a></li>
-<li><a href="#orgcbde4fd">Exercise 10.3</a></li>
-<li><a href="#org96a80a7">Exercise 10.4</a></li>
-<li><a href="#orgb7381ba">Exercise 10.5</a></li>
-<li><a href="#org96d04d5">Exercise 10.6</a></li>
+<li><a href="#orgff95bea">Imports</a></li>
+<li><a href="#orge5f9a0f">Utility code</a></li>
+</ul>
+</li>
+<li><a href="#org62a9bf0">Exercises</a>
+<ul>
+<li><a href="#org9469a47">Exercise 10.1</a></li>
+<li><a href="#org92d2d42">Exercise 10.2</a></li>
+<li><a href="#orgc38d6fa">Exercise 10.3</a></li>
+<li><a href="#orgbdfa8f8">Exercise 10.4</a></li>
+<li><a href="#org53252e2">Exercise 10.5</a></li>
+<li><a href="#orgccb8d16">Exercise 10.6</a></li>
+<li><a href="#orgd2f5aa6">Exercise 10.7</a></li>
+<li><a href="#org26e8651">Exercise 10.8</a></li>
+<li><a href="#org9e1eb91">Exercise 10.9</a></li>
+<li><a href="#orgca1c6bf">Exercise 10.10</a></li>
+<li><a href="#orgeb6e2c7">Exercise 10.11</a></li>
+<li><a href="#orgd30233e">Exercise 10.12</a></li>
+<li><a href="#org1b6ede7">Exercise 10.13</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf7df812" class="outline-2">
-<h2 id="orgf7df812">Setup</h2>
-<div class="outline-text-2" id="text-orgf7df812">
+<div id="outline-container-org79c504c" class="outline-2">
+<h2 id="org79c504c">Setup</h2>
+<div class="outline-text-2" id="text-org79c504c">
+</div>
+<div id="outline-container-orgff95bea" class="outline-3">
+<h3 id="orgff95bea">Imports</h3>
+<div class="outline-text-3" id="text-orgff95bea">
+<div class="org-src-container">
+<pre class="src src-sage" id="org96ba6dd"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
+<span class="org-keyword">from</span> chapter_8_sage <span class="org-keyword">import</span> make_operation
+</pre>
 </div>
 </div>
-<div id="outline-container-org3059f39" class="outline-2">
-<h2 id="org3059f39">Exercises</h2>
-<div class="outline-text-2" id="text-org3059f39">
 </div>
-<div id="outline-container-org1008dda" class="outline-3">
-<h3 id="org1008dda">Exercise 10.1</h3>
-<div class="outline-text-3" id="text-org1008dda">
+<div id="outline-container-orge5f9a0f" class="outline-3">
+<h3 id="orge5f9a0f">Utility code</h3>
+<div class="outline-text-3" id="text-orge5f9a0f">
+<div class="org-src-container">
+<pre class="src src-sage" id="org57c9ee6"><span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"g"</span>, domain<span class="org-operator">=</span><span class="org-string">"positive"</span>)
+<span class="org-variable-name">a</span>, <span class="org-variable-name">b</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"a b"</span>, domain<span class="org-operator">=</span><span class="org-string">"complex"</span>)
+assume(g <span class="org-operator">&lt;=</span> 1)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org62a9bf0" class="outline-2">
+<h2 id="org62a9bf0">Exercises</h2>
+<div class="outline-text-2" id="text-org62a9bf0">
+</div>
+<div id="outline-container-org9469a47" class="outline-3">
+<h3 id="org9469a47">Exercise 10.1</h3>
+<div class="outline-text-3" id="text-org9469a47">
 <p>
 Verify that the encoding circuit in Figure 10.2 works as claimed.
 </p>
@@ -83,9 +117,9 @@ Verify that the encoding circuit in Figure 10.2 works as claimed.
 </div>
 
 
-<div id="outline-container-orga3588b0" class="outline-4">
-<h4 id="orga3588b0">Solution</h4>
-<div class="outline-text-4" id="text-orga3588b0">
+<div id="outline-container-org43a9575" class="outline-4">
+<h4 id="org43a9575">Solution</h4>
+<div class="outline-text-4" id="text-org43a9575">
 <p>
 This is really just observing that the circuit acts like this on the <i>relevant</i> basis
 states
@@ -103,9 +137,9 @@ The rest follows by linearity.
 </div>
 </div>
 
-<div id="outline-container-org043db65" class="outline-3">
-<h3 id="org043db65">Exercise 10.2</h3>
-<div class="outline-text-3" id="text-org043db65">
+<div id="outline-container-org92d2d42" class="outline-3">
+<h3 id="org92d2d42">Exercise 10.2</h3>
+<div class="outline-text-3" id="text-org92d2d42">
 <p>
 The action of the bit flip channel can be described by the quantum operation
 \(\calE(\rho)=(1-p)\rho+pX\rho\?X\). Show that this may be given an alternate operator-sum
@@ -118,9 +152,9 @@ with probability \(2p\).
 </p>
 </div>
 
-<div id="outline-container-org73276f6" class="outline-4">
-<h4 id="org73276f6">Proof</h4>
-<div class="outline-text-4" id="text-org73276f6">
+<div id="outline-container-orge6825bc" class="outline-4">
+<h4 id="orge6825bc">Proof</h4>
+<div class="outline-text-4" id="text-orge6825bc">
 <p>
 Note that \(X=P_+-P_-\) and \(I=P_++P_-\). Hence
 </p>
@@ -149,9 +183,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgcbde4fd" class="outline-3">
-<h3 id="orgcbde4fd">Exercise 10.3</h3>
-<div class="outline-text-3" id="text-orgcbde4fd">
+<div id="outline-container-orgc38d6fa" class="outline-3">
+<h3 id="orgc38d6fa">Exercise 10.3</h3>
+<div class="outline-text-3" id="text-orgc38d6fa">
 <p>
 Show by explicit calculation that measuring \(Z_1Z_2\) followed by \(Z_2Z_3\) is equivalent,
 up to labeling of the measurement outcomes, to measuring the four projectors defined by
@@ -160,9 +194,9 @@ and post-measurement states.
 </p>
 </div>
 
-<div id="outline-container-orgd3bdcae" class="outline-4">
-<h4 id="orgd3bdcae">Proof</h4>
-<div class="outline-text-4" id="text-orgd3bdcae">
+<div id="outline-container-org84eb2c6" class="outline-4">
+<h4 id="org84eb2c6">Proof</h4>
+<div class="outline-text-4" id="text-org84eb2c6">
 <p>
 Let us define the following projectors
 </p>
@@ -214,9 +248,9 @@ Hence the projectors are the same, just re-labeled. QED.
 </div>
 </div>
 
-<div id="outline-container-org96a80a7" class="outline-3">
-<h3 id="org96a80a7">Exercise 10.4</h3>
-<div class="outline-text-3" id="text-org96a80a7">
+<div id="outline-container-orgbdfa8f8" class="outline-3">
+<h3 id="orgbdfa8f8">Exercise 10.4</h3>
+<div class="outline-text-3" id="text-orgbdfa8f8">
 <p>
 Consider the three qubit bit flip code. Suppose we had performed the error syndrome
 measurement by measuring the eight orthogonal projectors corresponding to projections onto
@@ -232,9 +266,9 @@ bit number \(j\) flipped, where \(j\) is in the range one to three.</li>
 </ol>
 </div>
 
-<div id="outline-container-org4969069" class="outline-4">
-<h4 id="org4969069">Solution for part 1</h4>
-<div class="outline-text-4" id="text-org4969069">
+<div id="outline-container-org0fc1778" class="outline-4">
+<h4 id="org0fc1778">Solution for part 1</h4>
+<div class="outline-text-4" id="text-org0fc1778">
 <p>
 The projectors are just \(P_j=\proj{j}\) for \(j=0..7\) (note that the binary representations
 for the numbers from \(0\) to \(7\) are \(000\), \(001\), \(010\), \(011\), \(100\), \(101\), \(110\),
@@ -249,7 +283,7 @@ set of possible measurements for the given value of \(k\). We have
 </p>
 
 <p>
-<a id="org1c26ccc"></a>
+<a id="org16f7993"></a>
 </p>
 \begin{align*}
   M_0 &= \{0, 7\} , \\
@@ -268,11 +302,11 @@ the three errors "is allowed" to happen)).
 </div>
 </div>
 
-<div id="outline-container-org1a541bd" class="outline-4">
-<h4 id="org1a541bd">Solution for part 2</h4>
-<div class="outline-text-4" id="text-org1a541bd">
+<div id="outline-container-org7abbe33" class="outline-4">
+<h4 id="org7abbe33">Solution for part 2</h4>
+<div class="outline-text-4" id="text-org7abbe33">
 <p>
-If we measure \(j\) and infer the error \(k\) <a href="#org1c26ccc">according to the sets</a> \(M_k\) we would correct it
+If we measure \(j\) and infer the error \(k\) <a href="#org16f7993">according to the sets</a> \(M_k\) we would correct it
 by applying \(X_k\) to the state. In other words, the following quantum operation \(\calR\)
 performs the syndrome measurement followed by the recovery:
 </p>
@@ -283,7 +317,7 @@ performs the syndrome measurement followed by the recovery:
 \end{align*}
 
 <p>
-Note that \(\calR\) is indeed trace-preserving (\(\sum_jE_j^\dagger\?E_j)=I\)). Let again
+Note that \(\calR\) is indeed trace-preserving (\(\sum_jE_j^\dagger\?E_j)=I\)). Recall
 \(\ket{\psi}=a\ket{000}+b\ket{111}\). Then (the <i>no error</i> case)
 </p>
 
@@ -305,8 +339,9 @@ the following noise channel
 </p>
 
 <p>
-where \(\sum_kp_k=p\) (trace-preserving), which stands for having at most one bit-flip
-(with probability \(p_k\) at position \(k\)), we have
+where \(\sum_kp_k=p\) (this implies trace-preservation, but we could more generally assume
+\(\ldots\leq\?p\), meaning that with certain probability "something else" happens), which
+stands for having at most one bit-flip (with probability \(p_k\) at position \(k\)), we have
 </p>
 
 <p>
@@ -316,8 +351,9 @@ where \(\sum_kp_k=p\) (trace-preserving), which stands for having at most one bi
 </p>
 
 <p>
-Hence the bit-flip error gets indeed corrected, but unwanted side effects happen too. The
-final state after recovery is either \(\ket{000}\) (probability \(\abs{a}^2\)) or \(\ket{111}\)
+(If \(\calE\) was not trace-preserving the RHS would have a factor \(1-p+\sum_jp_j\).) Hence
+the bit-flip error gets indeed corrected, but unwanted side effects happen too. The final
+state after recovery is either \(\ket{000}\) (probability \(\abs{a}^2\)) or \(\ket{111}\)
 (probability \(\abs{b}^2\)). That is the state collapses to a basis state. This is only
 correct if \(\ket{\psi}\) was already in a basis state (\(a=0\) or \(b=0\)) - which is the claim
 of part 2.
@@ -325,9 +361,9 @@ of part 2.
 </div>
 </div>
 
-<div id="outline-container-org415d7b9" class="outline-4">
-<h4 id="org415d7b9">Solution for part 3</h4>
-<div class="outline-text-4" id="text-org415d7b9">
+<div id="outline-container-orgd0a9d8c" class="outline-4">
+<h4 id="orgd0a9d8c">Solution for part 3</h4>
+<div class="outline-text-4" id="text-orgd0a9d8c">
 <p>
 Let us consider two cases:
 </p>
@@ -377,17 +413,30 @@ equivalently, from \(1\)).
 </p>
 
 <dl class="org-dl">
-<dt>Remark</dt><dd>The minimum fidelity of case 1 is the weighted root square mean of the two
+<dt>Remark</dt><dd><p>
+The minimum fidelity of case 1 is the weighted root square mean of the two
 possible fidelities of case 2. The weights are \(\abs{a}^2\) and \(\abs{b}^2\). See e.g.
-<a href="https://en.wikipedia.org/wiki/Generalized_mean">generalized mean</a> on wikipedia for more infos.</dd>
+<a href="https://en.wikipedia.org/wiki/Generalized_mean">generalized mean</a> on wikipedia for more infos. To make this more apparent consider
+\(\sigma=p\proj{0}+(1-p)\proj{1}\) (and \(\ket{\psi}=a\ket{0}+b\ket{1}\)):
+</p>
+
+<p>
+\[
+  F(\ket{\psi},\sigma) = \sqrt{\bra{\psi}\sigma\ket{\psi}} = \sqrt{p\abs{a}^2+(1-p)\abs{b}^2} .
+  \]
+</p>
+
+<p>
+Here \(p\) and \(1-p\) are the weights.
+</p></dd>
 </dl>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb7381ba" class="outline-3">
-<h3 id="orgb7381ba">Exercise 10.5</h3>
-<div class="outline-text-3" id="text-orgb7381ba">
+<div id="outline-container-org53252e2" class="outline-3">
+<h3 id="org53252e2">Exercise 10.5</h3>
+<div class="outline-text-3" id="text-org53252e2">
 <p>
 Show that the syndrome measurement for detecting phase flip errors in the Shor code
 corresponds to measuring the observables \(A=X_1X_2X_3X_4X_5X_6\) and
@@ -516,18 +565,18 @@ desired. QED.
 </div>
 </div>
 
-<div id="outline-container-org96d04d5" class="outline-3">
-<h3 id="org96d04d5">Exercise 10.6</h3>
-<div class="outline-text-3" id="text-org96d04d5">
+<div id="outline-container-orgccb8d16" class="outline-3">
+<h3 id="orgccb8d16">Exercise 10.6</h3>
+<div class="outline-text-3" id="text-orgccb8d16">
 <p>
 Show that recovery from a phase flip on any of the first three qubits may be accomplished
 by applying the operator \(Z_1Z_2Z_3\).
 </p>
 </div>
 
-<div id="outline-container-org39e32ac" class="outline-4">
-<h4 id="org39e32ac">Proof</h4>
-<div class="outline-text-4" id="text-org39e32ac">
+<div id="outline-container-orgbfb234e" class="outline-4">
+<h4 id="orgbfb234e">Proof</h4>
+<div class="outline-text-4" id="text-orgbfb234e">
 <p>
 Let us reuse the notation from the <a href="#exercise-10.5-solution">solution</a> of exercise 10.5. Clearly
 </p>
@@ -551,6 +600,619 @@ An error in the first three qubits means that the corresponding state is
 
 <p>
 QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd2f5aa6" class="outline-3">
+<h3 id="orgd2f5aa6">Exercise 10.7</h3>
+<div class="outline-text-3" id="text-orgd2f5aa6">
+<p>
+Consider the three qubit bit flip code of Section 10.1.1, with corresponding projector
+\(P=\proj{000}+\proj{111}\). The noise process this code against has operation elements
+</p>
+
+<p>
+\[
+  \left\{ \sqrt{(1-p)^3}I, \sqrt{p(1-p)^2}X_1, \sqrt{p(1-p)^2}X_2, \sqrt{p(1-p)^2}X_3 \right\} ,
+\]
+</p>
+
+<p>
+where \(p\) is the probability that a bit flips. Note that this quantum operation \(\calE\) is
+not trace-preserving, since we have omitted operation elements corresponding to bit flips
+on two and three qubits. Verify the quantum error-correction conditions for this code and
+noise process.
+</p>
+</div>
+
+<div id="outline-container-orgcc12a7e" class="outline-4">
+<h4 id="orgcc12a7e">Solution</h4>
+<div class="outline-text-4" id="text-orgcc12a7e">
+<p>
+Clearly \(PX_iX_jP=\delta_{ij}P\). Hence
+</p>
+
+\begin{align*}
+  P E_0^\dagger E_0 P &= (1-p)^3 P , \\
+  P E_i^\dagger E_i P &= p(1-p)^2 P \text{ for } i=1..3 , \\
+  P E_i^\dagger E_j P &= 0 \text{ for } i\neq j .
+\end{align*}
+
+<p>
+Hence the conditions are satisfied and there exists an error correction procedure \(\calR\)
+for this noise.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6a5bcba" class="outline-4">
+<h4 id="org6a5bcba">Bonus: Calculating the recovery procedure</h4>
+<div class="outline-text-4" id="text-org6a5bcba">
+<p>
+By the previous calculation and Theorem 10.1 there exists a trace-preserving quantum
+operation \(\calR\) such that
+</p>
+
+<p>
+\[
+  \calR \circ \calE (P\rho P) = [(1-p)^3 + 3p(1-p)^2] \, P \rho P .
+\]
+</p>
+
+<p>
+The concrete form of the proportionality factor follows from (10.25) as it equals
+\(\sum_kd_{kk}\). Since this is a trace this formula would even be true if \((d_{ij})\) wasn't
+already diagonal.
+</p>
+
+<p>
+To compute the Kraus matrices \(R_k\) of \(\calR\) we need the \(E_k\) such that the \((d_{ij})\)
+are diagonal. This is already the case
+</p>
+
+<p>
+\[
+  d = \diag((1-p)^3, p(1-p)^2, p(1-p)^2, p(1-p)^2) .
+\]
+</p>
+
+<p>
+From the proof of Theorem 10.1 we know that
+</p>
+
+<p>
+\[
+  R_k = U_k^\dagger P_k
+\]
+</p>
+
+<p>
+where \(P_k=U_kPU_k^\dagger\) and \(E_kP=\sqrt{d_{kk}}U_kP\) is a polar decomposition. The
+\(P_k\) are the projectors onto \(E_kC\) (\(C\) being the code space onto which \(P\)
+projects). The diagonality of \((d_{ij})\) implies that \(P_iP_j=\delta_{ij}P_i\) (meaning
+that the error subspaces are orthogonal to each other).
+</p>
+
+<p>
+Clearly we can set \(U_0=I\) (it is only uniquely defined on the image of \(P\)). For \(k=1\) we
+have
+</p>
+
+<p>
+\[
+  E_1 P = \sqrt{p(1-p)^2} X_1 P .
+\]
+</p>
+
+<p>
+This is already a polar decomposition (the Pauli operators are unitary). Hence we can just
+set \(U_1=X_1\) and analogously \(U_k=X_k\) for \(k=1..3\). Hence
+</p>
+
+\begin{align*}
+  P_0 &= \proj{000} + \proj{111} , \\
+  P_1 &= \proj{100} + \proj{011} , \\
+  P_2 &= \proj{010} + \proj{101} , \\
+  P_3 &= \proj{001} + \proj{110} .
+\end{align*}
+
+<p>
+Note that this corresponds to the already in (10.5-10.8) introduced syndrome measurement
+operators. The Kraus matrices of \(\calR\) are
+</p>
+
+<p>
+\[
+  R_k = U_k^\dagger P_k = \begin{cases} IP = P & \text{for } k = 0 , \\
+    X_k X_kPX_k = PX_k & \text{for } k \in \{1,2,3\} . \end{cases}
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org26e8651" class="outline-3">
+<h3 id="org26e8651">Exercise 10.8</h3>
+<div class="outline-text-3" id="text-org26e8651">
+<p>
+Verify that the three qubit phase flip code \(\ket{0_L}=\ket{+++}\), \(\ket{1_L}=\ket{---}\)
+satisfies the quantum error-correction conditions for the set of error operators
+\(\{I,Z_1,Z_2,Z_3\}\).
+</p>
+</div>
+
+<div id="outline-container-orgfc05002" class="outline-4">
+<h4 id="orgfc05002">Solution 1</h4>
+<div class="outline-text-4" id="text-orgfc05002">
+<p>
+Let us reduce this to the bit flip code. To convert to the bit flip code we only have to
+conjugate the projector of the code and the Kraus operators of the errors by
+\(H^{\otimes3}\) (Hadamard).
+</p>
+
+<p>
+\[
+  \proj{000} + \proj{111} = H^{\otimes3} \proj{+++} + \proj{---} H^{\otimes3}
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  X_k = H^{\otimes3} Z_k H^{\otimes3} .
+\]
+</p>
+
+<p>
+Let \(P\) be the projector of the phase flip code and let \(E_i\) be the mentioned errors it
+corrects. Let \(Q\) and \(F_j\) be the same thing for the bit flip.
+</p>
+
+<p>
+\[
+  P E_i^\dagger E_j P = H^{\otimes3} Q F_i^\dagger F_j Q H^{\otimes3}
+  = H^{\otimes3} \delta_{ij} Q H^{\otimes3}
+  = \delta_{ij} P .
+\]
+</p>
+
+<p>
+In the second equality we used what we already know about the bit flip code.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb0fd089" class="outline-4">
+<h4 id="orgb0fd089">Solution 2</h4>
+<div class="outline-text-4" id="text-orgb0fd089">
+<p>
+We can also verify this explicitly. Let \(P=P_{+++}+P_{---}\) be the projector onto the
+code, where we use the notation \(P_{ijk}=\proj{ijk}\). Clearly
+\(PE_i^\dagger\?E_iP=PIP=P\). Moreover
+</p>
+
+<p>
+\[
+  PZ_1P = (P_{+++} + P_{---})(P_{-++} + P_{+--}) = 0
+\]
+</p>
+
+<p>
+and
+</p>
+
+<p>
+\[
+  PZ_1Z_2P = (P_{+++} + P_{---})(P_{--+} + P_{++-}) = 0 .
+\]
+</p>
+
+<p>
+Similarly \(PIZ_jP=PZ_iZ_jP=0\) for \(i\neq\?j\). Hence \(PE_i^\dagger\?E_iP=\delta_{ij}\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9e1eb91" class="outline-3">
+<h3 id="org9e1eb91">Exercise 10.9</h3>
+<div class="outline-text-3" id="text-org9e1eb91">
+<p>
+Again, consider the three qubit phase flip code. Let \(P_i\) and \(Q_i\) be the projectors
+onto the \(\ket{0}\) and \(\ket{1}\) states, respectively, of the \(i\)​th qubit. Prove that the
+three qubit phase flip code protects against the error set \({I,P_1,Q_1,P_2,Q_2,P_3,Q_3}\).
+</p>
+</div>
+
+<div id="outline-container-org5fef1ab" class="outline-4">
+<h4 id="org5fef1ab">Solution</h4>
+<div class="outline-text-4" id="text-org5fef1ab">
+<p>
+Recall that the phase flip code corrects the errors \(I\), \(Z_1\), \(Z_2\), and \(Z_3\). By
+theorem 10.2 linear combinations of these errors are corrected too. Note that we have
+</p>
+
+\begin{align*}
+  P_k &= \frac{1}{2} (I + Z_k) , \\
+  Q_k &= \frac{1}{2} (I - Z_k) .
+\end{align*}
+
+<p>
+Hence those errors are corrected too.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgca1c6bf" class="outline-3">
+<h3 id="orgca1c6bf">Exercise 10.10</h3>
+<div class="outline-text-3" id="text-orgca1c6bf">
+<p>
+Explicitly verify the quantum error-correction conditions for the Shor code, for the error
+set containing \(I\) and the error operators \(X_j,Y_j,Z_j\) for \(j=1\) through \(9\).
+</p>
+</div>
+
+<div id="outline-container-org88e2629" class="outline-4">
+<h4 id="org88e2629">Solution</h4>
+<div class="outline-text-4" id="text-org88e2629">
+<p>
+Let us denote
+</p>
+
+\begin{align*}
+  \ket{\pi} &= \frac{1}{\sqrt{2}} (\ket{000} + \ket{111}) , \\
+  \ket{\mu} &= \frac{1}{\sqrt{2}} (\ket{000} - \ket{111}) .
+\end{align*}
+
+<p>
+The Shor code is given by he projector
+</p>
+
+<p>
+\[
+  P = \proj{\pi\pi\pi} + \proj{\mu\mu\mu} .
+\]
+</p>
+
+<p>
+It is not hard to see that the errors transform the code space into a set of mutually
+orthogonal subspaces - with one exception. The effect of \(Z_j\) is the same if \(j\) stays
+within one "block" (there are three block \(\{1,2,3\}\), \(\{4,5,6\}\), and
+\(\{7,8,9\}\)). Hence:
+</p>
+
+<p>
+\[
+  PE_i^\dagger E_j P = \begin{cases}
+    1 & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
+    0 & \text{else} .
+  \end{cases}
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeb6e2c7" class="outline-3">
+<h3 id="orgeb6e2c7">Exercise 10.11</h3>
+<div class="outline-text-3" id="text-orgeb6e2c7">
+<p>
+Construct operation elements for a single qubit quantum operation \(\calE\) that upon input
+of any state \(\rho\) replaces it with the completely randomized state \(I/2\). It is amazing
+that even such noise models as this may be corrected by codes such as the Shor code!
+</p>
+</div>
+
+<div id="outline-container-org39748af" class="outline-4">
+<h4 id="org39748af">Solution</h4>
+<div class="outline-text-4" id="text-org39748af">
+<p>
+We already know that the quantum operation
+</p>
+
+<p>
+\[
+  \calE(\rho) = \frac{1}{2} I
+\]
+</p>
+
+<p>
+is the depolarizing channel with \(p=1\). By (8.102) this is equal to
+</p>
+
+<p>
+\[
+  \calE(\rho) = \frac{1}{4} (I\rho I + X\rho X + Y\rho Y + Z\rho Z) .
+\]
+</p>
+
+<p>
+Hence the relevant operation elements are
+</p>
+
+<p>
+\[
+  \left\{\frac{1}{2}I, \frac{1}{2}X, \frac{1}{2}Y, \frac{1}{2}Z \right\} .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd30233e" class="outline-3">
+<h3 id="orgd30233e">Exercise 10.12</h3>
+<div class="outline-text-3" id="text-orgd30233e">
+<p>
+Show that the fidelity between the state \(\ket{0}\) and \(\calE(\proj{0})\) is \(\sqrt{1-2p/3}\)
+and use this to argue that the minimum fidelity for the depolarizing channel is
+\(\sqrt{1-2p/3}\).
+</p>
+</div>
+
+<div id="outline-container-orge8341a6" class="outline-4">
+<h4 id="orge8341a6">Solution 1</h4>
+<div class="outline-text-4" id="text-orge8341a6">
+<p>
+Let us follow the hint of the book.
+</p>
+
+<p>
+\[
+  F(\ket{0}, \calE(\proj{0}))
+  = \sqrt{(1-p) + \frac{p}{3}(\bra{0}X\ket{0}^2 + \bra{0}Y\ket{0}^2 + \bra{0}Z\ket{0}^2)}
+  = \sqrt{(1-p) + \frac{p}{3}}
+  = \sqrt{1-\frac{2p}{3}} .
+\]
+</p>
+
+<p>
+Let \(\ket{\psi}\) be an arbitrary state and \(U\) be a unitary operator such that
+\(\ket{\psi}=U\ket{0}\). Then
+</p>
+
+<p>
+\[
+  F(\ket{\psi}, \calE(\proj{\psi})) = F(U\ket{0}, U\calE(\proj{0})U^\dagger)
+  = F(\ket{0}, \calE(\proj{0})) = \sqrt{1-\frac{2p}{3}} .
+\]
+</p>
+
+<p>
+In the second equality we used that the fidelity is invariant under unitary transformations.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3d3249d" class="outline-4">
+<h4 id="org3d3249d">Solution 2</h4>
+<div class="outline-text-4" id="text-org3d3249d">
+<p>
+We could also prove the claim by using an alternative formula for the depolarizing channel:
+</p>
+
+<p>
+\[
+  \calE(\rho) = \frac{2p}{3} I + \left(1 - \frac{4p}{3}\right) \rho .
+\]
+</p>
+
+<p>
+(compare equations (8.100) and (8.102).) Hence
+</p>
+
+<p>
+\[
+  F(\ket{\psi}, \calE(\proj{\psi})) = \sqrt{\frac{2p}{3} + \left(1 - \frac{4p}{3}\right)}
+  = \sqrt{1-\frac{2p}{3}} .
+\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4e97e23" class="outline-4">
+<h4 id="org4e97e23">Solution 3</h4>
+<div class="outline-text-4" id="text-org4e97e23">
+<p>
+Yet another approach first calculates
+</p>
+
+<p>
+\[
+  F(\ket{\psi}, \calE(\proj{\psi}))
+  = \sqrt{(1-p) + \frac{p}{3}(\bra{\psi}X\ket{\psi}^2 + \bra{\psi}Y\ket{\psi}^2 + \bra{\psi}Z\ket{\psi}^2)} .
+\]
+</p>
+
+<p>
+Recall the representation \(\proj{\psi}=2\inv(I+\vec{r}\cdot\vec{\sigma})\) of a qubit in
+the bloch sphere (\(\abs{\vec{r}}=1\)). One can show that
+</p>
+
+<p>
+\[
+  \bra{\psi}Z\ket{\psi} = r_z
+\]
+</p>
+
+<p>
+and analogous formulas for \(r_x\) and \(r_y\). Hence
+</p>
+
+<p>
+\[
+  F(\ket{\psi}, \calE(\proj{\psi})) = \sqrt{(1-p) + \frac{p}{3}\abs{\vec{r}}^2} = \sqrt{1-\frac{2p}{3}} .
+\]
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd><p>
+To see e.g.
+</p>
+
+<p>
+\[
+  \bra{\psi}Z\ket{\psi} = r_z
+  \]
+</p>
+
+<p>
+observe that
+</p>
+
+<p>
+\[
+  \bra{\psi}Z\ket{\psi} = \trace{\proj{\psi}Z} = r_z .
+  \]
+</p>
+
+<p>
+In the last equality we used that the Pauli matrices (including \(I\)) are an orthogonal
+set with respect to the Hilbert-Schmidt scalar product (with norm \(\sqrt{2}\) for each
+base vector). The other two formulas for \(r_x\) and \(r_y\) follow along the same lines.
+</p>
+
+<p>
+If you want to see the last equality directly, observe that (using \(S=\sqrt{Z}\))
+</p>
+
+<p>
+\[
+  \trace{\proj{\psi}Z} = \trace{S\proj{\psi}S}
+  \]
+</p>
+
+<p>
+and use \(SIS=Z\), \(SXS=\ii\?X\), \(SYS=\ii\?Y\), \(SZS=I\) (only the last term has a non-zero
+trace).
+</p></dd>
+</dl>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1b6ede7" class="outline-3">
+<h3 id="org1b6ede7">Exercise 10.13</h3>
+<div class="outline-text-3" id="text-org1b6ede7">
+<p>
+Show that the minimum fidelity \(F(\ket{\psi},\calE(\proj{\psi}))\) when \(\calE\) is the
+amplitude damping channel with parameter \(\gamma\), is \(\sqrt{1-\gamma}\).
+</p>
+</div>
+
+<div id="outline-container-org4b2f0a0" class="outline-4">
+<h4 id="org4b2f0a0">Proof</h4>
+<div class="outline-text-4" id="text-org4b2f0a0">
+<p>
+Let us use sage to get an algebraic expression for \(F\). First define amplitude damping
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-variable-name">E0</span> <span class="org-operator">=</span> matrix.diagonal([1, sqrt(1<span class="org-operator">-</span>g)])
+<span class="org-variable-name">E1</span> <span class="org-operator">=</span> matrix([[0, sqrt(g)], [0, 0]])
+<span class="org-variable-name">AD</span> <span class="org-operator">=</span> make_operation([E0, E1])
+</pre>
+</div>
+
+<p>
+Now we can use this to compute \(F\):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sage"><span class="org-variable-name">psi</span> <span class="org-operator">=</span> a<span class="org-operator">*</span>ket(<span class="org-string">'0'</span>) <span class="org-operator">+</span> b<span class="org-operator">*</span>ket(<span class="org-string">'1'</span>)
+<span class="org-variable-name">psi_mat</span> <span class="org-operator">=</span> matrix(psi).T
+<span class="org-variable-name">rho</span> <span class="org-operator">=</span> AD(psi_mat<span class="org-operator">*</span>psi_mat.H).simplify_full()
+(psi.conjugate() <span class="org-operator">*</span> rho <span class="org-operator">*</span> psi).simplify_full()
+</pre>
+</div>
+
+<pre class="example">
+2*a*b*sqrt(-g + 1)*conjugate(a)*conjugate(b) + a^2*conjugate(a)^2 + b^2*conjugate(b)^2 + (a*b*conjugate(a)*conjugate(b) - b^2*conjugate(b)^2)*g
+</pre>
+
+
+<p>
+This looks a bit ugly so let us rewrite this:
+</p>
+
+<p>
+\[
+  F = \abs{a}^4 + \abs{b}^4 + \gamma(\abs{a}^2 \abs{b}^2 - \abs{b}^4) + 2\sqrt{1-\gamma}\, \abs{a}^2\abs{b}^2 .
+\]
+</p>
+
+<p>
+Substituting \(x=\abs{a}^2\) and \(y=\abs{b}^2\) this can be written as:
+</p>
+
+<p>
+\[
+  F = \sqrt{f(x,y)} = \sqrt{x^2 + y^2 + \gamma (xy - y^2) + 2\sqrt{1-\gamma} \, xy} ,
+\]
+</p>
+
+<p>
+under the constraint \(x+y=1\) and \(x,y\geq0\). Thus we have to solve a constrained
+minimization problem. There are two possibilities. The first one is that the minimum
+occurs at the boundaries of the feasible region. Therefore let us calculate
+</p>
+
+\begin{align*}
+  f(1,0) &= 1 , \\
+  f(0,1) &= 1 - \gamma .
+\end{align*}
+
+<p>
+The second possibility is that the minimum occurs in the inside of the feasible region. In
+that case we might try to find it by the method of Lagrange multipliers:
+</p>
+
+\begin{align*}
+  \partial_x f(x, y) &= 2x + (\gamma + 2\sqrt{1-\gamma}) y = \lambda \cdot 1 , \\
+  \partial_y f(x, y) &= 2(1-\gamma)y + (\gamma + 2\sqrt{1-\gamma}) x = \lambda \cdot 1 .
+\end{align*}
+
+<p>
+This looks a bit complicated so let us change the strategy a bit by defining a
+parameterization of the feasible region
+</p>
+
+<p>
+\[
+  g(s) = f(s,1-s) .
+\]
+</p>
+
+<p>
+Abbreviating \(\alpha=\gamma+2\sqrt{1-\gamma}\) we see that
+</p>
+
+\begin{align*}
+  g'(s) &= \partial_x f(s,1-s) - \partial_y f(s,1-s) \\
+  &= (\alpha + 2\gamma - 2) - 2(\gamma + \alpha - 2) s \\
+  &=: c_0 - c_1 s .
+\end{align*}
+
+<p>
+Observe that \(\alpha+\gamma\geq2\). Hence \(c_0,c_1\geq0\) which implies that there is a
+\(s_0\geq0\) such that \(g\) is increasing for \(s\leq\?s_0\) and decreasing afterwards (note
+also that \(s_0\) could be larger than \(1\)). Hence a local extremum can only be a local
+maximum and the minimum is indeed obtained at the boundary:
+</p>
+
+<p>
+\[
+  f(0, 1) = g(0) = 1 - \gamma .
+\]
+</p>
+
+<p>
+Hence \(F_{\min}=\sqrt{1-\gamma}\) . QED.
 </p>
 </div>
 </div>
