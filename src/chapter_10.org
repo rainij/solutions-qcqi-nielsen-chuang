@@ -9,10 +9,25 @@
 #+toc: headlines 2
 
 * Setup
+** Imports
+#+name: chapter-10-imports
+#+begin_src sage
+  from utils_sage import ket
+  from chapter_8_sage import make_operation
+#+end_src
+
 # Hidden imports
-#+name: imports-chapter-7-2
+#+name: chapter-10-hidden-imports
 #+begin_src python :exports none
   from qiskit.circuit import QuantumCircuit, QuantumRegister, Parameter as Param
+#+end_src
+
+** Utility code
+#+name: chapter-10-global-vars
+#+begin_src sage
+  g = SR.var("g", domain="positive")
+  a, b = SR.var("a b", domain="complex")
+  assume(g <= 1)
 #+end_src
 
 * Exercises
@@ -323,3 +338,366 @@ $$
 $$
 
 QED.
+
+** Exercise 10.7
+Consider the three qubit bit flip code of Section 10.1.1, with corresponding projector
+$P=\proj{000}+\proj{111}$. The noise process this code against has operation elements
+
+$$
+  \left\{ \sqrt{(1-p)^3}I, \sqrt{p(1-p)^2}X_1, \sqrt{p(1-p)^2}X_2, \sqrt{p(1-p)^2}X_3 \right\} ,
+$$
+
+where $p$ is the probability that a bit flips. Note that this quantum operation $\calE$ is
+not trace-preserving, since we have omitted operation elements corresponding to bit flips
+on two and three qubits. Verify the quantum error-correction conditions for this code and
+noise process.
+
+*** Solution
+Clearly $PX_iX_jP=\delta_{ij}P$. Hence
+
+\begin{align*}
+  P E_0^\dagger E_0 P &= (1-p)^3 P , \\
+  P E_i^\dagger E_i P &= p(1-p)^2 P \text{ for } i=1..3 , \\
+  P E_i^\dagger E_j P &= 0 \text{ for } i\neq j .
+\end{align*}
+
+Hence the conditions are satisfied and there exists an error correction procedure $\calR$
+for this noise.
+
+*** Bonus: Calculating the recovery procedure
+By the previous calculation and Theorem 10.1 there exists a trace-preserving quantum
+operation $\calR$ such that
+
+$$
+  \calR \circ \calE (P\rho P) = [(1-p)^3 + 3p(1-p)^2] \, P \rho P .
+$$
+
+The concrete form of the proportionality factor follows from (10.25) as it equals
+$\sum_kd_{kk}$. Since this is a trace this formula would even be true if $(d_{ij})$ wasn't
+already diagonal.
+
+To compute the Kraus matrices $R_k$ of $\calR$ we need the $E_k$ such that the $(d_{ij})$
+are diagonal. This is already the case
+
+$$
+  d = \diag((1-p)^3, p(1-p)^2, p(1-p)^2, p(1-p)^2) .
+$$
+
+From the proof of Theorem 10.1 we know that
+
+$$
+  R_k = U_k^\dagger P_k
+$$
+
+where $P_k=U_kPU_k^\dagger$ and $E_kP=\sqrt{d_{kk}}U_kP$ is a polar decomposition. The
+$P_k$ are the projectors onto $E_kC$ ($C$ being the code space onto which $P$
+projects). The diagonality of $(d_{ij})$ implies that $P_iP_j=\delta_{ij}P_i$ (meaning
+that the error subspaces are orthogonal to each other).
+
+Clearly we can set $U_0=I$ (it is only uniquely defined on the image of $P$). For $k=1$ we
+have
+
+$$
+  E_1 P = \sqrt{p(1-p)^2} X_1 P .
+$$
+
+This is already a polar decomposition (the Pauli operators are unitary). Hence we can just
+set $U_1=X_1$ and analogously $U_k=X_k$ for $k=1..3$. Hence
+
+\begin{align*}
+  P_0 &= \proj{000} + \proj{111} , \\
+  P_1 &= \proj{100} + \proj{011} , \\
+  P_2 &= \proj{010} + \proj{101} , \\
+  P_3 &= \proj{001} + \proj{110} .
+\end{align*}
+
+Note that this corresponds to the already in (10.5-10.8) introduced syndrome measurement
+operators. The Kraus matrices of $\calR$ are
+
+$$
+  R_k = U_k^\dagger P_k = \begin{cases} IP = P & \text{for } k = 0 , \\
+    X_k X_kPX_k = PX_k & \text{for } k \in \{1,2,3\} . \end{cases}
+$$
+
+** Exercise 10.8
+Verify that the three qubit phase flip code $\ket{0_L}=\ket{+++}$, $\ket{1_L}=\ket{---}$
+satisfies the quantum error-correction conditions for the set of error operators
+$\{I,Z_1,Z_2,Z_3\}$.
+
+*** Solution 1
+Let us reduce this to the bit flip code. To convert to the bit flip code we only have to
+conjugate the projector of the code and the Kraus operators of the errors by
+$H^{\otimes3}$ (Hadamard).
+
+$$
+  \proj{000} + \proj{111} = H^{\otimes3} \proj{+++} + \proj{---} H^{\otimes3}
+$$
+
+and
+
+$$
+  X_k = H^{\otimes3} Z_k H^{\otimes3} .
+$$
+
+Let $P$ be the projector of the phase flip code and let $E_i$ be the mentioned errors it
+corrects. Let $Q$ and $F_j$ be the same thing for the bit flip.
+
+$$
+  P E_i^\dagger E_j P = H^{\otimes3} Q F_i^\dagger F_j Q H^{\otimes3}
+  = H^{\otimes3} \delta_{ij} Q H^{\otimes3}
+  = \delta_{ij} P .
+$$
+
+In the second equality we used what we already know about the bit flip code.
+
+*** Solution 2
+We can also verify this explicitly. Let $P=P_{+++}+P_{---}$ be the projector onto the
+code, where we use the notation $P_{ijk}=\proj{ijk}$. Clearly
+$PE_i^\dagger\?E_iP=PIP=P$. Moreover
+
+$$
+  PZ_1P = (P_{+++} + P_{---})(P_{-++} + P_{+--}) = 0
+$$
+
+and
+
+$$
+  PZ_1Z_2P = (P_{+++} + P_{---})(P_{--+} + P_{++-}) = 0 .
+$$
+
+Similarly $PIZ_jP=PZ_iZ_jP=0$ for $i\neq\?j$. Hence $PE_i^\dagger\?E_iP=\delta_{ij}$.
+
+** Exercise 10.9
+Again, consider the three qubit phase flip code. Let $P_i$ and $Q_i$ be the projectors
+onto the $\ket{0}$ and $\ket{1}$ states, respectively, of the $i$​th qubit. Prove that the
+three qubit phase flip code protects against the error set ${I,P_1,Q_1,P_2,Q_2,P_3,Q_3}$.
+
+*** Solution
+Recall that the phase flip code corrects the errors $I$, $Z_1$, $Z_2$, and $Z_3$. By
+theorem 10.2 linear combinations of these errors are corrected too. Note that we have
+
+\begin{align*}
+  P_k &= \frac{1}{2} (I + Z_k) , \\
+  Q_k &= \frac{1}{2} (I - Z_k) .
+\end{align*}
+
+Hence those errors are corrected too.
+
+** Exercise 10.10
+Explicitly verify the quantum error-correction conditions for the Shor code, for the error
+set containing $I$ and the error operators $X_j,Y_j,Z_j$ for $j=1$ through $9$.
+
+*** Solution
+Let us denote
+
+\begin{align*}
+  \ket{\pi} &= \frac{1}{\sqrt{2}} (\ket{000} + \ket{111}) , \\
+  \ket{\mu} &= \frac{1}{\sqrt{2}} (\ket{000} - \ket{111}) .
+\end{align*}
+
+The Shor code is given by he projector
+
+$$
+  P = \proj{\pi\pi\pi} + \proj{\mu\mu\mu} .
+$$
+
+It is not hard to see that the errors transform the code space into a set of mutually
+orthogonal subspaces - with one exception. The effect of $Z_j$ is the same if $j$ stays
+within one "block" (there are three block $\{1,2,3\}$, $\{4,5,6\}$, and
+$\{7,8,9\}$). Hence:
+
+$$
+  PE_i^\dagger E_j P = \begin{cases}
+    1 & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
+    0 & \text{else} .
+  \end{cases}
+$$
+
+** Exercise 10.11
+Construct operation elements for a single qubit quantum operation $\calE$ that upon input
+of any state $\rho$ replaces it with the completely randomized state $I/2$. It is amazing
+that even such noise models as this may be corrected by codes such as the Shor code!
+
+*** Solution
+We already know that the quantum operation
+
+$$
+  \calE(\rho) = \frac{1}{2} I
+$$
+
+is the depolarizing channel with $p=1$. By (8.102) this is equal to
+
+$$
+  \calE(\rho) = \frac{1}{4} (I\rho I + X\rho X + Y\rho Y + Z\rho Z) .
+$$
+
+Hence the relevant operation elements are
+
+$$
+  \left\{\frac{1}{2}I, \frac{1}{2}X, \frac{1}{2}Y, \frac{1}{2}Z \right\} .
+$$
+
+** Exercise 10.12
+Show that the fidelity between the state $\ket{0}$ and $\calE(\proj{0})$ is $\sqrt{1-2p/3}$
+and use this to argue that the minimum fidelity for the depolarizing channel is
+$\sqrt{1-2p/3}$.
+
+*** Solution 1
+Let us follow the hint of the book.
+
+$$
+  F(\ket{0}, \calE(\proj{0}))
+  = \sqrt{(1-p) + \frac{p}{3}(\bra{0}X\ket{0}^2 + \bra{0}Y\ket{0}^2 + \bra{0}Z\ket{0}^2)}
+  = \sqrt{(1-p) + \frac{p}{3}}
+  = \sqrt{1-\frac{2p}{3}} .
+$$
+
+Let $\ket{\psi}$ be an arbitrary state and $U$ be a unitary operator such that
+$\ket{\psi}=U\ket{0}$. Then
+
+$$
+  F(\ket{\psi}, \calE(\proj{\psi})) = F(U\ket{0}, U\calE(\proj{0})U^\dagger)
+  = F(\ket{0}, \calE(\proj{0})) = \sqrt{1-\frac{2p}{3}} .
+$$
+
+In the second equality we used that the fidelity is invariant under unitary transformations.
+
+*** Solution 2
+We could also prove the claim by using an alternative formula for the depolarizing channel:
+
+$$
+  \calE(\rho) = \frac{2p}{3} I + \left(1 - \frac{4p}{3}\right) \rho .
+$$
+
+(compare equations (8.100) and (8.102).) Hence
+
+$$
+  F(\ket{\psi}, \calE(\proj{\psi})) = \sqrt{\frac{2p}{3} + \left(1 - \frac{4p}{3}\right)}
+  = \sqrt{1-\frac{2p}{3}} .
+$$
+
+*** Solution 3
+Yet another approach first calculates
+
+$$
+  F(\ket{\psi}, \calE(\proj{\psi}))
+  = \sqrt{(1-p) + \frac{p}{3}(\bra{\psi}X\ket{\psi}^2 + \bra{\psi}Y\ket{\psi}^2 + \bra{\psi}Z\ket{\psi}^2)} .
+$$
+
+Recall the representation $\proj{\psi}=2\inv(I+\vec{r}\cdot\vec{\sigma})$ of a qubit in
+the bloch sphere ($\abs{\vec{r}}=1$). One can show that
+
+$$
+  \bra{\psi}Z\ket{\psi} = r_z
+$$
+
+and analogous formulas for $r_x$ and $r_y$. Hence
+
+$$
+  F(\ket{\psi}, \calE(\proj{\psi})) = \sqrt{(1-p) + \frac{p}{3}\abs{\vec{r}}^2} = \sqrt{1-\frac{2p}{3}} .
+$$
+
+- Remark :: To see e.g.
+
+  $$
+  \bra{\psi}Z\ket{\psi} = r_z
+  $$
+
+  observe that
+
+  $$
+  \bra{\psi}Z\ket{\psi} = \trace{\proj{\psi}Z} = r_z .
+  $$
+
+  In the last equality we used that the Pauli matrices (including $I$) are an orthogonal
+  set with respect to the Hilbert-Schmidt scalar product (with norm $\sqrt{2}$ for each
+  base vector). The other two formulas for $r_x$ and $r_y$ follow along the same lines.
+
+  If you want to see the last equality directly, observe that (using $S=\sqrt{Z}$)
+
+  $$
+  \trace{\proj{\psi}Z} = \trace{S\proj{\psi}S}
+  $$
+
+  and use $SIS=Z$, $SXS=\ii\?X$, $SYS=\ii\?Y$, $SZS=I$ (only the last term has a non-zero
+  trace).
+
+** Exercise 10.13
+Show that the minimum fidelity $F(\ket{\psi},\calE(\proj{\psi}))$ when $\calE$ is the
+amplitude damping channel with parameter $\gamma$, is $\sqrt{1-\gamma}$.
+
+*** Proof
+Let us use sage to get an algebraic expression for $F$. First define amplitude damping
+
+#+begin_src sage
+  E0 = matrix.diagonal([1, sqrt(1-g)])
+  E1 = matrix([[0, sqrt(g)], [0, 0]])
+  AD = make_operation([E0, E1])
+#+end_src
+
+Now we can use this to compute $F$:
+
+#+begin_src sage :tangle no :results replace :cache yes
+  psi = a*ket('0') + b*ket('1')
+  psi_mat = matrix(psi).T
+  rho = AD(psi_mat*psi_mat.H).simplify_full()
+  (psi.conjugate() * rho * psi).simplify_full()
+#+end_src
+
+#+RESULTS[a966bcbc6402d10431f26efd81c21e2bb71234f7]:
+: 2*a*b*sqrt(-g + 1)*conjugate(a)*conjugate(b) + a^2*conjugate(a)^2 + b^2*conjugate(b)^2 + (a*b*conjugate(a)*conjugate(b) - b^2*conjugate(b)^2)*g
+
+This looks a bit ugly so let us rewrite this:
+
+$$
+  F = \abs{a}^4 + \abs{b}^4 + \gamma(\abs{a}^2 \abs{b}^2 - \abs{b}^4) + 2\sqrt{1-\gamma}\, \abs{a}^2\abs{b}^2 .
+$$
+
+Substituting $x=\abs{a}^2$ and $y=\abs{b}^2$ this can be written as:
+
+$$
+  F = \sqrt{f(x,y)} = \sqrt{x^2 + y^2 + \gamma (xy - y^2) + 2\sqrt{1-\gamma} \, xy} ,
+$$
+
+under the constraint $x+y=1$ and $x,y\geq0$. Thus we have to solve a constrained
+minimization problem. There are two possibilities. The first one is that the minimum
+occurs at the boundaries of the feasible region. Therefore let us calculate
+
+\begin{align*}
+  f(1,0) &= 1 , \\
+  f(0,1) &= 1 - \gamma .
+\end{align*}
+
+The second possibility is that the minimum occurs in the inside of the feasible region. In
+that case we might try to find it by the method of Lagrange multipliers:
+
+\begin{align*}
+  \partial_x f(x, y) &= 2x + (\gamma + 2\sqrt{1-\gamma}) y = \lambda \cdot 1 , \\
+  \partial_y f(x, y) &= 2(1-\gamma)y + (\gamma + 2\sqrt{1-\gamma}) x = \lambda \cdot 1 .
+\end{align*}
+
+This looks a bit complicated so let us change the strategy a bit by defining a
+parameterization of the feasible region
+
+$$
+  g(s) = f(s,1-s) .
+$$
+
+Abbreviating $\alpha=\gamma+2\sqrt{1-\gamma}$ we see that
+
+\begin{align*}
+  g'(s) &= \partial_x f(s,1-s) - \partial_y f(s,1-s) \\
+  &= (\alpha + 2\gamma - 2) - 2(\gamma + \alpha - 2) s \\
+  &=: c_0 - c_1 s .
+\end{align*}
+
+Observe that $\alpha+\gamma\geq2$. Hence $c_0,c_1\geq0$ which implies that there is a
+$s_0\geq0$ such that $g$ is increasing for $s\leq\?s_0$ and decreasing afterwards (note
+also that $s_0$ could be larger than $1$). Hence a local extremum can only be a local
+maximum and the minimum is indeed obtained at the boundary:
+
+$$
+  f(0, 1) = g(0) = 1 - \gamma .
+$$
+
+Hence $F_{\min}=\sqrt{1-\gamma}$ . QED.
