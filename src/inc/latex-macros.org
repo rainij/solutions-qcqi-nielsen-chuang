@@ -19,6 +19,7 @@
 # macros in ./latex-macros.tex. Execute org-dblock-update to sync with latex-macros.tex. Don't
 # forget to execute the source block of org-dblock-write:insert-latex-macros before!
 #+BEGIN: insert-latex-macros :file "../latex-macros.tex"
+#+latex_header: \newcommand{\BB}{\mathbb{B}}
 #+latex_header: \newcommand{\CC}{\mathbb{C}}
 #+latex_header: \newcommand{\HH}{\mathbb{H}}
 #+latex_header: \newcommand{\KK}{\mathbb{K}}
@@ -53,10 +54,12 @@
 #+latex_header: \newcommand{\ket}[1]{|#1\rangle}
 #+latex_header: \newcommand{\proj}[1]{\ket{#1}\bra{#1}}
 #+latex_header: \newcommand{\mean}[1]{\langle#1\rangle}
+#+latex_header: \newcommand{\wt}[1]{\mathrm{wt}\left(#1\right)}
 #+latex_header: \newcommand{\orac}{\mathrm{Orac}}
 #+latex_header: \newcommand{\?}{} % sometimes I need just a separator other than whitespace
 #+begin_export html
 \[
+\newcommand{\BB}{\mathbb{B}}
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\HH}{\mathbb{H}}
 \newcommand{\KK}{\mathbb{K}}
@@ -91,6 +94,7 @@
 \newcommand{\ket}[1]{|#1\rangle}
 \newcommand{\proj}[1]{\ket{#1}\bra{#1}}
 \newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\wt}[1]{\mathrm{wt}\left(#1\right)}
 \newcommand{\orac}{\mathrm{Orac}}
 \newcommand{\?}{} % sometimes I need just a separator other than whitespace
 \]
