@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 9</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 9</h1>\[
+\newcommand{\BB}{\mathbb{B}}
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\HH}{\mathbb{H}}
 \newcommand{\KK}{\mathbb{K}}
@@ -33,6 +34,7 @@
 \newcommand{\ket}[1]{|#1\rangle}
 \newcommand{\proj}[1]{\ket{#1}\bra{#1}}
 \newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\wt}[1]{\mathrm{wt}\left(#1\right)}
 \newcommand{\orac}{\mathrm{Orac}}
 \newcommand{\?}{} % sometimes I need just a separator other than whitespace
 \]
@@ -40,73 +42,73 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org7802170">Setup</a>
+<li><a href="#orgde7f937">Setup</a>
 <ul>
-<li><a href="#orgb9ba972">Imports</a></li>
+<li><a href="#orgb6c66ae">Imports</a></li>
 </ul>
 </li>
-<li><a href="#org7c0a4aa">Exercises</a>
+<li><a href="#org386e93f">Exercises</a>
 <ul>
-<li><a href="#org909670d">Exercise 9.1</a></li>
-<li><a href="#orgca2bab3">Exercise 9.2</a></li>
-<li><a href="#orgfe9bd45">Exercise 9.3</a></li>
+<li><a href="#org9fa2d8a">Exercise 9.1</a></li>
+<li><a href="#org4291309">Exercise 9.2</a></li>
+<li><a href="#org574ab52">Exercise 9.3</a></li>
 <li><a href="#exercise-9.4">Exercise 9.4</a></li>
-<li><a href="#orgf3694ed">Exercise 9.5</a></li>
-<li><a href="#orgdc5980c">Exercise 9.6</a></li>
-<li><a href="#orgcbd3e43">Exercise 9.7</a></li>
-<li><a href="#orgcd24449">Exercise 9.8 (Convexity of the trace distance)</a></li>
+<li><a href="#org068416f">Exercise 9.5</a></li>
+<li><a href="#org85be5d1">Exercise 9.6</a></li>
+<li><a href="#orgba0098d">Exercise 9.7</a></li>
+<li><a href="#org9dfc7cf">Exercise 9.8 (Convexity of the trace distance)</a></li>
 <li><a href="#exercise-9.9">Exercise 9.9 (Existence of fixed points)</a></li>
 <li><a href="#exercise-9.10">Exercise 9.10</a></li>
-<li><a href="#orgda2b50d">Exercise 9.11</a></li>
-<li><a href="#orgcaad64a">Exercise 9.12</a></li>
-<li><a href="#org72b2bd1">Exercise 9.13</a></li>
-<li><a href="#org87f2c1e">Exercise 9.14 (Invariance of fidelity under unitary transforms)</a></li>
-<li><a href="#org4dee9e6">Exercise 9.15</a></li>
-<li><a href="#org60fb20a">Exercise 9.16 (The Hilbert–Schmidt inner product and entanglement)</a></li>
-<li><a href="#orgcbf3515">Exercise 9.17</a></li>
-<li><a href="#org1575e4c">Exercise 9.18 (Contractivity of the angle)</a></li>
+<li><a href="#org12e1436">Exercise 9.11</a></li>
+<li><a href="#org33dceb7">Exercise 9.12</a></li>
+<li><a href="#orgf5226ff">Exercise 9.13</a></li>
+<li><a href="#org2fcdb07">Exercise 9.14 (Invariance of fidelity under unitary transforms)</a></li>
+<li><a href="#org91ff784">Exercise 9.15</a></li>
+<li><a href="#org075195e">Exercise 9.16 (The Hilbert–Schmidt inner product and entanglement)</a></li>
+<li><a href="#org5764c4f">Exercise 9.17</a></li>
+<li><a href="#org2848955">Exercise 9.18 (Contractivity of the angle)</a></li>
 <li><a href="#exercise-9.19">Exercise 9.19 (Joint concavity of fidelity)</a></li>
-<li><a href="#org0770148">Exercise 9.20 (Concavity of fidelity)</a></li>
-<li><a href="#orgf714769">Exercise 9.21</a></li>
-<li><a href="#org170354d">Exercise 9.22 (Chaining property for fidelity measures)</a></li>
-<li><a href="#org8c29c31">Exercise 9.23</a></li>
+<li><a href="#org75c5321">Exercise 9.20 (Concavity of fidelity)</a></li>
+<li><a href="#org8c5acd1">Exercise 9.21</a></li>
+<li><a href="#orgbae0ba9">Exercise 9.22 (Chaining property for fidelity measures)</a></li>
+<li><a href="#orgc8ab971">Exercise 9.23</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org7802170" class="outline-2">
-<h2 id="org7802170">Setup</h2>
-<div class="outline-text-2" id="text-org7802170">
+<div id="outline-container-orgde7f937" class="outline-2">
+<h2 id="orgde7f937">Setup</h2>
+<div class="outline-text-2" id="text-orgde7f937">
 </div>
-<div id="outline-container-orgb9ba972" class="outline-3">
-<h3 id="orgb9ba972">Imports</h3>
-<div class="outline-text-3" id="text-orgb9ba972">
+<div id="outline-container-orgb6c66ae" class="outline-3">
+<h3 id="orgb6c66ae">Imports</h3>
+<div class="outline-text-3" id="text-orgb6c66ae">
 <div class="org-src-container">
-<pre class="src src-sage" id="org720281b"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
+<pre class="src src-sage" id="org8818bd7"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7c0a4aa" class="outline-2">
-<h2 id="org7c0a4aa">Exercises</h2>
-<div class="outline-text-2" id="text-org7c0a4aa">
+<div id="outline-container-org386e93f" class="outline-2">
+<h2 id="org386e93f">Exercises</h2>
+<div class="outline-text-2" id="text-org386e93f">
 </div>
-<div id="outline-container-org909670d" class="outline-3">
-<h3 id="org909670d">Exercise 9.1</h3>
-<div class="outline-text-3" id="text-org909670d">
+<div id="outline-container-org9fa2d8a" class="outline-3">
+<h3 id="org9fa2d8a">Exercise 9.1</h3>
+<div class="outline-text-3" id="text-org9fa2d8a">
 <p>
 What is the trace distance between the probability distribution \((1,0)\) and the probability
 distribution \((1/2,1/2)\)? Between \((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
 </p>
 </div>
 
-<div id="outline-container-org3b5d0e5" class="outline-4">
-<h4 id="org3b5d0e5">Solution</h4>
-<div class="outline-text-4" id="text-org3b5d0e5">
+<div id="outline-container-orgd2f74a2" class="outline-4">
+<h4 id="orgd2f74a2">Solution</h4>
+<div class="outline-text-4" id="text-orgd2f74a2">
 <p>
 We have
 </p>
@@ -130,18 +132,18 @@ and
 </div>
 </div>
 
-<div id="outline-container-orgca2bab3" class="outline-3">
-<h3 id="orgca2bab3">Exercise 9.2</h3>
-<div class="outline-text-3" id="text-orgca2bab3">
+<div id="outline-container-org4291309" class="outline-3">
+<h3 id="org4291309">Exercise 9.2</h3>
+<div class="outline-text-3" id="text-org4291309">
 <p>
 Show that the trace distance between probability distributions \((p,1-p)\) and \((q,1-q)\) is
 \(\abs{p-q}\).
 </p>
 </div>
 
-<div id="outline-container-org513bd78" class="outline-4">
-<h4 id="org513bd78">Proof</h4>
-<div class="outline-text-4" id="text-org513bd78">
+<div id="outline-container-org0ddf3ae" class="outline-4">
+<h4 id="org0ddf3ae">Proof</h4>
+<div class="outline-text-4" id="text-org0ddf3ae">
 <p>
 \[
   D((p,1-p), (q, 1-q)) = \frac{1}{2} (\abs{p-q} + \abs{1-p-1+q}) = \abs{p-q} .
@@ -155,18 +157,18 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgfe9bd45" class="outline-3">
-<h3 id="orgfe9bd45">Exercise 9.3</h3>
-<div class="outline-text-3" id="text-orgfe9bd45">
+<div id="outline-container-org574ab52" class="outline-3">
+<h3 id="org574ab52">Exercise 9.3</h3>
+<div class="outline-text-3" id="text-org574ab52">
 <p>
 What is the fidelity of the probability distributions \((1,0)\) and \((1/2,1/2)\)? Of
 \((1/2,1/3,1/6)\) and \((3/4,1/8,1/8)\)?
 </p>
 </div>
 
-<div id="outline-container-org7ce008f" class="outline-4">
-<h4 id="org7ce008f">Solution</h4>
-<div class="outline-text-4" id="text-org7ce008f">
+<div id="outline-container-orgf201856" class="outline-4">
+<h4 id="orgf201856">Solution</h4>
+<div class="outline-text-4" id="text-orgf201856">
 <p>
 We have
 </p>
@@ -205,9 +207,9 @@ Prove (9.3):
 </p>
 </div>
 
-<div id="outline-container-org5e3a2c8" class="outline-4">
-<h4 id="org5e3a2c8">Proof</h4>
-<div class="outline-text-4" id="text-org5e3a2c8">
+<div id="outline-container-orgd0809d5" class="outline-4">
+<h4 id="orgd0809d5">Proof</h4>
+<div class="outline-text-4" id="text-orgd0809d5">
 <p>
 Let \(J\) be the index set of the probability distribution (I mean: when we write \(p_x\) the
 \(x\) is from \(J\)). For a set \(S\subset\?J\) let \(s\) be its 0-1-encoding, that is, \(s_x=1\)
@@ -254,9 +256,9 @@ choice also shows that one can leave out the absolute values from the procedure.
 </div>
 </div>
 
-<div id="outline-container-orgf3694ed" class="outline-3">
-<h3 id="orgf3694ed">Exercise 9.5</h3>
-<div class="outline-text-3" id="text-orgf3694ed">
+<div id="outline-container-org068416f" class="outline-3">
+<h3 id="org068416f">Exercise 9.5</h3>
+<div class="outline-text-3" id="text-org068416f">
 <p>
 Show that the absolute value signs may be removed from Equation (9.3), that is,
 </p>
@@ -268,9 +270,9 @@ Show that the absolute value signs may be removed from Equation (9.3), that is,
 </p>
 </div>
 
-<div id="outline-container-orgaa47259" class="outline-4">
-<h4 id="orgaa47259">Proof</h4>
-<div class="outline-text-4" id="text-orgaa47259">
+<div id="outline-container-org6c1c683" class="outline-4">
+<h4 id="org6c1c683">Proof</h4>
+<div class="outline-text-4" id="text-org6c1c683">
 <p>
 This statement was already proved in the solution of <a href="#exercise-9.4">exercise 9.4</a>.
 </p>
@@ -278,9 +280,9 @@ This statement was already proved in the solution of <a href="#exercise-9.4">exe
 </div>
 </div>
 
-<div id="outline-container-orgdc5980c" class="outline-3">
-<h3 id="orgdc5980c">Exercise 9.6</h3>
-<div class="outline-text-3" id="text-orgdc5980c">
+<div id="outline-container-org85be5d1" class="outline-3">
+<h3 id="org85be5d1">Exercise 9.6</h3>
+<div class="outline-text-3" id="text-org85be5d1">
 <p>
 What is the trace distance between the density operators
 </p>
@@ -308,9 +310,9 @@ Between:
 </p>
 </div>
 
-<div id="outline-container-org827c552" class="outline-4">
-<h4 id="org827c552">Solution</h4>
-<div class="outline-text-4" id="text-org827c552">
+<div id="outline-container-org24152c7" class="outline-4">
+<h4 id="org24152c7">Solution</h4>
+<div class="outline-text-4" id="text-org24152c7">
 <p>
 For the commuting pair of density operators we have
 </p>
@@ -366,9 +368,9 @@ Hence
 </div>
 </div>
 
-<div id="outline-container-orgcbd3e43" class="outline-3">
-<h3 id="orgcbd3e43">Exercise 9.7</h3>
-<div class="outline-text-3" id="text-orgcbd3e43">
+<div id="outline-container-orgba0098d" class="outline-3">
+<h3 id="orgba0098d">Exercise 9.7</h3>
+<div class="outline-text-3" id="text-orgba0098d">
 <p>
 Show that for any states \(\rho\) and \(\sigma\), one may write \(\rho-\sigma=Q-S\), where \(Q\)
 and \(S\) are positive operators with support on orthogonal vector spaces. (Hint: use the
@@ -377,9 +379,9 @@ positive and negative parts. This fact will continue to be useful later.)
 </p>
 </div>
 
-<div id="outline-container-orgfbf5468" class="outline-4">
-<h4 id="orgfbf5468">Proof</h4>
-<div class="outline-text-4" id="text-orgfbf5468">
+<div id="outline-container-orgd0806c0" class="outline-4">
+<h4 id="orgd0806c0">Proof</h4>
+<div class="outline-text-4" id="text-orgd0806c0">
 <p>
 The exercise already outlines what to do. I just make it <i>a little bit</i> more precise. Let
 \(D=\diag(\ldots,d_i,\ldots)\) be a diagonalization of \(\rho-\sigma\):
@@ -420,9 +422,9 @@ support. QED.
 </div>
 </div>
 
-<div id="outline-container-orgcd24449" class="outline-3">
-<h3 id="orgcd24449">Exercise 9.8 (Convexity of the trace distance)</h3>
-<div class="outline-text-3" id="text-orgcd24449">
+<div id="outline-container-org9dfc7cf" class="outline-3">
+<h3 id="org9dfc7cf">Exercise 9.8 (Convexity of the trace distance)</h3>
+<div class="outline-text-3" id="text-org9dfc7cf">
 <p>
 Show that the trace distance is convex in its first input,
 </p>
@@ -435,15 +437,15 @@ Show that the trace distance is convex in its first input,
 </p>
 </div>
 
-<div id="outline-container-org56672b1" class="outline-4">
-<h4 id="org56672b1">Proof</h4>
-<div class="outline-text-4" id="text-org56672b1">
+<div id="outline-container-org551c138" class="outline-4">
+<h4 id="org551c138">Proof</h4>
+<div class="outline-text-4" id="text-org551c138">
 <p>
 This directly follows from strong convexity with \(q_i=p_i\), using \(D(p,p)=0\). QED.
 </p>
 
 <p>
-<a id="org2001900"></a>
+<a id="org8bc40eb"></a>
 But in my opinion this result is actually misleading. The book emphasizes the fact that
 \(D\) is a metric, but actually it corresponds to a <i>norm</i> on the matrix space:
 </p>
@@ -496,9 +498,9 @@ Schauder’s fixed point theorem to prove that any trace-preserving quantum oper
 </p>
 </div>
 
-<div id="outline-container-orgf5e37db" class="outline-4">
-<h4 id="orgf5e37db">Proof</h4>
-<div class="outline-text-4" id="text-orgf5e37db">
+<div id="outline-container-org55ebb17" class="outline-4">
+<h4 id="org55ebb17">Proof</h4>
+<div class="outline-text-4" id="text-org55ebb17">
 <p>
 Just for definiteness let me recall my favorite version of Schauder's fixed point
 theorem. There are various specializations and generalizations. In my oppinion the
@@ -571,9 +573,9 @@ for any \(\rho\) and \(\sigma\), \(D(\calE(\rho),\calE(\sigma))\?<\?D(\rho,\sigm
 </p>
 </div>
 
-<div id="outline-container-org316f324" class="outline-4">
-<h4 id="org316f324">Proof</h4>
-<div class="outline-text-4" id="text-org316f324">
+<div id="outline-container-org8e011f6" class="outline-4">
+<h4 id="org8e011f6">Proof</h4>
+<div class="outline-text-4" id="text-org8e011f6">
 <p>
 We already know from <a href="#exercise-9.9">exercise 9.9</a> that there must be one fixed point \(\rho_0\). Suppose
 there was a second one \(\rho_1\neq\rho_0\). Then
@@ -615,9 +617,9 @@ which converges exponentially fast to the unique fixed point.
 </div>
 </div>
 
-<div id="outline-container-orgda2b50d" class="outline-3">
-<h3 id="orgda2b50d">Exercise 9.11</h3>
-<div class="outline-text-3" id="text-orgda2b50d">
+<div id="outline-container-org12e1436" class="outline-3">
+<h3 id="org12e1436">Exercise 9.11</h3>
+<div class="outline-text-3" id="text-org12e1436">
 <p>
 Suppose \(\calE\) is a trace-preserving quantum operation for which there exists a density
 operator \(\rho_0\) and a trace-preserving quantum operation \(\calE'\) such that
@@ -637,11 +639,11 @@ strictly contractive quantum operation, and thus has a unique fixed point.
 </p>
 </div>
 
-<div id="outline-container-org862ee13" class="outline-4">
-<h4 id="org862ee13">Proof</h4>
-<div class="outline-text-4" id="text-org862ee13">
+<div id="outline-container-orgeabb779" class="outline-4">
+<h4 id="orgeabb779">Proof</h4>
+<div class="outline-text-4" id="text-orgeabb779">
 <p>
-By strong contractivity (or just basic properties of <i>any</i> norm - see my <a href="#org2001900">extensive
+By strong contractivity (or just basic properties of <i>any</i> norm - see my <a href="#org8bc40eb">extensive
 commentary</a> to exercise 9.8) we have
 </p>
 
@@ -660,9 +662,9 @@ point. QED.
 </div>
 </div>
 
-<div id="outline-container-orgcaad64a" class="outline-3">
-<h3 id="orgcaad64a">Exercise 9.12</h3>
-<div class="outline-text-3" id="text-orgcaad64a">
+<div id="outline-container-org33dceb7" class="outline-3">
+<h3 id="org33dceb7">Exercise 9.12</h3>
+<div class="outline-text-3" id="text-org33dceb7">
 <p>
 Consider the depolarizing channel introduced in Section 8.3.4 on page 378,
 \(\calE(\rho)=pI/2+(1-p)\rho\). For arbitrary \(\rho\) and \(\sigma\) find
@@ -672,9 +674,9 @@ the map \(\calE\) is strictly contractive, that is,
 </p>
 </div>
 
-<div id="outline-container-orgd84f718" class="outline-4">
-<h4 id="orgd84f718">Solution</h4>
-<div class="outline-text-4" id="text-orgd84f718">
+<div id="outline-container-orgf82e4b5" class="outline-4">
+<h4 id="orgf82e4b5">Solution</h4>
+<div class="outline-text-4" id="text-orgf82e4b5">
 <p>
 Of course one could use the fact that the depolarizing channel acts like
 </p>
@@ -706,18 +708,18 @@ depolarizing channel contracts every other state towards it exponentially fast.
 </div>
 </div>
 
-<div id="outline-container-org72b2bd1" class="outline-3">
-<h3 id="org72b2bd1">Exercise 9.13</h3>
-<div class="outline-text-3" id="text-org72b2bd1">
+<div id="outline-container-orgf5226ff" class="outline-3">
+<h3 id="orgf5226ff">Exercise 9.13</h3>
+<div class="outline-text-3" id="text-orgf5226ff">
 <p>
 Show that the bit flip channel (Section 8.3.3) is contractive but not strictly
 contractive. Find the set of fixed points for the bit flip channel.
 </p>
 </div>
 
-<div id="outline-container-orgdb89a75" class="outline-4">
-<h4 id="orgdb89a75">Solution</h4>
-<div class="outline-text-4" id="text-orgdb89a75">
+<div id="outline-container-org314b2a4" class="outline-4">
+<h4 id="org314b2a4">Solution</h4>
+<div class="outline-text-4" id="text-org314b2a4">
 <p>
 The bit flip channel is given by the following Kraus operators
 </p>
@@ -748,9 +750,9 @@ the bit flip is just the identity operation.
 </div>
 </div>
 
-<div id="outline-container-org87f2c1e" class="outline-3">
-<h3 id="org87f2c1e">Exercise 9.14 (Invariance of fidelity under unitary transforms)</h3>
-<div class="outline-text-3" id="text-org87f2c1e">
+<div id="outline-container-org2fcdb07" class="outline-3">
+<h3 id="org2fcdb07">Exercise 9.14 (Invariance of fidelity under unitary transforms)</h3>
+<div class="outline-text-3" id="text-org2fcdb07">
 <p>
 Prove (9.61),
 </p>
@@ -767,9 +769,9 @@ by using the fact that for any positive operator \(A\),
 </p>
 </div>
 
-<div id="outline-container-orgbc56374" class="outline-4">
-<h4 id="orgbc56374">Proof</h4>
-<div class="outline-text-4" id="text-orgbc56374">
+<div id="outline-container-orge86b886" class="outline-4">
+<h4 id="orge86b886">Proof</h4>
+<div class="outline-text-4" id="text-orge86b886">
 <p>
 Recall that the spectral theorem implies \(f(UAU^\dagger)=Uf(A)U^\dagger\) for any
 continuous function \(f\) defined on the spectrum of \(A\) and any unitary \(U\). Actually this
@@ -807,9 +809,9 @@ trace. QED.
 </div>
 </div>
 
-<div id="outline-container-org4dee9e6" class="outline-3">
-<h3 id="org4dee9e6">Exercise 9.15</h3>
-<div class="outline-text-3" id="text-org4dee9e6">
+<div id="outline-container-org91ff784" class="outline-3">
+<h3 id="org91ff784">Exercise 9.15</h3>
+<div class="outline-text-3" id="text-org91ff784">
 <p>
 Show that
 </p>
@@ -826,9 +828,9 @@ purifications of \(\sigma\).
 </p>
 </div>
 
-<div id="outline-container-orga09c099" class="outline-4">
-<h4 id="orga09c099">Proof</h4>
-<div class="outline-text-4" id="text-orga09c099">
+<div id="outline-container-orgf9f3084" class="outline-4">
+<h4 id="orgf9f3084">Proof</h4>
+<div class="outline-text-4" id="text-orgf9f3084">
 <p>
 To prove this we just need a minor modification of the proof of Theorem 9.4. So recall
 the proof given in the book. To give a bit of relevant context recall that
@@ -887,9 +889,9 @@ where \(V\) is expressed as a matrix with respect to the basis \((\ket{i_Q})_i\)
 </div>
 </div>
 
-<div id="outline-container-org60fb20a" class="outline-3">
-<h3 id="org60fb20a">Exercise 9.16 (The Hilbert–Schmidt inner product and entanglement)</h3>
-<div class="outline-text-3" id="text-org60fb20a">
+<div id="outline-container-org075195e" class="outline-3">
+<h3 id="org075195e">Exercise 9.16 (The Hilbert–Schmidt inner product and entanglement)</h3>
+<div class="outline-text-3" id="text-org075195e">
 <p>
 Suppose <code>R</code> and <code>Q</code> are two quantum systems with the same Hilbert space. Let \((\ket{i_R})\)
 and \((\ket{i_Q})\) be orthonormal basis sets for <code>R</code> and <code>Q</code>. Let \(A\) be an operator on <code>R</code>
@@ -909,9 +911,9 @@ the matrix elements of \(A\) are taken with respect to the basis \((\ket{i_R})\)
 </p>
 </div>
 
-<div id="outline-container-orgc2efd56" class="outline-4">
-<h4 id="orgc2efd56">Proof</h4>
-<div class="outline-text-4" id="text-orgc2efd56">
+<div id="outline-container-org97ff199" class="outline-4">
+<h4 id="org97ff199">Proof</h4>
+<div class="outline-text-4" id="text-org97ff199">
 <p>
 This is just a short calculation
 </p>
@@ -931,18 +933,18 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgcbf3515" class="outline-3">
-<h3 id="orgcbf3515">Exercise 9.17</h3>
-<div class="outline-text-3" id="text-orgcbf3515">
+<div id="outline-container-org5764c4f" class="outline-3">
+<h3 id="org5764c4f">Exercise 9.17</h3>
+<div class="outline-text-3" id="text-org5764c4f">
 <p>
 Show that \(0\leq\?A(\rho,\sigma)\leq\pi/2\), with equality in the first inequality if and
 only if \(\rho=\sigma\).
 </p>
 </div>
 
-<div id="outline-container-org6384477" class="outline-4">
-<h4 id="org6384477">Proof</h4>
-<div class="outline-text-4" id="text-org6384477">
+<div id="outline-container-orgde26c20" class="outline-4">
+<h4 id="orgde26c20">Proof</h4>
+<div class="outline-text-4" id="text-orgde26c20">
 <p>
 The first claim follows from the fact that \(\arccos:[0,1]\to[0,\pi/2]\) is a strictly
 decreasing bijection and that \(F\) has values in \([0,1]\). The second assertion follows from
@@ -952,9 +954,9 @@ the fact that \(F(\rho,\sigma)=1\) iff \(\rho=\sigma\) by Uhlmann's theorem. QED
 </div>
 </div>
 
-<div id="outline-container-org1575e4c" class="outline-3">
-<h3 id="org1575e4c">Exercise 9.18 (Contractivity of the angle)</h3>
-<div class="outline-text-3" id="text-org1575e4c">
+<div id="outline-container-org2848955" class="outline-3">
+<h3 id="org2848955">Exercise 9.18 (Contractivity of the angle)</h3>
+<div class="outline-text-3" id="text-org2848955">
 <p>
 Let \(\calE\) be a trace-preserving quantum operation. Show that
 </p>
@@ -966,9 +968,9 @@ Let \(\calE\) be a trace-preserving quantum operation. Show that
 </p>
 </div>
 
-<div id="outline-container-org5156b7d" class="outline-4">
-<h4 id="org5156b7d">Proof</h4>
-<div class="outline-text-4" id="text-org5156b7d">
+<div id="outline-container-orga8f94aa" class="outline-4">
+<h4 id="orga8f94aa">Proof</h4>
+<div class="outline-text-4" id="text-orga8f94aa">
 <p>
 This is a direct corollary of the monotonicity of the fidelity (Theorem 9.6) and the fact
 that \(\arccos:[0,1]\to[0,\pi/2]\) is decreasing (and \(F(\rho,\sigma)\in[0,1]\)). QED.
@@ -991,9 +993,9 @@ Prove that the ﬁdelity is <i>jointly concave</i>,
 </p>
 </div>
 
-<div id="outline-container-org9982bd9" class="outline-4">
-<h4 id="org9982bd9">Proof</h4>
-<div class="outline-text-4" id="text-org9982bd9">
+<div id="outline-container-org56ee5e4" class="outline-4">
+<h4 id="org56ee5e4">Proof</h4>
+<div class="outline-text-4" id="text-org56ee5e4">
 <p>
 Follows from strict concavity with \(q_i=p_i\). QED.
 </p>
@@ -1001,9 +1003,9 @@ Follows from strict concavity with \(q_i=p_i\). QED.
 </div>
 </div>
 
-<div id="outline-container-org0770148" class="outline-3">
-<h3 id="org0770148">Exercise 9.20 (Concavity of fidelity)</h3>
-<div class="outline-text-3" id="text-org0770148">
+<div id="outline-container-org75c5321" class="outline-3">
+<h3 id="org75c5321">Exercise 9.20 (Concavity of fidelity)</h3>
+<div class="outline-text-3" id="text-org75c5321">
 <p>
 Prove that the ﬁdelity is concave in the first entry,
 </p>
@@ -1015,9 +1017,9 @@ Prove that the ﬁdelity is concave in the first entry,
 </p>
 </div>
 
-<div id="outline-container-org300eede" class="outline-4">
-<h4 id="org300eede">Proof</h4>
-<div class="outline-text-4" id="text-org300eede">
+<div id="outline-container-org8255682" class="outline-4">
+<h4 id="org8255682">Proof</h4>
+<div class="outline-text-4" id="text-org8255682">
 <p>
 Follows from <a href="#exercise-9.19">exercise 9.19</a> with \(\sigma_i=\sigma\). QED.
 </p>
@@ -1025,9 +1027,9 @@ Follows from <a href="#exercise-9.19">exercise 9.19</a> with \(\sigma_i=\sigma\)
 </div>
 </div>
 
-<div id="outline-container-orgf714769" class="outline-3">
-<h3 id="orgf714769">Exercise 9.21</h3>
-<div class="outline-text-3" id="text-orgf714769">
+<div id="outline-container-org8c5acd1" class="outline-3">
+<h3 id="org8c5acd1">Exercise 9.21</h3>
+<div class="outline-text-3" id="text-org8c5acd1">
 <p>
 When comparing pure states and mixed states it is possible to make a stronger statement
 than (9.110) about the relationship between trace distance and fidelity. Prove that
@@ -1040,9 +1042,9 @@ than (9.110) about the relationship between trace distance and fidelity. Prove t
 </p>
 </div>
 
-<div id="outline-container-org6d60033" class="outline-4">
-<h4 id="org6d60033">Proof</h4>
-<div class="outline-text-4" id="text-org6d60033">
+<div id="outline-container-org774a06c" class="outline-4">
+<h4 id="org774a06c">Proof</h4>
+<div class="outline-text-4" id="text-org774a06c">
 <p>
 The key to the proof is (9.60):
 </p>
@@ -1072,9 +1074,9 @@ In the first line we maximize over all projections. In the second line we set
 </div>
 </div>
 
-<div id="outline-container-org170354d" class="outline-3">
-<h3 id="org170354d">Exercise 9.22 (Chaining property for fidelity measures)</h3>
-<div class="outline-text-3" id="text-org170354d">
+<div id="outline-container-orgbae0ba9" class="outline-3">
+<h3 id="orgbae0ba9">Exercise 9.22 (Chaining property for fidelity measures)</h3>
+<div class="outline-text-3" id="text-orgbae0ba9">
 <p>
 Suppose \(U\) and \(V\) are unitary operators, and \(\calE\) and \(\calF\) are trace-preserving
 quantum operations meant to approximate \(U\) and \(V\). Letting \(d(\cdot,\cdot)\) be any
@@ -1097,9 +1099,9 @@ with high fidelity.
 </p>
 </div>
 
-<div id="outline-container-org9bd9fed" class="outline-4">
-<h4 id="org9bd9fed">Proof</h4>
-<div class="outline-text-4" id="text-org9bd9fed">
+<div id="outline-container-org1301302" class="outline-4">
+<h4 id="org1301302">Proof</h4>
+<div class="outline-text-4" id="text-org1301302">
 <p>
 We have
 </p>
@@ -1130,17 +1132,17 @@ inequality is just the triangle inequality. From this the claim directly follows
 </div>
 </div>
 
-<div id="outline-container-org8c29c31" class="outline-3">
-<h3 id="org8c29c31">Exercise 9.23</h3>
-<div class="outline-text-3" id="text-org8c29c31">
+<div id="outline-container-orgc8ab971" class="outline-3">
+<h3 id="orgc8ab971">Exercise 9.23</h3>
+<div class="outline-text-3" id="text-orgc8ab971">
 <p>
 Show that \(\bar{F}=1\) if and only if \(\calE(\rho_j)=\rho_j\) for all \(j\) such that \(p_j\?>\?0\).
 </p>
 </div>
 
-<div id="outline-container-org3050341" class="outline-4">
-<h4 id="org3050341">Proof</h4>
-<div class="outline-text-4" id="text-org3050341">
+<div id="outline-container-org77add76" class="outline-4">
+<h4 id="org77add76">Proof</h4>
+<div class="outline-text-4" id="text-org77add76">
 <p>
 Let us recall the formula for \(\bar{F}\):
 </p>

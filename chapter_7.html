@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Reinhard Stahn"/><title>Chapter 7</title><link rel="icon" type="image/x-icon" sizes="any" href="./favicon/favicon.ico"/><!-- https://simplecss.org - License: MIT - We are using ./simple.css from commit dcb3545f2304356985c99acce9471ba3f559976b from https://github.com/kevquirk/simple.css --><link rel="stylesheet" href="./css/simple.css"/><link rel="stylesheet" href="./css/style.css"/><script src="./js/perf.js"></script><script src="./js/mathjax.js"></script><script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script></head><body><nav><a href="index.html">HOME</a></nav><h1 class="title">Chapter 7</h1>\[
+\newcommand{\BB}{\mathbb{B}}
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\HH}{\mathbb{H}}
 \newcommand{\KK}{\mathbb{K}}
@@ -33,6 +34,7 @@
 \newcommand{\ket}[1]{|#1\rangle}
 \newcommand{\proj}[1]{\ket{#1}\bra{#1}}
 \newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\wt}[1]{\mathrm{wt}\left(#1\right)}
 \newcommand{\orac}{\mathrm{Orac}}
 \newcommand{\?}{} % sometimes I need just a separator other than whitespace
 \]
@@ -40,86 +42,86 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8b355ef">Setup</a>
+<li><a href="#org8ca9270">Setup</a>
 <ul>
-<li><a href="#org952d4d3">Imports</a></li>
-<li><a href="#org60683c2">Preparations</a></li>
-<li><a href="#org204fcb1">Harmonic Oscillator</a></li>
-<li><a href="#orgd3e85b6">Optical photon quantum computers</a></li>
+<li><a href="#org92b6652">Imports</a></li>
+<li><a href="#org54716cd">Preparations</a></li>
+<li><a href="#org5d8ec35">Harmonic Oscillator</a></li>
+<li><a href="#orgd2dd04a">Optical photon quantum computers</a></li>
 <li><a href="#discussion-annoying-error">Discussion of an annoying error</a></li>
 <li><a href="#chapter-7-state-tomography">On magnetization readout and state tomography</a></li>
 </ul>
 </li>
-<li><a href="#orgba15614">Exercises</a>
+<li><a href="#orged527a4">Exercises</a>
 <ul>
-<li><a href="#org42a9dbf">Exercise 7.1</a></li>
+<li><a href="#org070ba4b">Exercise 7.1</a></li>
 <li><a href="#exercise-7.2">Exercise 7.2</a></li>
-<li><a href="#orga877794">Exercise 7.3</a></li>
-<li><a href="#org4c26eb8">Exercise 7.4</a></li>
-<li><a href="#org17cc304">Exercise 7.5</a></li>
-<li><a href="#org980a4c7">Exercise 7.6 (Eigenstates of photon annihilation)</a></li>
-<li><a href="#org705ad0d">Exercise 7.7</a></li>
-<li><a href="#orgde10f16">Exercise 7.8</a></li>
-<li><a href="#org66cf36c">Exercise 7.9 (Optical Hadamard gate)</a></li>
-<li><a href="#orgb2569bb">Exercise 7.10 (Mach–Zehnder interferometer)</a></li>
-<li><a href="#org4e8cc8e">Exercise 7.11</a></li>
+<li><a href="#orgcc9327e">Exercise 7.3</a></li>
+<li><a href="#org6f6ca2c">Exercise 7.4</a></li>
+<li><a href="#orgf8f667c">Exercise 7.5</a></li>
+<li><a href="#org5ec833f">Exercise 7.6 (Eigenstates of photon annihilation)</a></li>
+<li><a href="#org13381cb">Exercise 7.7</a></li>
+<li><a href="#orgb04c190">Exercise 7.8</a></li>
+<li><a href="#orgfced556">Exercise 7.9 (Optical Hadamard gate)</a></li>
+<li><a href="#org5a1b06b">Exercise 7.10 (Mach–Zehnder interferometer)</a></li>
+<li><a href="#org99bac2b">Exercise 7.11</a></li>
 <li><a href="#exercise-7.12">Exercise 7.12 (Quantum beamsplitter with classical inputs)</a></li>
-<li><a href="#org5f2c51f">Exercise 7.13 (Optical Deutsch–Jozsa quantum circuit)</a></li>
-<li><a href="#org78e0328">Exercise 7.14 (Classical cross phase modulation)</a></li>
-<li><a href="#orgee1f19b">Exercise 7.15</a></li>
-<li><a href="#orgaf2a50a">Exercise 7.16 (Electric dipole selection rules)</a></li>
-<li><a href="#org27ccf43">Exercise 7.17 (Eigenstates of the Jaynes–Cummings Hamiltonian)</a></li>
+<li><a href="#orgf4a5f78">Exercise 7.13 (Optical Deutsch–Jozsa quantum circuit)</a></li>
+<li><a href="#org62b235f">Exercise 7.14 (Classical cross phase modulation)</a></li>
+<li><a href="#org3c21cbc">Exercise 7.15</a></li>
+<li><a href="#org2fca563">Exercise 7.16 (Electric dipole selection rules)</a></li>
+<li><a href="#org5a8ad5a">Exercise 7.17 (Eigenstates of the Jaynes–Cummings Hamiltonian)</a></li>
 <li><a href="#exercise-7.18">Exercise 7.18 (Rabi oscillations)</a></li>
-<li><a href="#orgd0aece3">Exercise 7.19 (Lorentzian absorption profile)</a></li>
+<li><a href="#org678e5a7">Exercise 7.19 (Lorentzian absorption profile)</a></li>
 <li><a href="#exercise-7.20">Exercise 7.20 (Single photon phase shift)</a></li>
-<li><a href="#orgbe58655">Exercise 7.21</a></li>
-<li><a href="#orgd3f546e">Exercise 7.22</a></li>
-<li><a href="#org4d43cb9">Exercise 7.23</a></li>
-<li><a href="#org4a8e86d">Exercise 7.24</a></li>
-<li><a href="#orgd1c6d23">Exercise 7.25</a></li>
+<li><a href="#org0853b35">Exercise 7.21</a></li>
+<li><a href="#orgd81a6e4">Exercise 7.22</a></li>
+<li><a href="#orga205aa2">Exercise 7.23</a></li>
+<li><a href="#org18e2a9b">Exercise 7.24</a></li>
+<li><a href="#org848a648">Exercise 7.25</a></li>
 <li><a href="#exercise-7.26">Exercise 7.26</a></li>
-<li><a href="#orgc945df5">Exercise 7.27 (Three spin angular momenta states)</a></li>
-<li><a href="#org353f03b">Exercise 7.28 (Hyperfine states)</a></li>
-<li><a href="#org35cec74"><span class="todo SKIP">SKIP</span> Exercise 7.29 (Spontaneous emission)</a></li>
-<li><a href="#orgfac3303">Exercise 7.30 (Electronic state lifetimes)</a></li>
-<li><a href="#org50bb21b">Exercise 7.31</a></li>
-<li><a href="#org3c621bb">Exercise 7.32</a></li>
-<li><a href="#org49d7353">Exercise 7.33 (Magnetic resonance)</a></li>
-<li><a href="#org415243a"><span class="todo TODO">TODO</span> Exercises 7.34 (NMR frequencies)</a></li>
-<li><a href="#orgcaedc3c"><span class="todo SKIP">SKIP</span> Exercises 7.35 (Motional narrowing)</a></li>
-<li><a href="#org80eb2cd">Exercises 7.36 (Thermal equilibrium NMR state)</a></li>
-<li><a href="#org5bc4279">Exercises 7.37 (NMR spectrum of coupled spins)</a></li>
-<li><a href="#org822711b">Exercise 7.38 (Refocusing)</a></li>
-<li><a href="#org007c54b">Exercise 7.39 (Three-dimensional refocusing)</a></li>
-<li><a href="#org9321b38">Exercise 7.40 (Refocusing dipolar interactions)</a></li>
-<li><a href="#org80a3bec">Exercise 7.41 (NMR <code>CNOT</code>)</a></li>
-<li><a href="#orge53921e">Exercise 7.42 (Permutations for temporal labeling)</a></li>
-<li><a href="#org8eab623">Exercise 7.43 (Permutations for logical labeling)</a></li>
-<li><a href="#orgf4e4a60"><span class="todo SKIP">SKIP</span> Exrcise 7.44 (Logical labeling for \(n\) spins)</a></li>
+<li><a href="#orge6fe256">Exercise 7.27 (Three spin angular momenta states)</a></li>
+<li><a href="#org7c3fba0">Exercise 7.28 (Hyperfine states)</a></li>
+<li><a href="#org0f086d0"><span class="todo SKIP">SKIP</span> Exercise 7.29 (Spontaneous emission)</a></li>
+<li><a href="#orgbf311b5">Exercise 7.30 (Electronic state lifetimes)</a></li>
+<li><a href="#org5fa09c1">Exercise 7.31</a></li>
+<li><a href="#org94b3971">Exercise 7.32</a></li>
+<li><a href="#orgd60bc39">Exercise 7.33 (Magnetic resonance)</a></li>
+<li><a href="#orgfc99059"><span class="todo TODO">TODO</span> Exercises 7.34 (NMR frequencies)</a></li>
+<li><a href="#orgb66a2a0"><span class="todo SKIP">SKIP</span> Exercises 7.35 (Motional narrowing)</a></li>
+<li><a href="#org7ac065e">Exercises 7.36 (Thermal equilibrium NMR state)</a></li>
+<li><a href="#orgd5aaff5">Exercises 7.37 (NMR spectrum of coupled spins)</a></li>
+<li><a href="#orgb5492b9">Exercise 7.38 (Refocusing)</a></li>
+<li><a href="#org04866d7">Exercise 7.39 (Three-dimensional refocusing)</a></li>
+<li><a href="#orgea7b840">Exercise 7.40 (Refocusing dipolar interactions)</a></li>
+<li><a href="#orgb7768a0">Exercise 7.41 (NMR <code>CNOT</code>)</a></li>
+<li><a href="#org2a1f1ab">Exercise 7.42 (Permutations for temporal labeling)</a></li>
+<li><a href="#org0359de1">Exercise 7.43 (Permutations for logical labeling)</a></li>
+<li><a href="#org5a8d13f"><span class="todo SKIP">SKIP</span> Exrcise 7.44 (Logical labeling for \(n\) spins)</a></li>
 <li><a href="#exercise-7.45">Exercise 7.45 (State tomography with NMR)</a></li>
-<li><a href="#org3d17a53"><span class="todo WIP">WIP</span> Exercise 7.46</a></li>
-<li><a href="#org2e98a9d">Exercise 7.47 (NMR <code>CNOT</code> gate)</a></li>
-<li><a href="#org5fc2d3b">Exercise 7.48</a></li>
-<li><a href="#orgf46f1bb">Exercise 7.49 (NMR swap gate)</a></li>
-<li><a href="#org384980b">Exercise 7.50</a></li>
-<li><a href="#orga2c2cc6">Exercise 7.51</a></li>
-<li><a href="#org0a45e64">Exercise 7.52 (Universality of Heisenberg Hamiltonian)</a></li>
+<li><a href="#org7dc1d01"><span class="todo WIP">WIP</span> Exercise 7.46</a></li>
+<li><a href="#org8833ee8">Exercise 7.47 (NMR <code>CNOT</code> gate)</a></li>
+<li><a href="#org904ad28">Exercise 7.48</a></li>
+<li><a href="#orgd3f7bb3">Exercise 7.49 (NMR swap gate)</a></li>
+<li><a href="#orgb7d44b5">Exercise 7.50</a></li>
+<li><a href="#org70971d8">Exercise 7.51</a></li>
+<li><a href="#org4faaf71">Exercise 7.52 (Universality of Heisenberg Hamiltonian)</a></li>
 </ul>
 </li>
-<li><a href="#orgecf8cad">References</a></li>
+<li><a href="#org1d6e4f3">References</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8b355ef" class="outline-2">
-<h2 id="org8b355ef">Setup</h2>
-<div class="outline-text-2" id="text-org8b355ef">
+<div id="outline-container-org8ca9270" class="outline-2">
+<h2 id="org8ca9270">Setup</h2>
+<div class="outline-text-2" id="text-org8ca9270">
 </div>
-<div id="outline-container-org952d4d3" class="outline-3">
-<h3 id="org952d4d3">Imports</h3>
-<div class="outline-text-3" id="text-org952d4d3">
+<div id="outline-container-org92b6652" class="outline-3">
+<h3 id="org92b6652">Imports</h3>
+<div class="outline-text-3" id="text-org92b6652">
 <div class="org-src-container">
-<pre class="src src-sage" id="org1eacf4e"><span class="org-keyword">from</span> scipy.constants <span class="org-keyword">import</span> physical_constants, pi <span class="org-keyword">as</span> pi_numeric
+<pre class="src src-sage" id="org407f880"><span class="org-keyword">from</span> scipy.constants <span class="org-keyword">import</span> physical_constants, pi <span class="org-keyword">as</span> pi_numeric
 
 <span class="org-keyword">from</span> utils <span class="org-keyword">import</span> commutator <span class="org-keyword">as</span> com
 <span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> Id, X, Y, Z, H, Rx, Ry, Rz, CX, CZ, SWAP, kron, bra, ket
@@ -131,15 +133,15 @@ For circuit drawings (python, not tangled):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgd6aea6a"><span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> QuantumCircuit, Gate
+<pre class="src src-python" id="org448ba16"><span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> QuantumCircuit, Gate
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org60683c2" class="outline-3">
-<h3 id="org60683c2">Preparations</h3>
-<div class="outline-text-3" id="text-org60683c2">
+<div id="outline-container-org54716cd" class="outline-3">
+<h3 id="org54716cd">Preparations</h3>
+<div class="outline-text-3" id="text-org54716cd">
 <p>
 Some code we rely on
 </p>
@@ -151,9 +153,9 @@ Some code we rely on
 </div>
 </div>
 
-<div id="outline-container-org204fcb1" class="outline-3">
-<h3 id="org204fcb1">Harmonic Oscillator</h3>
-<div class="outline-text-3" id="text-org204fcb1">
+<div id="outline-container-org5d8ec35" class="outline-3">
+<h3 id="org5d8ec35">Harmonic Oscillator</h3>
+<div class="outline-text-3" id="text-org5d8ec35">
 <p>
 To simplify calculations we will use unit-less expressions. To do this let \(\tilde{x}\),
 \(\tilde{p}\), etc denote physical quantities <i>with</i> units and denote the unit-less versions
@@ -161,7 +163,7 @@ without the tilde, such that e.g.
 </p>
 
 <p>
-<a id="org132ef28"></a>
+<a id="org28ff85c"></a>
 \[
   \tilde{x} = \sqrt{\frac{\hbar}{m\omega}} \; x, \quad \tilde{p} = \sqrt{m\omega\hbar} \; p .
 \]
@@ -179,7 +181,7 @@ as follows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgd57be18">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
+<pre class="src src-sage" id="org1ab5a53">R.<span class="org-operator">&lt;</span>x<span class="org-operator">&gt;</span> <span class="org-operator">=</span> QQbar[]
 <span class="org-variable-name">W</span> <span class="org-operator">=</span> DifferentialWeylAlgebra(R)
 (<span class="org-variable-name">x</span>, <span class="org-variable-name">dx</span>) <span class="org-operator">=</span> W.gens()
 <span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-operator">-</span>i<span class="org-operator">*</span>dx
@@ -192,7 +194,7 @@ and the corresponding annihilation (\(a\)), and creation operator (\(a^\dagger\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org90e0459"><span class="org-variable-name">H_qho</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
+<pre class="src src-sage" id="org2786fbb"><span class="org-variable-name">H_qho</span> <span class="org-operator">=</span> p<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2 <span class="org-operator">+</span> x<span class="org-operator">^</span>2 <span class="org-operator">/</span> 2
 
 <span class="org-variable-name">a</span> <span class="org-operator">=</span> (x <span class="org-operator">+</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
 <span class="org-variable-name">ad</span> <span class="org-operator">=</span> (x <span class="org-operator">-</span> i<span class="org-operator">*</span>p) <span class="org-operator">/</span> sqrt(2)
@@ -204,7 +206,7 @@ Some basic sanity checks:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org0a64b76"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
+<pre class="src src-sage" id="orgd0d0c07"><span class="org-keyword">assert</span> com(x, p) <span class="org-operator">==</span> i
 <span class="org-keyword">assert</span> com(a, ad) <span class="org-operator">==</span> 1
 <span class="org-string">"PASSED"</span>
 </pre>
@@ -216,11 +218,11 @@ Some basic sanity checks:
 
 
 <p>
-Note that from <a href="#org132ef28">above</a> we get
+Note that from <a href="#org28ff85c">above</a> we get
 </p>
 
 <p>
-<a id="orga049b26"></a>
+<a id="orgfb2bd3d"></a>
 \[
   \tilde{H} = \hbar\omega H, \quad \tilde{a} = a .
 \]
@@ -233,7 +235,7 @@ shifted by \(1/2\).
 </p>
 
 <p>
-<a id="orgc067091"></a>
+<a id="org38cd097"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem (Spectrum of 1D Harmonic Oscillator)</dt><dd><p>
@@ -258,7 +260,7 @@ space \(L^2 (\RR)\) of square integrable functions. Moreover they are eigenstate
 and \(N\) with \(N\ket{n}=n\ket{n}\).
 </p>
 <dl class="org-dl">
-<dt>Remark</dt><dd><a id="org26d8ec7"></a> It is well known that the gaussian function which
+<dt>Remark</dt><dd><a id="orge0398ce"></a> It is well known that the gaussian function which
 defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org/wiki/Gaussian_integral">gaussian integral</a>).</dd>
 <dt>Proof</dt><dd>See <a href="#exercise-7.4-proof">solution of exercise 7.4</a>.</dd>
 </dl></dd>
@@ -266,16 +268,16 @@ defines \(\ket{0}\) is already normalized (see <a href="https://en.wikipedia.org
 </div>
 </div>
 
-<div id="outline-container-orgd3e85b6" class="outline-3">
-<h3 id="orgd3e85b6">Optical photon quantum computers</h3>
-<div class="outline-text-3" id="text-orgd3e85b6">
+<div id="outline-container-orgd2dd04a" class="outline-3">
+<h3 id="orgd2dd04a">Optical photon quantum computers</h3>
+<div class="outline-text-3" id="text-orgd2dd04a">
 <p>
 The book showed that the beamsplitter \(B=e^{\theta(ab^\dagger-a^\dagger b)}\) acts as
 follows on the dual-rail representation
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org1af76fa"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
+<pre class="src src-sage" id="org92fec08"><span class="org-variable-name">theta</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'theta'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 <span class="org-variable-name">B</span> <span class="org-operator">=</span> matrix([[cos(theta), <span class="org-operator">-</span>sin(theta)], [sin(theta), cos(theta)]])
 </pre>
 </div>
@@ -285,7 +287,7 @@ This essentially follows from these commutation relations:
 </p>
 
 <p>
-<a id="org455b2ea"></a>
+<a id="org262336b"></a>
 \[
   BaB^\dagger = a \cos(\theta) + b \sin(\theta)
   \quad \text{and} \quad
@@ -437,7 +439,7 @@ Hence for the single spin case we have the following signal
 </p>
 
 <p>
-<a id="org5a55884"></a>
+<a id="orgd6440e0"></a>
 \[
   V_1(t) = V_0 \trace{\rho\sigma^-} e^{\ii \omega t} .
 \]
@@ -462,7 +464,7 @@ represented as
 
 <p>
 for some real vector \(\vec{r}=(r_x,r_y,r_z)\) with \(\norm{\vec{r}}\leq1\) (the state is pure
-if the norm is exactly one). The task is to determine \(\vec{r}\). Plugging this into <a href="#org5a55884">the
+if the norm is exactly one). The task is to determine \(\vec{r}\). Plugging this into <a href="#orgd6440e0">the
 formula</a> above and using the orthogonality of the Pauli matrices with respect to the
 scalar product \(A,B\mapsto\trace{A^\dagger\cdot\,B}\) we get
 </p>
@@ -533,28 +535,28 @@ to determine \(\rho\) via state tomography.
 </div>
 </div>
 
-<div id="outline-container-orgba15614" class="outline-2">
-<h2 id="orgba15614">Exercises</h2>
-<div class="outline-text-2" id="text-orgba15614">
+<div id="outline-container-orged527a4" class="outline-2">
+<h2 id="orged527a4">Exercises</h2>
+<div class="outline-text-2" id="text-orged527a4">
 </div>
-<div id="outline-container-org42a9dbf" class="outline-3">
-<h3 id="org42a9dbf">Exercise 7.1</h3>
-<div class="outline-text-3" id="text-org42a9dbf">
+<div id="outline-container-org070ba4b" class="outline-3">
+<h3 id="org070ba4b">Exercise 7.1</h3>
+<div class="outline-text-3" id="text-org070ba4b">
 <p>
 Using the fact that \(x\) and \(p\) do not commute, and that in fact \([x,p]=\ii\,\hbar\),
 explicitly show that \(a^\dagger\,a=H/\hbar\omega-1/2\).
 </p>
 </div>
 
-<div id="outline-container-orgc263427" class="outline-4">
-<h4 id="orgc263427">Solution</h4>
-<div class="outline-text-4" id="text-orgc263427">
+<div id="outline-container-org6b1303b" class="outline-4">
+<h4 id="org6b1303b">Solution</h4>
+<div class="outline-text-4" id="text-org6b1303b">
 <p>
 This is just boring algebra which can be done much faster (and more reliably) by <i>sage</i>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orga15a597"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H_qho <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
+<pre class="src src-sage" id="org4a11b41"><span class="org-keyword">assert</span> ad <span class="org-operator">*</span> a <span class="org-operator">==</span> H_qho <span class="org-operator">-</span> 1<span class="org-operator">/</span>2
 <span class="org-doc">"PASSED"</span>
 </pre>
 </div>
@@ -574,15 +576,15 @@ Given that \([x,p]=\ii\,\hbar\), compute \([a,a^\dagger]\).
 </p>
 </div>
 
-<div id="outline-container-orgf09bb1a" class="outline-4">
-<h4 id="orgf09bb1a">Solution</h4>
-<div class="outline-text-4" id="text-orgf09bb1a">
+<div id="outline-container-orge8d2048" class="outline-4">
+<h4 id="orge8d2048">Solution</h4>
+<div class="outline-text-4" id="text-orge8d2048">
 <p>
 The unitless result is \(1\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org1109567">com(a, ad)
+<pre class="src src-sage" id="org5530924">com(a, ad)
 </pre>
 </div>
 
@@ -592,15 +594,15 @@ The unitless result is \(1\):
 
 
 <p>
-Since the <a href="#orga049b26">creator/annihilator is already unit-less</a> the same is true with units.
+Since the <a href="#orgfb2bd3d">creator/annihilator is already unit-less</a> the same is true with units.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga877794" class="outline-3">
-<h3 id="orga877794">Exercise 7.3</h3>
-<div class="outline-text-3" id="text-orga877794">
+<div id="outline-container-orgcc9327e" class="outline-3">
+<h3 id="orgcc9327e">Exercise 7.3</h3>
+<div class="outline-text-3" id="text-orgcc9327e">
 <p>
 Compute \([H,a]\) and use the result to show that if \(\ket{\psi}\) is an eigenstate of \(H\)
 with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with energy
@@ -608,9 +610,9 @@ with energy \(E\geq n\hbar\omega\), then \(a^n\ket{\psi}\) is an eigenstate with
 </p>
 </div>
 
-<div id="outline-container-orgd92f1d7" class="outline-4">
-<h4 id="orgd92f1d7">Solution</h4>
-<div class="outline-text-4" id="text-orgd92f1d7">
+<div id="outline-container-orgb5b0d7f" class="outline-4">
+<h4 id="orgb5b0d7f">Solution</h4>
+<div class="outline-text-4" id="text-orgb5b0d7f">
 <p>
 Using \([a^\dagger,a]=-[a,a^\dagger]=-1\) (see <a href="#exercise-7.2">exercise 7.2</a>) we deduce (assuming unit-less quantities)
 </p>
@@ -652,9 +654,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org4c26eb8" class="outline-3">
-<h3 id="org4c26eb8">Exercise 7.4</h3>
-<div class="outline-text-3" id="text-org4c26eb8">
+<div id="outline-container-org6f6ca2c" class="outline-3">
+<h3 id="org6f6ca2c">Exercise 7.4</h3>
+<div class="outline-text-3" id="text-org6f6ca2c">
 <p>
 Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 </p>
@@ -665,7 +667,7 @@ Show that \(\ket{n}=\frac{(a^\dagger)^n}{\sqrt{n!}}\ket{0}\).
 <div class="outline-text-4" id="text-exercise-7.4-proof">
 <p>
 The exercise statement is rather "vague" (I try to be friendly here 😉), so let us prove
-some definite statement like the <a href="#orgc067091">theorem about the spectrum of the harmonic oscillator</a>
+some definite statement like the <a href="#org38cd097">theorem about the spectrum of the harmonic oscillator</a>
 instead.
 </p>
 
@@ -698,7 +700,7 @@ scalar factor, which can be seen by observing that the ODE is equivalent to
 </p>
 
 <p>
-The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#org26d8ec7">ensures normalization</a>. We thus
+The factor \(1/\sqrt{2\pi}\) in the definition of \(\ket{0}\) <a href="#orge0398ce">ensures normalization</a>. We thus
 proved \(N\ket{0}=0\). Next let us verify that \(\ket{n}\) is an eigenvector. To simplify the
 notation let us define \(\ket{n'}:=\sqrt{n!}\ket{n}\).
 </p>
@@ -774,38 +776,38 @@ leading factor \(2^n\)). The density now follows from the following well known r
 </p>
 
 <ol class="org-ol">
-<li><a id="org949ac8b"></a> The compactly supported continuous functions are dense in
+<li><a id="org74aae41"></a> The compactly supported continuous functions are dense in
 \(L^2(\RR)\). I do not have a good resource on that but one way to see this is by a
 method called <i><a href="https://en.wikipedia.org/wiki/Mollifier">mollification</a></i>.</li>
-<li><a id="org7cb2b03"></a> For any finite interval \(I\) the polynomials on that
+<li><a id="orgd642d83"></a> For any finite interval \(I\) the polynomials on that
 interval are dense in the continuous function on \(I\) with respect to the
 $L^&infin;$-norm which is stronger than the \(L^2\) norm (since the interval is
 finite). This is the <a href="https://en.wikipedia.org/wiki/Stone%E2%80%93Weierstrass_theorem">Stone-Weierstrass Theorem</a>.</li>
 </ol>
 
 <p>
-By <a href="#org7cb2b03">2</a> finite linear combinations of eigenstates can approximate any
+By <a href="#orgd642d83">2</a> finite linear combinations of eigenstates can approximate any
 compactly supported continuous function. Here it is important that any degree is
 represented among the eigenstates. It should be obvious that the factor \(e^{-x^2/2}\) does
 not disturb this argument at all. Now completeness directly follows from
-<a href="#org949ac8b">1</a>. QED.
+<a href="#org74aae41">1</a>. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org17cc304" class="outline-3">
-<h3 id="org17cc304">Exercise 7.5</h3>
-<div class="outline-text-3" id="text-org17cc304">
+<div id="outline-container-orgf8f667c" class="outline-3">
+<h3 id="orgf8f667c">Exercise 7.5</h3>
+<div class="outline-text-3" id="text-orgf8f667c">
 <p>
 Verify that Equations (7.11) and (7.12) are consistent with (7.10) and the normalization
 condition \(\norm{\ket{n}}^2=1\).
 </p>
 </div>
 
-<div id="outline-container-orge80bd83" class="outline-4">
-<h4 id="orge80bd83">Solution</h4>
-<div class="outline-text-4" id="text-orge80bd83">
+<div id="outline-container-org9634794" class="outline-4">
+<h4 id="org9634794">Solution</h4>
+<div class="outline-text-4" id="text-org9634794">
 <p>
 It is not hard to see that (7.11) and (7.12) imply (7.10):
 </p>
@@ -824,18 +826,18 @@ consistent with the three equations but for trivial reasons.
 </div>
 </div>
 
-<div id="outline-container-org980a4c7" class="outline-3">
-<h3 id="org980a4c7">Exercise 7.6 (Eigenstates of photon annihilation)</h3>
-<div class="outline-text-3" id="text-org980a4c7">
+<div id="outline-container-org5ec833f" class="outline-3">
+<h3 id="org5ec833f">Exercise 7.6 (Eigenstates of photon annihilation)</h3>
+<div class="outline-text-3" id="text-org5ec833f">
 <p>
 Prove that a coherent state is an eigenstate of the photon annihilation operator, that is,
 show \(a\ket{\alpha}=\lambda\ket{\alpha}\) for some constant \(\lambda\).
 </p>
 </div>
 
-<div id="outline-container-org7755e84" class="outline-4">
-<h4 id="org7755e84">Proof</h4>
-<div class="outline-text-4" id="text-org7755e84">
+<div id="outline-container-orgec26b6c" class="outline-4">
+<h4 id="orgec26b6c">Proof</h4>
+<div class="outline-text-4" id="text-orgec26b6c">
 <p>
 Recall that \(a\ket{n}=\sqrt{n}\ket{n-1}\) for \(n\geq1\) and \(a\ket{0}=0\). Hence
 </p>
@@ -855,9 +857,9 @@ The claim follows with \(\lambda=\alpha\). QED.
 </div>
 </div>
 
-<div id="outline-container-org705ad0d" class="outline-3">
-<h3 id="org705ad0d">Exercise 7.7</h3>
-<div class="outline-text-3" id="text-org705ad0d">
+<div id="outline-container-org13381cb" class="outline-3">
+<h3 id="org13381cb">Exercise 7.7</h3>
+<div class="outline-text-3" id="text-org13381cb">
 <p>
 Show that the circuit below transforms a dual-rail state by
 </p>
@@ -878,9 +880,9 @@ and the boxed \(\pi\) to represent a phase shift by \(\pi\).
 </dl>
 </div>
 
-<div id="outline-container-org88f556a" class="outline-4">
-<h4 id="org88f556a">Solution</h4>
-<div class="outline-text-4" id="text-org88f556a">
+<div id="outline-container-org2d9d550" class="outline-4">
+<h4 id="org2d9d550">Solution</h4>
+<div class="outline-text-4" id="text-org2d9d550">
 <p>
 By definition the circuit acts like this (we use \(e^{\ii\pi}=-1\) to simplify notation):
 </p>
@@ -906,18 +908,18 @@ as desired.
 </div>
 </div>
 
-<div id="outline-container-orgde10f16" class="outline-3">
-<h3 id="orgde10f16">Exercise 7.8</h3>
-<div class="outline-text-3" id="text-orgde10f16">
+<div id="outline-container-orgb04c190" class="outline-3">
+<h3 id="orgb04c190">Exercise 7.8</h3>
+<div class="outline-text-3" id="text-orgb04c190">
 <p>
 Show that \(P\ket{\alpha}=\ket{\alpha e^{\ii\Delta}}\) where \(\ket{\alpha}\) is a coherent
 state (note that, in general, \(\alpha\) is a complex number!).
 </p>
 </div>
 
-<div id="outline-container-org8ce844e" class="outline-4">
-<h4 id="org8ce844e">Proof</h4>
-<div class="outline-text-4" id="text-org8ce844e">
+<div id="outline-container-orgb819fa0" class="outline-4">
+<h4 id="orgb819fa0">Proof</h4>
+<div class="outline-text-4" id="text-orgb819fa0">
 <p>
 The phase shift operator is given by \(P\ket{n}=e^{\ii n\Delta}\ket{n}\). Hence, using \(\abs{e^{\ii\Delta}}=1\)
 </p>
@@ -936,9 +938,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org66cf36c" class="outline-3">
-<h3 id="org66cf36c">Exercise 7.9 (Optical Hadamard gate)</h3>
-<div class="outline-text-3" id="text-org66cf36c">
+<div id="outline-container-orgfced556" class="outline-3">
+<h3 id="orgfced556">Exercise 7.9 (Optical Hadamard gate)</h3>
+<div class="outline-text-3" id="text-orgfced556">
 <p>
 Show that the following circuit acts as a Hadamard gate on dual-rail single photon states,
 that is, \(\ket{01}\mapsto(\ket{01}+\ket{10})/\sqrt{2}\) and
@@ -950,9 +952,9 @@ that is, \(\ket{01}\mapsto(\ket{01}+\ket{10})/\sqrt{2}\) and
 </dl>
 </div>
 
-<div id="outline-container-org6f56922" class="outline-4">
-<h4 id="org6f56922">Solution</h4>
-<div class="outline-text-4" id="text-org6f56922">
+<div id="outline-container-org6143597" class="outline-4">
+<h4 id="org6143597">Solution</h4>
+<div class="outline-text-4" id="text-org6143597">
 <p>
 Assuming evolution from left to right the circuit implements \(ZB_{\theta=\pi/4}\) (note
 that the phase shift is \(Z\) up to a global phase). Below you can see that then the
@@ -982,9 +984,9 @@ f<span class="org-string">"sqrt(2)*H != </span>{sqrt(2) <span class="org-operato
 </div>
 </div>
 
-<div id="outline-container-orgb2569bb" class="outline-3">
-<h3 id="orgb2569bb">Exercise 7.10 (Mach–Zehnder interferometer)</h3>
-<div class="outline-text-3" id="text-orgb2569bb">
+<div id="outline-container-org5a1b06b" class="outline-3">
+<h3 id="org5a1b06b">Exercise 7.10 (Mach–Zehnder interferometer)</h3>
+<div class="outline-text-3" id="text-org5a1b06b">
 <p>
 Interferometers are optical tools used to measure small phase shifts, which are
 constructed from two beamsplitters. Their basic principle of operation can be understood
@@ -1018,9 +1020,9 @@ expressions. The second expression neglects the global phase (as is common).</dd
 </div>
 
 
-<div id="outline-container-orga6d60f1" class="outline-4">
-<h4 id="orga6d60f1">Solution</h4>
-<div class="outline-text-4" id="text-orga6d60f1">
+<div id="outline-container-org36e2446" class="outline-4">
+<h4 id="org36e2446">Solution</h4>
+<div class="outline-text-4" id="text-org36e2446">
 <p>
 Recall that we have \(B=B(\theta)=R_y(2\theta)\). Hence \(B_{\theta=\pi/4}\) is a rotation
 around the y-axis by ninety degrees. This maps the x-axis onto the reversed z-axsis. Hence
@@ -1053,20 +1055,20 @@ It worked out 😎!
 </div>
 </div>
 
-<div id="outline-container-org4e8cc8e" class="outline-3">
-<h3 id="org4e8cc8e">Exercise 7.11</h3>
-<div class="outline-text-3" id="text-org4e8cc8e">
+<div id="outline-container-org99bac2b" class="outline-3">
+<h3 id="org99bac2b">Exercise 7.11</h3>
+<div class="outline-text-3" id="text-org99bac2b">
 <p>
 What is \(B\ket{2,0}\) for \(\theta=\pi/4\)?
 </p>
 </div>
 
-<div id="outline-container-orgdddb02d" class="outline-4">
-<h4 id="orgdddb02d">Solution</h4>
-<div class="outline-text-4" id="text-orgdddb02d">
+<div id="outline-container-orgd174915" class="outline-4">
+<h4 id="orgd174915">Solution</h4>
+<div class="outline-text-4" id="text-orgd174915">
 <p>
 Following the book we basically identify states with products of creation operators and
-then use the <a href="#org455b2ea">commutation relations</a> for the beamsplitter and \(B\ket{0,0}=\ket{0,0}\):
+then use the <a href="#org262336b">commutation relations</a> for the beamsplitter and \(B\ket{0,0}=\ket{0,0}\):
 </p>
 
 <p>
@@ -1122,9 +1124,9 @@ states as in Equation (7.16)? (Hint: recall that
 </p>
 </div>
 
-<div id="outline-container-org67f7b53" class="outline-4">
-<h4 id="org67f7b53">Solution</h4>
-<div class="outline-text-4" id="text-org67f7b53">
+<div id="outline-container-org3373dde" class="outline-4">
+<h4 id="org3373dde">Solution</h4>
+<div class="outline-text-4" id="text-org3373dde">
 <p>
 Observe that
 </p>
@@ -1184,9 +1186,9 @@ Hence the operation of \(B\) on coherent states is again given by a rotation mat
 </div>
 </div>
 
-<div id="outline-container-org5f2c51f" class="outline-3">
-<h3 id="org5f2c51f">Exercise 7.13 (Optical Deutsch–Jozsa quantum circuit)</h3>
-<div class="outline-text-3" id="text-org5f2c51f">
+<div id="outline-container-orgf4a5f78" class="outline-3">
+<h3 id="orgf4a5f78">Exercise 7.13 (Optical Deutsch–Jozsa quantum circuit)</h3>
+<div class="outline-text-3" id="text-orgf4a5f78">
 <p>
 In Section 1.4.4 (page 34), we described a quantum circuit for solving the one-bit
 Deutsch–Jozsa problem. Here is a version of that circuit for single photon states (in the
@@ -1209,9 +1211,9 @@ states?</li>
 </ol>
 </div>
 
-<div id="outline-container-org8081aba" class="outline-4">
-<h4 id="org8081aba">Solution to 1</h4>
-<div class="outline-text-4" id="text-org8081aba">
+<div id="outline-container-org1c1c362" class="outline-4">
+<h4 id="org1c1c362">Solution to 1</h4>
+<div class="outline-text-4" id="text-org1c1c362">
 <p>
 Recall that \(U_f\) implements the following operation on the logical qubits:
 </p>
@@ -1267,9 +1269,9 @@ So overall, we could do this with the <i>optical</i> Fredkin gate alone!
 </div>
 </div>
 
-<div id="outline-container-org3d1b013" class="outline-4">
-<h4 id="org3d1b013">Solution to 2</h4>
-<div class="outline-text-4" id="text-org3d1b013">
+<div id="outline-container-org9243c65" class="outline-4">
+<h4 id="org9243c65">Solution to 2</h4>
+<div class="outline-text-4" id="text-org9243c65">
 <p>
 That \(U_f\) can be implemented without phase shifts should be clear since controlled <code>X</code>
 gates (this is what the optical Fredkin does on the dual-rail represenation as we have
@@ -1299,9 +1301,9 @@ final state it does not matter since we measure in the computational base anyway
 </div>
 </div>
 
-<div id="outline-container-org54443ce" class="outline-4">
-<h4 id="org54443ce">Solution to 3</h4>
-<div class="outline-text-4" id="text-org54443ce">
+<div id="outline-container-orga4b284c" class="outline-4">
+<h4 id="orga4b284c">Solution to 3</h4>
+<div class="outline-text-4" id="text-orga4b284c">
 <p>
 Not sure what this exercise even means. If it means to show that the circuit actually
 implements the Deutsch-Josza algorithm: then this was done in the solution to 2.
@@ -1309,9 +1311,9 @@ implements the Deutsch-Josza algorithm: then this was done in the solution to 2.
 </div>
 </div>
 
-<div id="outline-container-org0237387" class="outline-4">
-<h4 id="org0237387">Solution to 4</h4>
-<div class="outline-text-4" id="text-org0237387">
+<div id="outline-container-orgfe9b771" class="outline-4">
+<h4 id="orgfe9b771">Solution to 4</h4>
+<div class="outline-text-4" id="text-orgfe9b771">
 <p>
 No it does not work with coherent states. No matter how the measurement outcome is
 interpreted there is always a non-zero chance of failure for some \(f\) (recall that the
@@ -1374,9 +1376,9 @@ possible. QED.
 </div>
 </div>
 
-<div id="outline-container-org78e0328" class="outline-3">
-<h3 id="org78e0328">Exercise 7.14 (Classical cross phase modulation)</h3>
-<div class="outline-text-3" id="text-org78e0328">
+<div id="outline-container-org62b235f" class="outline-3">
+<h3 id="org62b235f">Exercise 7.14 (Classical cross phase modulation)</h3>
+<div class="outline-text-3" id="text-org62b235f">
 <p>
 To see that the expected classical behavior of a Kerr medium is obtained from the
 deﬁnition of \(K\), Equation (7.41), apply it to two modes, one with a coherent state and
@@ -1403,9 +1405,9 @@ and show that the main contribution to the sum is for \(m=\abs{\beta}^2\).
 </p>
 </div>
 
-<div id="outline-container-orgda08131" class="outline-4">
-<h4 id="orgda08131">Proof of the first part</h4>
-<div class="outline-text-4" id="text-orgda08131">
+<div id="outline-container-org7db144b" class="outline-4">
+<h4 id="org7db144b">Proof of the first part</h4>
+<div class="outline-text-4" id="text-org7db144b">
 <p>
 Let us abbreviate \(\xi=\chi L\) and \(J=a^\dagger ab^\dagger b\). We have
 </p>
@@ -1499,9 +1501,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org008b530" class="outline-4">
-<h4 id="org008b530">Proof of the second part</h4>
-<div class="outline-text-4" id="text-org008b530">
+<div id="outline-container-org0c3d91c" class="outline-4">
+<h4 id="org0c3d91c">Proof of the second part</h4>
+<div class="outline-text-4" id="text-org0c3d91c">
 <p>
 Using the first part we get
 </p>
@@ -1538,9 +1540,9 @@ biggest contribution to \(\rho_b\) comes from a state close to \(\ket{\alpha\,e^
 </div>
 </div>
 </div>
-<div id="outline-container-orgee1f19b" class="outline-3">
-<h3 id="orgee1f19b">Exercise 7.15</h3>
-<div class="outline-text-3" id="text-orgee1f19b">
+<div id="outline-container-org3c21cbc" class="outline-3">
+<h3 id="org3c21cbc">Exercise 7.15</h3>
+<div class="outline-text-3" id="text-org3c21cbc">
 <p>
 Plot (7.55):
 </p>
@@ -1556,15 +1558,15 @@ as a function of field detuning \(\varphi\), for \(R_1=R_2=0.9\).
 </p>
 </div>
 
-<div id="outline-container-org3d075b7" class="outline-4">
-<h4 id="org3d075b7">Solution</h4>
-<div class="outline-text-4" id="text-org3d075b7">
+<div id="outline-container-orgcc306ed" class="outline-4">
+<h4 id="orgcc306ed">Solution</h4>
+<div class="outline-text-4" id="text-orgcc306ed">
 <p>
 Here is the code to make the plot in <code>sage</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgfb46512"><span class="org-variable-name">R1</span>, <span class="org-variable-name">R2</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'R1 R2'</span>, domain<span class="org-operator">=</span><span class="org-string">'positive'</span>)
+<pre class="src src-sage" id="org39c0add"><span class="org-variable-name">R1</span>, <span class="org-variable-name">R2</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'R1 R2'</span>, domain<span class="org-operator">=</span><span class="org-string">'positive'</span>)
 <span class="org-variable-name">phi</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'phi'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 
 <span class="org-variable-name">power</span> <span class="org-operator">=</span> (1 <span class="org-operator">-</span> R1) <span class="org-operator">/</span> <span class="org-builtin">abs</span>(1 <span class="org-operator">+</span> exp(i<span class="org-operator">*</span>phi)<span class="org-operator">*</span>sqrt(R1<span class="org-operator">*</span>R2))<span class="org-operator">**</span>2
@@ -1586,7 +1588,7 @@ You can use it like so:
 </div>
 
 
-<div id="orgde88ef7" class="figure">
+<div id="org92df16f" class="figure">
 <p><img src="images/exercise_7_15_plot.png" alt="exercise_7_15_plot.png" />
 </p>
 <p><span class="figure-number">Figure 1: </span>Fabry-Perot cavity, relative power \(P_{\mathrm{cav}}/P_{\mathrm{in}}\) inside cavity vs \(\varphi/\pi\).</p>
@@ -1603,9 +1605,9 @@ roughly \((1-R_1)/4\) if \(R_1,R_2\approx1\). Moreover the width of the central 
 </div>
 </div>
 
-<div id="outline-container-orgaf2a50a" class="outline-3">
-<h3 id="orgaf2a50a">Exercise 7.16 (Electric dipole selection rules)</h3>
-<div class="outline-text-3" id="text-orgaf2a50a">
+<div id="outline-container-org2fca563" class="outline-3">
+<h3 id="org2fca563">Exercise 7.16 (Electric dipole selection rules)</h3>
+<div class="outline-text-3" id="text-org2fca563">
 <p>
 Show that (7.60):
 </p>
@@ -1639,9 +1641,9 @@ but the sign of \(\Delta\,l\) does not.
 </dl>
 </div>
 
-<div id="outline-container-orgcbe0a2b" class="outline-4">
-<h4 id="orgcbe0a2b">Proof</h4>
-<div class="outline-text-4" id="text-orgcbe0a2b">
+<div id="outline-container-org323712c" class="outline-4">
+<h4 id="org323712c">Proof</h4>
+<div class="outline-text-4" id="text-org323712c">
 <p>
 All relevant functions involve relatively complicated constant factors. Since we are only
 interested in the question whether the integral is non-zero or not, let us introduce a
@@ -1695,7 +1697,7 @@ times (in one or in the other direction) yields:
 </p>
 
 <p>
-<a id="orgf53e154"></a>
+<a id="org4dc3b06"></a>
 \[
   I_3(b=0) \sim \int_{-1}^{+1} \tilde{P}_{l_1}(x) \cdot D_{m_2} P_{l_2}(x) \dd x .
 \]
@@ -1706,7 +1708,7 @@ assuming \(l_1\neq0\), and
 </p>
 
 <p>
-<a id="org072d0aa"></a>
+<a id="org7cbe12a"></a>
 \[
   I_3(b=1) \sim \int_{-1}^{+1} D_{m_2+1} P_{l_1}(x) \cdot \tilde{P}_{l_2}(x) \dd x .
 \]
@@ -1728,12 +1730,12 @@ granted). The case \(b=1\) is similar.
 </p>
 
 <p>
-Let us come back to the above formulas for <a href="#orgf53e154">\(b=0\)</a> and <a href="#org072d0aa">\(b=1\)</a>. We have the following
+Let us come back to the above formulas for <a href="#org4dc3b06">\(b=0\)</a> and <a href="#org7cbe12a">\(b=1\)</a>. We have the following
 </p>
 
 <dl class="org-dl">
 <dt>Lemma</dt><dd><p>
-<a id="orgfb3ba4a"></a> \(P_l\) is an eigenfunction of \(D_n\). More precisely
+<a id="orgc74b45a"></a> \(P_l\) is an eigenfunction of \(D_n\). More precisely
 \(D_nP_l=\lambda_{nl}P_l\) where
 </p>
 
@@ -1810,7 +1812,7 @@ It remains to do the following
 </p>
 
 <dl class="org-dl">
-<dt>Proof of the <a href="#orgfb3ba4a">lemma</a></dt><dd><p>
+<dt>Proof of the <a href="#orgc74b45a">lemma</a></dt><dd><p>
 We prove this by mathematical induction. The case \(n=0\) is trivial
 (\(D_0\) is the identity and \(\lambda_{0l}=1\)). Let us assume the claim for an \(n\geq0\)
 and consider
@@ -1914,9 +1916,9 @@ which essentially proves the claim. QED.
 </div>
 </div>
 
-<div id="outline-container-orgc59124c" class="outline-4">
-<h4 id="orgc59124c">Appendix</h4>
-<div class="outline-text-4" id="text-orgc59124c">
+<div id="outline-container-org02f9b59" class="outline-4">
+<h4 id="org02f9b59">Appendix</h4>
+<div class="outline-text-4" id="text-org02f9b59">
 <p>
 Before I finally managed to find the solution to this exercise I had to do a lot of
 experiments with sage math. I do not want to collect them all here but let me just give
@@ -1924,7 +1926,7 @@ one example.
 </p>
 
 <p>
-I was a bit surprised by the fact that the <a href="#orgfb3ba4a">lemma</a> should be true. By what the exercise
+I was a bit surprised by the fact that the <a href="#orgc74b45a">lemma</a> should be true. By what the exercise
 demanded to show and what I already managed to prove it had to be true. On the other hand
 I typically do a lot of mistakes when doing such calculations so I needed a way to verify
 the claim for concrete values of \(n\) and \(l\). It turned out that my experiments backed the
@@ -1932,7 +1934,7 @@ lemma and I could go on proving it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org88b701d"><span class="org-comment-delimiter"># </span><span class="org-comment">We have to call it xx to not overwrite the position operator.</span>
+<pre class="src src-sage" id="org10aa62b"><span class="org-comment-delimiter"># </span><span class="org-comment">We have to call it xx to not overwrite the position operator.</span>
 <span class="org-variable-name">xx</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'x'</span>, domain<span class="org-operator">=</span><span class="org-string">'real'</span>)
 
 <span class="org-keyword">def</span> <span class="org-function-name">Pl</span>(l):
@@ -1959,7 +1961,7 @@ Test the claim of the lemma:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org0f4b63e"><span class="org-keyword">for</span> l <span class="org-keyword">in</span> <span class="org-builtin">range</span>(6):
+<pre class="src src-sage" id="orgb3aa3b0"><span class="org-keyword">for</span> l <span class="org-keyword">in</span> <span class="org-builtin">range</span>(6):
     <span class="org-keyword">for</span> n <span class="org-keyword">in</span> <span class="org-builtin">range</span>(l<span class="org-operator">+</span>1):
         <span class="org-variable-name">q</span> <span class="org-operator">=</span> Dn(Pl(l), n) <span class="org-operator">-</span> lambda_nl(n, l)<span class="org-operator">*</span>Pl(l)
         <span class="org-keyword">assert</span> q <span class="org-operator">==</span> 0
@@ -1974,9 +1976,9 @@ Test the claim of the lemma:
 </div>
 </div>
 
-<div id="outline-container-org27ccf43" class="outline-3">
-<h3 id="org27ccf43">Exercise 7.17 (Eigenstates of the Jaynes–Cummings Hamiltonian)</h3>
-<div class="outline-text-3" id="text-org27ccf43">
+<div id="outline-container-org5a8ad5a" class="outline-3">
+<h3 id="org5a8ad5a">Exercise 7.17 (Eigenstates of the Jaynes–Cummings Hamiltonian)</h3>
+<div class="outline-text-3" id="text-org5a8ad5a">
 <p>
 Show that
 </p>
@@ -2001,9 +2003,9 @@ where the labels in the ket are \(\ket{\mathrm{field},\mathrm{atom}}\).
 </p>
 </div>
 
-<div id="outline-container-orgd282630" class="outline-4">
-<h4 id="orgd282630">Proof</h4>
-<div class="outline-text-4" id="text-orgd282630">
+<div id="outline-container-orgfea4858" class="outline-4">
+<h4 id="orgfea4858">Proof</h4>
+<div class="outline-text-4" id="text-orgfea4858">
 <p>
 Recall
 </p>
@@ -2016,7 +2018,7 @@ Recall
 </p>
 
 <p>
-Using this with the <a href="#orgc067091">theorem on the ladder operators</a> for the harmonic oscillator yields
+Using this with the <a href="#org38cd097">theorem on the ladder operators</a> for the harmonic oscillator yields
 </p>
 
 \begin{align*}
@@ -2109,9 +2111,9 @@ not mean it is correct though).
 </dl>
 </div>
 
-<div id="outline-container-org311b0cb" class="outline-4">
-<h4 id="org311b0cb">Proof</h4>
-<div class="outline-text-4" id="text-org311b0cb">
+<div id="outline-container-org0726872" class="outline-4">
+<h4 id="org0726872">Proof</h4>
+<div class="outline-text-4" id="text-org0726872">
 <p>
 Observe that \(H\) is block-diagonal
 </p>
@@ -2171,9 +2173,9 @@ Plugging in \(Z=\proj{01}-\proj{10}\), \(X=\ket{01}\bra{10}+\ket{10}\bra{01}\), 
 </div>
 </div>
 
-<div id="outline-container-orgd0aece3" class="outline-3">
-<h3 id="orgd0aece3">Exercise 7.19 (Lorentzian absorption profile)</h3>
-<div class="outline-text-3" id="text-orgd0aece3">
+<div id="outline-container-org678e5a7" class="outline-3">
+<h3 id="org678e5a7">Exercise 7.19 (Lorentzian absorption profile)</h3>
+<div class="outline-text-3" id="text-org678e5a7">
 <p>
 Plot the photon-absorbtion probability (7.79)
 </p>
@@ -2190,9 +2192,9 @@ the corresponding classical result. What are the oscillations due to?
 </p>
 </div>
 
-<div id="outline-container-org202082c" class="outline-4">
-<h4 id="org202082c">Proof</h4>
-<div class="outline-text-4" id="text-org202082c">
+<div id="outline-container-org7f03cdd" class="outline-4">
+<h4 id="org7f03cdd">Proof</h4>
+<div class="outline-text-4" id="text-org7f03cdd">
 <p>
 First of all observe that for \(\delta\to\infty\) we have the following asymptotics
 </p>
@@ -2208,7 +2210,7 @@ This is consistent with the following plot:
 </p>
 
 
-<div id="orgf760b80" class="figure">
+<div id="org758f62d" class="figure">
 <p><img src="images/exercise_7_19_plot.png" alt="exercise_7_19_plot.png" />
 </p>
 <p><span class="figure-number">Figure 2: </span>Absorbtion probability \(\chi_r\) against \(\delta\) for \(t=1\) and \(g=1.2\).</p>
@@ -2219,7 +2221,7 @@ The plot is produced by the following function
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org5a2c2df"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex719</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>15, 15), t<span class="org-operator">=</span>1, g<span class="org-operator">=</span>1.2):
+<pre class="src src-sage" id="org76b2d54"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex719</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>15, 15), t<span class="org-operator">=</span>1, g<span class="org-operator">=</span>1.2):
     <span class="org-doc">"""Plot for exercise 7.19."""</span>
     <span class="org-variable-name">d</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'delta'</span>)
     <span class="org-variable-name">Omega2</span> <span class="org-operator">=</span> g<span class="org-operator">^</span>2 <span class="org-operator">+</span> d<span class="org-operator">^</span>2
@@ -2266,9 +2268,9 @@ multiple of \(2\pi\)).</dd>
 </dl>
 </div>
 
-<div id="outline-container-orgad6a9ed" class="outline-4">
-<h4 id="orgad6a9ed">Solution</h4>
-<div class="outline-text-4" id="text-orgad6a9ed">
+<div id="outline-container-org8d9d929" class="outline-4">
+<h4 id="org8d9d929">Solution</h4>
+<div class="outline-text-4" id="text-org8d9d929">
 <p>
 At first I didn't really understand what the authors want (the wording in the main text was
 very confusing for me). But reading on I could infer what they meant (hopefully).
@@ -2396,7 +2398,7 @@ zone away from \(0\) and \(\infty\) the approximation works well at the <i>quali
 </p>
 
 
-<div id="org8400c4f" class="figure">
+<div id="orgb0eee6e" class="figure">
 <p><img src="./images/exercise_7_20_plot.png" alt="exercise_7_20_plot.png" />
 </p>
 <p><span class="figure-number">Figure 3: </span>The refractive index \(\chi_i\) of a single atom against the detuning \(\delta\) (blue) for \(g=1.2\) and \(t=1\). In green and red approximations in terms of \(\sim-\delta/\Omega^2\) at \(0\) and \(\infty\).</p>
@@ -2407,7 +2409,7 @@ This is the code to produce the plot:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgf14fcdc"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex720</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>15, 15), t<span class="org-operator">=</span>1, g<span class="org-operator">=</span>1.2):
+<pre class="src src-sage" id="org4809460"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex720</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>15, 15), t<span class="org-operator">=</span>1, g<span class="org-operator">=</span>1.2):
     <span class="org-doc">"""Plot for exercise 7.20."""</span>
     <span class="org-variable-name">d</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'delta'</span>)
     <span class="org-variable-name">Omega</span> <span class="org-operator">=</span> sqrt(g<span class="org-operator">^</span>2 <span class="org-operator">+</span> d<span class="org-operator">^</span>2)
@@ -2433,9 +2435,9 @@ This is the code to produce the plot:
 </div>
 </div>
 
-<div id="outline-container-orgbe58655" class="outline-3">
-<h3 id="orgbe58655">Exercise 7.21</h3>
-<div class="outline-text-3" id="text-orgbe58655">
+<div id="outline-container-org0853b35" class="outline-3">
+<h3 id="org0853b35">Exercise 7.21</h3>
+<div class="outline-text-3" id="text-org0853b35">
 <p>
 Explicitly exponentiate (7.82) and show that
 </p>
@@ -2453,9 +2455,9 @@ which sidesteps much of the complication typically involved in classical nonline
 </p>
 </div>
 
-<div id="outline-container-org1835563" class="outline-4">
-<h4 id="org1835563">Solution</h4>
-<div class="outline-text-4" id="text-org1835563">
+<div id="outline-container-org3a561ca" class="outline-4">
+<h4 id="org3a561ca">Solution</h4>
+<div class="outline-text-4" id="text-org3a561ca">
 <p>
 To be consistent with the remark from <a href="#exercise-7.18">exercise 7.18</a> I assume that equation (7.83) reads
 \(H_0=\delta\) (instead of \(H_0=-\delta\)). Let
@@ -2501,7 +2503,7 @@ This is basically what we dealt with in <a href="#exercise-7.20">exercise 7.20</
 
 <p>
 We only have to exponentiate \(H_2\) to compute this (not all of \(H\)). But actually we not
-even have to do this due to the following observation (see also <a href="#org9b1e1b1">sage code</a> below):
+even have to do this due to the following observation (see also <a href="#org0c67c42">sage code</a> below):
 </p>
 
 <p>
@@ -2515,7 +2517,7 @@ Note that \(\ket{110}\) corresponds to the upper left corner of the matrix \(H_2
 </p>
 
 <p>
-<a id="org92520f1"></a>
+<a id="org5d2e9aa"></a>
 \[
   \bra{110}U\ket{110} = \sum_{n \text{ even}} \frac{(-\ii t)^n}{n!} \Omega_{ab}^n +
     \sum_{n \text{ odd}} \frac{(-\ii t)^n}{n!} (-\delta)\Omega_{ab}^{n-1}
@@ -2557,29 +2559,29 @@ By what we have just shown the Kerr phase shift is
 </p>
 
 
-<div id="org19e9e5b" class="figure">
+<div id="orgf082ed7" class="figure">
 <p><img src="./images/exercise_7_21_plot.png" alt="exercise_7_21_plot.png" />
 </p>
 <p><span class="figure-number">Figure 4: </span>Kerr phase shift \(\chi_3\), in degrees, for \(g=1\), \(t=0.98\) plotted against the detuning \(\delta\).</p>
 </div>
 
 <p>
-The code for the plot can be found <a href="#orgbf6e998">below</a>. In principle my plot should show the same as
+The code for the plot can be found <a href="#org6c359ea">below</a>. In principle my plot should show the same as
 Figure 7.5 in the book. And indeed it looks very similar. However it is not exactly the
 same. Not sure why this is the case 🤨.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org4f6ecb7" class="outline-4">
-<h4 id="org4f6ecb7">Appendix</h4>
-<div class="outline-text-4" id="text-org4f6ecb7">
+<div id="outline-container-org91e7876" class="outline-4">
+<h4 id="org91e7876">Appendix</h4>
+<div class="outline-text-4" id="text-org91e7876">
 <p>
 Code to square \(H_2\):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgc1db6b2"><span class="org-keyword">def</span> <span class="org-function-name">square_H2</span>():
+<pre class="src src-sage" id="org20c8e4a"><span class="org-keyword">def</span> <span class="org-function-name">square_H2</span>():
     <span class="org-variable-name">delta</span>, <span class="org-variable-name">ga</span>, <span class="org-variable-name">gb</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'delta g_a g_b'</span>)
 
     <span class="org-variable-name">H2</span> <span class="org-operator">=</span> matrix([
@@ -2613,7 +2615,7 @@ Code to make the plot:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgbf6e998"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex721</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>2, 2), t<span class="org-operator">=</span>0.98, ga<span class="org-operator">=</span>1, gb<span class="org-operator">=</span>1):
+<pre class="src src-sage" id="org6c359ea"><span class="org-keyword">def</span> <span class="org-function-name">make_plot_ex721</span>(interval<span class="org-operator">=</span>(<span class="org-operator">-</span>2, 2), t<span class="org-operator">=</span>0.98, ga<span class="org-operator">=</span>1, gb<span class="org-operator">=</span>1):
     <span class="org-doc">"""Plot for exercise 7.21."""</span>
     <span class="org-variable-name">d</span> <span class="org-operator">=</span> SR.var(<span class="org-string">'delta'</span>)
     <span class="org-variable-name">Omega_a</span> <span class="org-operator">=</span> sqrt(ga<span class="org-operator">^</span>2 <span class="org-operator">+</span> d<span class="org-operator">^</span>2)
@@ -2638,9 +2640,9 @@ Code to make the plot:
 </div>
 </div>
 
-<div id="outline-container-orgd3f546e" class="outline-3">
-<h3 id="orgd3f546e">Exercise 7.22</h3>
-<div class="outline-text-3" id="text-orgd3f546e">
+<div id="outline-container-orgd81a6e4" class="outline-3">
+<h3 id="orgd81a6e4">Exercise 7.22</h3>
+<div class="outline-text-3" id="text-orgd81a6e4">
 <p>
 Associated with the cross phase modulation is also a certain amount of loss, which is
 given by the probability that a photon is absorbed by the atom. Compute this probability,
@@ -2654,11 +2656,11 @@ probability. I corrected this.</dd>
 </dl>
 </div>
 
-<div id="outline-container-orge9be27e" class="outline-4">
-<h4 id="orge9be27e">Solution</h4>
-<div class="outline-text-4" id="text-orge9be27e">
+<div id="outline-container-orgde4634b" class="outline-4">
+<h4 id="orgde4634b">Solution</h4>
+<div class="outline-text-4" id="text-orgde4634b">
 <p>
-Let \(\Omega_{ab}=\sqrt{\delta^2+g_a^2+g_b^2}\). By a <a href="#org92520f1">formula for</a> \(\bra{110}U\ket{110}\) from
+Let \(\Omega_{ab}=\sqrt{\delta^2+g_a^2+g_b^2}\). By a <a href="#org5d2e9aa">formula for</a> \(\bra{110}U\ket{110}\) from
 exercise 7.21 we have
 </p>
 
@@ -2689,9 +2691,9 @@ the one-photon absorbtion probability (which seems plausible of course).
 </div>
 </div>
 
-<div id="outline-container-org4d43cb9" class="outline-3">
-<h3 id="org4d43cb9">Exercise 7.23</h3>
-<div class="outline-text-3" id="text-org4d43cb9">
+<div id="outline-container-orga205aa2" class="outline-3">
+<h3 id="orga205aa2">Exercise 7.23</h3>
+<div class="outline-text-3" id="text-orga205aa2">
 <p>
 Show that the two qubit gate of (7.87)
 </p>
@@ -2714,9 +2716,9 @@ unitaries.
 </p>
 </div>
 
-<div id="outline-container-orgb04b3d9" class="outline-4">
-<h4 id="orgb04b3d9">Proof</h4>
-<div class="outline-text-4" id="text-orgb04b3d9">
+<div id="outline-container-org1d2fa34" class="outline-4">
+<h4 id="org1d2fa34">Proof</h4>
+<div class="outline-text-4" id="text-org1d2fa34">
 <p>
 Note that up to a global phase \(e^{\ii(\varphi_a+\varphi_b)/2}\) we have
 </p>
@@ -2761,9 +2763,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org4a8e86d" class="outline-3">
-<h3 id="org4a8e86d">Exercise 7.24</h3>
-<div class="outline-text-3" id="text-org4a8e86d">
+<div id="outline-container-org18e2a9b" class="outline-3">
+<h3 id="org18e2a9b">Exercise 7.24</h3>
+<div class="outline-text-3" id="text-org18e2a9b">
 <p>
 The energy of a nuclear spin in a magnetic ﬁeld is approximately \(\mu_NB\), where
 \(\mu_N=eh/4\pi\,m_p\approx5\times10^{-27}\) joules per tesla is the nuclear Bohr magneton.
@@ -2772,15 +2774,15 @@ energy \(k_BT\) at \(T=300K\).
 </p>
 </div>
 
-<div id="outline-container-orgbdac94a" class="outline-4">
-<h4 id="orgbdac94a">Solution</h4>
-<div class="outline-text-4" id="text-orgbdac94a">
+<div id="outline-container-orgdfa85c2" class="outline-4">
+<h4 id="orgdfa85c2">Solution</h4>
+<div class="outline-text-4" id="text-orgdfa85c2">
 <p>
 Let us do a quick calculation:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgfcd1c23"><span class="org-keyword">def</span> <span class="org-function-name">thermal_vs_spin_energy</span>(T<span class="org-operator">=</span>300, B<span class="org-operator">=</span>10):
+<pre class="src src-sage" id="org1ce48cc"><span class="org-keyword">def</span> <span class="org-function-name">thermal_vs_spin_energy</span>(T<span class="org-operator">=</span>300, B<span class="org-operator">=</span>10):
     <span class="org-doc">"""Ratio of thermal energy against nuclear spin energy.</span>
 
 <span class="org-doc">    Args:</span>
@@ -2824,18 +2826,18 @@ strong magnetic field).
 </div>
 </div>
 
-<div id="outline-container-orgd1c6d23" class="outline-3">
-<h3 id="orgd1c6d23">Exercise 7.25</h3>
-<div class="outline-text-3" id="text-orgd1c6d23">
+<div id="outline-container-org848a648" class="outline-3">
+<h3 id="org848a648">Exercise 7.25</h3>
+<div class="outline-text-3" id="text-org848a648">
 <p>
 Show that the total angular momenta operators obey the commutation relations for \(\mathrm{SU}(2)\),
 that is, \([j_i,j_j]=\ii\epsilon_{ijk}j_k\).
 </p>
 </div>
 
-<div id="outline-container-org0b5e82c" class="outline-4">
-<h4 id="org0b5e82c">Proof</h4>
-<div class="outline-text-4" id="text-org0b5e82c">
+<div id="outline-container-orga29741f" class="outline-4">
+<h4 id="orga29741f">Proof</h4>
+<div class="outline-text-4" id="text-orga29741f">
 <p>
 Let \(\sigma=(X,Y,Z)\) be a vector of Pauli matrices. Then
 </p>
@@ -2878,11 +2880,11 @@ Verify the properties of \(\ket{j,m_j}_J\) by explicitly writing the 4×4 matric
 </dl>
 </div>
 
-<div id="outline-container-orgaae6cc2" class="outline-4">
-<h4 id="orgaae6cc2">Solution</h4>
-<div class="outline-text-4" id="text-orgaae6cc2">
+<div id="outline-container-orged7d2a0" class="outline-4">
+<h4 id="orged7d2a0">Solution</h4>
+<div class="outline-text-4" id="text-orged7d2a0">
 <div class="org-src-container">
-<pre class="src src-sage" id="org49bf6d0"><span class="org-keyword">def</span> <span class="org-function-name">make_ji</span>(A, n<span class="org-operator">=</span>2):
+<pre class="src src-sage" id="orgb415d26"><span class="org-keyword">def</span> <span class="org-function-name">make_ji</span>(A, n<span class="org-operator">=</span>2):
     <span class="org-doc">"""Return one component of the Angular momentum operator for n spin-1/2 particles.</span>
 
 <span class="org-doc">    Args:</span>
@@ -2947,7 +2949,7 @@ U.H <span class="org-operator">*</span> jz <span class="org-operator">*</span> U
 </pre>
 </div>
 
-<pre class="example" id="orgb17ecea">
+<pre class="example" id="org72e62c6">
 J^2 diagonalized:
 [0 0 0 0]
 [0 2 0 0]
@@ -2964,9 +2966,9 @@ j_z diagonalized:
 </div>
 </div>
 
-<div id="outline-container-orgc945df5" class="outline-3">
-<h3 id="orgc945df5">Exercise 7.27 (Three spin angular momenta states)</h3>
-<div class="outline-text-3" id="text-orgc945df5">
+<div id="outline-container-orge6fe256" class="outline-3">
+<h3 id="orge6fe256">Exercise 7.27 (Three spin angular momenta states)</h3>
+<div class="outline-text-3" id="text-orge6fe256">
 <p>
 Three spin-1/2 spins can combine together to give states of total angular momenta with
 \(j=1/2\) and \(j=3/2\). Show that the states
@@ -2997,9 +2999,9 @@ for the old formulas. The issue is essentially the same as in <a href="#exercise
 </dl>
 </div>
 
-<div id="outline-container-org5fe9d41" class="outline-4">
-<h4 id="org5fe9d41">Solution</h4>
-<div class="outline-text-4" id="text-org5fe9d41">
+<div id="outline-container-orgc994101" class="outline-4">
+<h4 id="orgc994101">Solution</h4>
+<div class="outline-text-4" id="text-orgc994101">
 <p>
 We proceed in the same way as in <a href="#exercise-7.26">exercise 7.26</a> by first defining the operators and then
 the unitary matrix \(U\) made of the mentioned basis vectors:
@@ -3058,7 +3060,7 @@ U.H <span class="org-operator">*</span> jz <span class="org-operator">*</span> U
 </pre>
 </div>
 
-<pre class="example" id="org96dfb4f">
+<pre class="example" id="orgd80d263">
 J^2 diagonalized:
 [15/4    0    0    0    0    0    0    0]
 [   0 15/4    0    0    0    0    0    0]
@@ -3083,9 +3085,9 @@ j_z diagonalized:
 </div>
 </div>
 
-<div id="outline-container-org353f03b" class="outline-3">
-<h3 id="org353f03b">Exercise 7.28 (Hyperfine states)</h3>
-<div class="outline-text-3" id="text-org353f03b">
+<div id="outline-container-org7c3fba0" class="outline-3">
+<h3 id="org7c3fba0">Exercise 7.28 (Hyperfine states)</h3>
+<div class="outline-text-3" id="text-org7c3fba0">
 <p>
 We shall be taking a look at beryllium in Section 7.6.4 – the total angular momenta states
 relevant there involve a nuclear spin \(I=3/2\) combining with an electron spin \(S=1/2\) to
@@ -3120,15 +3122,15 @@ obtain basis states \(\ket{f,m}\) for which \(F\ket{f,m}=f(f+1)\ket{f,m}\) and
 </ol>
 </div>
 
-<div id="outline-container-orgfcd0847" class="outline-4">
-<h4 id="orgfcd0847">Solution for claim 1</h4>
-<div class="outline-text-4" id="text-orgfcd0847">
+<div id="outline-container-org4d821bd" class="outline-4">
+<h4 id="org4d821bd">Solution for claim 1</h4>
+<div class="outline-text-4" id="text-org4d821bd">
 <p>
 Let us first define \(i_x\), \(i_y\), and \(i_z\) within sage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org459a2ec"><span class="org-variable-name">iz</span> <span class="org-operator">=</span> matrix([
+<pre class="src src-sage" id="orgcd0c9eb"><span class="org-variable-name">iz</span> <span class="org-operator">=</span> matrix([
     [<span class="org-operator">-</span>3, 0, 0, 0],
     [0, <span class="org-operator">-</span>1, 0, 0],
     [0, 0, 1, 0],
@@ -3174,15 +3176,15 @@ Hence \([i_i,i_j]=\ii\epsilon_{ijk}i_k\) since \([A,B]=-[B,A]\) and \([A,A]=0\).
 </div>
 </div>
 
-<div id="outline-container-orgb091c3b" class="outline-4">
-<h4 id="orgb091c3b">Solution for claim 2</h4>
-<div class="outline-text-4" id="text-orgb091c3b">
+<div id="outline-container-orgaca1312" class="outline-4">
+<h4 id="orgaca1312">Solution for claim 2</h4>
+<div class="outline-text-4" id="text-orgaca1312">
 <p>
 Let us first define the relevant operators
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org14bde26"><span class="org-variable-name">Id2</span> <span class="org-operator">=</span> matrix.identity(2)
+<pre class="src src-sage" id="org7a368ce"><span class="org-variable-name">Id2</span> <span class="org-operator">=</span> matrix.identity(2)
 <span class="org-variable-name">Id4</span> <span class="org-operator">=</span> matrix.identity(4)
 
 <span class="org-variable-name">fz</span> <span class="org-operator">=</span> kron(iz, Id2) <span class="org-operator">+</span> kron(Id4, Z<span class="org-operator">/</span>2)
@@ -3205,7 +3207,7 @@ Before we go on let us define two auxiliary functions.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgf824b67"><span class="org-keyword">def</span> <span class="org-function-name">restrict</span>(A: matrix, M: matrix) <span class="org-operator">-&gt;</span> matrix:
+<pre class="src src-sage" id="org1ae75e2"><span class="org-keyword">def</span> <span class="org-function-name">restrict</span>(A: matrix, M: matrix) <span class="org-operator">-&gt;</span> matrix:
     <span class="org-doc">"""A is a d&#215;d matrix and M a l&#215;d matrix whose rows are linearly independent. This</span>
 <span class="org-doc">    method returns the matrix A restricted to the subspace spanned by these l vectors and</span>
 <span class="org-doc">    with respect to those vectors as basis.</span>
@@ -3300,7 +3302,7 @@ U
 </pre>
 </div>
 
-<pre class="example" id="orgca32eb6">
+<pre class="example" id="org6d99992">
 U^† * F^2 * U:
 [6 0 0 0 0 0 0 0]
 [0 6 0 0 0 0 0 0]
@@ -3350,9 +3352,9 @@ From this we can easily read out the eigenbasis:
 </div>
 </div>
 
-<div id="outline-container-org35cec74" class="outline-3">
-<h3 id="org35cec74"><span class="todo SKIP">SKIP</span> Exercise 7.29 (Spontaneous emission)</h3>
-<div class="outline-text-3" id="text-org35cec74">
+<div id="outline-container-org0f086d0" class="outline-3">
+<h3 id="org0f086d0"><span class="todo SKIP">SKIP</span> Exercise 7.29 (Spontaneous emission)</h3>
+<div class="outline-text-3" id="text-org0f086d0">
 <p>
 The spontaneous emission rate (7.112) can be derived from (7.110)–(7.111) by the following
 steps.
@@ -3399,9 +3401,9 @@ According to the <a href="https://www.michaelnielsen.org/qcqi/errata/errata/erra
 </dl>
 </div>
 
-<div id="outline-container-org018851c" class="outline-4">
-<h4 id="org018851c">Discussion</h4>
-<div class="outline-text-4" id="text-org018851c">
+<div id="outline-container-org1c16261" class="outline-4">
+<h4 id="org1c16261">Discussion</h4>
+<div class="outline-text-4" id="text-org1c16261">
 <p>
 No matter how I look at this exercise the integral is just infinite for me. Ignoring the
 sine for a moment the integrand looks essentially like this:
@@ -3429,9 +3431,9 @@ what and I didn't have time to investigate.
 </div>
 </div>
 
-<div id="outline-container-orgfac3303" class="outline-3">
-<h3 id="orgfac3303">Exercise 7.30 (Electronic state lifetimes)</h3>
-<div class="outline-text-3" id="text-orgfac3303">
+<div id="outline-container-orgbf311b5" class="outline-3">
+<h3 id="orgbf311b5">Exercise 7.30 (Electronic state lifetimes)</h3>
+<div class="outline-text-3" id="text-orgbf311b5">
 <p>
 A calculation similar to that for γred can be done to estimate the lifetimes expected for
 electronic transitions, that is, those which involve energy level changes
@@ -3466,15 +3468,15 @@ states can decay compared with hyperﬁne states.
 </p>
 </div>
 
-<div id="outline-container-org4c55a1b" class="outline-4">
-<h4 id="org4c55a1b">Solution</h4>
-<div class="outline-text-4" id="text-org4c55a1b">
+<div id="outline-container-org412e085" class="outline-4">
+<h4 id="org412e085">Solution</h4>
+<div class="outline-text-4" id="text-org412e085">
 <p>
 That is just plugging in numbers so let us write a convenience function
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org8c6db56"><span class="org-keyword">def</span> <span class="org-function-name">make_gamma</span>(which: <span class="org-builtin">str</span>):
+<pre class="src src-sage" id="orgcef4f5f"><span class="org-keyword">def</span> <span class="org-function-name">make_gamma</span>(which: <span class="org-builtin">str</span>):
     <span class="org-doc">"""For exercise 7.30."""</span>
     <span class="org-variable-name">eps0</span>, <span class="org-variable-name">_</span>, <span class="org-variable-name">_</span> <span class="org-operator">=</span> physical_constants[<span class="org-string">"vacuum electric permittivity"</span>]
     <span class="org-variable-name">c</span>, <span class="org-variable-name">_</span>, <span class="org-variable-name">_</span> <span class="org-operator">=</span> physical_constants[<span class="org-string">"speed of light in vacuum"</span>]
@@ -3543,17 +3545,17 @@ book on page 316: you would get this value if you remove the factor \(2\pi\).
 </div>
 </div>
 
-<div id="outline-container-org50bb21b" class="outline-3">
-<h3 id="org50bb21b">Exercise 7.31</h3>
-<div class="outline-text-3" id="text-org50bb21b">
+<div id="outline-container-org5fa09c1" class="outline-3">
+<h3 id="org5fa09c1">Exercise 7.31</h3>
+<div class="outline-text-3" id="text-org5fa09c1">
 <p>
 Construct a Hadamard gate from \(R_x\) and \(R_y\) rotations.
 </p>
 </div>
 
-<div id="outline-container-org0bc5a85" class="outline-4">
-<h4 id="org0bc5a85">Solution</h4>
-<div class="outline-text-4" id="text-org0bc5a85">
+<div id="outline-container-orgeb52eec" class="outline-4">
+<h4 id="orgeb52eec">Solution</h4>
+<div class="outline-text-4" id="text-orgeb52eec">
 <p>
 This is not hard to accomplish in the rotation formalism for the Pauli matrices and
 rotations. First of all note that
@@ -3621,18 +3623,18 @@ The global phase is not observable so we accomplished what we wanted.
 </div>
 </div>
 
-<div id="outline-container-org3c621bb" class="outline-3">
-<h3 id="org3c621bb">Exercise 7.32</h3>
-<div class="outline-text-3" id="text-org3c621bb">
+<div id="outline-container-org94b3971" class="outline-3">
+<h3 id="org94b3971">Exercise 7.32</h3>
+<div class="outline-text-3" id="text-org94b3971">
 <p>
 Show that the circuit in Figure 7.14 is equivalent (up to relative phases) to a <code>CNOT</code>
 gate, with the phonon state as the control qubit.
 </p>
 </div>
 
-<div id="outline-container-org35537f1" class="outline-4">
-<h4 id="org35537f1">Proof</h4>
-<div class="outline-text-4" id="text-org35537f1">
+<div id="outline-container-org3a3338b" class="outline-4">
+<h4 id="org3a3338b">Proof</h4>
+<div class="outline-text-4" id="text-org3a3338b">
 <p>
 First of all recall that the <code>CZ</code> gate is symmetric in the sense that the <code>CZ</code> with
 control and target somewhere is the same as the <code>CZ</code> gate where control and target are
@@ -3682,9 +3684,9 @@ rotation was \(\pi/2\) instead of \(-\pi/2\) the phase factor would be \(1\).
 </div>
 </div>
 
-<div id="outline-container-org49d7353" class="outline-3">
-<h3 id="org49d7353">Exercise 7.33 (Magnetic resonance)</h3>
-<div class="outline-text-3" id="text-org49d7353">
+<div id="outline-container-orgd60bc39" class="outline-3">
+<h3 id="orgd60bc39">Exercise 7.33 (Magnetic resonance)</h3>
+<div class="outline-text-3" id="text-orgd60bc39">
 <p>
 Show that (7.128) simplifies to become (7.129). What laboratory frame Hamiltonian gives
 rise to the rotating frame Hamiltonian (7.135)?
@@ -3718,9 +3720,9 @@ to do a X-rotation during time interval \([t_1,t_2]\) you set \(g_2(t)=0\) and
 </dl>
 </div>
 
-<div id="outline-container-orga2a5041" class="outline-4">
-<h4 id="orga2a5041">Proof</h4>
-<div class="outline-text-4" id="text-orga2a5041">
+<div id="outline-container-org75c5746" class="outline-4">
+<h4 id="org75c5746">Proof</h4>
+<div class="outline-text-4" id="text-org75c5746">
 <p>
 To see that (7.128) simplifies to (7.129) it suffices to recall the product rule of
 differentiation:
@@ -3746,7 +3748,7 @@ also note at this point that (7.130):
 </p>
 
 <p>
-directly follows from the <a href="chapter_4.html#org15f9511">fundamental theorem</a> on Pauli rotations. In the following let
+directly follows from the <a href="chapter_4.html#org8a1a412">fundamental theorem</a> on Pauli rotations. In the following let
 \(c\), \(s\) and let \(H^{\RF}=g_1(t)X+g_2(t)Y\). Again by the fundamental theorem:
 </p>
 
@@ -3764,9 +3766,9 @@ as desired. The special case \(g_1=1\), \(g_0\) was considered in the book. QED.
 </div>
 </div>
 
-<div id="outline-container-org415243a" class="outline-3">
-<h3 id="org415243a"><span class="todo TODO">TODO</span> Exercises 7.34 (NMR frequencies)</h3>
-<div class="outline-text-3" id="text-org415243a">
+<div id="outline-container-orgfc99059" class="outline-3">
+<h3 id="orgfc99059"><span class="todo TODO">TODO</span> Exercises 7.34 (NMR frequencies)</h3>
+<div class="outline-text-3" id="text-orgfc99059">
 <p>
 Starting with the nuclear Bohr magneton, compute the precession frequency of a proton in a
 magnetic ﬁeld of 11.8 tesla. How many gauss should \(B_1\) be to accomplish a 90° rotation
@@ -3775,17 +3777,17 @@ in 10 microseconds?
 </div>
 </div>
 
-<div id="outline-container-orgcaedc3c" class="outline-3">
-<h3 id="orgcaedc3c"><span class="todo SKIP">SKIP</span> Exercises 7.35 (Motional narrowing)</h3>
-<div class="outline-text-3" id="text-orgcaedc3c">
+<div id="outline-container-orgb66a2a0" class="outline-3">
+<h3 id="orgb66a2a0"><span class="todo SKIP">SKIP</span> Exercises 7.35 (Motional narrowing)</h3>
+<div class="outline-text-3" id="text-orgb66a2a0">
 <p>
 Show that the spherical average of \(H_{1,2}^{\mathrm{D}}\) over \(\hat{n}\) is zero.
 </p>
 </div>
 
-<div id="outline-container-orge348bfe" class="outline-4">
-<h4 id="orge348bfe">Discussion</h4>
-<div class="outline-text-4" id="text-orge348bfe">
+<div id="outline-container-orga7f790b" class="outline-4">
+<h4 id="orga7f790b">Discussion</h4>
+<div class="outline-text-4" id="text-orga7f790b">
 <p>
 Actually I do <i>not</i> get that the average is zero! I am not sure if I misunderstand the
 exercise, did a mistake in my calculations, or if there is actually an error in the book.
@@ -3794,9 +3796,9 @@ exercise, did a mistake in my calculations, or if there is actually an error in 
 </div>
 </div>
 
-<div id="outline-container-org80eb2cd" class="outline-3">
-<h3 id="org80eb2cd">Exercises 7.36 (Thermal equilibrium NMR state)</h3>
-<div class="outline-text-3" id="text-org80eb2cd">
+<div id="outline-container-org7ac065e" class="outline-3">
+<h3 id="org7ac065e">Exercises 7.36 (Thermal equilibrium NMR state)</h3>
+<div class="outline-text-3" id="text-org7ac065e">
 <p>
 For \(n=1\) show that the thermal equilibrium state is
 </p>
@@ -3824,9 +3826,9 @@ obtained in the solution below.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org72045c7" class="outline-4">
-<h4 id="org72045c7">Solution</h4>
-<div class="outline-text-4" id="text-org72045c7">
+<div id="outline-container-org218ba55" class="outline-4">
+<h4 id="org218ba55">Solution</h4>
+<div class="outline-text-4" id="text-org218ba55">
 <p>
 Recall that the thermal equilibrium state is approximately
 \(\rho\approx2^{-n}(1-\beta\,H)\). For \(n=1\) we have \(H_1=2^{-1}\hbar\omega\,Z\). Hence
@@ -3871,9 +3873,9 @@ Hence
 </div>
 </div>
 
-<div id="outline-container-org5bc4279" class="outline-3">
-<h3 id="org5bc4279">Exercises 7.37 (NMR spectrum of coupled spins)</h3>
-<div class="outline-text-3" id="text-org5bc4279">
+<div id="outline-container-orgd5aaff5" class="outline-3">
+<h3 id="orgd5aaff5">Exercises 7.37 (NMR spectrum of coupled spins)</h3>
+<div class="outline-text-3" id="text-orgd5aaff5">
 <p>
 Calculate \(V(t)\) for \(H=JZ_1Z_2\) and
 </p>
@@ -3891,9 +3893,9 @@ relative magnitudes be?
 </p>
 </div>
 
-<div id="outline-container-orged8ec7e" class="outline-4">
-<h4 id="orged8ec7e">Solution</h4>
-<div class="outline-text-4" id="text-orged8ec7e">
+<div id="outline-container-org4e47ff5" class="outline-4">
+<h4 id="org4e47ff5">Solution</h4>
+<div class="outline-text-4" id="text-org4e47ff5">
 <p>
 First of all we have
 </p>
@@ -3942,9 +3944,9 @@ where the rest contained in the dots does not observe \(X_1\). Hence we see peak
 </div>
 </div>
 
-<div id="outline-container-org822711b" class="outline-3">
-<h3 id="org822711b">Exercise 7.38 (Refocusing)</h3>
-<div class="outline-text-3" id="text-org822711b">
+<div id="outline-container-orgb5492b9" class="outline-3">
+<h3 id="orgb5492b9">Exercise 7.38 (Refocusing)</h3>
+<div class="outline-text-3" id="text-orgb5492b9">
 <p>
 Explicitly show that (7.150)
 </p>
@@ -3966,9 +3968,9 @@ could just add the standard phrase about equality <i>up to a global phase</i>.</
 </dl>
 </div>
 
-<div id="outline-container-orgc18aa29" class="outline-4">
-<h4 id="orgc18aa29">Proof</h4>
-<div class="outline-text-4" id="text-orgc18aa29">
+<div id="outline-container-org035d041" class="outline-4">
+<h4 id="org035d041">Proof</h4>
+<div class="outline-text-4" id="text-org035d041">
 <p>
 First of all, recall that
 </p>
@@ -3987,18 +3989,18 @@ which holds for any matrix \(A\). QED.
 </div>
 </div>
 
-<div id="outline-container-org007c54b" class="outline-3">
-<h3 id="org007c54b">Exercise 7.39 (Three-dimensional refocusing)</h3>
-<div class="outline-text-3" id="text-org007c54b">
+<div id="outline-container-org04866d7" class="outline-3">
+<h3 id="org04866d7">Exercise 7.39 (Three-dimensional refocusing)</h3>
+<div class="outline-text-3" id="text-org04866d7">
 <p>
 What set of pulses can be used to refocus evolution under <i>any</i> single spin Hamiltonian
 \(H^{\sys}=\sum_kc_k\sigma_k\) where \(\sigma_k\in\{X,Y,Z\}\) (acting on qubit \(k\))?
 </p>
 </div>
 
-<div id="outline-container-org8463274" class="outline-4">
-<h4 id="org8463274">Proof</h4>
-<div class="outline-text-4" id="text-org8463274">
+<div id="outline-container-orgc8eb4a0" class="outline-4">
+<h4 id="orgc8eb4a0">Proof</h4>
+<div class="outline-text-4" id="text-orgc8eb4a0">
 <p>
 Let \(K\) be the set of all qubits and let \(S\subseteq\,K\). Assume that we want to refocus
 the evolution to
@@ -4053,18 +4055,18 @@ which is the desired refocusing. QED.
 </div>
 </div>
 
-<div id="outline-container-org9321b38" class="outline-3">
-<h3 id="org9321b38">Exercise 7.40 (Refocusing dipolar interactions)</h3>
-<div class="outline-text-3" id="text-org9321b38">
+<div id="outline-container-orgea7b840" class="outline-3">
+<h3 id="orgea7b840">Exercise 7.40 (Refocusing dipolar interactions)</h3>
+<div class="outline-text-3" id="text-orgea7b840">
 <p>
 Give a sequence of pulses which can be used to turn two spin dipolar coupling \(H_{1,2}^{\mathrm{D}}\)
 into the much simpler form of (7.138), \(cZ_1Z_2\) (for some constant \(c\)).
 </p>
 </div>
 
-<div id="outline-container-orgabef969" class="outline-4">
-<h4 id="orgabef969">Solution</h4>
-<div class="outline-text-4" id="text-orgabef969">
+<div id="outline-container-orgb464283" class="outline-4">
+<h4 id="orgb464283">Solution</h4>
+<div class="outline-text-4" id="text-orgb464283">
 <p>
 The Hamiltonian \(H^{\mathrm{D}}_{1,2}\) is a special case of a Hamiltonian of the Form
 </p>
@@ -4078,7 +4080,7 @@ The Hamiltonian \(H^{\mathrm{D}}_{1,2}\) is a special case of a Hamiltonian of t
 <p>
 where \(\sigma_i,\sigma_j\in\{X,Y,Z\}\). Let \(R_z=R_z(\pi/2)\). Note that
 \(R_z^2=R_yR_x^2R_y^\dagger\), which means that \(R_z\) can indeed be realized by RF-pulses
-(see e.g. <a href="chapter_4.html#org15f9511">here</a>). We have <i>up to a global phase</i>
+(see e.g. <a href="chapter_4.html#org8a1a412">here</a>). We have <i>up to a global phase</i>
 </p>
 
 <p>
@@ -4119,9 +4121,9 @@ is a simpler solution in the sense that less terms are involved.
 </div>
 </div>
 
-<div id="outline-container-org80a3bec" class="outline-3">
-<h3 id="org80a3bec">Exercise 7.41 (NMR <code>CNOT</code>)</h3>
-<div class="outline-text-3" id="text-org80a3bec">
+<div id="outline-container-orgb7768a0" class="outline-3">
+<h3 id="orgb7768a0">Exercise 7.41 (NMR <code>CNOT</code>)</h3>
+<div class="outline-text-3" id="text-orgb7768a0">
 <p>
 Give an explicit sequence of single qubit rotations which realize a <code>CNOT</code> between two
 spins evolving under the Hamiltonian of (7.147):
@@ -4148,9 +4150,9 @@ but the result can be simplified to reduce the number of single qubit rotations.
 </p>
 </div>
 
-<div id="outline-container-org50d30e0" class="outline-4">
-<h4 id="org50d30e0">Solution</h4>
-<div class="outline-text-4" id="text-org50d30e0">
+<div id="outline-container-org701d46c" class="outline-4">
+<h4 id="org701d46c">Solution</h4>
+<div class="outline-text-4" id="text-org701d46c">
 <p>
 Recall that
 </p>
@@ -4166,7 +4168,7 @@ Hence
 </p>
 
 <p>
-<a id="org0b7e73c"></a>
+<a id="org4df4268"></a>
 \[
   C(Z) = -\sqrt{i} \cdot e^{-\ii Z_1Z_2 \pi/4} \cdot e^{\ii Z_1 \pi/4} \cdot e^{\ii Z_2 \pi/4} .
 \]
@@ -4197,14 +4199,14 @@ Note that \(R_z\) commutes with <code>CZ</code>. Because of this, and of \(R_z^4
 </p>
 
 <p>
-<a id="orgd944d25"></a>
+<a id="org031e7a3"></a>
 \[
   C(X) = (H_2 R_{z2}^2) \cdot e^{-\ii H^{\sys} t_c} R_{z1}(\theta_a) R_{z2}(\theta_b) \cdot (R_{z2}^2 H_2) .
 \]
 </p>
 
 <p>
-Because of the <a href="chapter_4.html#org15f9511">fundamental theorem</a> on Pauli rotations we have (up to a global phase)
+Because of the <a href="chapter_4.html#org8a1a412">fundamental theorem</a> on Pauli rotations we have (up to a global phase)
 </p>
 
 <p>
@@ -4227,7 +4229,7 @@ Hence, using \(XR_yX=R_y\inv\),
 </p>
 
 <p>
-Plugging this into <a href="#orgd944d25">what we already have</a>:
+Plugging this into <a href="#org031e7a3">what we already have</a>:
 </p>
 
 <p>
@@ -4254,9 +4256,9 @@ and the evolution of the system Hamiltonian.
 </div>
 </div>
 
-<div id="outline-container-orge53921e" class="outline-3">
-<h3 id="orge53921e">Exercise 7.42 (Permutations for temporal labeling)</h3>
-<div class="outline-text-3" id="text-orge53921e">
+<div id="outline-container-org2a1f1ab" class="outline-3">
+<h3 id="org2a1f1ab">Exercise 7.42 (Permutations for temporal labeling)</h3>
+<div class="outline-text-3" id="text-org2a1f1ab">
 <p>
 Give a quantum circuit to accomplish the permutations \(P\) and \(P^\dagger\) necessary to
 transform
@@ -4279,9 +4281,9 @@ of (7.154).
 </p>
 </div>
 
-<div id="outline-container-org2967468" class="outline-4">
-<h4 id="org2967468">Solution</h4>
-<div class="outline-text-4" id="text-org2967468">
+<div id="outline-container-orgb37bcdd" class="outline-4">
+<h4 id="orgb37bcdd">Solution</h4>
+<div class="outline-text-4" id="text-orgb37bcdd">
 <p>
 The permutation has to map
 </p>
@@ -4360,9 +4362,9 @@ q_3: ─X──X─
 </div>
 </div>
 
-<div id="outline-container-org8eab623" class="outline-3">
-<h3 id="org8eab623">Exercise 7.43 (Permutations for logical labeling)</h3>
-<div class="outline-text-3" id="text-org8eab623">
+<div id="outline-container-org0359de1" class="outline-3">
+<h3 id="org0359de1">Exercise 7.43 (Permutations for logical labeling)</h3>
+<div class="outline-text-3" id="text-org0359de1">
 <p>
 Give a quantum circuit to accomplish the permutations \(P\) necessary to transform
 </p>
@@ -4389,9 +4391,9 @@ of (7.165).
 </p>
 </div>
 
-<div id="outline-container-org261ceee" class="outline-4">
-<h4 id="org261ceee">Solution</h4>
-<div class="outline-text-4" id="text-org261ceee">
+<div id="outline-container-org54f1281" class="outline-4">
+<h4 id="org54f1281">Solution</h4>
+<div class="outline-text-4" id="text-org54f1281">
 <p>
 Before we begin, let us quickly verify that the appoximation for \(\rho\) is valid. Let us
 start at the RHS. Under the assumption that \(\alpha_1\ll\delta_1\) (let us justify this
@@ -4413,7 +4415,7 @@ Setting \(\delta=\delta_1^3=2^{-3}\) (it must be this value due to the trace con
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org3411294"><span class="org-variable-name">Z1</span> <span class="org-operator">=</span> kron(Z, Id, Id)
+<pre class="src src-sage" id="orgfecb8f9"><span class="org-variable-name">Z1</span> <span class="org-operator">=</span> kron(Z, Id, Id)
 <span class="org-variable-name">Z2</span> <span class="org-operator">=</span> kron(Id, Z, Id)
 <span class="org-variable-name">Z3</span> <span class="org-operator">=</span> kron(Id, Id, Z)
 
@@ -4442,7 +4444,7 @@ notation)
 This can immidiately be implemented by three swap operations:
 </p>
 
-<pre class="example" id="orgd5348b6">
+<pre class="example" id="org8545421">
 
 q_0: ─────────
 
@@ -4465,9 +4467,9 @@ q_7: ───────X─
 </div>
 </div>
 
-<div id="outline-container-orgf4e4a60" class="outline-3">
-<h3 id="orgf4e4a60"><span class="todo SKIP">SKIP</span> Exrcise 7.44 (Logical labeling for \(n\) spins)</h3>
-<div class="outline-text-3" id="text-orgf4e4a60">
+<div id="outline-container-org5a8d13f" class="outline-3">
+<h3 id="org5a8d13f"><span class="todo SKIP">SKIP</span> Exrcise 7.44 (Logical labeling for \(n\) spins)</h3>
+<div class="outline-text-3" id="text-org5a8d13f">
 <p>
 Suppose we have a system of \(n\) nearly identical spins of Zeeman frequency \(\omega\) in
 thermal equilibrium at temperature \(T\) with state \(\rho\). What is the largest effective
@@ -4476,9 +4478,9 @@ advantage of states whose labels have Hamming weight of \(n/2\).)
 </p>
 </div>
 
-<div id="outline-container-orgcb89dc5" class="outline-4">
-<h4 id="orgcb89dc5">Discussion</h4>
-<div class="outline-text-4" id="text-orgcb89dc5">
+<div id="outline-container-org7541e50" class="outline-4">
+<h4 id="org7541e50">Discussion</h4>
+<div class="outline-text-4" id="text-org7541e50">
 <p>
 I do not know how this exercise is meant. Not sure what state \(\rho\) they mean and how
 \(\omega\) is relevant here.
@@ -4512,9 +4514,9 @@ tomography</a>.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org72ce325" class="outline-4">
-<h4 id="org72ce325">Solution</h4>
-<div class="outline-text-4" id="text-org72ce325">
+<div id="outline-container-org8015e00" class="outline-4">
+<h4 id="org8015e00">Solution</h4>
+<div class="outline-text-4" id="text-org8015e00">
 <p>
 The system Hamiltonian looks as follows
 </p>
@@ -4578,7 +4580,7 @@ Expressing \(R_z(-2\theta)\) as \(\cos(\theta)+\ii\sin(\theta)Z\) we obtain
 </p>
 
 <p>
-<a id="org6e93ddf"></a>
+<a id="orgb9b657f"></a>
 \[
   V_k(t) = V_0 \trace{M_k\rho M_k^\dagger \cdot (
     \sigma_1^- \cdot \cos(J_{12}t)e^{\ii\omega_1 t} + \sigma_2^- \cdot \cos(J_{12}t)e^{\ii\omega_2 t} +
@@ -4611,17 +4613,17 @@ sufficient.
 </div>
 </div>
 
-<div id="outline-container-org3d17a53" class="outline-3">
-<h3 id="org3d17a53"><span class="todo WIP">WIP</span> Exercise 7.46</h3>
-<div class="outline-text-3" id="text-org3d17a53">
+<div id="outline-container-org7dc1d01" class="outline-3">
+<h3 id="org7dc1d01"><span class="todo WIP">WIP</span> Exercise 7.46</h3>
+<div class="outline-text-3" id="text-org7dc1d01">
 <p>
 How many experiments are sufficient for three spins? Necessary?
 </p>
 </div>
 
-<div id="outline-container-org0bb697e" class="outline-4">
-<h4 id="org0bb697e">Sketch of a solution</h4>
-<div class="outline-text-4" id="text-org0bb697e">
+<div id="outline-container-org95d4f17" class="outline-4">
+<h4 id="org95d4f17">Sketch of a solution</h4>
+<div class="outline-text-4" id="text-org95d4f17">
 <p>
 In this case the Hamiltonian looks as follows
 </p>
@@ -4637,7 +4639,7 @@ In this case the Hamiltonian looks as follows
 
 <p>
 The precedure and the results of <a href="#exercise-7.45">exercise 7.45</a> can be adapted (or reused) to get a formula
-for \(V(t)\) analogous to <a href="#org6e93ddf">the one</a> obtained there. This formula determines which of the terms
+for \(V(t)\) analogous to <a href="#orgb9b657f">the one</a> obtained there. This formula determines which of the terms
 \(A_1B_2C_3\), with \(A,B,C\in\{I,X,Y,Z\}\), of \(\rho\) are observed by \(V(t)\). Moreover, it is
 also clear how RF-pulses like \(R_{x3}\), \(R_{y2}\), etc. change which terms are observed.
 </p>
@@ -4657,9 +4659,9 @@ way to determine a minimial set of experiments.
 </div>
 </div>
 
-<div id="outline-container-org2e98a9d" class="outline-3">
-<h3 id="org2e98a9d">Exercise 7.47 (NMR <code>CNOT</code> gate)</h3>
-<div class="outline-text-3" id="text-org2e98a9d">
+<div id="outline-container-org8833ee8" class="outline-3">
+<h3 id="org8833ee8">Exercise 7.47 (NMR <code>CNOT</code> gate)</h3>
+<div class="outline-text-3" id="text-org8833ee8">
 <p>
 Verify that the circuit shown in the top left of Figure 7.19
 </p>
@@ -4682,7 +4684,7 @@ gate.
 </p>
 
 <p>
-<a id="org2a0a6ae"></a>
+<a id="org5caad65"></a>
 </p>
 <dl class="org-dl">
 <dt>Remark</dt><dd><p>
@@ -4718,15 +4720,15 @@ resolve the issue.
 </dl>
 </div>
 
-<div id="outline-container-org8327373" class="outline-4">
-<h4 id="org8327373">Solution</h4>
-<div class="outline-text-4" id="text-org8327373">
+<div id="outline-container-orgc24e1e1" class="outline-4">
+<h4 id="orgc24e1e1">Solution</h4>
+<div class="outline-text-4" id="text-orgc24e1e1">
 <p>
 An easy way to check the first assertion is to plug it into sage.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org164b312"><span class="org-variable-name">sqrtZZ</span> <span class="org-operator">=</span> matrix([
+<pre class="src src-sage" id="orgb61e436"><span class="org-variable-name">sqrtZZ</span> <span class="org-operator">=</span> matrix([
   [1, 0, 0, 0],
   [0, i, 0, 0],
   [0, 0, i, 0],
@@ -4793,7 +4795,7 @@ Hence the following circuit actually implements the <code>CNOT</code> gate:
 </p>
 
 <p>
-<a id="org7e8b5e0"></a>
+<a id="org8f2898f"></a>
 </p>
 <pre class="example">
      ┌──────┐┌──────┐┌────┐      ┌───────────┐
@@ -4806,9 +4808,9 @@ q_1: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├┤ Rx ├┤1          ├┤ Ry ├
 </div>
 </div>
 
-<div id="outline-container-org5fc2d3b" class="outline-3">
-<h3 id="org5fc2d3b">Exercise 7.48</h3>
-<div class="outline-text-3" id="text-org5fc2d3b">
+<div id="outline-container-org904ad28" class="outline-3">
+<h3 id="org904ad28">Exercise 7.48</h3>
+<div class="outline-text-3" id="text-org904ad28">
 <p>
 Verify that the circuit
 </p>
@@ -4828,13 +4830,13 @@ shown in the bottom left of Figure 7.19 creates the Bell state
 </p>
 
 <dl class="org-dl">
-<dt>Remark</dt><dd>The same remark as in <a href="#org2a0a6ae">exercise 7.47</a> applies here too.</dd>
+<dt>Remark</dt><dd>The same remark as in <a href="#org5caad65">exercise 7.47</a> applies here too.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org4ee36eb" class="outline-4">
-<h4 id="org4ee36eb">Solution</h4>
-<div class="outline-text-4" id="text-org4ee36eb">
+<div id="outline-container-orga57ada7" class="outline-4">
+<h4 id="orga57ada7">Solution</h4>
+<div class="outline-text-4" id="text-orga57ada7">
 <p>
 That is easily verified by sage:
 </p>
@@ -4853,9 +4855,9 @@ That is easily verified by sage:
 </div>
 </div>
 
-<div id="outline-container-orgf46f1bb" class="outline-3">
-<h3 id="orgf46f1bb">Exercise 7.49 (NMR swap gate)</h3>
-<div class="outline-text-3" id="text-orgf46f1bb">
+<div id="outline-container-orgd3f7bb3" class="outline-3">
+<h3 id="orgd3f7bb3">Exercise 7.49 (NMR swap gate)</h3>
+<div class="outline-text-3" id="text-orgd3f7bb3">
 <p>
 An important chemical application of NMR is measurement of connectivity of spins,
 i.e. what protons, carbons, and phosphorus atoms are nearest neighbors in a molecule. One
@@ -4871,13 +4873,13 @@ start from the circuit in Figure 1.7).
 </p>
 
 <dl class="org-dl">
-<dt>Remark</dt><dd>The same remark as in <a href="#org2a0a6ae">exercise 7.47</a> applies here too.</dd>
+<dt>Remark</dt><dd>The same remark as in <a href="#org5caad65">exercise 7.47</a> applies here too.</dd>
 </dl>
 </div>
 
-<div id="outline-container-orgee29e6e" class="outline-4">
-<h4 id="orgee29e6e">Solution</h4>
-<div class="outline-text-4" id="text-orgee29e6e">
+<div id="outline-container-orgb171005" class="outline-4">
+<h4 id="orgb171005">Solution</h4>
+<div class="outline-text-4" id="text-orgb171005">
 <p>
 A <code>SWAP</code> gate can be implemented in terms of three <code>CNOT</code> gates:
 </p>
@@ -4892,11 +4894,11 @@ q_1: ┤ X ├──■──┤ X ├
 
 
 <p>
-In exercise 7.47 <a href="#org7e8b5e0">we have seen</a> how to implement a single <code>CNOT</code>. So let us glue together
+In exercise 7.47 <a href="#org8f2898f">we have seen</a> how to implement a single <code>CNOT</code>. So let us glue together
 three of those:
 </p>
 
-<pre class="example" id="org8154674">
+<pre class="example" id="org816de8a">
      ┌──────┐┌──────┐┌────┐      ┌───────────┐┌──────┐┌──────┐ ┌────┐ ┌────┐»
 q_0: ┤ Ry^† ├┤ Rx^† ├┤ Ry ├──────┤0          ├┤ Ry^† ├┤ Rx^† ├─┤ Ry ├─┤ Rx ├»
      ├──────┤├──────┤├────┤┌────┐│  sqrt(ZZ) │└┬────┬┘├──────┤┌┴────┴┐├────┤»
@@ -4917,28 +4919,28 @@ There are two places with \(R_yR_y^\dagger\) which can be ommitted. But otherwis
 </div>
 </div>
 
-<div id="outline-container-org384980b" class="outline-3">
-<h3 id="org384980b">Exercise 7.50</h3>
-<div class="outline-text-3" id="text-org384980b">
+<div id="outline-container-orgb7d44b5" class="outline-3">
+<h3 id="orgb7d44b5">Exercise 7.50</h3>
+<div class="outline-text-3" id="text-orgb7d44b5">
 <p>
 Find quantum circuits using just single qubit rotations and \(e^{-\ii\,H/(4\hbar\,J)}\) to
 implement the oracle \(O\) for \(x_0\in\{0,1,2\}\).
 </p>
 
 <dl class="org-dl">
-<dt>Remark</dt><dd>The same remark as in <a href="#org2a0a6ae">exercise 7.47</a> applies here too.</dd>
+<dt>Remark</dt><dd>The same remark as in <a href="#org5caad65">exercise 7.47</a> applies here too.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org2649b88" class="outline-4">
-<h4 id="org2649b88">Solutions</h4>
-<div class="outline-text-4" id="text-org2649b88">
+<div id="outline-container-org9cda48b" class="outline-4">
+<h4 id="org9cda48b">Solutions</h4>
+<div class="outline-text-4" id="text-org9cda48b">
 <p>
 Let us first define all relevant gates
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org7137713"><span class="org-variable-name">rx1</span> <span class="org-operator">=</span> kron(rx, Id)
+<pre class="src src-sage" id="orgd75c794"><span class="org-variable-name">rx1</span> <span class="org-operator">=</span> kron(rx, Id)
 <span class="org-variable-name">rx2</span> <span class="org-operator">=</span> kron(Id, rx)
 
 <span class="org-variable-name">ry1</span> <span class="org-operator">=</span> kron(ry, Id)
@@ -4958,7 +4960,7 @@ Let us first define all relevant gates
 </div>
 
 <p>
-<a id="orga3ae823"></a>
+<a id="orga0033dc"></a>
 First of all we note that the book made a mistake by swapping the formulas for the oracle
 and the other projector. Correct would for example these ones:
 </p>
@@ -5000,7 +5002,7 @@ pulses, making them implementable in the framework of NMR quantum computation:
 </p>
 
 <p>
-<a id="org01ea0b9"></a>
+<a id="org9044894"></a>
 </p>
 \begin{align*}
   O_1 &= R_{y1}^\dagger R_{x1} R_{y1} R_{y2}^\dagger R_{x2} R_{y2} \cdot \sqrt{Z_1Z_2} , \\
@@ -5010,7 +5012,7 @@ pulses, making them implementable in the framework of NMR quantum computation:
 \end{align*}
 
 <p>
-Note that the main text (but take into account the <a href="#orga3ae823">typo-fix</a> from above) got a slightly
+Note that the main text (but take into account the <a href="#orga0033dc">typo-fix</a> from above) got a slightly
 different formula for \(O_4\). The difference could be explained by usage of a different
 formula for expressing Z-rotations as RF-pulses: \(R_z=R_yR_x^{\dagger}R_y^\dagger\).
 </p>
@@ -5018,9 +5020,9 @@ formula for expressing Z-rotations as RF-pulses: \(R_z=R_yR_x^{\dagger}R_y^\dagg
 </div>
 </div>
 
-<div id="outline-container-orga2c2cc6" class="outline-3">
-<h3 id="orga2c2cc6">Exercise 7.51</h3>
-<div class="outline-text-3" id="text-orga2c2cc6">
+<div id="outline-container-org70971d8" class="outline-3">
+<h3 id="org70971d8">Exercise 7.51</h3>
+<div class="outline-text-3" id="text-org70971d8">
 <p>
 Show that the Grover iteration can be simplified, by canceling adjacent single qubit
 rotations appropriately, to obtain an implemenation for \(G\) (for all possible cases of
@@ -5034,9 +5036,9 @@ since there are different possibilities anyway.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org7443f8f" class="outline-4">
-<h4 id="org7443f8f">Solution</h4>
-<div class="outline-text-4" id="text-org7443f8f">
+<div id="outline-container-orgb7f1698" class="outline-4">
+<h4 id="orgb7f1698">Solution</h4>
+<div class="outline-text-4" id="text-orgb7f1698">
 <p>
 Recall that the Grover operator is given by (for \(i\in\{0,1,2,3\}\))
 </p>
@@ -5048,7 +5050,7 @@ Recall that the Grover operator is given by (for \(i\in\{0,1,2,3\}\))
 </p>
 
 <p>
-where \(O_i\) can be implemented by <a href="#org01ea0b9">the formulas</a> from exercise 7.50, the Hadamard gates by
+where \(O_i\) can be implemented by <a href="#org9044894">the formulas</a> from exercise 7.50, the Hadamard gates by
 \(H=R_x^2R_y\), and \(P\) by (e.g.)
 </p>
 
@@ -5152,9 +5154,9 @@ The following code contains all four implementations and verifies them:
 </div>
 </div>
 
-<div id="outline-container-org0a45e64" class="outline-3">
-<h3 id="org0a45e64">Exercise 7.52 (Universality of Heisenberg Hamiltonian)</h3>
-<div class="outline-text-3" id="text-org0a45e64">
+<div id="outline-container-org4faaf71" class="outline-3">
+<h3 id="org4faaf71">Exercise 7.52 (Universality of Heisenberg Hamiltonian)</h3>
+<div class="outline-text-3" id="text-org4faaf71">
 <p>
 Show that a swap operation \(U\) can be implemented by turning on \(J(t)\) for an appropriate
 amount of time in the Heisenberg coupling Hamiltonian of (7.174), to obtain
@@ -5173,15 +5175,15 @@ with single qubit operations.
 </p>
 </div>
 
-<div id="outline-container-orgdbfad90" class="outline-4">
-<h4 id="orgdbfad90">Solution</h4>
-<div class="outline-text-4" id="text-orgdbfad90">
+<div id="outline-container-orgf12f3d7" class="outline-4">
+<h4 id="orgf12f3d7">Solution</h4>
+<div class="outline-text-4" id="text-orgf12f3d7">
 <p>
 Let us first define the Heisenberg Hamiltonian in sage.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orga495c8e"><span class="org-variable-name">Z1</span> <span class="org-operator">=</span> kron(Z, Id)
+<pre class="src src-sage" id="orga010a1a"><span class="org-variable-name">Z1</span> <span class="org-operator">=</span> kron(Z, Id)
 <span class="org-variable-name">Z2</span> <span class="org-operator">=</span> kron(Id, Z)
 
 <span class="org-variable-name">X1</span> <span class="org-operator">=</span> kron(X, Id)
@@ -5211,7 +5213,7 @@ As we can see the primary action happens on the subspace spanned by \(\ket{01}\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org340edc5"><span class="org-variable-name">Hberg0</span> <span class="org-operator">=</span> matrix.diagonal([1, 1, <span class="org-operator">-</span>3, 1])
+<pre class="src src-sage" id="org91912bc"><span class="org-variable-name">Hberg0</span> <span class="org-operator">=</span> matrix.diagonal([1, 1, <span class="org-operator">-</span>3, 1])
 
 <span class="org-variable-name">V</span> <span class="org-operator">=</span> matrix([
   [1, 0, 0, 0],
@@ -5265,7 +5267,7 @@ separately:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="orgc9fe801"><span class="org-variable-name">sqrtSWAP</span> <span class="org-operator">=</span> matrix([
+<pre class="src src-sage" id="orgae36862"><span class="org-variable-name">sqrtSWAP</span> <span class="org-operator">=</span> matrix([
   [2,   0,   0, 0],
   [0, 1<span class="org-operator">+</span>i, 1<span class="org-operator">-</span>i, 0],
   [0, 1<span class="org-operator">-</span>i, 1<span class="org-operator">+</span>i, 0],
@@ -5332,9 +5334,9 @@ q_1: ┤ H ├┤1            ├─────┤1            ├┤ Rz^† �
 </div>
 </div>
 
-<div id="outline-container-orgecf8cad" class="outline-2">
-<h2 id="orgecf8cad">References</h2>
-<div class="outline-text-2" id="text-orgecf8cad">
+<div id="outline-container-org1d6e4f3" class="outline-2">
+<h2 id="org1d6e4f3">References</h2>
+<div class="outline-text-2" id="text-org1d6e4f3">
 <p>
 Jae-Seung Lee (2002). <i>The quantum state tomography on an NMR system</i>, Physics Letters A.</p>
 </div>
