@@ -897,3 +897,164 @@ between the code words and the elements of $\BB^k$).
 
 On the other hand, from $d(C)=d$, using exercise 10.20, we see that the rank of $H$ must
 be at least $d-1$. Hence $n-k\geq\?d-1$. QED.
+
+** Exercise 10.22
+Show that all Hamming codes have distance $3$, and thus can correct an error on a single
+bit. The Hamming codes are therefore $[2^r-1,2^r-r-1,3]$ codes.
+
+*** Proof
+The parity check matrix of the Hamming code is made of matrices with columns $h_j$ being
+the binary representation of $j$ for $j\in\{1,\ldots,2^r-1\}$. Hence
+
+$$
+  h_1 + h_2 = h_3 ,
+$$
+
+implying that the first three columns are linearly dependent. On the other hand any two
+columns are linearly independent since
+
+$$
+  h_i + h_j = 0
+$$
+
+implies $i=j$. Now the claim follows from [[#exercise-10.20][exercise 10.20]]. QED.
+
+** Exercise 10.23
+Prove the Gilbert–Varshamov bound: Let $\varepsilon\?>0$ and $0\?<\delta\?<\?1/2$. There
+exists an $[n,k,d]$ code such that
+
+$$
+  R \geq 1 - H(\delta) - \varepsilon ,
+$$
+
+where $R=k/n$ is the /rate/ of the code, $\delta\leq(d-1)/n$, and
+$H(x)=-x\log_2(x)-(1-x)\log_2(x)$. In other words, for a given relative distance
+$\delta\?<\?1/2$ there is always a corresponding code whose transmission rate is not too
+bad.
+
+- Remark ::
+  - For $\varepsilon=0$ this is equivalent to the orginial exercise. The proof /suggests/
+    that it is necessary to have $\varepsilon\?>\?0$. Moreover the [[https://en.wikipedia.org/wiki/Gilbert%E2%80%93Varshamov_bound_for_linear_codes][wikipedia]] version of
+    the theorem also has it. Hence I believe this is just an error in the exercise.
+  - Another reason why I reformulated the statement is the following: In the original
+    statement I originally imagined $t$ to be fixed. But then if you only consider large
+    $n$ this isn't really useful since a code with very many bits has also a large "attack
+    surface" for errors. So it is more natural to consider a relative quantity instead.
+  - The authors write "The proof of the Gilbert–Varshamov bound is quite simple ...". I do
+    not share this assessment. Maybe my solution is more complicated than it should
+    be. But in my opinion most exercises in part III of the book (so far) are much easier.
+
+*** Proof
+In this proof we use the so called [[https://en.wikipedia.org/wiki/Probabilistic_method][probabilistic method]] which seems to be the standard way
+to prove this bound (see e.g. [[https://en.wikipedia.org/wiki/Gilbert%E2%80%93Varshamov_bound_for_linear_codes][wikipedia]] for the general case of linear codes over finite
+fields).
+
+Let $n\geq\?k$ to be fixed later. The main idea is to consider a uniform probability
+distribution over $\BB^{n\times\?k}$ and draw random generators $G$ from it (let us
+denote the generated code by $C$). The idea is to show that there is a non-zero
+probability that the drawn generator generates a code with the desired properties.
+
+Note one subtle thing here: the generator must be injective in order to generate a
+$k$​-dimensional code. Therefore consider the following lemma.
+
+- Lemma :: For all $n\geq\?k$ let $P(n,k)$ be the probability that a uniformly at random
+  drawn matrix $G\in\BB^{n\times\?k}$ has rank $k$. There exists a constant $P_\infty\?>\?0$
+  (which does not depend on $n$ or $k$) such that $P(n,k)\geq\?P_\infty$.
+  - Proof :: Clearly $P(n,k)\geq\?P(k,k)$. So we only have to consider the case $n=k$. For
+    $l\leq\?k$ let $P_l$ be the probability that a random matrix from $\BB^{l\times\?k}$
+    has rank $l$. Clearly
+
+    $$ P_1 = (2^k - 1) / 2^k = 1 - 2^{-k} $$
+
+    because there is only one vector (the zero vector) which leads to a single rowed
+    rank-zero matrix. Observe that
+
+    $$ P_{l+1} = P_l \cdot (2^k - 2^l) /2^k . $$
+
+    This is because in order to have $l+1$ independent rows you first need $l$ independent
+    rows and the last row has to be outside the $l$​-dimensional subspace (with $2^l$
+    elements) of the first $l$ rows. Hence
+
+    $$ P(k,k) = P_k = \prod_{j=1}^{k} (1 - 2^{-j}) \geq \prod_{j=1}^{\infty} (1 - 2^{-j}) =: P_\infty > 0 . $$
+
+    QED.
+
+Our goal is to prove that for sufficiently large $n$ (considering also non-injective $G$)
+
+<<exercise-10.23-2>>
+$$
+  \prob{d(C)\geq d} > P_\infty
+$$
+
+because then
+
+$$
+  \prob{d(C)\geq d \text{ and } \rank{G}=k} \geq  \prob{d(C)\geq d} - P_\infty > 0 .
+$$
+
+which proves the claim. Let us estimate the probability that the distance of the code is
+/not/ at least $d$. In order to show the above [[exercise-10.23-2][bound]] it suffices to show that the
+following can be made arbitrary small (for large $n$):
+
+<<exercise-10.23-1>>
+$$
+  \prob{d(C)\leq d-1} \leq \sum_{x\in\BB^k\backslash\{0\}} \prob{\wt{Gx} \leq d-1} = \frac{V_d}{2^{n-k}} .
+$$
+
+The first inequality follows from the fact that the event $d(C)\leq\?d-1$ is equivalent to
+the event that at least one of the code words has distance at most $d-1$ (also use the
+sub-additivity of probabilities). For the equality on the right let us first note that for
+each $x$ the code word $Gx$ is uniformly distributed (each column of $G$ is uniformly
+distrubuted and so is each sum of columns). Hence $\prob{\wt{Gx}\leq\?d-1}=V_d/2^n$ where
+
+$$
+  V_d = \sum_{i=0}^{d-1} \binom{n}{i}
+$$
+
+is the number of potential code words with weight at most $d-1$.
+
+- Lemma :: $V_d\leq2^{H(\delta)n}$ if $\delta\leq1/2$, where $\delta=(d-1)/n$.
+  - Remark :: A reverse inequality is is also true: $V_d\geq2^{H(\delta)n+o(n)}$. This can
+    be seen from Stirlings formula. Actually I knew this reverse inequality already since
+    I solved exercise 6.14, see e.g. [[file:chapter_6.org::exercise-6.14-proof-probability-entropy][here]] to get an idea for the proof. This is the reason
+    I found it natural to connect $V_d$ to the entropy. I was a bit surprised to find out
+    that the $V_d\leq\ldots$ inequality has such a clean form (no Landau notation).
+  - Proof :: The claim follows from this:
+
+    $$
+      \sum_{i=0}^{d-1} \binom{n}{i} 2^{-H(\delta)n}
+      = \sum_{i=0}^{d-1} \binom{n}{i} \delta^{d-1} (1-\delta)^{n-d+1}
+      \leq \sum_{i=0}^{d-1} \binom{n}{i} \delta^j (1-\delta)^{j-d}
+      = (\delta + (1 - \delta))^n
+      = 1 .
+    $$
+
+    For the inequality in the middle it is important to have $\delta\leq1/2$. The last
+    equality is just the binomial formula. QED.
+
+Using the lemma in [[exercise-10.23-1][the estimate]] for the probability that $d(C)\leq\?d-1$ we get
+
+$$
+  P := \prob{d(C)\leq d-1} \leq \left[\frac{2^{H(\delta)+O(n\inv)}}{2^{1-R}}\right]^n
+  = \left[\frac{2^{R+o(1)}}{2^{1-H(\delta)}}\right]^n .
+$$
+
+Here we choose $d$ minimal so that $\delta\leq(d-1)/n$ holds. Hence $\delta=(d-1+O(1))/n$
+which explains the $O(n\inv)$ in the inequalities above.
+
+Let us suppose we can choose $R$ such that
+
+\begin{align*}
+  R &\geq 1 - H(\delta) - \varepsilon , \\
+  R + o(1) &\leq 1 - H(\delta) - \varepsilon/2 , \\
+\end{align*}
+
+Then we would have $P\leq2^{-\varepsilon\?n/2}$ which is arbitrary small if $n$ is large
+enough - which proves the [[exercise-10.23-2][desired bound]]. But since $R=k/n$ this is indeed possible if we
+choose $n$ large enough and $k$ appropriately. QED.
+
+** TODO Exercise 10.24
+** TODO Exercise 10.25
+** TODO Exercise 10.26
+** TODO Exercise 10.27
+** TODO Exercise 10.28
