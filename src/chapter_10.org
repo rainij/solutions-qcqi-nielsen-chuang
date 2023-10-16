@@ -1053,8 +1053,147 @@ Then we would have $P\leq2^{-\varepsilon\?n/2}$ which is arbitrary small if $n$ 
 enough - which proves the [[exercise-10.23-2][desired bound]]. But since $R=k/n$ this is indeed possible if we
 choose $n$ large enough and $k$ appropriately. QED.
 
-** TODO Exercise 10.24
-** TODO Exercise 10.25
-** TODO Exercise 10.26
-** TODO Exercise 10.27
-** TODO Exercise 10.28
+** Exercise 10.24
+Show that a code with generator matrix G is weakly self-dual if and only if $G^TG=0$.
+
+*** Proof
+Weakly self dual means $C\subseteq\?C^{\bot}$. Hence
+
+$$
+  H^{\bot} G = 0 ,
+$$
+
+where $G$ is the generator of $C$ and $H^\bot$ the parity check matrix of $C^\bot$. But
+a parity check matrix of $C^\bot$ is $H^\bot=G^T$. QED.
+
+** Exercise 10.25
+Let $C$ be a linear code. Show that if $x\in\?C^\bot$ then
+$\sum_{y\in\?C}(-1)^{x\cdot\?y}=\abs{C}$, while if $x\notin\?C^\bot$ then
+$\sum_{y\in\?C}(-1)^{x\cdot\?y}=0$.
+
+*** Proof
+By definition of dual codes we have $x\cdot\?y=0$ if $x\in\?C^\bot$ and $y\in\?C$. Hence,
+in that case
+
+$$
+  \sum_{y\in\?C}(-1)^{x\cdot y} = \sum_{y\in\?C} 1 = \abs{C}
+$$
+
+Assume now that $x\in\?C^\bot$. Hence there exists a $\tilde{y}\in\?C$ such that
+$x\cdot\?\tilde{y}=1$. Let us decompose $C=C'\oplus\?\tilde{y}\BB$. Hence
+
+$$
+  \sum_{y\in C}(-1)^{x\cdot y}
+  = \sum_{y'\in C'} \sum_{\alpha=0}^1 (-1)^{y'\cdot x + \alpha\tilde{y}\cdot x}
+  = \sum_{y'\in C'} 0
+  = 0 .
+$$
+
+QED.
+
+** Exercise 10.26
+Suppose $H$ is a parity check matrix. Explain how to compute the transformation
+$\ket{x}\ket{0}\mapsto\ket{x}\ket{Hx}$ using a circuit composed entirely of =CNOT= gates.
+
+*** Solution
+Let us explain it on the specific example of the $[3,1]$ repetition code:
+
+$$
+  H = \begin{bmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{bmatrix} .
+$$
+
+A corresponding circuit would be
+
+#+RESULTS[a2f14439236c60ff5cd3272265c21f9531fca42b]: exercise-10.26-circuit
+#+begin_example
+
+a_0: ──■─────────────────
+       │
+a_1: ──┼────■────■───────
+       │    │    │
+a_2: ──┼────┼────┼────■──
+     ┌─┴─┐┌─┴─┐  │    │
+b_0: ┤ X ├┤ X ├──┼────┼──
+     └───┘└───┘┌─┴─┐┌─┴─┐
+b_1: ──────────┤ X ├┤ X ├
+               └───┘└───┘
+#+end_example
+
+The idea is that for each $(i,j)$ with $H_{ij}=1$ we have a =CNOT= with control at target
+$b_i$ and control $a_j$.
+
+#+name: exercise-10.26-circuit
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(3, "a")
+  qr1 = QuantumRegister(2, "b")
+
+  qc = QuantumCircuit(qr0, qr1)
+
+  # H_{0j}
+  qc.cx(qr0[0], qr1[0])
+  qc.cx(qr0[1], qr1[0])
+
+  # H_{1j}
+  qc.cx(qr0[1], qr1[1])
+  qc.cx(qr0[2], qr1[1])
+
+  qc.draw()
+#+end_src
+
+** Exercise 10.27
+Show that the codes defined by
+
+$$
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in\?C_2} (-1)^{u\cdot y} \ket{x+y+v}
+$$
+
+and parameterized by $u$ and $v$ are equivalent to $\mathrm{CSS}(C_1,C_2)$ in the sense
+that they have the same error-correcting properties. These codes, which we’ll refer to as
+$\mathrm{CSS}_{u,v}(C_1,C_2)$, will be useful later in our study of quantum key
+distribution, in Section 12.6.5.
+
+*** Sketch of a solution
+By using $X$, $Z$, and Hadamard gates one can unitarily transform the code into the
+following form
+
+$$
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in\?C_2} (-1)^{u\cdot x} \ket{x+y}
+  = (-1)^{u\cdot x} \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in\?C_2} \ket{x+y} .
+$$
+
+Basically we introduce errors $e_1=v$ and $e_2=u$ on purpose to accomplish that. Now it is
+not hard to verify that the factor $(-1)^{u\cdot\?x}$ does not interfere with the analysis
+from the book.
+
+** Exercise 10.28
+Verify that the transpose of the matrix in (10.77) is the generator of the $[7,4,3]$
+Hamming code.
+
+*** Solution
+The claim follows essentially from the following calculation:
+
+#+begin_src sage :tangle no :results replace :cache yes
+  # Standard parity check matrix for the [7,3] Hamming code:
+  H = matrix(GF(2), [
+      [0, 0, 0, 1, 1, 1, 1],
+      [0, 1, 1, 0, 0, 1, 1],
+      [1, 0, 1, 0, 1, 0, 1],
+  ])
+
+  # We want to check that this is indeed a generator:
+  G = matrix(GF(2), [
+      [1, 0, 0, 0, 0, 1, 1],
+      [0, 1, 0, 0, 1, 0, 1],
+      [0, 0, 1, 0, 1, 1, 0],
+      [0, 0, 0, 1, 1, 1, 1],
+  ]).T
+
+  assert H*G == matrix.zero(3, 4)
+  "PASSED"
+#+end_src
+
+#+RESULTS[08edf7627e1235ea9a0bb19479584be688be03ed]:
+: 'PASSED'
+
+One important thing to note is that $G$ has full rank (obviously). Hence $HG=0$ is
+sufficient to prove $G$ to be a generator of the $[7,4]$ Hamming code.
