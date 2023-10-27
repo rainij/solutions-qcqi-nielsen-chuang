@@ -43,68 +43,77 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd003c66">Setup</a>
+<li><a href="#org5198ecb">Setup</a>
 <ul>
-<li><a href="#org048b4b4">Imports</a></li>
-<li><a href="#org294ccb5">Utility code</a></li>
-<li><a href="#orgbda612d">Notation</a></li>
+<li><a href="#orgd34897a">Imports</a></li>
+<li><a href="#org730f20b">Utility code</a></li>
+<li><a href="#org2399bef">Notation</a></li>
+<li><a href="#org741746f">Stabilizer codes</a></li>
+<li><a href="#chapter-10-css-as-stabilizer">CSS codes in the stabilizer formalism</a></li>
 </ul>
 </li>
-<li><a href="#orga19cccf">Exercises</a>
+<li><a href="#orga8bc1d7">Exercises</a>
 <ul>
-<li><a href="#org3ebfa87">Exercise 10.1</a></li>
-<li><a href="#orgaca5b02">Exercise 10.2</a></li>
-<li><a href="#org88dedb7">Exercise 10.3</a></li>
-<li><a href="#org2f50d37">Exercise 10.4</a></li>
-<li><a href="#org40858de">Exercise 10.5</a></li>
-<li><a href="#org115331f">Exercise 10.6</a></li>
-<li><a href="#orgd07d7e7">Exercise 10.7</a></li>
-<li><a href="#org9282486">Exercise 10.8</a></li>
-<li><a href="#orgd01030e">Exercise 10.9</a></li>
-<li><a href="#org8e8a14e">Exercise 10.10</a></li>
-<li><a href="#org14d26e6">Exercise 10.11</a></li>
-<li><a href="#org825fae1">Exercise 10.12</a></li>
-<li><a href="#org60f6085">Exercise 10.13</a></li>
-<li><a href="#org7010622">Exercise 10.14</a></li>
-<li><a href="#org105c761">Exercise 10.15</a></li>
-<li><a href="#org5d58e76">Exercise 10.16</a></li>
-<li><a href="#org0e5d0f6">Exercise 10.17</a></li>
+<li><a href="#orga1c677a">Exercise 10.1</a></li>
+<li><a href="#orgf2a1138">Exercise 10.2</a></li>
+<li><a href="#orgcd1aa20">Exercise 10.3</a></li>
+<li><a href="#org5765a7c">Exercise 10.4</a></li>
+<li><a href="#orgc6732b8">Exercise 10.5</a></li>
+<li><a href="#org662ece9">Exercise 10.6</a></li>
+<li><a href="#orgaadbb71">Exercise 10.7</a></li>
+<li><a href="#org11b3293">Exercise 10.8</a></li>
+<li><a href="#orgfa85ef0">Exercise 10.9</a></li>
+<li><a href="#orgf261fe3">Exercise 10.10</a></li>
+<li><a href="#orgad531c4">Exercise 10.11</a></li>
+<li><a href="#org315c3a7">Exercise 10.12</a></li>
+<li><a href="#org3a421d6">Exercise 10.13</a></li>
+<li><a href="#org2df9501">Exercise 10.14</a></li>
+<li><a href="#orgc8e7caf">Exercise 10.15</a></li>
+<li><a href="#org3abb17c">Exercise 10.16</a></li>
+<li><a href="#org005dd7d">Exercise 10.17</a></li>
 <li><a href="#exercise-10.18">Exercise 10.18</a></li>
-<li><a href="#orge6ab650">Exercise 10.19</a></li>
+<li><a href="#orgcf4d047">Exercise 10.19</a></li>
 <li><a href="#exercise-10.20">Exercise 10.20</a></li>
-<li><a href="#orgbc8313c">Exercise 10.21 (Singleton bound)</a></li>
-<li><a href="#org6b9b72b">Exercise 10.22</a></li>
-<li><a href="#orgbacf1e7">Exercise 10.23</a></li>
-<li><a href="#orgeeb7650">Exercise 10.24</a></li>
-<li><a href="#orgf7582be">Exercise 10.25</a></li>
-<li><a href="#org25be67e">Exercise 10.26</a></li>
-<li><a href="#org1499e14">Exercise 10.27</a></li>
-<li><a href="#org1586e6c">Exercise 10.28</a></li>
+<li><a href="#orgeb33287">Exercise 10.21 (Singleton bound)</a></li>
+<li><a href="#org933d991">Exercise 10.22</a></li>
+<li><a href="#org67719ca">Exercise 10.23</a></li>
+<li><a href="#org0f06680">Exercise 10.24</a></li>
+<li><a href="#org4d5672d">Exercise 10.25</a></li>
+<li><a href="#orgc259128">Exercise 10.26</a></li>
+<li><a href="#org0b44888">Exercise 10.27</a></li>
+<li><a href="#orgee48312">Exercise 10.28</a></li>
+<li><a href="#org93d22c4">Exercise 10.29</a></li>
+<li><a href="#org206da1a">Exercise 10.30</a></li>
+<li><a href="#org675a973">Exercise 10.31</a></li>
+<li><a href="#orgff4d3bf">Exercise 10.32</a></li>
+<li><a href="#exercise-10.33">Exercise 10.33</a></li>
+<li><a href="#orgd6210ae">Exercise 10.34</a></li>
+<li><a href="#exercise-10.35">Exercise 10.35</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgd003c66" class="outline-2">
-<h2 id="orgd003c66">Setup</h2>
-<div class="outline-text-2" id="text-orgd003c66">
+<div id="outline-container-org5198ecb" class="outline-2">
+<h2 id="org5198ecb">Setup</h2>
+<div class="outline-text-2" id="text-org5198ecb">
 </div>
-<div id="outline-container-org048b4b4" class="outline-3">
-<h3 id="org048b4b4">Imports</h3>
-<div class="outline-text-3" id="text-org048b4b4">
+<div id="outline-container-orgd34897a" class="outline-3">
+<h3 id="orgd34897a">Imports</h3>
+<div class="outline-text-3" id="text-orgd34897a">
 <div class="org-src-container">
-<pre class="src src-sage" id="orge0a7697"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
+<pre class="src src-sage" id="org34c0168"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket
 <span class="org-keyword">from</span> chapter_8_sage <span class="org-keyword">import</span> make_operation
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org294ccb5" class="outline-3">
-<h3 id="org294ccb5">Utility code</h3>
-<div class="outline-text-3" id="text-org294ccb5">
+<div id="outline-container-org730f20b" class="outline-3">
+<h3 id="org730f20b">Utility code</h3>
+<div class="outline-text-3" id="text-org730f20b">
 <div class="org-src-container">
-<pre class="src src-sage" id="org5383dd9"><span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"g"</span>, domain<span class="org-operator">=</span><span class="org-string">"positive"</span>)
+<pre class="src src-sage" id="orga1e8112"><span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"g"</span>, domain<span class="org-operator">=</span><span class="org-string">"positive"</span>)
 <span class="org-variable-name">a</span>, <span class="org-variable-name">b</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"a b"</span>, domain<span class="org-operator">=</span><span class="org-string">"complex"</span>)
 assume(g <span class="org-operator">&lt;=</span> 1)
 </pre>
@@ -112,24 +121,408 @@ assume(g <span class="org-operator">&lt;=</span> 1)
 </div>
 </div>
 
-<div id="outline-container-orgbda612d" class="outline-3">
-<h3 id="orgbda612d">Notation</h3>
-<div class="outline-text-3" id="text-orgbda612d">
+<div id="outline-container-org2399bef" class="outline-3">
+<h3 id="org2399bef">Notation</h3>
+<div class="outline-text-3" id="text-org2399bef">
 <p>
 Below we use \(\BB=\mathrm{GF}(2)=\ZZ_2\) to denote the field of two elements. This models a
 <i>bit</i>.
 </p>
 </div>
 </div>
+
+<div id="outline-container-org741746f" class="outline-3">
+<h3 id="org741746f">Stabilizer codes</h3>
+<div class="outline-text-3" id="text-org741746f">
+<p>
+The purpose of this section is to complement chapter 10.5. From the book I am missing some
+concrete statement on how <i>exactly</i> stabilizer codes are characterized. I try to do this
+in the <a href="#org3edacf0">fundamental theorem</a> of stabilizer codes below.
+</p>
+
+<p>
+Let \(G_n\) be the Pauli group. As in the book let \(V_S=\{v|\forall\?g\in\?S:gv=v\}\) for a
+subgroup \(S\) of \(G_n\). Note that any element of \(G_n\) can be represented as
+</p>
+
+<p>
+<a id="orga4b49df"></a>
+\[
+  g = \alpha \bigotimes_{j=1}^n N_j ,
+\]
+</p>
+
+<p>
+where \(\alpha\in\langle\ii\rangle=\{1,-1,\ii,-\ii\}\) and \(N_j\in\{I,X,Y,Z\}\). An easy to
+prove but important observation is that
+</p>
+
+<dl class="org-dl">
+<dt>Lemma</dt><dd>For all \(g,h\in\?G_n\) we have \(gh=\pm\?hg\). That is, if two elements of the
+Pauli group do not commute then \(gh=-hg\).
+<dl class="org-dl">
+<dt>Proof</dt><dd>This directly follows from the commutator relation of the Pauli
+matrices. QED.</dd>
+</dl></dd>
+</dl>
+
+<p>
+Define a group homomorphism \(r:G_n\to\BB^{2n}\) by the following table
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">\(N_j\)</th>
+<th scope="col" class="org-left">\(r(g)_j\)</th>
+<th scope="col" class="org-left">\(r(g)_{n+j}\)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">\(I\)</td>
+<td class="org-left">\(0\)</td>
+<td class="org-left">\(0\)</td>
+</tr>
+
+<tr>
+<td class="org-left">\(X\)</td>
+<td class="org-left">\(1\)</td>
+<td class="org-left">\(0\)</td>
+</tr>
+
+<tr>
+<td class="org-left">\(Y\)</td>
+<td class="org-left">\(1\)</td>
+<td class="org-left">\(1\)</td>
+</tr>
+
+<tr>
+<td class="org-left">\(Z\)</td>
+<td class="org-left">\(0\)</td>
+<td class="org-left">\(1\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+By group homomorphism we mean that \(r(gg')=r(g)+r(g')\) and \(r(g\inv)=-r(g)\) (note that
+\(-r(g)=r(g)\) as we have \(\BB\) as the base field).
+</p>
+
+<p>
+Let \(g_1,\ldots,g_l\in\?G_n\) and let \(S=\langle\?g_1,\ldots,g_l\rangle\). Early on in chapter 10.5 we have seen that
+</p>
+
+<p>
+<a id="org81c0854"></a>
+</p>
+<dl class="org-dl">
+<dt>Lemma</dt><dd>If \(V_S\) is non-trivial then \(-I\notin\?S\) and all the \(g_j\) commute.
+<dl class="org-dl">
+<dt>Proof</dt><dd>See chapter 10.5.1 for the simple proof.</dd>
+<dt>Remark</dt><dd>In Proposition 10.5 in the book the reverse direction is proved and moreover
+it is shown that \(\dim(V_S)=2^k\) if \(l=n-k\).</dd>
+</dl></dd>
+</dl>
+
+<p>
+In the following we want to better understand the condition from the Lemma. Therefore let
+us define the corresponding <b>check matrix</b> \(G\in\BB^{l\times2n}\) by
+</p>
+
+<p>
+\[
+  G_{ij} = r(g_i)_j
+\]
+</p>
+
+<dl class="org-dl">
+<dt>Theorem</dt><dd><p>
+Let \(\Lambda=X\otimes\?I_n\) and let
+</p>
+
+<p>
+\[
+  \beta = r(g)\Lambda r(h)^T \; (\in \BB) .
+  \]
+</p>
+
+<p>
+Then \(gh=(-1)^\beta\?hg\) for all \(g,h\in\?G_n\). In particular \(g\) and \(h\) commute iff
+\(\beta=0\).
+</p>
+<dl class="org-dl">
+<dt>Proof</dt><dd>See <a href="#exercise-10.33">exercise 10.33</a>.</dd>
+</dl></dd>
+</dl>
+
+<p>
+As a corollary we get a nice way to check whether \(S\) is abelian or not:
+</p>
+
+<p>
+<a id="org350a0a1"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem</dt><dd>The \(g_1,\ldots,g_l\) commute iff \(G\Lambda\?G^T=0\in\BB^{l\times\?l}\).</dd>
+</dl>
+
+<p>
+It is left to find a nice way to check whether \(-I\notin\?S\) and how to characterize
+independent generators. This is the purpose of the following series of theorems.
+</p>
+
+<p>
+<a id="orgcb0e8ff"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem</dt><dd><p>
+The following assertions are equivalent
+</p>
+<ol class="org-ol">
+<li>\(-I\notin\?S\) .</li>
+<li>\(r\) is injective .</li>
+</ol>
+
+<dl class="org-dl">
+<dt>Proof</dt><dd><dl class="org-dl">
+<dt>(1) → (2)</dt><dd>Note that \(r\) is injective if \(r(g)=0\) has only one solution
+(\(g=I\)). Clearly \(r(g)=0\) iff \(N_j=I\) for all \(j\). Hence \(g=\pm\?I\) or
+\(g=\pm\ii\?I\). By (1) only \(g=I\) is possible.</dd>
+<dt>(2) → (1)</dt><dd>This follows from \(r(-I)=0=r(I)\). Hence \(r\) cannot be injective
+whenever \(-I\in\?S\).</dd>
+</dl>
+<p>
+QED.
+</p></dd>
+</dl></dd>
+</dl>
+
+<p>
+<a id="org0d1d509"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem</dt><dd><p>
+Assume that \(-I\notin\?S\). The following assertions are equivalent:
+</p>
+<ol class="org-ol">
+<li>The \(g_1,\ldots,g_l\) are independent.</li>
+<li>\(\rank{G}=l\).</li>
+</ol>
+
+<p>
+The implication <b>(2) → (1)</b> holds even without assuming \(-I\notin\?S\).
+</p>
+<dl class="org-dl">
+<dt>Proof</dt><dd><dl class="org-dl">
+<dt>(1) → (2)</dt><dd>This follows from the fact that an injective group homomorphism maps
+independent sets to independent sets. By a <a href="#orgcb0e8ff">previous theorem</a> \(r\) is injective. Hence
+the rows of \(G\) are independent as elements of the group \(\BB^{2n}\). But this means
+they are independent as elements of the vector space \(\BB^{2n}\).</dd>
+<dt>(2) → (1)</dt><dd>From (2) we deduce that the \(r(g_j)\) are independent. But this implies
+that the \(g_j\) must be independent. This holds even without the assumption that \(r\)
+is injective.</dd>
+</dl>
+<p>
+QED.
+</p></dd>
+</dl></dd>
+</dl>
+
+<p>
+<a id="org962c4a2"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem</dt><dd><p>
+Assume that \(\rank{G}=l\). The following assertions are equivalent
+</p>
+<ol class="org-ol">
+<li>\(-I\notin\?S\),</li>
+<li>\(\alpha_j=\pm1\) for all \(j\),</li>
+</ol>
+
+<p>
+<a href="#orga4b49df">where</a> \(g_j=\alpha_j\bigotimes_jN_j\).
+</p>
+<dl class="org-dl">
+<dt>Proof</dt><dd><dl class="org-dl">
+<dt>(1) → (2)</dt><dd>Since \(g_j=\alpha_j^2I=\pm\?I\) we see that \(-I\notin\?S\) implies
+\(\alpha_j\neq\pm\ii\) for all \(j\).</dd>
+
+<dt>(2) → (1)</dt><dd><p>
+Assume to the contrary that \(-I\in\?S\). There is a non-zero \(x\in\ZZ^l\)
+such that \(-I=\prod_jg_j^{x_j}\) (we may assume that \(x_j\in\{0,1,2,3\}\)). Hence
+</p>
+
+<p>
+\[
+      0 = r(-I) = \sum_{j=1}^n x_j r(g_j) = x G .
+      \]
+</p>
+
+<p>
+Since \(\rank{G}=l\) (as matrix over \(\BB\)) we have that \(x_j\in\{0,2\}\) for all
+\(j\). But \(g_j^2=\alpha_j^2I\) and hence \(\alpha_j=\pm\ii\) for at least one \(j\) -
+contradicting (2).
+</p></dd>
+</dl>
+<p>
+QED.
+</p></dd>
+</dl></dd>
+</dl>
+
+<p>
+We are in a position to state and prove the main theorem of this section:
+</p>
+
+<p>
+<a id="org3edacf0"></a>
+</p>
+<dl class="org-dl">
+<dt>Fundamental theorem on stabilizer codes</dt><dd><p>
+The non-trivial stabilizer codes are given by
+all check matrices \(G\in\BB^{l\times2n}\) (for any \(n\) and \(l\)), corresponding to a set
+of generators \(g_1,\ldots,g_l\in\?G_n\), which satisfy
+</p>
+<ol class="org-ol">
+<li>\(\alpha_j=\pm1\) (c.f. <a href="#orga4b49df">representation</a> of \(g_j\)),</li>
+<li>\(\rank{G}=l\) ,</li>
+<li>\(G\Lambda\?G^T=0\in\BB^{l\times\?l}\) .</li>
+</ol>
+
+<p>
+In that case the \(g_j\) commute, are independent and the dimension of the code is
+\(2^{n-l}\).
+</p>
+
+<p>
+Moreover, two stabilizer codes \(C\) and \(C'\) which have the same check matrix \(G\) (and
+hence only differ in the signs \(\alpha_j\)) are equivalent in the sense that there exists
+a Pauli operator \(g\in\?G_n\) such that \(C'=gC\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>Because of the statement about equivalent stabilizer codes one might set
+\(\alpha_j=1\) for simplicity. Under this convention the check matrix describes the
+stabilizer code completely.</dd>
+
+<dt>Proof</dt><dd><p>
+Let \(V_S\) be a non-trivial stabilizer code. Let \(g_1,\ldots,g_l\) be a an
+independent set of generators. By proposition 10.5 (or the <a href="#org81c0854">Lemma</a> above) we have
+\(-I\notin\?S\) and all \(g_j\) commute. By independence of \(g_j\) and \(-I\notin\?S\) we
+<a href="#org0d1d509">deduce</a> that \(\rank{G}=l\). From this and again using \(-I\notin\?S\) we <a href="#org962c4a2">deduce</a> that
+\(\alpha_j=\pm1\) for all \(j\). Finally, the fact that the generators commute is
+<a href="#org350a0a1">equivalent</a> to \(G\Lambda\?G^T=0\). This shows one part of the claim.
+</p>
+
+<p>
+Let us now assume the conditions 1 to 3. From (1) and (2) we <a href="#org962c4a2">deduce</a> that
+\(-I\notin\?S\). (3) is <a href="#org350a0a1">equivalent</a> to all \(g_j\) commuting. By proposition 10.5 this
+implies that \(V_S\) is non-trivial.
+</p>
+
+<p>
+The claim about the dimension of the code is contained in proposition 10.5.
+</p>
+
+<p>
+Finally let us show that two stabilizer codes which differ only in \(\alpha\) are
+equivalent in the sense stated. For concreteness let \(C\) be the code with all
+\(\alpha_j=1\) and let \(C'\) be another code with the same check matrix and signs
+\(\alpha_j=\chi_j=\pm1\). The claim actually follows from the proof of proposition
+10.5. In fact, if \(P^{(0,\ldots,0)}_S\) is the projector of \(C\) then clearly
+\(P^{\chi}_S\) is the projector of \(C'\). The proof showed that there exists a
+\(g_{\chi}\in\?G_n\) such that
+\(g_{\chi}P^{(0,\ldots,0)}_Sg_{\chi}^\dagger=P^{\chi}_S\). QED.
+</p></dd>
+</dl></dd>
+</dl>
+</div>
 </div>
 
-<div id="outline-container-orga19cccf" class="outline-2">
-<h2 id="orga19cccf">Exercises</h2>
-<div class="outline-text-2" id="text-orga19cccf">
+<div id="outline-container-chapter-10-css-as-stabilizer" class="outline-3">
+<h3 id="chapter-10-css-as-stabilizer">CSS codes in the stabilizer formalism</h3>
+<div class="outline-text-3" id="text-chapter-10-css-as-stabilizer">
+<p>
+There is a subtle error on page 456 which explains how the parity check matrices of a CSS
+code map to the generators in the stabilizer formalism.
+</p>
+
+<p>
+They say that the \(g_j\) containing the \(X\) correspond to the check matrix of \(C_1\) and
+that the \(g_j\) containing the \(Z\) correspond to the check matrix of \(C_2^\top\). Actually
+it is the other way round. This doesn't affect the example (Steane code) because the
+parity check matrices are identical for \(C_1\) and \(C_2^\top\). But it might be
+confusing. Hence I take the opportunity to lay out the translation for the general case.
+</p>
+
+<p>
+Recall that a \([n,k_1-k_2]\) CSS code is constructed from two linear codes \(C_1\)
+(\([n,k_1]\)) and \(C_2\) (\([n,k_2]\)) with \(C_2\subset\?C_1\). The code words are given by
+</p>
+
+<p>
+\[
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \ket{x + y}
+\]
+</p>
+
+<p>
+where \(x+C_2\) is from the quotient space \(C_1/C_2\). Let \(A\in\BB^{(n-k_1)\times\?n}\) be
+the parity check matrix of \(C_1\) and let \(B\in\BB^{k_2\times\?n}\) be the parity check
+matrix of \(C_2^\top\). Let
+</p>
+
+<p>
+<a id="org2bbb2cc"></a>
+</p>
+\begin{align*}
+  g_i &= \bigotimes_{j=1}^n X^{B_{ij}}, \text{ for } i=1..k_2, \\
+  g_{k_2+i} &= \bigotimes_{j=1}^n Z^{A_{ij}}, \text{ for } i=1..(n-k_1). \\
+\end{align*}
+
+<p>
+<a id="orgf0bf142"></a>
+</p>
+<dl class="org-dl">
+<dt>Theorem</dt><dd><a href="#org2bbb2cc">These</a> \(n-(k_1-k_2)\) Pauli operators are the stabilizer for the CSS code of
+\(C_1\) over \(C_2\).
+<dl class="org-dl">
+<dt>Proof</dt><dd>We provide a proof in the <a href="#exercise-10.32-solution">solution</a> of exercise 10.32.</dd>
+</dl></dd>
+</dl>
+
+<p>
+The check matrix of the CSS code is given by the following block matrix
+</p>
+
+<p>
+\[
+  \begin{bmatrix} B & 0 \\ 0 & A \end{bmatrix} .
+\]
+</p>
 </div>
-<div id="outline-container-org3ebfa87" class="outline-3">
-<h3 id="org3ebfa87">Exercise 10.1</h3>
-<div class="outline-text-3" id="text-org3ebfa87">
+</div>
+</div>
+
+<div id="outline-container-orga8bc1d7" class="outline-2">
+<h2 id="orga8bc1d7">Exercises</h2>
+<div class="outline-text-2" id="text-orga8bc1d7">
+</div>
+<div id="outline-container-orga1c677a" class="outline-3">
+<h3 id="orga1c677a">Exercise 10.1</h3>
+<div class="outline-text-3" id="text-orga1c677a">
 <p>
 Verify that the encoding circuit in Figure 10.2 works as claimed.
 </p>
@@ -146,9 +539,9 @@ Verify that the encoding circuit in Figure 10.2 works as claimed.
 </div>
 
 
-<div id="outline-container-org543866d" class="outline-4">
-<h4 id="org543866d">Solution</h4>
-<div class="outline-text-4" id="text-org543866d">
+<div id="outline-container-org4e1ad4e" class="outline-4">
+<h4 id="org4e1ad4e">Solution</h4>
+<div class="outline-text-4" id="text-org4e1ad4e">
 <p>
 This is really just observing that the circuit acts like this on the <i>relevant</i> basis
 states
@@ -166,9 +559,9 @@ The rest follows by linearity.
 </div>
 </div>
 
-<div id="outline-container-orgaca5b02" class="outline-3">
-<h3 id="orgaca5b02">Exercise 10.2</h3>
-<div class="outline-text-3" id="text-orgaca5b02">
+<div id="outline-container-orgf2a1138" class="outline-3">
+<h3 id="orgf2a1138">Exercise 10.2</h3>
+<div class="outline-text-3" id="text-orgf2a1138">
 <p>
 The action of the bit flip channel can be described by the quantum operation
 \(\calE(\rho)=(1-p)\rho+pX\rho\?X\). Show that this may be given an alternate operator-sum
@@ -181,9 +574,9 @@ with probability \(2p\).
 </p>
 </div>
 
-<div id="outline-container-org15905ad" class="outline-4">
-<h4 id="org15905ad">Proof</h4>
-<div class="outline-text-4" id="text-org15905ad">
+<div id="outline-container-org81966f5" class="outline-4">
+<h4 id="org81966f5">Proof</h4>
+<div class="outline-text-4" id="text-org81966f5">
 <p>
 Note that \(X=P_+-P_-\) and \(I=P_++P_-\). Hence
 </p>
@@ -212,9 +605,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org88dedb7" class="outline-3">
-<h3 id="org88dedb7">Exercise 10.3</h3>
-<div class="outline-text-3" id="text-org88dedb7">
+<div id="outline-container-orgcd1aa20" class="outline-3">
+<h3 id="orgcd1aa20">Exercise 10.3</h3>
+<div class="outline-text-3" id="text-orgcd1aa20">
 <p>
 Show by explicit calculation that measuring \(Z_1Z_2\) followed by \(Z_2Z_3\) is equivalent,
 up to labeling of the measurement outcomes, to measuring the four projectors defined by
@@ -223,9 +616,9 @@ and post-measurement states.
 </p>
 </div>
 
-<div id="outline-container-orga765b94" class="outline-4">
-<h4 id="orga765b94">Proof</h4>
-<div class="outline-text-4" id="text-orga765b94">
+<div id="outline-container-org1a64a4c" class="outline-4">
+<h4 id="org1a64a4c">Proof</h4>
+<div class="outline-text-4" id="text-org1a64a4c">
 <p>
 Let us define the following projectors
 </p>
@@ -277,9 +670,9 @@ Hence the projectors are the same, just re-labeled. QED.
 </div>
 </div>
 
-<div id="outline-container-org2f50d37" class="outline-3">
-<h3 id="org2f50d37">Exercise 10.4</h3>
-<div class="outline-text-3" id="text-org2f50d37">
+<div id="outline-container-org5765a7c" class="outline-3">
+<h3 id="org5765a7c">Exercise 10.4</h3>
+<div class="outline-text-3" id="text-org5765a7c">
 <p>
 Consider the three qubit bit flip code. Suppose we had performed the error syndrome
 measurement by measuring the eight orthogonal projectors corresponding to projections onto
@@ -295,9 +688,9 @@ bit number \(j\) flipped, where \(j\) is in the range one to three.</li>
 </ol>
 </div>
 
-<div id="outline-container-orgf7f1586" class="outline-4">
-<h4 id="orgf7f1586">Solution for part 1</h4>
-<div class="outline-text-4" id="text-orgf7f1586">
+<div id="outline-container-org2b55b3c" class="outline-4">
+<h4 id="org2b55b3c">Solution for part 1</h4>
+<div class="outline-text-4" id="text-org2b55b3c">
 <p>
 The projectors are just \(P_j=\proj{j}\) for \(j=0..7\) (note that the binary representations
 for the numbers from \(0\) to \(7\) are \(000\), \(001\), \(010\), \(011\), \(100\), \(101\), \(110\),
@@ -312,7 +705,7 @@ set of possible measurements for the given value of \(k\). We have
 </p>
 
 <p>
-<a id="org45b9bf6"></a>
+<a id="orgd9b23e8"></a>
 </p>
 \begin{align*}
   M_0 &= \{0, 7\} , \\
@@ -331,11 +724,11 @@ the three errors "is allowed" to happen)).
 </div>
 </div>
 
-<div id="outline-container-org19a4f1d" class="outline-4">
-<h4 id="org19a4f1d">Solution for part 2</h4>
-<div class="outline-text-4" id="text-org19a4f1d">
+<div id="outline-container-org40922ad" class="outline-4">
+<h4 id="org40922ad">Solution for part 2</h4>
+<div class="outline-text-4" id="text-org40922ad">
 <p>
-If we measure \(j\) and infer the error \(k\) <a href="#org45b9bf6">according to the sets</a> \(M_k\) we would correct it
+If we measure \(j\) and infer the error \(k\) <a href="#orgd9b23e8">according to the sets</a> \(M_k\) we would correct it
 by applying \(X_k\) to the state. In other words, the following quantum operation \(\calR\)
 performs the syndrome measurement followed by the recovery:
 </p>
@@ -390,9 +783,9 @@ of part 2.
 </div>
 </div>
 
-<div id="outline-container-org890933c" class="outline-4">
-<h4 id="org890933c">Solution for part 3</h4>
-<div class="outline-text-4" id="text-org890933c">
+<div id="outline-container-org789ee4b" class="outline-4">
+<h4 id="org789ee4b">Solution for part 3</h4>
+<div class="outline-text-4" id="text-org789ee4b">
 <p>
 Let us consider two cases:
 </p>
@@ -463,9 +856,9 @@ Here \(p\) and \(1-p\) are the weights.
 </div>
 </div>
 
-<div id="outline-container-org40858de" class="outline-3">
-<h3 id="org40858de">Exercise 10.5</h3>
-<div class="outline-text-3" id="text-org40858de">
+<div id="outline-container-orgc6732b8" class="outline-3">
+<h3 id="orgc6732b8">Exercise 10.5</h3>
+<div class="outline-text-3" id="text-orgc6732b8">
 <p>
 Show that the syndrome measurement for detecting phase flip errors in the Shor code
 corresponds to measuring the observables \(A=X_1X_2X_3X_4X_5X_6\) and
@@ -594,18 +987,18 @@ desired. QED.
 </div>
 </div>
 
-<div id="outline-container-org115331f" class="outline-3">
-<h3 id="org115331f">Exercise 10.6</h3>
-<div class="outline-text-3" id="text-org115331f">
+<div id="outline-container-org662ece9" class="outline-3">
+<h3 id="org662ece9">Exercise 10.6</h3>
+<div class="outline-text-3" id="text-org662ece9">
 <p>
 Show that recovery from a phase flip on any of the first three qubits may be accomplished
 by applying the operator \(Z_1Z_2Z_3\).
 </p>
 </div>
 
-<div id="outline-container-orgcc31cc4" class="outline-4">
-<h4 id="orgcc31cc4">Proof</h4>
-<div class="outline-text-4" id="text-orgcc31cc4">
+<div id="outline-container-org75d6e34" class="outline-4">
+<h4 id="org75d6e34">Proof</h4>
+<div class="outline-text-4" id="text-org75d6e34">
 <p>
 Let us reuse the notation from the <a href="#exercise-10.5-solution">solution</a> of exercise 10.5. Clearly
 </p>
@@ -634,12 +1027,13 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgd07d7e7" class="outline-3">
-<h3 id="orgd07d7e7">Exercise 10.7</h3>
-<div class="outline-text-3" id="text-orgd07d7e7">
+<div id="outline-container-orgaadbb71" class="outline-3">
+<h3 id="orgaadbb71">Exercise 10.7</h3>
+<div class="outline-text-3" id="text-orgaadbb71">
 <p>
 Consider the three qubit bit flip code of Section 10.1.1, with corresponding projector
-\(P=\proj{000}+\proj{111}\). The noise process this code against has operation elements
+\(P=\proj{000}+\proj{111}\). The noise process this code protects against has operation
+elements
 </p>
 
 <p>
@@ -656,9 +1050,9 @@ noise process.
 </p>
 </div>
 
-<div id="outline-container-orgc4513ee" class="outline-4">
-<h4 id="orgc4513ee">Solution</h4>
-<div class="outline-text-4" id="text-orgc4513ee">
+<div id="outline-container-org78cfe57" class="outline-4">
+<h4 id="org78cfe57">Solution</h4>
+<div class="outline-text-4" id="text-org78cfe57">
 <p>
 Clearly \(PX_iX_jP=\delta_{ij}P\). Hence
 </p>
@@ -676,9 +1070,9 @@ for this noise.
 </div>
 </div>
 
-<div id="outline-container-orgdb376ce" class="outline-4">
-<h4 id="orgdb376ce">Bonus: Calculating the recovery procedure</h4>
-<div class="outline-text-4" id="text-orgdb376ce">
+<div id="outline-container-org0c16cbe" class="outline-4">
+<h4 id="org0c16cbe">Bonus: Calculating the recovery procedure</h4>
+<div class="outline-text-4" id="text-org0c16cbe">
 <p>
 By the previous calculation and Theorem 10.1 there exists a trace-preserving quantum
 operation \(\calR\) such that
@@ -762,9 +1156,9 @@ operators. The Kraus matrices of \(\calR\) are
 </div>
 </div>
 
-<div id="outline-container-org9282486" class="outline-3">
-<h3 id="org9282486">Exercise 10.8</h3>
-<div class="outline-text-3" id="text-org9282486">
+<div id="outline-container-org11b3293" class="outline-3">
+<h3 id="org11b3293">Exercise 10.8</h3>
+<div class="outline-text-3" id="text-org11b3293">
 <p>
 Verify that the three qubit phase flip code \(\ket{0_L}=\ket{+++}\), \(\ket{1_L}=\ket{---}\)
 satisfies the quantum error-correction conditions for the set of error operators
@@ -772,9 +1166,9 @@ satisfies the quantum error-correction conditions for the set of error operators
 </p>
 </div>
 
-<div id="outline-container-orgd51ba25" class="outline-4">
-<h4 id="orgd51ba25">Solution 1</h4>
-<div class="outline-text-4" id="text-orgd51ba25">
+<div id="outline-container-org9377d72" class="outline-4">
+<h4 id="org9377d72">Solution 1</h4>
+<div class="outline-text-4" id="text-org9377d72">
 <p>
 Let us reduce this to the bit flip code. To convert to the bit flip code we only have to
 conjugate the projector of the code and the Kraus operators of the errors by
@@ -816,9 +1210,9 @@ In the second equality we used what we already know about the bit flip code.
 </div>
 </div>
 
-<div id="outline-container-org2051b9e" class="outline-4">
-<h4 id="org2051b9e">Solution 2</h4>
-<div class="outline-text-4" id="text-org2051b9e">
+<div id="outline-container-orge71ddc8" class="outline-4">
+<h4 id="orge71ddc8">Solution 2</h4>
+<div class="outline-text-4" id="text-orge71ddc8">
 <p>
 We can also verify this explicitly. Let \(P=P_{+++}+P_{---}\) be the projector onto the
 code, where we use the notation \(P_{ijk}=\proj{ijk}\). Clearly
@@ -848,9 +1242,9 @@ Similarly \(PIZ_jP=PZ_iZ_jP=0\) for \(i\neq\?j\). Hence \(PE_i^\dagger\?E_iP=\de
 </div>
 </div>
 
-<div id="outline-container-orgd01030e" class="outline-3">
-<h3 id="orgd01030e">Exercise 10.9</h3>
-<div class="outline-text-3" id="text-orgd01030e">
+<div id="outline-container-orgfa85ef0" class="outline-3">
+<h3 id="orgfa85ef0">Exercise 10.9</h3>
+<div class="outline-text-3" id="text-orgfa85ef0">
 <p>
 Again, consider the three qubit phase flip code. Let \(P_i\) and \(Q_i\) be the projectors
 onto the \(\ket{0}\) and \(\ket{1}\) states, respectively, of the \(i\)​th qubit. Prove that the
@@ -858,9 +1252,9 @@ three qubit phase flip code protects against the error set \({I,P_1,Q_1,P_2,Q_2,
 </p>
 </div>
 
-<div id="outline-container-org74db796" class="outline-4">
-<h4 id="org74db796">Solution</h4>
-<div class="outline-text-4" id="text-org74db796">
+<div id="outline-container-orgce5c463" class="outline-4">
+<h4 id="orgce5c463">Solution</h4>
+<div class="outline-text-4" id="text-orgce5c463">
 <p>
 Recall that the phase flip code corrects the errors \(I\), \(Z_1\), \(Z_2\), and \(Z_3\). By
 theorem 10.2 linear combinations of these errors are corrected too. Note that we have
@@ -878,18 +1272,18 @@ Hence those errors are corrected too.
 </div>
 </div>
 
-<div id="outline-container-org8e8a14e" class="outline-3">
-<h3 id="org8e8a14e">Exercise 10.10</h3>
-<div class="outline-text-3" id="text-org8e8a14e">
+<div id="outline-container-orgf261fe3" class="outline-3">
+<h3 id="orgf261fe3">Exercise 10.10</h3>
+<div class="outline-text-3" id="text-orgf261fe3">
 <p>
 Explicitly verify the quantum error-correction conditions for the Shor code, for the error
 set containing \(I\) and the error operators \(X_j,Y_j,Z_j\) for \(j=1\) through \(9\).
 </p>
 </div>
 
-<div id="outline-container-orgaeaeca5" class="outline-4">
-<h4 id="orgaeaeca5">Solution</h4>
-<div class="outline-text-4" id="text-orgaeaeca5">
+<div id="outline-container-orgecc7e12" class="outline-4">
+<h4 id="orgecc7e12">Solution</h4>
+<div class="outline-text-4" id="text-orgecc7e12">
 <p>
 Let us denote
 </p>
@@ -919,7 +1313,7 @@ within one "block" (there are three block \(\{1,2,3\}\), \(\{4,5,6\}\), and
 <p>
 \[
   PE_i^\dagger E_j P = \begin{cases}
-    1 & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
+    P & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
     0 & \text{else} .
   \end{cases}
 \]
@@ -928,9 +1322,9 @@ within one "block" (there are three block \(\{1,2,3\}\), \(\{4,5,6\}\), and
 </div>
 </div>
 
-<div id="outline-container-org14d26e6" class="outline-3">
-<h3 id="org14d26e6">Exercise 10.11</h3>
-<div class="outline-text-3" id="text-org14d26e6">
+<div id="outline-container-orgad531c4" class="outline-3">
+<h3 id="orgad531c4">Exercise 10.11</h3>
+<div class="outline-text-3" id="text-orgad531c4">
 <p>
 Construct operation elements for a single qubit quantum operation \(\calE\) that upon input
 of any state \(\rho\) replaces it with the completely randomized state \(I/2\). It is amazing
@@ -938,9 +1332,9 @@ that even such noise models as this may be corrected by codes such as the Shor c
 </p>
 </div>
 
-<div id="outline-container-orgc131a80" class="outline-4">
-<h4 id="orgc131a80">Solution</h4>
-<div class="outline-text-4" id="text-orgc131a80">
+<div id="outline-container-orgd0dac51" class="outline-4">
+<h4 id="orgd0dac51">Solution</h4>
+<div class="outline-text-4" id="text-orgd0dac51">
 <p>
 We already know that the quantum operation
 </p>
@@ -974,9 +1368,9 @@ Hence the relevant operation elements are
 </div>
 </div>
 
-<div id="outline-container-org825fae1" class="outline-3">
-<h3 id="org825fae1">Exercise 10.12</h3>
-<div class="outline-text-3" id="text-org825fae1">
+<div id="outline-container-org315c3a7" class="outline-3">
+<h3 id="org315c3a7">Exercise 10.12</h3>
+<div class="outline-text-3" id="text-org315c3a7">
 <p>
 Show that the fidelity between the state \(\ket{0}\) and \(\calE(\proj{0})\) is \(\sqrt{1-2p/3}\)
 and use this to argue that the minimum fidelity for the depolarizing channel is
@@ -984,9 +1378,9 @@ and use this to argue that the minimum fidelity for the depolarizing channel is
 </p>
 </div>
 
-<div id="outline-container-orgfc8dd14" class="outline-4">
-<h4 id="orgfc8dd14">Solution 1</h4>
-<div class="outline-text-4" id="text-orgfc8dd14">
+<div id="outline-container-orgaee1894" class="outline-4">
+<h4 id="orgaee1894">Solution 1</h4>
+<div class="outline-text-4" id="text-orgaee1894">
 <p>
 Let us follow the hint of the book.
 </p>
@@ -1018,9 +1412,9 @@ In the second equality we used that the fidelity is invariant under unitary tran
 </div>
 </div>
 
-<div id="outline-container-org38f0b83" class="outline-4">
-<h4 id="org38f0b83">Solution 2</h4>
-<div class="outline-text-4" id="text-org38f0b83">
+<div id="outline-container-org5f62853" class="outline-4">
+<h4 id="org5f62853">Solution 2</h4>
+<div class="outline-text-4" id="text-org5f62853">
 <p>
 We could also prove the claim by using an alternative formula for the depolarizing channel:
 </p>
@@ -1044,9 +1438,9 @@ We could also prove the claim by using an alternative formula for the depolarizi
 </div>
 </div>
 
-<div id="outline-container-orgfd62465" class="outline-4">
-<h4 id="orgfd62465">Solution 3</h4>
-<div class="outline-text-4" id="text-orgfd62465">
+<div id="outline-container-orgb7084f9" class="outline-4">
+<h4 id="orgb7084f9">Solution 3</h4>
+<div class="outline-text-4" id="text-orgb7084f9">
 <p>
 Yet another approach first calculates
 </p>
@@ -1125,18 +1519,18 @@ trace).
 </div>
 </div>
 
-<div id="outline-container-org60f6085" class="outline-3">
-<h3 id="org60f6085">Exercise 10.13</h3>
-<div class="outline-text-3" id="text-org60f6085">
+<div id="outline-container-org3a421d6" class="outline-3">
+<h3 id="org3a421d6">Exercise 10.13</h3>
+<div class="outline-text-3" id="text-org3a421d6">
 <p>
 Show that the minimum fidelity \(F(\ket{\psi},\calE(\proj{\psi}))\) when \(\calE\) is the
 amplitude damping channel with parameter \(\gamma\), is \(\sqrt{1-\gamma}\).
 </p>
 </div>
 
-<div id="outline-container-org4392eab" class="outline-4">
-<h4 id="org4392eab">Proof</h4>
-<div class="outline-text-4" id="text-org4392eab">
+<div id="outline-container-org4047d85" class="outline-4">
+<h4 id="org4047d85">Proof</h4>
+<div class="outline-text-4" id="text-org4047d85">
 <p>
 Let us use sage to get an algebraic expression for \(F\). First define amplitude damping
 </p>
@@ -1247,9 +1641,9 @@ Hence \(F_{\min}=\sqrt{1-\gamma}\) . QED.
 </div>
 </div>
 
-<div id="outline-container-org7010622" class="outline-3">
-<h3 id="org7010622">Exercise 10.14</h3>
-<div class="outline-text-3" id="text-org7010622">
+<div id="outline-container-org2df9501" class="outline-3">
+<h3 id="org2df9501">Exercise 10.14</h3>
+<div class="outline-text-3" id="text-org2df9501">
 <p>
 Write an expression for a generator matrix encoding \(k\) bits using \(r\) repetitions for
 each bit. This is an \([rk,k]\) linear code, and should have an \(rk\times\?k\) generator
@@ -1278,18 +1672,18 @@ This naturally reproduces the special cases \(r=3\), \(k\in\{1,2\}\) from the bo
 </div>
 </div>
 
-<div id="outline-container-org105c761" class="outline-3">
-<h3 id="org105c761">Exercise 10.15</h3>
-<div class="outline-text-3" id="text-org105c761">
+<div id="outline-container-orgc8e7caf" class="outline-3">
+<h3 id="orgc8e7caf">Exercise 10.15</h3>
+<div class="outline-text-3" id="text-orgc8e7caf">
 <p>
 Show that adding one column of \(G\) to another results in a generator matrix generating the
 same code.
 </p>
 </div>
 
-<div id="outline-container-org4f59cb5" class="outline-4">
-<h4 id="org4f59cb5">Proof</h4>
-<div class="outline-text-4" id="text-org4f59cb5">
+<div id="outline-container-orga7c9103" class="outline-4">
+<h4 id="orga7c9103">Proof</h4>
+<div class="outline-text-4" id="text-orga7c9103">
 <p>
 Let \((e_j)\) be the standard basis vectors in \(\BB^k\). The code generated by \(G\) is just
 the image \(C=G\BB^k\) of \(G\) which in turn is given by all linear combinations of
@@ -1324,9 +1718,9 @@ This shows the claim. QED.
 </div>
 </div>
 
-<div id="outline-container-org5d58e76" class="outline-3">
-<h3 id="org5d58e76">Exercise 10.16</h3>
-<div class="outline-text-3" id="text-org5d58e76">
+<div id="outline-container-org3abb17c" class="outline-3">
+<h3 id="org3abb17c">Exercise 10.16</h3>
+<div class="outline-text-3" id="text-org3abb17c">
 <p>
 Show that adding one row of the parity check matrix to another does not change the
 code. Using Gaussian elimination and swapping of bits it is therefore possible to assume
@@ -1335,9 +1729,9 @@ that the parity check matrix has the standard form \([A|I_{n-k}]\), where \(A\) 
 </p>
 </div>
 
-<div id="outline-container-org2cdc9a2" class="outline-4">
-<h4 id="org2cdc9a2">Proof</h4>
-<div class="outline-text-4" id="text-org2cdc9a2">
+<div id="outline-container-org3fbf1eb" class="outline-4">
+<h4 id="org3fbf1eb">Proof</h4>
+<div class="outline-text-4" id="text-org3fbf1eb">
 <p>
 Recall that a code \(C\), in terms of a parity check matrix \(H\), is defined as
 </p>
@@ -1379,9 +1773,9 @@ inclusion. QED.
 </div>
 </div>
 
-<div id="outline-container-org0e5d0f6" class="outline-3">
-<h3 id="org0e5d0f6">Exercise 10.17</h3>
-<div class="outline-text-3" id="text-org0e5d0f6">
+<div id="outline-container-org005dd7d" class="outline-3">
+<h3 id="org005dd7d">Exercise 10.17</h3>
+<div class="outline-text-3" id="text-org005dd7d">
 <p>
 Find a parity check matrix for the \([6,2]\) repetition code defined by the generator matrix in
 (10.54).
@@ -1397,9 +1791,9 @@ Find a parity check matrix for the \([6,2]\) repetition code defined by the gene
 \end{bmatrix}
 </div>
 
-<div id="outline-container-org25d85d8" class="outline-4">
-<h4 id="org25d85d8">Solution</h4>
-<div class="outline-text-4" id="text-org25d85d8">
+<div id="outline-container-org64fd978" class="outline-4">
+<h4 id="org64fd978">Solution</h4>
+<div class="outline-text-4" id="text-org64fd978">
 <p>
 Let \(G_1\) and \(H_1\) be the generator and parity check matrix for \(k=1\) bits (see equations
 (10.53) and (10.58)). We have
@@ -1442,9 +1836,9 @@ satisfy \(HG=0\).
 </p>
 </div>
 
-<div id="outline-container-org47d5dfb" class="outline-4">
-<h4 id="org47d5dfb">Proof</h4>
-<div class="outline-text-4" id="text-org47d5dfb">
+<div id="outline-container-org5d486d2" class="outline-4">
+<h4 id="org5d486d2">Proof</h4>
+<div class="outline-text-4" id="text-org5d486d2">
 <p>
 Recall that a code \(C\) is just the image of the generator \(C=G\BB^k\). On the other hand it
 can be defined as the kernel of the parity check matrix: \(C=\{y|Hy=0\}\). Since every code
@@ -1454,9 +1848,9 @@ word has the form \(y=Gx\) we see that \(HGx=0\) for every \(x\). Hence the clai
 </div>
 </div>
 
-<div id="outline-container-orge6ab650" class="outline-3">
-<h3 id="orge6ab650">Exercise 10.19</h3>
-<div class="outline-text-3" id="text-orge6ab650">
+<div id="outline-container-orgcf4d047" class="outline-3">
+<h3 id="orgcf4d047">Exercise 10.19</h3>
+<div class="outline-text-3" id="text-orgcf4d047">
 <p>
 Suppose an \([n,k]\) linear code \(C\) has a parity check matrix of the form \(H=[A|I_{n-k}]\),
 for some \((n-k)\times\?k\) matrix \(A\). Show that the corresponding generator matrix is
@@ -1474,9 +1868,9 @@ linear codes over more general ﬁelds than \(\ZZ_2\).)
 </p>
 </div>
 
-<div id="outline-container-org51006c8" class="outline-4">
-<h4 id="org51006c8">Solution</h4>
-<div class="outline-text-4" id="text-org51006c8">
+<div id="outline-container-orge44c890" class="outline-4">
+<h4 id="orge44c890">Solution</h4>
+<div class="outline-text-4" id="text-orge44c890">
 <p>
 Clearly \(G\) has rank \(k\). Hence its images has the same dimension as the kernel of \(H\)
 (which is \(k\)). We only have to verify that \(HG=0\) (c.f. <a href="#exercise-10.18">exercise 10.18</a>). But this is
@@ -1502,9 +1896,9 @@ has distance \(d\).
 </p>
 </div>
 
-<div id="outline-container-org160dcc4" class="outline-4">
-<h4 id="org160dcc4">Proof</h4>
-<div class="outline-text-4" id="text-org160dcc4">
+<div id="outline-container-org0c795b8" class="outline-4">
+<h4 id="org0c795b8">Proof</h4>
+<div class="outline-text-4" id="text-org0c795b8">
 <p>
 Let us divide the proof into two parts. In part one we assume that \(H\) has \(d\) linearly
 <i>dependent</i> columns. In part two we assume that every \(d-1\) columns are linearly
@@ -1558,17 +1952,17 @@ dependent. QED.
 </div>
 </div>
 
-<div id="outline-container-orgbc8313c" class="outline-3">
-<h3 id="orgbc8313c">Exercise 10.21 (Singleton bound)</h3>
-<div class="outline-text-3" id="text-orgbc8313c">
+<div id="outline-container-orgeb33287" class="outline-3">
+<h3 id="orgeb33287">Exercise 10.21 (Singleton bound)</h3>
+<div class="outline-text-3" id="text-orgeb33287">
 <p>
 Show that an \([n,k,d]\) code must satisfy \(n-k\geq\?d-1\).
 </p>
 </div>
 
-<div id="outline-container-org4d91826" class="outline-4">
-<h4 id="org4d91826">Proof</h4>
-<div class="outline-text-4" id="text-org4d91826">
+<div id="outline-container-orgce2bcda" class="outline-4">
+<h4 id="orgce2bcda">Proof</h4>
+<div class="outline-text-4" id="text-orgce2bcda">
 <p>
 This follows directly from <a href="#exercise-10.20">exercise 10.20</a>. In fact, the parity check matrix
 \(H\in\BB^{(n-k)\times\?n}\) of the code must have full rank \(n-k\) in order for the code
@@ -1584,18 +1978,18 @@ be at least \(d-1\). Hence \(n-k\geq\?d-1\). QED.
 </div>
 </div>
 
-<div id="outline-container-org6b9b72b" class="outline-3">
-<h3 id="org6b9b72b">Exercise 10.22</h3>
-<div class="outline-text-3" id="text-org6b9b72b">
+<div id="outline-container-org933d991" class="outline-3">
+<h3 id="org933d991">Exercise 10.22</h3>
+<div class="outline-text-3" id="text-org933d991">
 <p>
 Show that all Hamming codes have distance \(3\), and thus can correct an error on a single
 bit. The Hamming codes are therefore \([2^r-1,2^r-r-1,3]\) codes.
 </p>
 </div>
 
-<div id="outline-container-orgcfb5a6d" class="outline-4">
-<h4 id="orgcfb5a6d">Proof</h4>
-<div class="outline-text-4" id="text-orgcfb5a6d">
+<div id="outline-container-orgcc3c31f" class="outline-4">
+<h4 id="orgcc3c31f">Proof</h4>
+<div class="outline-text-4" id="text-orgcc3c31f">
 <p>
 The parity check matrix of the Hamming code is made of matrices with columns \(h_j\) being
 the binary representation of \(j\) for \(j\in\{1,\ldots,2^r-1\}\). Hence
@@ -1625,9 +2019,9 @@ implies \(i=j\). Now the claim follows from <a href="#exercise-10.20">exercise 1
 </div>
 </div>
 
-<div id="outline-container-orgbacf1e7" class="outline-3">
-<h3 id="orgbacf1e7">Exercise 10.23</h3>
-<div class="outline-text-3" id="text-orgbacf1e7">
+<div id="outline-container-org67719ca" class="outline-3">
+<h3 id="org67719ca">Exercise 10.23</h3>
+<div class="outline-text-3" id="text-org67719ca">
 <p>
 Prove the Gilbert–Varshamov bound: Let \(\varepsilon\?>0\) and \(0\?<\delta\?<\?1/2\). There
 exists an \([n,k,d]\) code such that
@@ -1662,9 +2056,9 @@ be. But in my opinion most exercises in part III of the book (so far) are much e
 </dl>
 </div>
 
-<div id="outline-container-org4d0ab6e" class="outline-4">
-<h4 id="org4d0ab6e">Proof</h4>
-<div class="outline-text-4" id="text-org4d0ab6e">
+<div id="outline-container-org0a05cf0" class="outline-4">
+<h4 id="org0a05cf0">Proof</h4>
+<div class="outline-text-4" id="text-org0a05cf0">
 <p>
 In this proof we use the so called <a href="https://en.wikipedia.org/wiki/Probabilistic_method">probabilistic method</a> which seems to be the standard way
 to prove this bound (see e.g. <a href="https://en.wikipedia.org/wiki/Gilbert%E2%80%93Varshamov_bound_for_linear_codes">wikipedia</a> for the general case of linear codes over finite
@@ -1728,7 +2122,7 @@ Our goal is to prove that for sufficiently large \(n\) (considering also non-inj
 </p>
 
 <p>
-<a id="orgd8369aa"></a>
+<a id="org66b3035"></a>
 \[
   \prob{d(C)\geq d} > P_\infty
 \]
@@ -1746,12 +2140,12 @@ because then
 
 <p>
 which proves the claim. Let us estimate the probability that the distance of the code is
-<i>not</i> at least \(d\). In order to show the above <a href="#orgd8369aa">bound</a> it suffices to show that the
+<i>not</i> at least \(d\). In order to show the above <a href="#org66b3035">bound</a> it suffices to show that the
 following can be made arbitrary small (for large \(n\)):
 </p>
 
 <p>
-<a id="org50743ef"></a>
+<a id="org8daf8c7"></a>
 \[
   \prob{d(C)\leq d-1} \leq \sum_{x\in\BB^k\backslash\{0\}} \prob{\wt{Gx} \leq d-1} = \frac{V_d}{2^{n-k}} .
 \]
@@ -1780,7 +2174,7 @@ is the number of potential code words with weight at most \(d-1\).
 <dl class="org-dl">
 <dt>Remark</dt><dd>A reverse inequality is is also true: \(V_d\geq2^{H(\delta)n+o(n)}\). This can
 be seen from Stirlings formula. Actually I knew this reverse inequality already since
-I solved exercise 6.14, see e.g. <a href="chapter_6.html#org6b4f7a4">here</a> to get an idea for the proof. This is the reason
+I solved exercise 6.14, see e.g. <a href="chapter_6.html#org4ad963a">here</a> to get an idea for the proof. This is the reason
 I found it natural to connect \(V_d\) to the entropy. I was a bit surprised to find out
 that the \(V_d\leq\ldots\) inequality has such a clean form (no Landau notation).</dd>
 <dt>Proof</dt><dd><p>
@@ -1805,7 +2199,7 @@ equality is just the binomial formula. QED.
 </dl>
 
 <p>
-Using the lemma in <a href="#org50743ef">the estimate</a> for the probability that \(d(C)\leq\?d-1\) we get
+Using the lemma in <a href="#org8daf8c7">the estimate</a> for the probability that \(d(C)\leq\?d-1\) we get
 </p>
 
 <p>
@@ -1831,24 +2225,24 @@ Let us suppose we can choose \(R\) such that
 
 <p>
 Then we would have \(P\leq2^{-\varepsilon\?n/2}\) which is arbitrary small if \(n\) is large
-enough - which proves the <a href="#orgd8369aa">desired bound</a>. But since \(R=k/n\) this is indeed possible if we
+enough - which proves the <a href="#org66b3035">desired bound</a>. But since \(R=k/n\) this is indeed possible if we
 choose \(n\) large enough and \(k\) appropriately. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgeeb7650" class="outline-3">
-<h3 id="orgeeb7650">Exercise 10.24</h3>
-<div class="outline-text-3" id="text-orgeeb7650">
+<div id="outline-container-org0f06680" class="outline-3">
+<h3 id="org0f06680">Exercise 10.24</h3>
+<div class="outline-text-3" id="text-org0f06680">
 <p>
 Show that a code with generator matrix G is weakly self-dual if and only if \(G^TG=0\).
 </p>
 </div>
 
-<div id="outline-container-org90a0cb4" class="outline-4">
-<h4 id="org90a0cb4">Proof</h4>
-<div class="outline-text-4" id="text-org90a0cb4">
+<div id="outline-container-org122d3c1" class="outline-4">
+<h4 id="org122d3c1">Proof</h4>
+<div class="outline-text-4" id="text-org122d3c1">
 <p>
 Weakly self dual means \(C\subseteq\?C^{\bot}\). Hence
 </p>
@@ -1867,9 +2261,9 @@ a parity check matrix of \(C^\bot\) is \(H^\bot=G^T\). QED.
 </div>
 </div>
 
-<div id="outline-container-orgf7582be" class="outline-3">
-<h3 id="orgf7582be">Exercise 10.25</h3>
-<div class="outline-text-3" id="text-orgf7582be">
+<div id="outline-container-org4d5672d" class="outline-3">
+<h3 id="org4d5672d">Exercise 10.25</h3>
+<div class="outline-text-3" id="text-org4d5672d">
 <p>
 Let \(C\) be a linear code. Show that if \(x\in\?C^\bot\) then
 \(\sum_{y\in\?C}(-1)^{x\cdot\?y}=\abs{C}\), while if \(x\notin\?C^\bot\) then
@@ -1877,9 +2271,9 @@ Let \(C\) be a linear code. Show that if \(x\in\?C^\bot\) then
 </p>
 </div>
 
-<div id="outline-container-org77c7790" class="outline-4">
-<h4 id="org77c7790">Proof</h4>
-<div class="outline-text-4" id="text-org77c7790">
+<div id="outline-container-org9d62c87" class="outline-4">
+<h4 id="org9d62c87">Proof</h4>
+<div class="outline-text-4" id="text-org9d62c87">
 <p>
 By definition of dual codes we have \(x\cdot\?y=0\) if \(x\in\?C^\bot\) and \(y\in\?C\). Hence,
 in that case
@@ -1912,18 +2306,18 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org25be67e" class="outline-3">
-<h3 id="org25be67e">Exercise 10.26</h3>
-<div class="outline-text-3" id="text-org25be67e">
+<div id="outline-container-orgc259128" class="outline-3">
+<h3 id="orgc259128">Exercise 10.26</h3>
+<div class="outline-text-3" id="text-orgc259128">
 <p>
 Suppose \(H\) is a parity check matrix. Explain how to compute the transformation
 \(\ket{x}\ket{0}\mapsto\ket{x}\ket{Hx}\) using a circuit composed entirely of <code>CNOT</code> gates.
 </p>
 </div>
 
-<div id="outline-container-org5213b56" class="outline-4">
-<h4 id="org5213b56">Solution</h4>
-<div class="outline-text-4" id="text-org5213b56">
+<div id="outline-container-org678a905" class="outline-4">
+<h4 id="org678a905">Solution</h4>
+<div class="outline-text-4" id="text-org678a905">
 <p>
 Let us explain it on the specific example of the \([3,1]\) repetition code:
 </p>
@@ -1938,7 +2332,7 @@ Let us explain it on the specific example of the \([3,1]\) repetition code:
 A corresponding circuit would be
 </p>
 
-<pre class="example" id="orge5b825f">
+<pre class="example" id="orga49f9ea">
 
 a_0: ──■─────────────────
        │
@@ -1960,9 +2354,9 @@ The idea is that for each \((i,j)\) with \(H_{ij}=1\) we have a <code>CNOT</code
 </div>
 </div>
 
-<div id="outline-container-org1499e14" class="outline-3">
-<h3 id="org1499e14">Exercise 10.27</h3>
-<div class="outline-text-3" id="text-org1499e14">
+<div id="outline-container-org0b44888" class="outline-3">
+<h3 id="org0b44888">Exercise 10.27</h3>
+<div class="outline-text-3" id="text-org0b44888">
 <p>
 Show that the codes defined by
 </p>
@@ -1981,9 +2375,9 @@ distribution, in Section 12.6.5.
 </p>
 </div>
 
-<div id="outline-container-orgd0b76a4" class="outline-4">
-<h4 id="orgd0b76a4">Sketch of a solution</h4>
-<div class="outline-text-4" id="text-orgd0b76a4">
+<div id="outline-container-org115b7d9" class="outline-4">
+<h4 id="org115b7d9">Sketch of a solution</h4>
+<div class="outline-text-4" id="text-org115b7d9">
 <p>
 By using \(X\), \(Z\), and Hadamard gates one can unitarily transform the code into the
 following form
@@ -2005,18 +2399,18 @@ from the book.
 </div>
 </div>
 
-<div id="outline-container-org1586e6c" class="outline-3">
-<h3 id="org1586e6c">Exercise 10.28</h3>
-<div class="outline-text-3" id="text-org1586e6c">
+<div id="outline-container-orgee48312" class="outline-3">
+<h3 id="orgee48312">Exercise 10.28</h3>
+<div class="outline-text-3" id="text-orgee48312">
 <p>
 Verify that the transpose of the matrix in (10.77) is the generator of the \([7,4,3]\)
 Hamming code.
 </p>
 </div>
 
-<div id="outline-container-org32277f0" class="outline-4">
-<h4 id="org32277f0">Solution</h4>
-<div class="outline-text-4" id="text-org32277f0">
+<div id="outline-container-org5c70072" class="outline-4">
+<h4 id="org5c70072">Solution</h4>
+<div class="outline-text-4" id="text-org5c70072">
 <p>
 The claim follows essentially from the following calculation:
 </p>
@@ -2054,5 +2448,335 @@ sufficient to prove \(G\) to be a generator of the \([7,4]\) Hamming code.
 </div>
 </div>
 </div>
+
+<div id="outline-container-org93d22c4" class="outline-3">
+<h3 id="org93d22c4">Exercise 10.29</h3>
+<div class="outline-text-3" id="text-org93d22c4">
+<p>
+Show that an arbitrary linear combination of any two elements of \(V_S\) is also in
+\(V_S\). Therefore, \(V_S\) is a subspace of the \(n\) qubit state space. Show that \(V_S\) is the
+intersection of the subspaces fixed by each operator in \(S\) (that is, the eigenvalue one
+eigenspaces of elements of \(S\)).
+</p>
 </div>
-<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.50 (<a href="https://orgmode.org">Org</a> mode 9.6.9)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
+
+<div id="outline-container-orgfc2c5a9" class="outline-4">
+<h4 id="orgfc2c5a9">Solution</h4>
+<div class="outline-text-4" id="text-orgfc2c5a9">
+<p>
+We have
+</p>
+
+\begin{align*}
+  V_S &= \{v | \forall g\in S: gv = v\} \\
+  &= \bigcap_{g\in S} \{v | gv = v\} \\
+  &= \bigcap_{g\in S} \ker(g-I) .
+\end{align*}
+
+<p>
+Since the kernel of a linear operator is a linear subspace and since the intersection of
+linear subscpaces is again linear the claim follows.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org206da1a" class="outline-3">
+<h3 id="org206da1a">Exercise 10.30</h3>
+<div class="outline-text-3" id="text-org206da1a">
+<p>
+Show that \(-I\notin\?S\) implies \(\pm\ii\?I\notin\?S\).
+</p>
+</div>
+
+<div id="outline-container-org4237c41" class="outline-4">
+<h4 id="org4237c41">Proof</h4>
+<div class="outline-text-4" id="text-org4237c41">
+<p>
+Recall the elementary logical rule that \(\neg\?a\Rightarrow\neg\?b\) is equivalent to
+\(a\Leftarrow\?b\). Hence, we have to prove that \(\pm\ii\?I\in\?S\) implies \(-I\in\?S\). But
+this is obvious! QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org675a973" class="outline-3">
+<h3 id="org675a973">Exercise 10.31</h3>
+<div class="outline-text-3" id="text-org675a973">
+<p>
+Suppose \(S\) is a subgroup of \(G_n\) generated by elements \(g_1,\ldots,g_l\). Show that all
+the elements of \(S\) commute if and only if \(g_i\) and \(g_j\) commute for each pair \(i\), \(j\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The claim remains true if we replace \(G_n\) by any group. This follows from the
+proof below.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org2944393" class="outline-4">
+<h4 id="org2944393">Proof</h4>
+<div class="outline-text-4" id="text-org2944393">
+<p>
+One direction of the implication is obvious. Therefore let us just prove the other
+direction.
+</p>
+
+<p>
+Assume that all \(g_i\) and \(g_j\) commute. One can show that every \(g\in\?S\) can be
+represented (not necessarily uniquely) as
+</p>
+
+<p>
+\[
+  g = \prod_{j=1}^l g_j^{x_j}
+\]
+</p>
+
+<p>
+where \(x_j\in\ZZ\), and that inversion and products are represented as follows
+</p>
+
+\begin{align*}
+  g\inv &= \prod_{j=1}^l g_j^{-x_j} \\
+  g\cdot h &= \prod_{j=1}^l g_j^{x_j+y_j}
+\end{align*}
+
+<p>
+where \(h=\prod_{j=1}^lg_j^{y_j}\). More precisely: if we already know that \(g\) and \(h\) have
+such a representation then from commutativity the representations for \(g\inv\) and \(gh\)
+easily follow. Now observe that the set \(S'\) of \(g\) which can be represented like this
+must be contained in \(S\) (because the \((g_j)\) generate \(S\)). But we have just seen that
+making products and inverses doesn't take us outside of \(S'\). Hence \(S'=S\) as claimed.
+</p>
+
+<p>
+But now it is obvious that \(S\) is abelian because the standard representations of \(gh\) and
+\(hg\) are the same. QED.
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>Above we used the fact that if \(g_i\) and \(g_j\) commute then also \(g_i^x\) and
+\(g_j^y\) commute for any \(x,y\in\ZZ\). This is clear for non-negative \(x\), \(y\). The
+general case follows from the fact that \(g_j\) and \(g_i\inv\) commute. In fact, let
+\(a=g_j\inv\?g_i\) and \(b=g_ig_j\inv\). Since \(g_i\) and \(g_j\) commute we have
+\(g_ja=g_jb\). But this implies \(a=b\).</dd>
+</dl>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgff4d3bf" class="outline-3">
+<h3 id="orgff4d3bf">Exercise 10.32</h3>
+<div class="outline-text-3" id="text-orgff4d3bf">
+<p>
+Verify that the generators in Figure 10.6 stabilize the codewords for the Steane code, as
+described in Section 10.4.2.
+</p>
+</div>
+
+<div id="outline-container-exercise-10.32-solution" class="outline-4">
+<h4 id="exercise-10.32-solution">Solution</h4>
+<div class="outline-text-4" id="text-exercise-10.32-solution">
+<p>
+Note that there is a <a href="#chapter-10-css-as-stabilizer">subtle error</a> in the paragraph right before the exercise. Moreover I
+think it makes sense to prove a more <a href="#orgf0bf142">general theorem</a> given in the intro section of this
+site. So let us do this.
+</p>
+
+<p>
+An element of the CSS code looks like this
+</p>
+
+<p>
+\[
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \ket{x + y} ,
+\]
+</p>
+
+<p>
+where \(x\in\?C_1\). Recall that \(C_2\subseteq\?C_1\). Hence all the \(x+y\) above also belong
+to \(C_1\). Hence \(A(x+y)=0\). Hence for all \(i=1..(n-k_1)\) we have
+</p>
+
+\begin{align*}
+  g_{k_2+i}\ket{x+C_2} &= \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \bigotimes_{j=1}^n Z^{A_{ij}} \ket{x + y} \\
+  &= \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \underbrace{(-1)^{A_i\cdot(x+y)}}_{= 1} \ket{x + y} \\
+  &= \ket{x+C_2} .
+\end{align*}
+
+<p>
+(I write \(A_i\) for the \(i\)​-th row of \(A\).) Hence the \(g_{k_2+1}\) stabilize the code. To
+prove the same statement for \(g_i\) with \(i=1..k_2\) we switch to the X-basis by applying
+the Hadamard transform to the state. Note that this transform changes the \(X\) in the
+definition of the \(g_i\) to \(Z\). As in section 10.4.2 we see that
+</p>
+
+<p>
+\[
+  H^{\otimes n} \ket{x+C_2} = \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \ket{z} .
+\]
+</p>
+
+<p>
+Hence we see in a similar way as in the first part that
+</p>
+
+\begin{align*}
+  H^{\otimes n} g_{i}\ket{x+C_2}
+  &= H^{\otimes n} g_{i} H^{\otimes n}H^{\otimes n} \ket{x+C_2} \\
+  &= \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \bigotimes_{j=1}^n Z^{B_{ij}} \ket{z} \\
+  &= \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \underbrace{(-1)^{B_i\cdot z}}_{= 1} \ket{z} \\
+  &= H^{\otimes n} \ket{x+C_2} .
+\end{align*}
+
+<p>
+By dividing away the Hadamard transform we see that the \(g_i\) for \(i=1..k_2\) stabilize the
+CSS code too. This already shows the claim of the exercise.
+</p>
+
+<p>
+In order to finish the proof of the theorem we need to show that the given generators do
+not stabilize an even larger space than the desired CSS code. But this is basically a
+dimensionality argument. By design the CSS code has dimension \(2^{k}\) where
+\(k=k_1-k_2\). On the other hand under certain conditions a stabilizer code with \(n-k\)
+generators has the same dimension. Said conditions are that \(-I\notin\?S\) and that the
+generators commute (Proposition 10.5). The latter is clear from the form of the
+generators. The former follows from the fact that the parity check matrices have full
+rank. QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-10.33" class="outline-3">
+<h3 id="exercise-10.33">Exercise 10.33</h3>
+<div class="outline-text-3" id="text-exercise-10.33">
+<p>
+Show that \(g\) and \(g'\) commute if and only if \(r(g)\Lambda\?r(g')^T=0\). (In the check
+matrix representation, arithmetic is done modulo two.)
+</p>
+</div>
+
+<div id="outline-container-orgdf24fc4" class="outline-4">
+<h4 id="orgdf24fc4">Solution</h4>
+<div class="outline-text-4" id="text-orgdf24fc4">
+<p>
+Let \(\beta=r(g)\Lambda\?r(g')^T\) (which is an element of \(\BB\)). We will show that
+</p>
+
+<p>
+\[
+  gg' = (-1)^\beta g'g ,
+\]
+</p>
+
+<p>
+which implies the claim of the exercise. Let us write
+</p>
+
+\begin{align*}
+  g &= \alpha \bigotimes_{j=1}^n N_j , \\
+  g' &= \alpha' \bigotimes_{j=1}^n N'_j ,
+\end{align*}
+
+<p>
+where \(N_j,N'_j\in\{I,X,Y,Z\}\), and \(\alpha,\alpha'\in\{1,-1,\ii,-\ii\}\). Without loss of
+generality we may assume \(\alpha=\alpha'=1\). Moreover let us split \(r=r_x\oplus\?r_z\)
+where \(r_x\) is responsible for the first \(n\) bits and \(r_z\) for the last \(n\) bits. We have
+</p>
+
+<p>
+\[
+  \beta = r_x(g) \cdot r_z(g') + r_z(g) \cdot r_x(g')
+  = \sum_{j=1}^n \underbrace{r_x(N_j) \cdot r_z(N'_j) + r_z(N_j) \cdot r_x(N'_j)}_{=:\beta_j} .
+\]
+</p>
+
+<p>
+It is not hard to verify that \(N_jN'_j=(-1)^{\beta_j}N'_jN_j\). Hence
+\(gg'=(-1)^{\sum_j\beta_j}g'g\). QED.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd6210ae" class="outline-3">
+<h3 id="orgd6210ae">Exercise 10.34</h3>
+<div class="outline-text-3" id="text-orgd6210ae">
+<p>
+Let \(S=\langle\?g_1,\ldots,g_l\rangle\). Show that \(-I\) is not an element of \(S\) if and
+only if \(g_j^2=I\) for all \(j\), and \(g_j\neq-I\) for all \(j\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The implication \(-I\notin\?S\Rightarrow\ldots\) is just <a href="#exercise-10.35">exercise 10.35</a>. The
+other direction is actually wrong.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org73e44d9" class="outline-4">
+<h4 id="org73e44d9">Counterexamples</h4>
+<div class="outline-text-4" id="text-org73e44d9">
+<p>
+The claim of the exercise is wrong. To see this consider the following counterexample. Let
+</p>
+
+<p>
+\[
+  g_1 = X, \; g_2 = Z .
+\]
+</p>
+
+<p>
+Clearly \(g_j^2=I\) for all \(j\), and \(g_j\neq-I\) for all \(j\). On the other hand
+\(XZXZ=-ZZ=-I\) and hence \(-I\in\?S\). One might wonder if the claim becomes true if one
+assumes that the \(g_j\) commute (and are independent). But this is also not true as the
+following counterexample shows:
+</p>
+
+<p>
+\[
+  g_1 = Z, \; g_2 = -Z .
+\]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-exercise-10.35" class="outline-3">
+<h3 id="exercise-10.35">Exercise 10.35</h3>
+<div class="outline-text-3" id="text-exercise-10.35">
+<p>
+Let \(S\) be a subgroup of \(G_n\) such that \(-I\) is not an element of \(S\). Show that \(g^2=I\)
+for all \(g\in\?S\), and thus \(g^\dagger=g\).
+</p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>The original exercise contained the additional implication that \(g\in\?-I\) for
+all \(g\in\?S\) but this is a slightly too trivial conclusion if you already assume that
+\(-I\notin\?S\) - in my opinion.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org8d83563" class="outline-4">
+<h4 id="org8d83563">Proof</h4>
+<div class="outline-text-4" id="text-org8d83563">
+<p>
+Recall that any \(g\in\?G_n\) has the form
+</p>
+
+\begin{align*}
+  g &= \alpha \bigotimes_{j=1}^n N_j ,
+\end{align*}
+
+<p>
+where \(N_j\in\{I,X,Y,Z\}\), and \(\alpha\in\{1,-1,\ii,-\ii\}\). Hence
+\(g^2=\alpha^2I=\pm\?I\). By \(-I\notin\?S\) we must have \(g^2=I\) as desired. QED.
+</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer"><p>Made by <a href="https://github.com/rainij">Reinhard Stahn</a> with <a href="https://www.gnu.org/software/emacs/">Emacs</a> 29.1.90 (<a href="https://orgmode.org">Org</a> mode 9.6.10)</p><p>Find the source code on <a href="https://github.com/rainij/solutions-qcqi-nielsen-chuang">Github</a></p></footer></body></html>
