@@ -34,6 +34,208 @@
 Below we use $\BB=\mathrm{GF}(2)=\ZZ_2$ to denote the field of two elements. This models a
 /bit/.
 
+** Stabilizer codes
+The purpose of this section is to complement chapter 10.5. From the book I am missing some
+concrete statement on how /exactly/ stabilizer codes are characterized. I try to do this
+in the [[fundamental-theorem-of-stabilizer-codes][fundamental theorem]] of stabilizer codes below.
+
+Let $G_n$ be the Pauli group. As in the book let $V_S=\{v|\forall\?g\in\?S:gv=v\}$ for a
+subgroup $S$ of $G_n$. Note that any element of $G_n$ can be represented as
+
+<<pauli-representation>>
+$$
+  g = \alpha \bigotimes_{j=1}^n N_j ,
+$$
+
+where $\alpha\in\langle\ii\rangle=\{1,-1,\ii,-\ii\}$ and $N_j\in\{I,X,Y,Z\}$. An easy to
+prove but important observation is that
+
+- Lemma :: For all $g,h\in\?G_n$ we have $gh=\pm\?hg$. That is, if two elements of the
+  Pauli group do not commute then $gh=-hg$.
+  - Proof :: This directly follows from the commutator relation of the Pauli
+    matrices. QED.
+
+Define a group homomorphism $r:G_n\to\BB^{2n}$ by the following table
+
+| $N_j$ | $r(g)_j$ | $r(g)_{n+j}$ |
+|-------+----------+--------------|
+| $I$   | $0$      | $0$          |
+| $X$   | $1$      | $0$          |
+| $Y$   | $1$      | $1$          |
+| $Z$   | $0$      | $1$          |
+
+By group homomorphism we mean that $r(gg')=r(g)+r(g')$ and $r(g\inv)=-r(g)$ (note that
+$-r(g)=r(g)$ as we have $\BB$ as the base field).
+
+Let $g_1,\ldots,g_l\in\?G_n$ and let $S=\langle\?g_1,\ldots,g_l\rangle$. Early on in chapter 10.5 we have seen that
+
+<<lemma-on-non-trivial-stabilizer-codes>>
+- Lemma :: If $V_S$ is non-trivial then $-I\notin\?S$ and all the $g_j$ commute.
+  - Proof :: See chapter 10.5.1 for the simple proof.
+  - Remark :: In Proposition 10.5 in the book the reverse direction is proved and moreover
+    it is shown that $\dim(V_S)=2^k$ if $l=n-k$.
+
+In the following we want to better understand the condition from the Lemma. Therefore let
+us define the corresponding *check matrix* $G\in\BB^{l\times2n}$ by
+
+$$
+  G_{ij} = r(g_i)_j
+$$
+
+- Theorem :: Let $\Lambda=X\otimes\?I_n$ and let
+
+  $$
+  \beta = r(g)\Lambda r(h)^T \; (\in \BB) .
+  $$
+
+  Then $gh=(-1)^\beta\?hg$ for all $g,h\in\?G_n$. In particular $g$ and $h$ commute iff
+  $\beta=0$.
+  - Proof :: See [[#exercise-10.33][exercise 10.33]].
+
+As a corollary we get a nice way to check whether $S$ is abelian or not:
+
+<<characterize-commuting-stabilizer>>
+- Theorem :: The $g_1,\ldots,g_l$ commute iff $G\Lambda\?G^T=0\in\BB^{l\times\?l}$.
+
+It is left to find a nice way to check whether $-I\notin\?S$ and how to characterize
+independent generators. This is the purpose of the following series of theorems.
+
+<<characterize-r-injective>>
+- Theorem :: The following assertions are equivalent
+  1. $-I\notin\?S$ .
+  2. $r$ is injective .
+  #
+  #
+  - Proof ::
+    - (1) → (2) :: Note that $r$ is injective if $r(g)=0$ has only one solution
+      ($g=I$). Clearly $r(g)=0$ iff $N_j=I$ for all $j$. Hence $g=\pm\?I$ or
+      $g=\pm\ii\?I$. By (1) only $g=I$ is possible.
+    - (2) → (1) :: This follows from $r(-I)=0=r(I)$. Hence $r$ cannot be injective
+      whenever $-I\in\?S$.
+    QED.
+
+<<gj-independent-means-full-rank-check-matrix>>
+- Theorem :: Assume that $-I\notin\?S$. The following assertions are equivalent:
+  1. The $g_1,\ldots,g_l$ are independent.
+  2. $\rank{G}=l$.
+
+  The implication *(2) → (1)* holds even without assuming $-I\notin\?S$.
+  - Proof ::
+    - (1) → (2) :: This follows from the fact that an injective group homomorphism maps
+      independent sets to independent sets. By a [[characterize-r-injective][previous theorem]] $r$ is injective. Hence
+      the rows of $G$ are independent as elements of the group $\BB^{2n}$. But this means
+      they are independent as elements of the vector space $\BB^{2n}$.
+    - (2) → (1) :: From (2) we deduce that the $r(g_j)$ are independent. But this implies
+      that the $g_j$ must be independent. This holds even without the assumption that $r$
+      is injective.
+    QED.
+
+<<characterize-minus-I-notin-S>>
+- Theorem :: Assume that $\rank{G}=l$. The following assertions are equivalent
+  1. $-I\notin\?S$,
+  2. $\alpha_j=\pm1$ for all $j$,
+
+  [[pauli-representation][where]] $g_j=\alpha_j\bigotimes_jN_j$.
+  - Proof ::
+    - (1) → (2) :: Since $g_j=\alpha_j^2I=\pm\?I$ we see that $-I\notin\?S$ implies
+      $\alpha_j\neq\pm\ii$ for all $j$.
+
+    - (2) → (1) :: Assume to the contrary that $-I\in\?S$. There is a non-zero $x\in\ZZ^l$
+      such that $-I=\prod_jg_j^{x_j}$ (we may assume that $x_j\in\{0,1,2,3\}$). Hence
+
+      $$
+      0 = r(-I) = \sum_{j=1}^n x_j r(g_j) = x G .
+      $$
+
+      Since $\rank{G}=l$ (as matrix over $\BB$) we have that $x_j\in\{0,2\}$ for all
+      $j$. But $g_j^2=\alpha_j^2I$ and hence $\alpha_j=\pm\ii$ for at least one $j$ -
+      contradicting (2).
+    QED.
+
+We are in a position to state and prove the main theorem of this section:
+
+<<fundamental-theorem-of-stabilizer-codes>>
+- Fundamental theorem on stabilizer codes :: The non-trivial stabilizer codes are given by
+  all check matrices $G\in\BB^{l\times2n}$ (for any $n$ and $l$), corresponding to a set
+  of generators $g_1,\ldots,g_l\in\?G_n$, which satisfy
+  1. $\alpha_j=\pm1$ (c.f. [[pauli-representation][representation]] of $g_j$),
+  2. $\rank{G}=l$ ,
+  3. $G\Lambda\?G^T=0\in\BB^{l\times\?l}$ .
+
+  In that case the $g_j$ commute, are independent and the dimension of the code is
+  $2^{n-l}$.
+
+  Moreover, two stabilizer codes $C$ and $C'$ which have the same check matrix $G$ (and
+  hence only differ in the signs $\alpha_j$) are equivalent in the sense that there exists
+  a Pauli operator $g\in\?G_n$ such that $C'=gC$.
+
+  - Remark :: Because of the statement about equivalent stabilizer codes one might set
+    $\alpha_j=1$ for simplicity. Under this convention the check matrix describes the
+    stabilizer code completely.
+
+  - Proof :: Let $V_S$ be a non-trivial stabilizer code. Let $g_1,\ldots,g_l$ be a an
+    independent set of generators. By proposition 10.5 (or the [[lemma-on-non-trivial-stabilizer-codes][Lemma]] above) we have
+    $-I\notin\?S$ and all $g_j$ commute. By independence of $g_j$ and $-I\notin\?S$ we
+    [[gj-independent-means-full-rank-check-matrix][deduce]] that $\rank{G}=l$. From this and again using $-I\notin\?S$ we [[characterize-minus-I-notin-S][deduce]] that
+    $\alpha_j=\pm1$ for all $j$. Finally, the fact that the generators commute is
+    [[characterize-commuting-stabilizer][equivalent]] to $G\Lambda\?G^T=0$. This shows one part of the claim.
+
+    Let us now assume the conditions 1 to 3. From (1) and (2) we [[characterize-minus-I-notin-S][deduce]] that
+    $-I\notin\?S$. (3) is [[characterize-commuting-stabilizer][equivalent]] to all $g_j$ commuting. By proposition 10.5 this
+    implies that $V_S$ is non-trivial.
+
+    The claim about the dimension of the code is contained in proposition 10.5.
+
+    Finally let us show that two stabilizer codes which differ only in $\alpha$ are
+    equivalent in the sense stated. For concreteness let $C$ be the code with all
+    $\alpha_j=1$ and let $C'$ be another code with the same check matrix and signs
+    $\alpha_j=\chi_j=\pm1$. The claim actually follows from the proof of proposition
+    10.5. In fact, if $P^{(0,\ldots,0)}_S$ is the projector of $C$ then clearly
+    $P^{\chi}_S$ is the projector of $C'$. The proof showed that there exists a
+    $g_{\chi}\in\?G_n$ such that
+    $g_{\chi}P^{(0,\ldots,0)}_Sg_{\chi}^\dagger=P^{\chi}_S$. QED.
+
+** CSS codes in the stabilizer formalism
+:PROPERTIES:
+:CUSTOM_ID: chapter-10-css-as-stabilizer
+:END:
+There is a subtle error on page 456 which explains how the parity check matrices of a CSS
+code map to the generators in the stabilizer formalism.
+
+They say that the $g_j$ containing the $X$ correspond to the check matrix of $C_1$ and
+that the $g_j$ containing the $Z$ correspond to the check matrix of $C_2^\top$. Actually
+it is the other way round. This doesn't affect the example (Steane code) because the
+parity check matrices are identical for $C_1$ and $C_2^\top$. But it might be
+confusing. Hence I take the opportunity to lay out the translation for the general case.
+
+Recall that a $[n,k_1-k_2]$ CSS code is constructed from two linear codes $C_1$
+($[n,k_1]$) and $C_2$ ($[n,k_2]$) with $C_2\subset\?C_1$. The code words are given by
+
+$$
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \ket{x + y}
+$$
+
+where $x+C_2$ is from the quotient space $C_1/C_2$. Let $A\in\BB^{(n-k_1)\times\?n}$ be
+the parity check matrix of $C_1$ and let $B\in\BB^{k_2\times\?n}$ be the parity check
+matrix of $C_2^\top$. Let
+
+<<css-stabilizer>>
+\begin{align*}
+  g_i &= \bigotimes_{j=1}^n X^{B_{ij}}, \text{ for } i=1..k_2, \\
+  g_{k_2+i} &= \bigotimes_{j=1}^n Z^{A_{ij}}, \text{ for } i=1..(n-k_1). \\
+\end{align*}
+
+<<theorem-css-stabilizer>>
+- Theorem :: [[css-stabilizer][These]] $n-(k_1-k_2)$ Pauli operators are the stabilizer for the CSS code of
+  $C_1$ over $C_2$.
+  - Proof :: We provide a proof in the [[#exercise-10.32-solution][solution]] of exercise 10.32.
+
+The check matrix of the CSS code is given by the following block matrix
+
+$$
+  \begin{bmatrix} B & 0 \\ 0 & A \end{bmatrix} .
+$$
+
 * Exercises
 ** Exercise 10.1
 Verify that the encoding circuit in Figure 10.2 works as claimed.
@@ -345,7 +547,8 @@ QED.
 
 ** Exercise 10.7
 Consider the three qubit bit flip code of Section 10.1.1, with corresponding projector
-$P=\proj{000}+\proj{111}$. The noise process this code against has operation elements
+$P=\proj{000}+\proj{111}$. The noise process this code protects against has operation
+elements
 
 $$
   \left\{ \sqrt{(1-p)^3}I, \sqrt{p(1-p)^2}X_1, \sqrt{p(1-p)^2}X_2, \sqrt{p(1-p)^2}X_3 \right\} ,
@@ -512,7 +715,7 @@ $\{7,8,9\}$). Hence:
 
 $$
   PE_i^\dagger E_j P = \begin{cases}
-    1 & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
+    P & \text{if } i=j \text{ or } E_i,E_j \text{ both Z on same block} , \\
     0 & \text{else} .
   \end{cases}
 $$
@@ -1197,3 +1400,204 @@ The claim follows essentially from the following calculation:
 
 One important thing to note is that $G$ has full rank (obviously). Hence $HG=0$ is
 sufficient to prove $G$ to be a generator of the $[7,4]$ Hamming code.
+
+** Exercise 10.29
+Show that an arbitrary linear combination of any two elements of $V_S$ is also in
+$V_S$. Therefore, $V_S$ is a subspace of the $n$ qubit state space. Show that $V_S$ is the
+intersection of the subspaces fixed by each operator in $S$ (that is, the eigenvalue one
+eigenspaces of elements of $S$).
+
+*** Solution
+We have
+
+\begin{align*}
+  V_S &= \{v | \forall g\in S: gv = v\} \\
+  &= \bigcap_{g\in S} \{v | gv = v\} \\
+  &= \bigcap_{g\in S} \ker(g-I) .
+\end{align*}
+
+Since the kernel of a linear operator is a linear subspace and since the intersection of
+linear subscpaces is again linear the claim follows.
+
+** Exercise 10.30
+Show that $-I\notin\?S$ implies $\pm\ii\?I\notin\?S$.
+
+*** Proof
+Recall the elementary logical rule that $\neg\?a\Rightarrow\neg\?b$ is equivalent to
+$a\Leftarrow\?b$. Hence, we have to prove that $\pm\ii\?I\in\?S$ implies $-I\in\?S$. But
+this is obvious! QED.
+
+** Exercise 10.31
+Suppose $S$ is a subgroup of $G_n$ generated by elements $g_1,\ldots,g_l$. Show that all
+the elements of $S$ commute if and only if $g_i$ and $g_j$ commute for each pair $i$, $j$.
+
+- Remark :: The claim remains true if we replace $G_n$ by any group. This follows from the
+  proof below.
+
+*** Proof
+One direction of the implication is obvious. Therefore let us just prove the other
+direction.
+
+Assume that all $g_i$ and $g_j$ commute. One can show that every $g\in\?S$ can be
+represented (not necessarily uniquely) as
+
+$$
+  g = \prod_{j=1}^l g_j^{x_j}
+$$
+
+where $x_j\in\ZZ$, and that inversion and products are represented as follows
+
+\begin{align*}
+  g\inv &= \prod_{j=1}^l g_j^{-x_j} \\
+  g\cdot h &= \prod_{j=1}^l g_j^{x_j+y_j}
+\end{align*}
+
+where $h=\prod_{j=1}^lg_j^{y_j}$. More precisely: if we already know that $g$ and $h$ have
+such a representation then from commutativity the representations for $g\inv$ and $gh$
+easily follow. Now observe that the set $S'$ of $g$ which can be represented like this
+must be contained in $S$ (because the $(g_j)$ generate $S$). But we have just seen that
+making products and inverses doesn't take us outside of $S'$. Hence $S'=S$ as claimed.
+
+But now it is obvious that $S$ is abelian because the standard representations of $gh$ and
+$hg$ are the same. QED.
+
+- Remark :: Above we used the fact that if $g_i$ and $g_j$ commute then also $g_i^x$ and
+  $g_j^y$ commute for any $x,y\in\ZZ$. This is clear for non-negative $x$, $y$. The
+  general case follows from the fact that $g_j$ and $g_i\inv$ commute. In fact, let
+  $a=g_j\inv\?g_i$ and $b=g_ig_j\inv$. Since $g_i$ and $g_j$ commute we have
+  $g_ja=g_jb$. But this implies $a=b$.
+
+** Exercise 10.32
+Verify that the generators in Figure 10.6 stabilize the codewords for the Steane code, as
+described in Section 10.4.2.
+
+*** Solution
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.32-solution
+:END:
+Note that there is a [[#chapter-10-css-as-stabilizer][subtle error]] in the paragraph right before the exercise. Moreover I
+think it makes sense to prove a more [[theorem-css-stabilizer][general theorem]] given in the intro section of this
+site. So let us do this.
+
+An element of the CSS code looks like this
+
+$$
+  \ket{x+C_2} = \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \ket{x + y} ,
+$$
+
+where $x\in\?C_1$. Recall that $C_2\subseteq\?C_1$. Hence all the $x+y$ above also belong
+to $C_1$. Hence $A(x+y)=0$. Hence for all $i=1..(n-k_1)$ we have
+
+\begin{align*}
+  g_{k_2+i}\ket{x+C_2} &= \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \bigotimes_{j=1}^n Z^{A_{ij}} \ket{x + y} \\
+  &= \frac{1}{\sqrt{\abs{C_2}}} \sum_{y\in C_2} \underbrace{(-1)^{A_i\cdot(x+y)}}_{= 1} \ket{x + y} \\
+  &= \ket{x+C_2} .
+\end{align*}
+
+(I write $A_i$ for the $i$​-th row of $A$.) Hence the $g_{k_2+1}$ stabilize the code. To
+prove the same statement for $g_i$ with $i=1..k_2$ we switch to the X-basis by applying
+the Hadamard transform to the state. Note that this transform changes the $X$ in the
+definition of the $g_i$ to $Z$. As in section 10.4.2 we see that
+
+$$
+  H^{\otimes n} \ket{x+C_2} = \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \ket{z} .
+$$
+
+Hence we see in a similar way as in the first part that
+
+\begin{align*}
+  H^{\otimes n} g_{i}\ket{x+C_2}
+  &= H^{\otimes n} g_{i} H^{\otimes n}H^{\otimes n} \ket{x+C_2} \\
+  &= \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \bigotimes_{j=1}^n Z^{B_{ij}} \ket{z} \\
+  &= \sqrt{\frac{\abs{C_2}}{2^n}} \sum_{z\in C_2^\top} (-1)^{x\cdot z} \underbrace{(-1)^{B_i\cdot z}}_{= 1} \ket{z} \\
+  &= H^{\otimes n} \ket{x+C_2} .
+\end{align*}
+
+By dividing away the Hadamard transform we see that the $g_i$ for $i=1..k_2$ stabilize the
+CSS code too. This already shows the claim of the exercise.
+
+In order to finish the proof of the theorem we need to show that the given generators do
+not stabilize an even larger space than the desired CSS code. But this is basically a
+dimensionality argument. By design the CSS code has dimension $2^{k}$ where
+$k=k_1-k_2$. On the other hand under certain conditions a stabilizer code with $n-k$
+generators has the same dimension. Said conditions are that $-I\notin\?S$ and that the
+generators commute (Proposition 10.5). The latter is clear from the form of the
+generators. The former follows from the fact that the parity check matrices have full
+rank. QED.
+
+** Exercise 10.33
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.33
+:END:
+Show that $g$ and $g'$ commute if and only if $r(g)\Lambda\?r(g')^T=0$. (In the check
+matrix representation, arithmetic is done modulo two.)
+
+*** Solution
+Let $\beta=r(g)\Lambda\?r(g')^T$ (which is an element of $\BB$). We will show that
+
+$$
+  gg' = (-1)^\beta g'g ,
+$$
+
+which implies the claim of the exercise. Let us write
+
+\begin{align*}
+  g &= \alpha \bigotimes_{j=1}^n N_j , \\
+  g' &= \alpha' \bigotimes_{j=1}^n N'_j ,
+\end{align*}
+
+where $N_j,N'_j\in\{I,X,Y,Z\}$, and $\alpha,\alpha'\in\{1,-1,\ii,-\ii\}$. Without loss of
+generality we may assume $\alpha=\alpha'=1$. Moreover let us split $r=r_x\oplus\?r_z$
+where $r_x$ is responsible for the first $n$ bits and $r_z$ for the last $n$ bits. We have
+
+$$
+  \beta = r_x(g) \cdot r_z(g') + r_z(g) \cdot r_x(g')
+  = \sum_{j=1}^n \underbrace{r_x(N_j) \cdot r_z(N'_j) + r_z(N_j) \cdot r_x(N'_j)}_{=:\beta_j} .
+$$
+
+It is not hard to verify that $N_jN'_j=(-1)^{\beta_j}N'_jN_j$. Hence
+$gg'=(-1)^{\sum_j\beta_j}g'g$. QED.
+
+** Exercise 10.34
+Let $S=\langle\?g_1,\ldots,g_l\rangle$. Show that $-I$ is not an element of $S$ if and
+only if $g_j^2=I$ for all $j$, and $g_j\neq-I$ for all $j$.
+
+- Remark :: The implication $-I\notin\?S\Rightarrow\ldots$ is just [[#exercise-10.35][exercise 10.35]]. The
+  other direction is actually wrong.
+
+*** Counterexamples
+The claim of the exercise is wrong. To see this consider the following counterexample. Let
+
+$$
+  g_1 = X, \; g_2 = Z .
+$$
+
+Clearly $g_j^2=I$ for all $j$, and $g_j\neq-I$ for all $j$. On the other hand
+$XZXZ=-ZZ=-I$ and hence $-I\in\?S$. One might wonder if the claim becomes true if one
+assumes that the $g_j$ commute (and are independent). But this is also not true as the
+following counterexample shows:
+
+$$
+  g_1 = Z, \; g_2 = -Z .
+$$
+
+** Exercise 10.35
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.35
+:END:
+Let $S$ be a subgroup of $G_n$ such that $-I$ is not an element of $S$. Show that $g^2=I$
+for all $g\in\?S$, and thus $g^\dagger=g$.
+
+- Remark :: The original exercise contained the additional implication that $g\in\?-I$ for
+  all $g\in\?S$ but this is a slightly too trivial conclusion if you already assume that
+  $-I\notin\?S$ - in my opinion.
+
+*** Proof
+Recall that any $g\in\?G_n$ has the form
+
+\begin{align*}
+  g &= \alpha \bigotimes_{j=1}^n N_j ,
+\end{align*}
+
+where $N_j\in\{I,X,Y,Z\}$, and $\alpha\in\{1,-1,\ii,-\ii\}$. Hence
+$g^2=\alpha^2I=\pm\?I$. By $-I\notin\?S$ we must have $g^2=I$ as desired. QED.
