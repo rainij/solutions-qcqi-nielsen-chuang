@@ -107,6 +107,10 @@ Some multi-qubit gates:
   CY = kron(P0, Id) + kron(P1, Y)
   CZ = kron(P0, Id) + kron(P1, Z)
 
+  Id2 = kron(Id, Id)
+
+  CCX = kron(P0, Id2) + kron(P1, CX)
+
   SWAP = matrix([
     [1, 0, 0, 0],
     [0, 0, 1, 0],
