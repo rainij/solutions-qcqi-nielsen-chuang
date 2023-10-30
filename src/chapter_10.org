@@ -2080,9 +2080,163 @@ e.g. the coefficients of $UX_1U^\dagger$ one could do the following:
 #+RESULTS:
 : 'PASSED'
 
-** TODO Exercise 10.42
+** Exercise 10.42
 Use the stabilizer formalism to verify that the circuit of Figure 1.13 on page 27
 teleports qubits, as claimed. Note that the stabilizer formalism restricts the class of
 states being teleported, so in some sense this is not a complete description of
 teleportation, nevertheless it does allow an understanding of the dynamics of
 teleportation.
+
+- Remark :: Unfortunately I do not see how this exercise improves my understanding of
+  teleportation. It seems to be a very complicated way to verify that the circuit actually
+  teleports qubits. On the other hand it is a nice exercise to understand the (certainly
+  very useful) stabilizer formalism.
+
+*** Solution
+The circuit can be divided into three major steps:
+- Unitary evolution up until the measurements,
+- Measuring the first two qubits in the Z-basis,
+- Performing conditioned operations on the third qubit.
+
+I split up the solution according to the three stages. Additionally I add a section on a
+specific example to get some feeling for how things work out.
+
+**** Unitary evolution
+Let $\ket{\psi}$ be the single qubit state to be teleported. The whole system is in the
+state $\ket{\psi,0,0}$ initially (the circuit displayed in Figure 1.12 produces
+$\ket{\psi,\beta_{00}}$ which feeds into the circuit in Figure 13.).
+
+Let $N\in\{\pm\?X,\pm\?Y,\pm\?Z\}$ be the stabilizer of $\ket{\psi}$. Of course this
+restricts $\ket{\psi}$ to be an eigenstate of one of the Paulis (six possibilities up to
+global phase), but this is just the restriction of the stabilizer formalism already
+mentioned in the statement of the exercise. The stabilizer of the whole system is
+$\langle\?N_1,Z_2,Z_3\rangle$ (where $N_1=N\otimes\?I\otimes\?I$).
+
+Let us abbreviate $V=\cx_{12}$ and calculate the evolution by the stabilizer formalism:
+
+\begin{align*}
+  & \langle N_1, Z_2, Z_3 \rangle & (\text{initial state } \ket{\psi,0,0}) \\
+  H_2 :\; & \langle N_1, X_2, Z_3 \rangle  \\
+  \cx_{23} :\; & \langle N_1, X_2X_3, Z_2Z_3 \rangle & (\ket{\psi,\beta_{00}}) \\
+  \cx_{12} :\; & \langle VN_1V, X_2X_3, Z_1Z_2Z_3 \rangle \\
+  H_1 :\; & \langle H_1VN_1VH_1, X_2X_3, X_1Z_2Z_3 \rangle & (\text{right before measurement}).
+\end{align*}
+
+In the following let us denote by $g_1$, $g_2$, $g_3$ the three generators from the last
+step:
+
+$$
+  g_1 = HVN_1VH, \quad g_2 = X_2X_3, \quad g_3 = X_1Z_2Z_3 .
+$$
+
+**** Intermezzo: A specific example
+Let us look at the specific example $N=+X$, i.e. $\ket{\psi}=\ket{+}$ (up to global
+phase). Here we have
+
+$$
+  g_1 = H_1V N_1 VH_1 = Z_1X_2 .
+$$
+
+We have to measure $Z_1$ and $Z_2$. Lets do $Z_1$ first. Clearly it anti-commutes with
+$g_3$ and commutes with the others. This is precisely one of the two standard situations
+described in section 10.5.3 which outlines how measurements are performed in the
+stabilizer formalism. If we measure $(-1)^{m_1}$ for $m_1\in\BB$ the post-measurment state
+is
+
+$$
+  S' = \langle Z_1X_2, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+$$
+
+Next we measure $Z_2$. Note that $Z_2$ anti-commutes with two of the generators from the
+preciding equation. We can fix this by multiplying the second one to the first one:
+
+$$
+  S' = \langle Z_1X_3, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+$$
+
+Now $Z_2$ only anti-commutes with the second generator. If we measure $(-1)^{m_2}$ for
+$m_2\in\BB$ the post-measurment state is
+
+$$
+  S'' = \langle Z_1X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle
+  = \langle (-1)^{m_1} X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+$$
+
+For the second equality we multiplied the third generator to the first one to get rid of
+the $Z_1$. Let us note two things here: the second and the third generator do not affect
+the third qubit and just say that the first two qubits are in the state
+$\ket{m_1,m_2}$. On the other hand $(-1)^{m_1}X_3$ only refers to the third qubit and says
+that it is in the state $H\ket{m_1}\in\{\ket{+},\ket{-}\}$. For teleportation to be
+succesful we thus have to get rid of the sign bit $m_1$. This is what the conditioned
+operations accomplish.
+
+\begin{align*}
+  & S'' = \langle (-1)^{m_1}X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  X_3^{m_2} :\; & \langle (-1)^{m_1} X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  Z_3^{m_1} :\; & \langle X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+Note that the last state is indeed $\ket{m_1,m_2,\psi}$ as desired. Thus we have verified
+the teleportation property for the particular state stabilized by $N=+X$.
+
+**** Measuring $Z_1$ and $Z_2$
+More generally any (for the stabilizer formalism) possible single qubit state is
+stabilized by some $N=(-1)^s\ii^{ab}X^aZ^b\in\{\pm\?X,\pm\?Y,\pm\?Z\}$ where
+$s,a,b\in\BB$. Hence the state right before measurement is
+
+\begin{align*}
+  S &= \langle H_1V (-1)^s \ii^{ab} X_1^aZ_1^b VH_1, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle H_1 (-1)^s \ii^{ab} X_1^aX_2^aZ_1^b H_1, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle (-1)^s \ii^{ab} Z_1^aX_2^aX_1^b, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle (-1)^{s+ab} \ii^{ab} X_1^bX_2^aZ_1^a, X_2X_3, X_1Z_2Z_3 \rangle .
+\end{align*}
+
+In the last equality I brought the product in the standard form so that all $X$ precede
+all $Z$. Doing so I had to move $X_1^b$ past $Z_1^a$, which introduces an additional sign
+factor $-1$ in case $a=b=1$.
+
+Let us measure $Z_1$ now. Note that it anti-commutes with the first generator iff $b=1$,
+and always anti-commutes with the third generator. To fix this multiply the first
+generator by the third one raised to the power $b$ to obtain (note that this cancels the
+$(-1)^{ab}$ if we rearrange the Paulis in the "X first" order):
+
+\begin{align*}
+  S = \langle (-1)^{s} \ii^{ab} X_2^aZ_1^aZ_2^bZ_3^b, X_2X_3, X_1Z_2Z_3 \rangle .
+\end{align*}
+
+Now $Z_1$ only anti-commutes with the third generator. After measuring $(-1)^{m_1}$ for
+$m_1\in\BB$ the post-measurment state is
+
+\begin{align*}
+  S' = \langle (-1)^{s} \ii^{ab} X_2^aZ_1^aZ_2^bZ_3^b, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+Now let us measure $Z_2$. Observe that $Z_2$ anti-commutes with the first generator iff
+$a=1$ and always with the second generator. To fix this let us multipy the first generator
+by the second raised to the power $a$:
+
+\begin{align*}
+  S' = \langle (-1)^{s} \ii^{ab} X_3^aZ_1^aZ_2^bZ_3^b, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+Now $Z_2$ only anti-commutes with the second generator. Hence, aber measuring $(-1)^{m_2}$
+for $m_2\in\BB$ the post-measurment state is
+
+\begin{align*}
+  S'' &= \langle (-1)^{s} \ii^{ab} X_3^aZ_1^aZ_2^bZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  &= \langle (-1)^{s+m_1a+m_2b} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+In the second equality I multiplied the first generator by the second and third raised to
+the power $a$.
+
+**** Apply $Z_3^{m_1}X_3^{m_2}$
+Let us finally apply the conditioned operations:
+
+\begin{align*}
+  & S'' = \langle (-1)^{s+m_1a+m_2b} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  X_3^{m_2} :\; & \langle (-1)^{s+m_1a} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  Z_3^{m_1} :\; & \langle (-1)^{s} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+The final result is the stabilizer of the state $\ket{m_1,m_2,\psi}$ as desired.
