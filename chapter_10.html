@@ -17,6 +17,9 @@
 \newcommand{\RF}{\mathrm{RF}}
 \newcommand{\sys}{\mathrm{sys}}
 \newcommand{\diag}{\mathrm{diag}}
+\newcommand{\cx}{\mathrm{CX}}
+\newcommand{\cy}{\mathrm{CY}}
+\newcommand{\cz}{\mathrm{CZ}}
 \newcommand{\calE}{\mathcal{E}}
 \newcommand{\calF}{\mathcal{F}}
 \newcommand{\calH}{\mathcal{H}}
@@ -43,74 +46,74 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org462eb65">Setup</a>
+<li><a href="#org89445b0">Setup</a>
 <ul>
-<li><a href="#orge6d18cf">Imports</a></li>
-<li><a href="#orgf6d2452">Utility code</a></li>
-<li><a href="#org6697289">Notation</a></li>
-<li><a href="#orga1aa11c">Stabilizer codes</a></li>
+<li><a href="#org2820d20">Imports</a></li>
+<li><a href="#org4802e66">Utility code</a></li>
+<li><a href="#orgbcbab13">Notation</a></li>
+<li><a href="#orgba9f9d7">Stabilizer codes</a></li>
 <li><a href="#chapter-10-css-as-stabilizer">CSS codes in the stabilizer formalism</a></li>
 </ul>
 </li>
-<li><a href="#org8ca9c1f">Exercises</a>
+<li><a href="#org2bdef60">Exercises</a>
 <ul>
-<li><a href="#orgb6c6ad3">Exercise 10.1</a></li>
-<li><a href="#orgf4dfa24">Exercise 10.2</a></li>
-<li><a href="#orgebad086">Exercise 10.3</a></li>
-<li><a href="#orgccd1214">Exercise 10.4</a></li>
-<li><a href="#org0a39bbc">Exercise 10.5</a></li>
-<li><a href="#org8cfb29b">Exercise 10.6</a></li>
-<li><a href="#org380d7c5">Exercise 10.7</a></li>
-<li><a href="#org3d84287">Exercise 10.8</a></li>
-<li><a href="#orgc83e72d">Exercise 10.9</a></li>
-<li><a href="#orgd594c4a">Exercise 10.10</a></li>
-<li><a href="#org0b4d9e4">Exercise 10.11</a></li>
-<li><a href="#org92f6093">Exercise 10.12</a></li>
-<li><a href="#org8eb805c">Exercise 10.13</a></li>
-<li><a href="#orgd3bfc54">Exercise 10.14</a></li>
-<li><a href="#orgfacae74">Exercise 10.15</a></li>
-<li><a href="#orgbcf503e">Exercise 10.16</a></li>
-<li><a href="#org506de18">Exercise 10.17</a></li>
+<li><a href="#org8b5251c">Exercise 10.1</a></li>
+<li><a href="#org94791a4">Exercise 10.2</a></li>
+<li><a href="#org655603c">Exercise 10.3</a></li>
+<li><a href="#orgfb8fab0">Exercise 10.4</a></li>
+<li><a href="#org983c208">Exercise 10.5</a></li>
+<li><a href="#org6ad1ad9">Exercise 10.6</a></li>
+<li><a href="#org7a4540f">Exercise 10.7</a></li>
+<li><a href="#org177465e">Exercise 10.8</a></li>
+<li><a href="#orgd341675">Exercise 10.9</a></li>
+<li><a href="#org77cdb51">Exercise 10.10</a></li>
+<li><a href="#orge25507c">Exercise 10.11</a></li>
+<li><a href="#org7343619">Exercise 10.12</a></li>
+<li><a href="#orgd8992b3">Exercise 10.13</a></li>
+<li><a href="#org4bef415">Exercise 10.14</a></li>
+<li><a href="#orga613403">Exercise 10.15</a></li>
+<li><a href="#org882c2ee">Exercise 10.16</a></li>
+<li><a href="#org589b2c2">Exercise 10.17</a></li>
 <li><a href="#exercise-10.18">Exercise 10.18</a></li>
-<li><a href="#org533cbd1">Exercise 10.19</a></li>
+<li><a href="#orgef03ce6">Exercise 10.19</a></li>
 <li><a href="#exercise-10.20">Exercise 10.20</a></li>
-<li><a href="#orge5cd176">Exercise 10.21 (Singleton bound)</a></li>
-<li><a href="#orgaba8c84">Exercise 10.22</a></li>
-<li><a href="#orgd093aeb">Exercise 10.23</a></li>
-<li><a href="#org6286b6c">Exercise 10.24</a></li>
-<li><a href="#org46db601">Exercise 10.25</a></li>
-<li><a href="#org9dd6716">Exercise 10.26</a></li>
-<li><a href="#org1770b64">Exercise 10.27</a></li>
-<li><a href="#org9fd3376">Exercise 10.28</a></li>
-<li><a href="#org557e12f">Exercise 10.29</a></li>
-<li><a href="#org855314e">Exercise 10.30</a></li>
-<li><a href="#orgbfa3d2d">Exercise 10.31</a></li>
-<li><a href="#orgf3447a8">Exercise 10.32</a></li>
+<li><a href="#org831c822">Exercise 10.21 (Singleton bound)</a></li>
+<li><a href="#org7152dbd">Exercise 10.22</a></li>
+<li><a href="#org2779686">Exercise 10.23</a></li>
+<li><a href="#org17440c8">Exercise 10.24</a></li>
+<li><a href="#orge010abd">Exercise 10.25</a></li>
+<li><a href="#orgc90ab62">Exercise 10.26</a></li>
+<li><a href="#orge198900">Exercise 10.27</a></li>
+<li><a href="#orgffb311e">Exercise 10.28</a></li>
+<li><a href="#orgce90fa0">Exercise 10.29</a></li>
+<li><a href="#orgf6ff578">Exercise 10.30</a></li>
+<li><a href="#org26e4256">Exercise 10.31</a></li>
+<li><a href="#org633d7f7">Exercise 10.32</a></li>
 <li><a href="#exercise-10.33">Exercise 10.33</a></li>
-<li><a href="#orgfcd55c8">Exercise 10.34</a></li>
+<li><a href="#orgbafe823">Exercise 10.34</a></li>
 <li><a href="#exercise-10.35">Exercise 10.35</a></li>
-<li><a href="#orgeb745b7">Exercise 10.36</a></li>
-<li><a href="#org7e7b8f0">Exercise 10.37</a></li>
-<li><a href="#org5c51a57">Exercise 10.38</a></li>
+<li><a href="#org6f79f73">Exercise 10.36</a></li>
+<li><a href="#org0b1ebde">Exercise 10.37</a></li>
+<li><a href="#orgc6eacba">Exercise 10.38</a></li>
 <li><a href="#exercise-10.39">Exercise 10.39</a></li>
-<li><a href="#org6fea003">Exercise 10.40</a></li>
-<li><a href="#orga7df250">Exercise 10.41</a></li>
-<li><a href="#orgeb4e342"><span class="todo TODO">TODO</span> Exercise 10.42</a></li>
+<li><a href="#org73e5b7c">Exercise 10.40</a></li>
+<li><a href="#org9b5e865">Exercise 10.41</a></li>
+<li><a href="#org5f3945f">Exercise 10.42</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org462eb65" class="outline-2">
-<h2 id="org462eb65">Setup</h2>
-<div class="outline-text-2" id="text-org462eb65">
+<div id="outline-container-org89445b0" class="outline-2">
+<h2 id="org89445b0">Setup</h2>
+<div class="outline-text-2" id="text-org89445b0">
 </div>
-<div id="outline-container-orge6d18cf" class="outline-3">
-<h3 id="orge6d18cf">Imports</h3>
-<div class="outline-text-3" id="text-orge6d18cf">
+<div id="outline-container-org2820d20" class="outline-3">
+<h3 id="org2820d20">Imports</h3>
+<div class="outline-text-3" id="text-org2820d20">
 <div class="org-src-container">
-<pre class="src src-sage" id="orgae3643d"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket, kron, trace, Id, X, Y, Z, Id2, CCX
+<pre class="src src-sage" id="org4a99a56"><span class="org-keyword">from</span> utils_sage <span class="org-keyword">import</span> ket, kron, trace, Id, X, Y, Z, Id2, CCX
 <span class="org-keyword">from</span> chapter_8_sage <span class="org-keyword">import</span> make_operation
 </pre>
 </div>
@@ -120,18 +123,18 @@ Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org0386610"><span class="org-keyword">from</span> qiskit.quantum_info <span class="org-keyword">import</span> Pauli, Clifford
+<pre class="src src-python" id="org27f6eee"><span class="org-keyword">from</span> qiskit.quantum_info <span class="org-keyword">import</span> Pauli, Clifford
 <span class="org-keyword">from</span> qiskit.circuit <span class="org-keyword">import</span> QuantumCircuit, Gate, ControlledGate
 <span class="org-keyword">from</span> qiskit.circuit.library <span class="org-keyword">import</span> CXGate
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgf6d2452" class="outline-3">
-<h3 id="orgf6d2452">Utility code</h3>
-<div class="outline-text-3" id="text-orgf6d2452">
+<div id="outline-container-org4802e66" class="outline-3">
+<h3 id="org4802e66">Utility code</h3>
+<div class="outline-text-3" id="text-org4802e66">
 <div class="org-src-container">
-<pre class="src src-sage" id="org811b2b7"><span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"g"</span>, domain<span class="org-operator">=</span><span class="org-string">"positive"</span>)
+<pre class="src src-sage" id="org4fcc7c4"><span class="org-variable-name">g</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"g"</span>, domain<span class="org-operator">=</span><span class="org-string">"positive"</span>)
 <span class="org-variable-name">a</span>, <span class="org-variable-name">b</span> <span class="org-operator">=</span> SR.var(<span class="org-string">"a b"</span>, domain<span class="org-operator">=</span><span class="org-string">"complex"</span>)
 assume(g <span class="org-operator">&lt;=</span> 1)
 </pre>
@@ -142,7 +145,7 @@ The Pauli gates on two and three qubits:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sage" id="org02865a7"><span class="org-keyword">def</span> <span class="org-function-name">make_multi</span>(gate, num_qubits):
+<pre class="src src-sage" id="org7e167c6"><span class="org-keyword">def</span> <span class="org-function-name">make_multi</span>(gate, num_qubits):
     <span class="org-doc">"""Given a single qubit gate G, make all G_j for j=1..num_qubits."""</span>
     <span class="org-variable-name">gs</span> <span class="org-operator">=</span> [Id]<span class="org-operator">*</span>num_qubits
     <span class="org-keyword">return</span> <span class="org-builtin">tuple</span>([kron(<span class="org-operator">*</span>(gs[:i]<span class="org-operator">+</span>[gate]<span class="org-operator">+</span>gs[i<span class="org-operator">+</span>1:])) <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(num_qubits)])
@@ -160,9 +163,9 @@ The Pauli gates on two and three qubits:
 </div>
 </div>
 
-<div id="outline-container-org6697289" class="outline-3">
-<h3 id="org6697289">Notation</h3>
-<div class="outline-text-3" id="text-org6697289">
+<div id="outline-container-orgbcbab13" class="outline-3">
+<h3 id="orgbcbab13">Notation</h3>
+<div class="outline-text-3" id="text-orgbcbab13">
 <p>
 Below we use \(\BB=\mathrm{GF}(2)=\ZZ_2\) to denote the field of two elements. This models a
 <i>bit</i>.
@@ -170,13 +173,13 @@ Below we use \(\BB=\mathrm{GF}(2)=\ZZ_2\) to denote the field of two elements. T
 </div>
 </div>
 
-<div id="outline-container-orga1aa11c" class="outline-3">
-<h3 id="orga1aa11c">Stabilizer codes</h3>
-<div class="outline-text-3" id="text-orga1aa11c">
+<div id="outline-container-orgba9f9d7" class="outline-3">
+<h3 id="orgba9f9d7">Stabilizer codes</h3>
+<div class="outline-text-3" id="text-orgba9f9d7">
 <p>
 The purpose of this section is to complement chapter 10.5. From the book I am missing some
 concrete statement on how <i>exactly</i> stabilizer codes are characterized. I try to do this
-in the <a href="#org9d7bbe2">fundamental theorem</a> of stabilizer codes below.
+in the <a href="#org67fb6c0">fundamental theorem</a> of stabilizer codes below.
 </p>
 
 <p>
@@ -185,7 +188,7 @@ subgroup \(S\) of \(G_n\). Note that any element of \(G_n\) can be represented a
 </p>
 
 <p>
-<a id="org6a70866"></a>
+<a id="orgbb51b71"></a>
 \[
   g = \alpha \bigotimes_{j=1}^n N_j ,
 \]
@@ -263,7 +266,7 @@ Let \(g_1,\ldots,g_l\in\?G_n\) and let \(S=\langle\?g_1,\ldots,g_l\rangle\). Ear
 </p>
 
 <p>
-<a id="org0b614c3"></a>
+<a id="org5c28874"></a>
 </p>
 <dl class="org-dl">
 <dt>Lemma</dt><dd>If \(V_S\) is non-trivial then \(-I\notin\?S\) and all the \(g_j\) commute.
@@ -310,7 +313,7 @@ As a corollary we get a nice way to check whether \(S\) is abelian or not:
 </p>
 
 <p>
-<a id="org44da136"></a>
+<a id="orga755ec1"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem</dt><dd>The \(g_1,\ldots,g_l\) commute iff \(G\Lambda\?G^T=0\in\BB^{l\times\?l}\).</dd>
@@ -322,7 +325,7 @@ independent generators. This is the purpose of the following series of theorems.
 </p>
 
 <p>
-<a id="org2d04825"></a>
+<a id="org5cb3972"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem</dt><dd><p>
@@ -348,7 +351,7 @@ QED.
 </dl>
 
 <p>
-<a id="orgc14b3e1"></a>
+<a id="org658709d"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem</dt><dd><p>
@@ -365,7 +368,7 @@ The implication <b>(2) → (1)</b> holds even without assuming \(-I\notin\?S\).
 <dl class="org-dl">
 <dt>Proof</dt><dd><dl class="org-dl">
 <dt>(1) → (2)</dt><dd>This follows from the fact that an injective group homomorphism maps
-independent sets to independent sets. By a <a href="#org2d04825">previous theorem</a> \(r\) is injective. Hence
+independent sets to independent sets. By a <a href="#org5cb3972">previous theorem</a> \(r\) is injective. Hence
 the rows of \(G\) are independent as elements of the group \(\BB^{2n}\). But this means
 they are independent as elements of the vector space \(\BB^{2n}\).</dd>
 <dt>(2) → (1)</dt><dd>From (2) we deduce that the \(r(g_j)\) are independent. But this implies
@@ -379,7 +382,7 @@ QED.
 </dl>
 
 <p>
-<a id="org5a3f167"></a>
+<a id="orgfe08b0c"></a>
 </p>
 <dl class="org-dl">
 <dt>Theorem</dt><dd><p>
@@ -391,7 +394,7 @@ Assume that \(\rank{G}=l\). The following assertions are equivalent
 </ol>
 
 <p>
-<a href="#org6a70866">where</a> \(g_j=\alpha_j\bigotimes_jN_j\).
+<a href="#orgbb51b71">where</a> \(g_j=\alpha_j\bigotimes_jN_j\).
 </p>
 <dl class="org-dl">
 <dt>Proof</dt><dd><dl class="org-dl">
@@ -426,7 +429,7 @@ We are in a position to state and prove the main theorem of this section:
 </p>
 
 <p>
-<a id="org9d7bbe2"></a>
+<a id="org67fb6c0"></a>
 </p>
 <dl class="org-dl">
 <dt>Fundamental theorem on stabilizer codes</dt><dd><p>
@@ -435,7 +438,7 @@ all check matrices \(G\in\BB^{l\times2n}\) (for any \(n\) and \(l\)), correspond
 of generators \(g_1,\ldots,g_l\in\?G_n\), which satisfy
 </p>
 <ol class="org-ol">
-<li>\(\alpha_j=\pm1\) (c.f. <a href="#org6a70866">representation</a> of \(g_j\)),</li>
+<li>\(\alpha_j=\pm1\) (c.f. <a href="#orgbb51b71">representation</a> of \(g_j\)),</li>
 <li>\(\rank{G}=l\) ,</li>
 <li>\(G\Lambda\?G^T=0\in\BB^{l\times\?l}\) .</li>
 </ol>
@@ -458,16 +461,16 @@ stabilizer code completely.</dd>
 
 <dt>Proof</dt><dd><p>
 Let \(V_S\) be a non-trivial stabilizer code. Let \(g_1,\ldots,g_l\) be a an
-independent set of generators. By proposition 10.5 (or the <a href="#org0b614c3">Lemma</a> above) we have
+independent set of generators. By proposition 10.5 (or the <a href="#org5c28874">Lemma</a> above) we have
 \(-I\notin\?S\) and all \(g_j\) commute. By independence of \(g_j\) and \(-I\notin\?S\) we
-<a href="#orgc14b3e1">deduce</a> that \(\rank{G}=l\). From this and again using \(-I\notin\?S\) we <a href="#org5a3f167">deduce</a> that
+<a href="#org658709d">deduce</a> that \(\rank{G}=l\). From this and again using \(-I\notin\?S\) we <a href="#orgfe08b0c">deduce</a> that
 \(\alpha_j=\pm1\) for all \(j\). Finally, the fact that the generators commute is
-<a href="#org44da136">equivalent</a> to \(G\Lambda\?G^T=0\). This shows one part of the claim.
+<a href="#orga755ec1">equivalent</a> to \(G\Lambda\?G^T=0\). This shows one part of the claim.
 </p>
 
 <p>
-Let us now assume the conditions 1 to 3. From (1) and (2) we <a href="#org5a3f167">deduce</a> that
-\(-I\notin\?S\). (3) is <a href="#org44da136">equivalent</a> to all \(g_j\) commuting. By proposition 10.5 this
+Let us now assume the conditions 1 to 3. From (1) and (2) we <a href="#orgfe08b0c">deduce</a> that
+\(-I\notin\?S\). (3) is <a href="#orga755ec1">equivalent</a> to all \(g_j\) commuting. By proposition 10.5 this
 implies that \(V_S\) is non-trivial.
 </p>
 
@@ -524,7 +527,7 @@ matrix of \(C_2^\top\). Let
 </p>
 
 <p>
-<a id="orgd4b452d"></a>
+<a id="org0433583"></a>
 </p>
 \begin{align*}
   g_i &= \bigotimes_{j=1}^n X^{B_{ij}}, \text{ for } i=1..k_2, \\
@@ -532,10 +535,10 @@ matrix of \(C_2^\top\). Let
 \end{align*}
 
 <p>
-<a id="orge622228"></a>
+<a id="orgca3b99d"></a>
 </p>
 <dl class="org-dl">
-<dt>Theorem</dt><dd><a href="#orgd4b452d">These</a> \(n-(k_1-k_2)\) Pauli operators are the stabilizer for the CSS code of
+<dt>Theorem</dt><dd><a href="#org0433583">These</a> \(n-(k_1-k_2)\) Pauli operators are the stabilizer for the CSS code of
 \(C_1\) over \(C_2\).
 <dl class="org-dl">
 <dt>Proof</dt><dd>We provide a proof in the <a href="#exercise-10.32-solution">solution</a> of exercise 10.32.</dd>
@@ -555,13 +558,13 @@ The check matrix of the CSS code is given by the following block matrix
 </div>
 </div>
 
-<div id="outline-container-org8ca9c1f" class="outline-2">
-<h2 id="org8ca9c1f">Exercises</h2>
-<div class="outline-text-2" id="text-org8ca9c1f">
+<div id="outline-container-org2bdef60" class="outline-2">
+<h2 id="org2bdef60">Exercises</h2>
+<div class="outline-text-2" id="text-org2bdef60">
 </div>
-<div id="outline-container-orgb6c6ad3" class="outline-3">
-<h3 id="orgb6c6ad3">Exercise 10.1</h3>
-<div class="outline-text-3" id="text-orgb6c6ad3">
+<div id="outline-container-org8b5251c" class="outline-3">
+<h3 id="org8b5251c">Exercise 10.1</h3>
+<div class="outline-text-3" id="text-org8b5251c">
 <p>
 Verify that the encoding circuit in Figure 10.2 works as claimed.
 </p>
@@ -578,9 +581,9 @@ Verify that the encoding circuit in Figure 10.2 works as claimed.
 </div>
 
 
-<div id="outline-container-org270b5de" class="outline-4">
-<h4 id="org270b5de">Solution</h4>
-<div class="outline-text-4" id="text-org270b5de">
+<div id="outline-container-org31ee66e" class="outline-4">
+<h4 id="org31ee66e">Solution</h4>
+<div class="outline-text-4" id="text-org31ee66e">
 <p>
 This is really just observing that the circuit acts like this on the <i>relevant</i> basis
 states
@@ -598,9 +601,9 @@ The rest follows by linearity.
 </div>
 </div>
 
-<div id="outline-container-orgf4dfa24" class="outline-3">
-<h3 id="orgf4dfa24">Exercise 10.2</h3>
-<div class="outline-text-3" id="text-orgf4dfa24">
+<div id="outline-container-org94791a4" class="outline-3">
+<h3 id="org94791a4">Exercise 10.2</h3>
+<div class="outline-text-3" id="text-org94791a4">
 <p>
 The action of the bit flip channel can be described by the quantum operation
 \(\calE(\rho)=(1-p)\rho+pX\rho\?X\). Show that this may be given an alternate operator-sum
@@ -613,9 +616,9 @@ with probability \(2p\).
 </p>
 </div>
 
-<div id="outline-container-orgdb5741e" class="outline-4">
-<h4 id="orgdb5741e">Proof</h4>
-<div class="outline-text-4" id="text-orgdb5741e">
+<div id="outline-container-org3d2d8e0" class="outline-4">
+<h4 id="org3d2d8e0">Proof</h4>
+<div class="outline-text-4" id="text-org3d2d8e0">
 <p>
 Note that \(X=P_+-P_-\) and \(I=P_++P_-\). Hence
 </p>
@@ -644,9 +647,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-orgebad086" class="outline-3">
-<h3 id="orgebad086">Exercise 10.3</h3>
-<div class="outline-text-3" id="text-orgebad086">
+<div id="outline-container-org655603c" class="outline-3">
+<h3 id="org655603c">Exercise 10.3</h3>
+<div class="outline-text-3" id="text-org655603c">
 <p>
 Show by explicit calculation that measuring \(Z_1Z_2\) followed by \(Z_2Z_3\) is equivalent,
 up to labeling of the measurement outcomes, to measuring the four projectors defined by
@@ -655,9 +658,9 @@ and post-measurement states.
 </p>
 </div>
 
-<div id="outline-container-org7f653ac" class="outline-4">
-<h4 id="org7f653ac">Proof</h4>
-<div class="outline-text-4" id="text-org7f653ac">
+<div id="outline-container-org079fc95" class="outline-4">
+<h4 id="org079fc95">Proof</h4>
+<div class="outline-text-4" id="text-org079fc95">
 <p>
 Let us define the following projectors
 </p>
@@ -709,9 +712,9 @@ Hence the projectors are the same, just re-labeled. QED.
 </div>
 </div>
 
-<div id="outline-container-orgccd1214" class="outline-3">
-<h3 id="orgccd1214">Exercise 10.4</h3>
-<div class="outline-text-3" id="text-orgccd1214">
+<div id="outline-container-orgfb8fab0" class="outline-3">
+<h3 id="orgfb8fab0">Exercise 10.4</h3>
+<div class="outline-text-3" id="text-orgfb8fab0">
 <p>
 Consider the three qubit bit flip code. Suppose we had performed the error syndrome
 measurement by measuring the eight orthogonal projectors corresponding to projections onto
@@ -727,9 +730,9 @@ bit number \(j\) flipped, where \(j\) is in the range one to three.</li>
 </ol>
 </div>
 
-<div id="outline-container-org059bca7" class="outline-4">
-<h4 id="org059bca7">Solution for part 1</h4>
-<div class="outline-text-4" id="text-org059bca7">
+<div id="outline-container-org528d5c8" class="outline-4">
+<h4 id="org528d5c8">Solution for part 1</h4>
+<div class="outline-text-4" id="text-org528d5c8">
 <p>
 The projectors are just \(P_j=\proj{j}\) for \(j=0..7\) (note that the binary representations
 for the numbers from \(0\) to \(7\) are \(000\), \(001\), \(010\), \(011\), \(100\), \(101\), \(110\),
@@ -744,7 +747,7 @@ set of possible measurements for the given value of \(k\). We have
 </p>
 
 <p>
-<a id="orgc0fe679"></a>
+<a id="org65cd18e"></a>
 </p>
 \begin{align*}
   M_0 &= \{0, 7\} , \\
@@ -763,11 +766,11 @@ the three errors "is allowed" to happen)).
 </div>
 </div>
 
-<div id="outline-container-orgc1a8935" class="outline-4">
-<h4 id="orgc1a8935">Solution for part 2</h4>
-<div class="outline-text-4" id="text-orgc1a8935">
+<div id="outline-container-org693de58" class="outline-4">
+<h4 id="org693de58">Solution for part 2</h4>
+<div class="outline-text-4" id="text-org693de58">
 <p>
-If we measure \(j\) and infer the error \(k\) <a href="#orgc0fe679">according to the sets</a> \(M_k\) we would correct it
+If we measure \(j\) and infer the error \(k\) <a href="#org65cd18e">according to the sets</a> \(M_k\) we would correct it
 by applying \(X_k\) to the state. In other words, the following quantum operation \(\calR\)
 performs the syndrome measurement followed by the recovery:
 </p>
@@ -822,9 +825,9 @@ of part 2.
 </div>
 </div>
 
-<div id="outline-container-org69a6b1d" class="outline-4">
-<h4 id="org69a6b1d">Solution for part 3</h4>
-<div class="outline-text-4" id="text-org69a6b1d">
+<div id="outline-container-org5c84433" class="outline-4">
+<h4 id="org5c84433">Solution for part 3</h4>
+<div class="outline-text-4" id="text-org5c84433">
 <p>
 Let us consider two cases:
 </p>
@@ -895,9 +898,9 @@ Here \(p\) and \(1-p\) are the weights.
 </div>
 </div>
 
-<div id="outline-container-org0a39bbc" class="outline-3">
-<h3 id="org0a39bbc">Exercise 10.5</h3>
-<div class="outline-text-3" id="text-org0a39bbc">
+<div id="outline-container-org983c208" class="outline-3">
+<h3 id="org983c208">Exercise 10.5</h3>
+<div class="outline-text-3" id="text-org983c208">
 <p>
 Show that the syndrome measurement for detecting phase flip errors in the Shor code
 corresponds to measuring the observables \(A=X_1X_2X_3X_4X_5X_6\) and
@@ -1026,18 +1029,18 @@ desired. QED.
 </div>
 </div>
 
-<div id="outline-container-org8cfb29b" class="outline-3">
-<h3 id="org8cfb29b">Exercise 10.6</h3>
-<div class="outline-text-3" id="text-org8cfb29b">
+<div id="outline-container-org6ad1ad9" class="outline-3">
+<h3 id="org6ad1ad9">Exercise 10.6</h3>
+<div class="outline-text-3" id="text-org6ad1ad9">
 <p>
 Show that recovery from a phase flip on any of the first three qubits may be accomplished
 by applying the operator \(Z_1Z_2Z_3\).
 </p>
 </div>
 
-<div id="outline-container-org70cbe9a" class="outline-4">
-<h4 id="org70cbe9a">Proof</h4>
-<div class="outline-text-4" id="text-org70cbe9a">
+<div id="outline-container-orgdf34198" class="outline-4">
+<h4 id="orgdf34198">Proof</h4>
+<div class="outline-text-4" id="text-orgdf34198">
 <p>
 Let us reuse the notation from the <a href="#exercise-10.5-solution">solution</a> of exercise 10.5. Clearly
 </p>
@@ -1066,9 +1069,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org380d7c5" class="outline-3">
-<h3 id="org380d7c5">Exercise 10.7</h3>
-<div class="outline-text-3" id="text-org380d7c5">
+<div id="outline-container-org7a4540f" class="outline-3">
+<h3 id="org7a4540f">Exercise 10.7</h3>
+<div class="outline-text-3" id="text-org7a4540f">
 <p>
 Consider the three qubit bit flip code of Section 10.1.1, with corresponding projector
 \(P=\proj{000}+\proj{111}\). The noise process this code protects against has operation
@@ -1089,9 +1092,9 @@ noise process.
 </p>
 </div>
 
-<div id="outline-container-orgf2c59a1" class="outline-4">
-<h4 id="orgf2c59a1">Solution</h4>
-<div class="outline-text-4" id="text-orgf2c59a1">
+<div id="outline-container-org789505f" class="outline-4">
+<h4 id="org789505f">Solution</h4>
+<div class="outline-text-4" id="text-org789505f">
 <p>
 Clearly \(PX_iX_jP=\delta_{ij}P\). Hence
 </p>
@@ -1109,9 +1112,9 @@ for this noise.
 </div>
 </div>
 
-<div id="outline-container-org835d88b" class="outline-4">
-<h4 id="org835d88b">Bonus: Calculating the recovery procedure</h4>
-<div class="outline-text-4" id="text-org835d88b">
+<div id="outline-container-orga11426e" class="outline-4">
+<h4 id="orga11426e">Bonus: Calculating the recovery procedure</h4>
+<div class="outline-text-4" id="text-orga11426e">
 <p>
 By the previous calculation and Theorem 10.1 there exists a trace-preserving quantum
 operation \(\calR\) such that
@@ -1195,9 +1198,9 @@ operators. The Kraus matrices of \(\calR\) are
 </div>
 </div>
 
-<div id="outline-container-org3d84287" class="outline-3">
-<h3 id="org3d84287">Exercise 10.8</h3>
-<div class="outline-text-3" id="text-org3d84287">
+<div id="outline-container-org177465e" class="outline-3">
+<h3 id="org177465e">Exercise 10.8</h3>
+<div class="outline-text-3" id="text-org177465e">
 <p>
 Verify that the three qubit phase flip code \(\ket{0_L}=\ket{+++}\), \(\ket{1_L}=\ket{---}\)
 satisfies the quantum error-correction conditions for the set of error operators
@@ -1205,9 +1208,9 @@ satisfies the quantum error-correction conditions for the set of error operators
 </p>
 </div>
 
-<div id="outline-container-org5247d24" class="outline-4">
-<h4 id="org5247d24">Solution 1</h4>
-<div class="outline-text-4" id="text-org5247d24">
+<div id="outline-container-orgbc72387" class="outline-4">
+<h4 id="orgbc72387">Solution 1</h4>
+<div class="outline-text-4" id="text-orgbc72387">
 <p>
 Let us reduce this to the bit flip code. To convert to the bit flip code we only have to
 conjugate the projector of the code and the Kraus operators of the errors by
@@ -1249,9 +1252,9 @@ In the second equality we used what we already know about the bit flip code.
 </div>
 </div>
 
-<div id="outline-container-org917bca6" class="outline-4">
-<h4 id="org917bca6">Solution 2</h4>
-<div class="outline-text-4" id="text-org917bca6">
+<div id="outline-container-orge063dca" class="outline-4">
+<h4 id="orge063dca">Solution 2</h4>
+<div class="outline-text-4" id="text-orge063dca">
 <p>
 We can also verify this explicitly. Let \(P=P_{+++}+P_{---}\) be the projector onto the
 code, where we use the notation \(P_{ijk}=\proj{ijk}\). Clearly
@@ -1281,9 +1284,9 @@ Similarly \(PIZ_jP=PZ_iZ_jP=0\) for \(i\neq\?j\). Hence \(PE_i^\dagger\?E_iP=\de
 </div>
 </div>
 
-<div id="outline-container-orgc83e72d" class="outline-3">
-<h3 id="orgc83e72d">Exercise 10.9</h3>
-<div class="outline-text-3" id="text-orgc83e72d">
+<div id="outline-container-orgd341675" class="outline-3">
+<h3 id="orgd341675">Exercise 10.9</h3>
+<div class="outline-text-3" id="text-orgd341675">
 <p>
 Again, consider the three qubit phase flip code. Let \(P_i\) and \(Q_i\) be the projectors
 onto the \(\ket{0}\) and \(\ket{1}\) states, respectively, of the \(i\)​th qubit. Prove that the
@@ -1291,9 +1294,9 @@ three qubit phase flip code protects against the error set \({I,P_1,Q_1,P_2,Q_2,
 </p>
 </div>
 
-<div id="outline-container-orgdb56411" class="outline-4">
-<h4 id="orgdb56411">Solution</h4>
-<div class="outline-text-4" id="text-orgdb56411">
+<div id="outline-container-orga57ea8d" class="outline-4">
+<h4 id="orga57ea8d">Solution</h4>
+<div class="outline-text-4" id="text-orga57ea8d">
 <p>
 Recall that the phase flip code corrects the errors \(I\), \(Z_1\), \(Z_2\), and \(Z_3\). By
 theorem 10.2 linear combinations of these errors are corrected too. Note that we have
@@ -1311,18 +1314,18 @@ Hence those errors are corrected too.
 </div>
 </div>
 
-<div id="outline-container-orgd594c4a" class="outline-3">
-<h3 id="orgd594c4a">Exercise 10.10</h3>
-<div class="outline-text-3" id="text-orgd594c4a">
+<div id="outline-container-org77cdb51" class="outline-3">
+<h3 id="org77cdb51">Exercise 10.10</h3>
+<div class="outline-text-3" id="text-org77cdb51">
 <p>
 Explicitly verify the quantum error-correction conditions for the Shor code, for the error
 set containing \(I\) and the error operators \(X_j,Y_j,Z_j\) for \(j=1\) through \(9\).
 </p>
 </div>
 
-<div id="outline-container-org5b366d0" class="outline-4">
-<h4 id="org5b366d0">Solution</h4>
-<div class="outline-text-4" id="text-org5b366d0">
+<div id="outline-container-org71b3b4c" class="outline-4">
+<h4 id="org71b3b4c">Solution</h4>
+<div class="outline-text-4" id="text-org71b3b4c">
 <p>
 Let us denote
 </p>
@@ -1361,9 +1364,9 @@ within one "block" (there are three block \(\{1,2,3\}\), \(\{4,5,6\}\), and
 </div>
 </div>
 
-<div id="outline-container-org0b4d9e4" class="outline-3">
-<h3 id="org0b4d9e4">Exercise 10.11</h3>
-<div class="outline-text-3" id="text-org0b4d9e4">
+<div id="outline-container-orge25507c" class="outline-3">
+<h3 id="orge25507c">Exercise 10.11</h3>
+<div class="outline-text-3" id="text-orge25507c">
 <p>
 Construct operation elements for a single qubit quantum operation \(\calE\) that upon input
 of any state \(\rho\) replaces it with the completely randomized state \(I/2\). It is amazing
@@ -1371,9 +1374,9 @@ that even such noise models as this may be corrected by codes such as the Shor c
 </p>
 </div>
 
-<div id="outline-container-orge1485fc" class="outline-4">
-<h4 id="orge1485fc">Solution</h4>
-<div class="outline-text-4" id="text-orge1485fc">
+<div id="outline-container-orgffc76d0" class="outline-4">
+<h4 id="orgffc76d0">Solution</h4>
+<div class="outline-text-4" id="text-orgffc76d0">
 <p>
 We already know that the quantum operation
 </p>
@@ -1407,9 +1410,9 @@ Hence the relevant operation elements are
 </div>
 </div>
 
-<div id="outline-container-org92f6093" class="outline-3">
-<h3 id="org92f6093">Exercise 10.12</h3>
-<div class="outline-text-3" id="text-org92f6093">
+<div id="outline-container-org7343619" class="outline-3">
+<h3 id="org7343619">Exercise 10.12</h3>
+<div class="outline-text-3" id="text-org7343619">
 <p>
 Show that the fidelity between the state \(\ket{0}\) and \(\calE(\proj{0})\) is \(\sqrt{1-2p/3}\)
 and use this to argue that the minimum fidelity for the depolarizing channel is
@@ -1417,9 +1420,9 @@ and use this to argue that the minimum fidelity for the depolarizing channel is
 </p>
 </div>
 
-<div id="outline-container-org76e7c2b" class="outline-4">
-<h4 id="org76e7c2b">Solution 1</h4>
-<div class="outline-text-4" id="text-org76e7c2b">
+<div id="outline-container-org9300eba" class="outline-4">
+<h4 id="org9300eba">Solution 1</h4>
+<div class="outline-text-4" id="text-org9300eba">
 <p>
 Let us follow the hint of the book.
 </p>
@@ -1451,9 +1454,9 @@ In the second equality we used that the fidelity is invariant under unitary tran
 </div>
 </div>
 
-<div id="outline-container-orgce1399b" class="outline-4">
-<h4 id="orgce1399b">Solution 2</h4>
-<div class="outline-text-4" id="text-orgce1399b">
+<div id="outline-container-orgf8a8b99" class="outline-4">
+<h4 id="orgf8a8b99">Solution 2</h4>
+<div class="outline-text-4" id="text-orgf8a8b99">
 <p>
 We could also prove the claim by using an alternative formula for the depolarizing channel:
 </p>
@@ -1477,9 +1480,9 @@ We could also prove the claim by using an alternative formula for the depolarizi
 </div>
 </div>
 
-<div id="outline-container-org02ec86c" class="outline-4">
-<h4 id="org02ec86c">Solution 3</h4>
-<div class="outline-text-4" id="text-org02ec86c">
+<div id="outline-container-org39c5dcd" class="outline-4">
+<h4 id="org39c5dcd">Solution 3</h4>
+<div class="outline-text-4" id="text-org39c5dcd">
 <p>
 Yet another approach first calculates
 </p>
@@ -1558,18 +1561,18 @@ trace).
 </div>
 </div>
 
-<div id="outline-container-org8eb805c" class="outline-3">
-<h3 id="org8eb805c">Exercise 10.13</h3>
-<div class="outline-text-3" id="text-org8eb805c">
+<div id="outline-container-orgd8992b3" class="outline-3">
+<h3 id="orgd8992b3">Exercise 10.13</h3>
+<div class="outline-text-3" id="text-orgd8992b3">
 <p>
 Show that the minimum fidelity \(F(\ket{\psi},\calE(\proj{\psi}))\) when \(\calE\) is the
 amplitude damping channel with parameter \(\gamma\), is \(\sqrt{1-\gamma}\).
 </p>
 </div>
 
-<div id="outline-container-org833d843" class="outline-4">
-<h4 id="org833d843">Proof</h4>
-<div class="outline-text-4" id="text-org833d843">
+<div id="outline-container-org184f57d" class="outline-4">
+<h4 id="org184f57d">Proof</h4>
+<div class="outline-text-4" id="text-org184f57d">
 <p>
 Let us use sage to get an algebraic expression for \(F\). First define amplitude damping
 </p>
@@ -1680,9 +1683,9 @@ Hence \(F_{\min}=\sqrt{1-\gamma}\) . QED.
 </div>
 </div>
 
-<div id="outline-container-orgd3bfc54" class="outline-3">
-<h3 id="orgd3bfc54">Exercise 10.14</h3>
-<div class="outline-text-3" id="text-orgd3bfc54">
+<div id="outline-container-org4bef415" class="outline-3">
+<h3 id="org4bef415">Exercise 10.14</h3>
+<div class="outline-text-3" id="text-org4bef415">
 <p>
 Write an expression for a generator matrix encoding \(k\) bits using \(r\) repetitions for
 each bit. This is an \([rk,k]\) linear code, and should have an \(rk\times\?k\) generator
@@ -1711,18 +1714,18 @@ This naturally reproduces the special cases \(r=3\), \(k\in\{1,2\}\) from the bo
 </div>
 </div>
 
-<div id="outline-container-orgfacae74" class="outline-3">
-<h3 id="orgfacae74">Exercise 10.15</h3>
-<div class="outline-text-3" id="text-orgfacae74">
+<div id="outline-container-orga613403" class="outline-3">
+<h3 id="orga613403">Exercise 10.15</h3>
+<div class="outline-text-3" id="text-orga613403">
 <p>
 Show that adding one column of \(G\) to another results in a generator matrix generating the
 same code.
 </p>
 </div>
 
-<div id="outline-container-org98ee983" class="outline-4">
-<h4 id="org98ee983">Proof</h4>
-<div class="outline-text-4" id="text-org98ee983">
+<div id="outline-container-org1340e40" class="outline-4">
+<h4 id="org1340e40">Proof</h4>
+<div class="outline-text-4" id="text-org1340e40">
 <p>
 Let \((e_j)\) be the standard basis vectors in \(\BB^k\). The code generated by \(G\) is just
 the image \(C=G\BB^k\) of \(G\) which in turn is given by all linear combinations of
@@ -1757,9 +1760,9 @@ This shows the claim. QED.
 </div>
 </div>
 
-<div id="outline-container-orgbcf503e" class="outline-3">
-<h3 id="orgbcf503e">Exercise 10.16</h3>
-<div class="outline-text-3" id="text-orgbcf503e">
+<div id="outline-container-org882c2ee" class="outline-3">
+<h3 id="org882c2ee">Exercise 10.16</h3>
+<div class="outline-text-3" id="text-org882c2ee">
 <p>
 Show that adding one row of the parity check matrix to another does not change the
 code. Using Gaussian elimination and swapping of bits it is therefore possible to assume
@@ -1768,9 +1771,9 @@ that the parity check matrix has the standard form \([A|I_{n-k}]\), where \(A\) 
 </p>
 </div>
 
-<div id="outline-container-orgf752abd" class="outline-4">
-<h4 id="orgf752abd">Proof</h4>
-<div class="outline-text-4" id="text-orgf752abd">
+<div id="outline-container-org6fd470a" class="outline-4">
+<h4 id="org6fd470a">Proof</h4>
+<div class="outline-text-4" id="text-org6fd470a">
 <p>
 Recall that a code \(C\), in terms of a parity check matrix \(H\), is defined as
 </p>
@@ -1812,9 +1815,9 @@ inclusion. QED.
 </div>
 </div>
 
-<div id="outline-container-org506de18" class="outline-3">
-<h3 id="org506de18">Exercise 10.17</h3>
-<div class="outline-text-3" id="text-org506de18">
+<div id="outline-container-org589b2c2" class="outline-3">
+<h3 id="org589b2c2">Exercise 10.17</h3>
+<div class="outline-text-3" id="text-org589b2c2">
 <p>
 Find a parity check matrix for the \([6,2]\) repetition code defined by the generator matrix in
 (10.54).
@@ -1830,9 +1833,9 @@ Find a parity check matrix for the \([6,2]\) repetition code defined by the gene
 \end{bmatrix}
 </div>
 
-<div id="outline-container-org6729bbf" class="outline-4">
-<h4 id="org6729bbf">Solution</h4>
-<div class="outline-text-4" id="text-org6729bbf">
+<div id="outline-container-org48f0b4c" class="outline-4">
+<h4 id="org48f0b4c">Solution</h4>
+<div class="outline-text-4" id="text-org48f0b4c">
 <p>
 Let \(G_1\) and \(H_1\) be the generator and parity check matrix for \(k=1\) bits (see equations
 (10.53) and (10.58)). We have
@@ -1875,9 +1878,9 @@ satisfy \(HG=0\).
 </p>
 </div>
 
-<div id="outline-container-orge6a40dd" class="outline-4">
-<h4 id="orge6a40dd">Proof</h4>
-<div class="outline-text-4" id="text-orge6a40dd">
+<div id="outline-container-org18a9d2f" class="outline-4">
+<h4 id="org18a9d2f">Proof</h4>
+<div class="outline-text-4" id="text-org18a9d2f">
 <p>
 Recall that a code \(C\) is just the image of the generator \(C=G\BB^k\). On the other hand it
 can be defined as the kernel of the parity check matrix: \(C=\{y|Hy=0\}\). Since every code
@@ -1887,9 +1890,9 @@ word has the form \(y=Gx\) we see that \(HGx=0\) for every \(x\). Hence the clai
 </div>
 </div>
 
-<div id="outline-container-org533cbd1" class="outline-3">
-<h3 id="org533cbd1">Exercise 10.19</h3>
-<div class="outline-text-3" id="text-org533cbd1">
+<div id="outline-container-orgef03ce6" class="outline-3">
+<h3 id="orgef03ce6">Exercise 10.19</h3>
+<div class="outline-text-3" id="text-orgef03ce6">
 <p>
 Suppose an \([n,k]\) linear code \(C\) has a parity check matrix of the form \(H=[A|I_{n-k}]\),
 for some \((n-k)\times\?k\) matrix \(A\). Show that the corresponding generator matrix is
@@ -1907,9 +1910,9 @@ linear codes over more general ﬁelds than \(\ZZ_2\).)
 </p>
 </div>
 
-<div id="outline-container-org300512e" class="outline-4">
-<h4 id="org300512e">Solution</h4>
-<div class="outline-text-4" id="text-org300512e">
+<div id="outline-container-org10fafb9" class="outline-4">
+<h4 id="org10fafb9">Solution</h4>
+<div class="outline-text-4" id="text-org10fafb9">
 <p>
 Clearly \(G\) has rank \(k\). Hence its images has the same dimension as the kernel of \(H\)
 (which is \(k\)). We only have to verify that \(HG=0\) (c.f. <a href="#exercise-10.18">exercise 10.18</a>). But this is
@@ -1935,9 +1938,9 @@ has distance \(d\).
 </p>
 </div>
 
-<div id="outline-container-orgd0493f8" class="outline-4">
-<h4 id="orgd0493f8">Proof</h4>
-<div class="outline-text-4" id="text-orgd0493f8">
+<div id="outline-container-orgc653a7a" class="outline-4">
+<h4 id="orgc653a7a">Proof</h4>
+<div class="outline-text-4" id="text-orgc653a7a">
 <p>
 Let us divide the proof into two parts. In part one we assume that \(H\) has \(d\) linearly
 <i>dependent</i> columns. In part two we assume that every \(d-1\) columns are linearly
@@ -1991,17 +1994,17 @@ dependent. QED.
 </div>
 </div>
 
-<div id="outline-container-orge5cd176" class="outline-3">
-<h3 id="orge5cd176">Exercise 10.21 (Singleton bound)</h3>
-<div class="outline-text-3" id="text-orge5cd176">
+<div id="outline-container-org831c822" class="outline-3">
+<h3 id="org831c822">Exercise 10.21 (Singleton bound)</h3>
+<div class="outline-text-3" id="text-org831c822">
 <p>
 Show that an \([n,k,d]\) code must satisfy \(n-k\geq\?d-1\).
 </p>
 </div>
 
-<div id="outline-container-org64a7dd9" class="outline-4">
-<h4 id="org64a7dd9">Proof</h4>
-<div class="outline-text-4" id="text-org64a7dd9">
+<div id="outline-container-org66c7c91" class="outline-4">
+<h4 id="org66c7c91">Proof</h4>
+<div class="outline-text-4" id="text-org66c7c91">
 <p>
 This follows directly from <a href="#exercise-10.20">exercise 10.20</a>. In fact, the parity check matrix
 \(H\in\BB^{(n-k)\times\?n}\) of the code must have full rank \(n-k\) in order for the code
@@ -2017,18 +2020,18 @@ be at least \(d-1\). Hence \(n-k\geq\?d-1\). QED.
 </div>
 </div>
 
-<div id="outline-container-orgaba8c84" class="outline-3">
-<h3 id="orgaba8c84">Exercise 10.22</h3>
-<div class="outline-text-3" id="text-orgaba8c84">
+<div id="outline-container-org7152dbd" class="outline-3">
+<h3 id="org7152dbd">Exercise 10.22</h3>
+<div class="outline-text-3" id="text-org7152dbd">
 <p>
 Show that all Hamming codes have distance \(3\), and thus can correct an error on a single
 bit. The Hamming codes are therefore \([2^r-1,2^r-r-1,3]\) codes.
 </p>
 </div>
 
-<div id="outline-container-orgc8558ef" class="outline-4">
-<h4 id="orgc8558ef">Proof</h4>
-<div class="outline-text-4" id="text-orgc8558ef">
+<div id="outline-container-org9c0c7b5" class="outline-4">
+<h4 id="org9c0c7b5">Proof</h4>
+<div class="outline-text-4" id="text-org9c0c7b5">
 <p>
 The parity check matrix of the Hamming code is made of matrices with columns \(h_j\) being
 the binary representation of \(j\) for \(j\in\{1,\ldots,2^r-1\}\). Hence
@@ -2058,9 +2061,9 @@ implies \(i=j\). Now the claim follows from <a href="#exercise-10.20">exercise 1
 </div>
 </div>
 
-<div id="outline-container-orgd093aeb" class="outline-3">
-<h3 id="orgd093aeb">Exercise 10.23</h3>
-<div class="outline-text-3" id="text-orgd093aeb">
+<div id="outline-container-org2779686" class="outline-3">
+<h3 id="org2779686">Exercise 10.23</h3>
+<div class="outline-text-3" id="text-org2779686">
 <p>
 Prove the Gilbert–Varshamov bound: Let \(\varepsilon\?>0\) and \(0\?<\delta\?<\?1/2\). There
 exists an \([n,k,d]\) code such that
@@ -2095,9 +2098,9 @@ be. But in my opinion most exercises in part III of the book (so far) are much e
 </dl>
 </div>
 
-<div id="outline-container-org3a77332" class="outline-4">
-<h4 id="org3a77332">Proof</h4>
-<div class="outline-text-4" id="text-org3a77332">
+<div id="outline-container-org553868d" class="outline-4">
+<h4 id="org553868d">Proof</h4>
+<div class="outline-text-4" id="text-org553868d">
 <p>
 In this proof we use the so called <a href="https://en.wikipedia.org/wiki/Probabilistic_method">probabilistic method</a> which seems to be the standard way
 to prove this bound (see e.g. <a href="https://en.wikipedia.org/wiki/Gilbert%E2%80%93Varshamov_bound_for_linear_codes">wikipedia</a> for the general case of linear codes over finite
@@ -2161,7 +2164,7 @@ Our goal is to prove that for sufficiently large \(n\) (considering also non-inj
 </p>
 
 <p>
-<a id="org71739ee"></a>
+<a id="org6482b17"></a>
 \[
   \prob{d(C)\geq d} > P_\infty
 \]
@@ -2179,12 +2182,12 @@ because then
 
 <p>
 which proves the claim. Let us estimate the probability that the distance of the code is
-<i>not</i> at least \(d\). In order to show the above <a href="#org71739ee">bound</a> it suffices to show that the
+<i>not</i> at least \(d\). In order to show the above <a href="#org6482b17">bound</a> it suffices to show that the
 following can be made arbitrary small (for large \(n\)):
 </p>
 
 <p>
-<a id="orgac9901e"></a>
+<a id="org62e8b82"></a>
 \[
   \prob{d(C)\leq d-1} \leq \sum_{x\in\BB^k\backslash\{0\}} \prob{\wt{Gx} \leq d-1} = \frac{V_d}{2^{n-k}} .
 \]
@@ -2213,7 +2216,7 @@ is the number of potential code words with weight at most \(d-1\).
 <dl class="org-dl">
 <dt>Remark</dt><dd>A reverse inequality is is also true: \(V_d\geq2^{H(\delta)n+o(n)}\). This can
 be seen from Stirlings formula. Actually I knew this reverse inequality already since
-I solved exercise 6.14, see e.g. <a href="chapter_6.html#org2a902cc">here</a> to get an idea for the proof. This is the reason
+I solved exercise 6.14, see e.g. <a href="chapter_6.html#orgf98af9b">here</a> to get an idea for the proof. This is the reason
 I found it natural to connect \(V_d\) to the entropy. I was a bit surprised to find out
 that the \(V_d\leq\ldots\) inequality has such a clean form (no Landau notation).</dd>
 <dt>Proof</dt><dd><p>
@@ -2238,7 +2241,7 @@ equality is just the binomial formula. QED.
 </dl>
 
 <p>
-Using the lemma in <a href="#orgac9901e">the estimate</a> for the probability that \(d(C)\leq\?d-1\) we get
+Using the lemma in <a href="#org62e8b82">the estimate</a> for the probability that \(d(C)\leq\?d-1\) we get
 </p>
 
 <p>
@@ -2264,24 +2267,24 @@ Let us suppose we can choose \(R\) such that
 
 <p>
 Then we would have \(P\leq2^{-\varepsilon\?n/2}\) which is arbitrary small if \(n\) is large
-enough - which proves the <a href="#org71739ee">desired bound</a>. But since \(R=k/n\) this is indeed possible if we
+enough - which proves the <a href="#org6482b17">desired bound</a>. But since \(R=k/n\) this is indeed possible if we
 choose \(n\) large enough and \(k\) appropriately. QED.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6286b6c" class="outline-3">
-<h3 id="org6286b6c">Exercise 10.24</h3>
-<div class="outline-text-3" id="text-org6286b6c">
+<div id="outline-container-org17440c8" class="outline-3">
+<h3 id="org17440c8">Exercise 10.24</h3>
+<div class="outline-text-3" id="text-org17440c8">
 <p>
 Show that a code with generator matrix G is weakly self-dual if and only if \(G^TG=0\).
 </p>
 </div>
 
-<div id="outline-container-orgce633c8" class="outline-4">
-<h4 id="orgce633c8">Proof</h4>
-<div class="outline-text-4" id="text-orgce633c8">
+<div id="outline-container-orga38c5b2" class="outline-4">
+<h4 id="orga38c5b2">Proof</h4>
+<div class="outline-text-4" id="text-orga38c5b2">
 <p>
 Weakly self dual means \(C\subseteq\?C^{\bot}\). Hence
 </p>
@@ -2300,9 +2303,9 @@ a parity check matrix of \(C^\bot\) is \(H^\bot=G^T\). QED.
 </div>
 </div>
 
-<div id="outline-container-org46db601" class="outline-3">
-<h3 id="org46db601">Exercise 10.25</h3>
-<div class="outline-text-3" id="text-org46db601">
+<div id="outline-container-orge010abd" class="outline-3">
+<h3 id="orge010abd">Exercise 10.25</h3>
+<div class="outline-text-3" id="text-orge010abd">
 <p>
 Let \(C\) be a linear code. Show that if \(x\in\?C^\bot\) then
 \(\sum_{y\in\?C}(-1)^{x\cdot\?y}=\abs{C}\), while if \(x\notin\?C^\bot\) then
@@ -2310,9 +2313,9 @@ Let \(C\) be a linear code. Show that if \(x\in\?C^\bot\) then
 </p>
 </div>
 
-<div id="outline-container-orgcca916d" class="outline-4">
-<h4 id="orgcca916d">Proof</h4>
-<div class="outline-text-4" id="text-orgcca916d">
+<div id="outline-container-org396babd" class="outline-4">
+<h4 id="org396babd">Proof</h4>
+<div class="outline-text-4" id="text-org396babd">
 <p>
 By definition of dual codes we have \(x\cdot\?y=0\) if \(x\in\?C^\bot\) and \(y\in\?C\). Hence,
 in that case
@@ -2345,18 +2348,18 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org9dd6716" class="outline-3">
-<h3 id="org9dd6716">Exercise 10.26</h3>
-<div class="outline-text-3" id="text-org9dd6716">
+<div id="outline-container-orgc90ab62" class="outline-3">
+<h3 id="orgc90ab62">Exercise 10.26</h3>
+<div class="outline-text-3" id="text-orgc90ab62">
 <p>
 Suppose \(H\) is a parity check matrix. Explain how to compute the transformation
 \(\ket{x}\ket{0}\mapsto\ket{x}\ket{Hx}\) using a circuit composed entirely of <code>CNOT</code> gates.
 </p>
 </div>
 
-<div id="outline-container-org5daba11" class="outline-4">
-<h4 id="org5daba11">Solution</h4>
-<div class="outline-text-4" id="text-org5daba11">
+<div id="outline-container-org3f38c2a" class="outline-4">
+<h4 id="org3f38c2a">Solution</h4>
+<div class="outline-text-4" id="text-org3f38c2a">
 <p>
 Let us explain it on the specific example of the \([3,1]\) repetition code:
 </p>
@@ -2371,7 +2374,7 @@ Let us explain it on the specific example of the \([3,1]\) repetition code:
 A corresponding circuit would be
 </p>
 
-<pre class="example" id="orgf15804a">
+<pre class="example" id="org23fcdde">
 
 a_0: ──■─────────────────
        │
@@ -2393,9 +2396,9 @@ The idea is that for each \((i,j)\) with \(H_{ij}=1\) we have a <code>CNOT</code
 </div>
 </div>
 
-<div id="outline-container-org1770b64" class="outline-3">
-<h3 id="org1770b64">Exercise 10.27</h3>
-<div class="outline-text-3" id="text-org1770b64">
+<div id="outline-container-orge198900" class="outline-3">
+<h3 id="orge198900">Exercise 10.27</h3>
+<div class="outline-text-3" id="text-orge198900">
 <p>
 Show that the codes defined by
 </p>
@@ -2414,9 +2417,9 @@ distribution, in Section 12.6.5.
 </p>
 </div>
 
-<div id="outline-container-org88c3323" class="outline-4">
-<h4 id="org88c3323">Sketch of a solution</h4>
-<div class="outline-text-4" id="text-org88c3323">
+<div id="outline-container-org68cdfdc" class="outline-4">
+<h4 id="org68cdfdc">Sketch of a solution</h4>
+<div class="outline-text-4" id="text-org68cdfdc">
 <p>
 By using \(X\), \(Z\), and Hadamard gates one can unitarily transform the code into the
 following form
@@ -2438,18 +2441,18 @@ from the book.
 </div>
 </div>
 
-<div id="outline-container-org9fd3376" class="outline-3">
-<h3 id="org9fd3376">Exercise 10.28</h3>
-<div class="outline-text-3" id="text-org9fd3376">
+<div id="outline-container-orgffb311e" class="outline-3">
+<h3 id="orgffb311e">Exercise 10.28</h3>
+<div class="outline-text-3" id="text-orgffb311e">
 <p>
 Verify that the transpose of the matrix in (10.77) is the generator of the \([7,4,3]\)
 Hamming code.
 </p>
 </div>
 
-<div id="outline-container-orge152d0a" class="outline-4">
-<h4 id="orge152d0a">Solution</h4>
-<div class="outline-text-4" id="text-orge152d0a">
+<div id="outline-container-orgaf1db00" class="outline-4">
+<h4 id="orgaf1db00">Solution</h4>
+<div class="outline-text-4" id="text-orgaf1db00">
 <p>
 The claim follows essentially from the following calculation:
 </p>
@@ -2488,9 +2491,9 @@ sufficient to prove \(G\) to be a generator of the \([7,4]\) Hamming code.
 </div>
 </div>
 
-<div id="outline-container-org557e12f" class="outline-3">
-<h3 id="org557e12f">Exercise 10.29</h3>
-<div class="outline-text-3" id="text-org557e12f">
+<div id="outline-container-orgce90fa0" class="outline-3">
+<h3 id="orgce90fa0">Exercise 10.29</h3>
+<div class="outline-text-3" id="text-orgce90fa0">
 <p>
 Show that an arbitrary linear combination of any two elements of \(V_S\) is also in
 \(V_S\). Therefore, \(V_S\) is a subspace of the \(n\) qubit state space. Show that \(V_S\) is the
@@ -2499,9 +2502,9 @@ eigenspaces of elements of \(S\)).
 </p>
 </div>
 
-<div id="outline-container-org16dccce" class="outline-4">
-<h4 id="org16dccce">Solution</h4>
-<div class="outline-text-4" id="text-org16dccce">
+<div id="outline-container-orge04723d" class="outline-4">
+<h4 id="orge04723d">Solution</h4>
+<div class="outline-text-4" id="text-orge04723d">
 <p>
 We have
 </p>
@@ -2520,17 +2523,17 @@ linear subscpaces is again linear the claim follows.
 </div>
 </div>
 
-<div id="outline-container-org855314e" class="outline-3">
-<h3 id="org855314e">Exercise 10.30</h3>
-<div class="outline-text-3" id="text-org855314e">
+<div id="outline-container-orgf6ff578" class="outline-3">
+<h3 id="orgf6ff578">Exercise 10.30</h3>
+<div class="outline-text-3" id="text-orgf6ff578">
 <p>
 Show that \(-I\notin\?S\) implies \(\pm\ii\?I\notin\?S\).
 </p>
 </div>
 
-<div id="outline-container-orgd61bc0f" class="outline-4">
-<h4 id="orgd61bc0f">Proof</h4>
-<div class="outline-text-4" id="text-orgd61bc0f">
+<div id="outline-container-orge26749b" class="outline-4">
+<h4 id="orge26749b">Proof</h4>
+<div class="outline-text-4" id="text-orge26749b">
 <p>
 Recall the elementary logical rule that \(\neg\?a\Rightarrow\neg\?b\) is equivalent to
 \(a\Leftarrow\?b\). Hence, we have to prove that \(\pm\ii\?I\in\?S\) implies \(-I\in\?S\). But
@@ -2540,9 +2543,9 @@ this is obvious! QED.
 </div>
 </div>
 
-<div id="outline-container-orgbfa3d2d" class="outline-3">
-<h3 id="orgbfa3d2d">Exercise 10.31</h3>
-<div class="outline-text-3" id="text-orgbfa3d2d">
+<div id="outline-container-org26e4256" class="outline-3">
+<h3 id="org26e4256">Exercise 10.31</h3>
+<div class="outline-text-3" id="text-org26e4256">
 <p>
 Suppose \(S\) is a subgroup of \(G_n\) generated by elements \(g_1,\ldots,g_l\). Show that all
 the elements of \(S\) commute if and only if \(g_i\) and \(g_j\) commute for each pair \(i\), \(j\).
@@ -2554,9 +2557,9 @@ proof below.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org718bce2" class="outline-4">
-<h4 id="org718bce2">Proof</h4>
-<div class="outline-text-4" id="text-org718bce2">
+<div id="outline-container-org5d4c32f" class="outline-4">
+<h4 id="org5d4c32f">Proof</h4>
+<div class="outline-text-4" id="text-org5d4c32f">
 <p>
 One direction of the implication is obvious. Therefore let us just prove the other
 direction.
@@ -2606,9 +2609,9 @@ general case follows from the fact that \(g_j\) and \(g_i\inv\) commute. In fact
 </div>
 </div>
 
-<div id="outline-container-orgf3447a8" class="outline-3">
-<h3 id="orgf3447a8">Exercise 10.32</h3>
-<div class="outline-text-3" id="text-orgf3447a8">
+<div id="outline-container-org633d7f7" class="outline-3">
+<h3 id="org633d7f7">Exercise 10.32</h3>
+<div class="outline-text-3" id="text-org633d7f7">
 <p>
 Verify that the generators in Figure 10.6 stabilize the codewords for the Steane code, as
 described in Section 10.4.2.
@@ -2620,7 +2623,7 @@ described in Section 10.4.2.
 <div class="outline-text-4" id="text-exercise-10.32-solution">
 <p>
 Note that there is a <a href="#chapter-10-css-as-stabilizer">subtle error</a> in the paragraph right before the exercise. Moreover I
-think it makes sense to prove a more <a href="#orge622228">general theorem</a> given in the intro section of this
+think it makes sense to prove a more <a href="#orgca3b99d">general theorem</a> given in the intro section of this
 site. So let us do this.
 </p>
 
@@ -2698,9 +2701,9 @@ matrix representation, arithmetic is done modulo two.)
 </p>
 </div>
 
-<div id="outline-container-org1ced3ff" class="outline-4">
-<h4 id="org1ced3ff">Solution</h4>
-<div class="outline-text-4" id="text-org1ced3ff">
+<div id="outline-container-org6f72459" class="outline-4">
+<h4 id="org6f72459">Solution</h4>
+<div class="outline-text-4" id="text-org6f72459">
 <p>
 Let \(\beta=r(g)\Lambda\?r(g')^T\) (which is an element of \(\BB\)). We will show that
 </p>
@@ -2741,9 +2744,9 @@ It is not hard to verify that \(N_jN'_j=(-1)^{\beta_j}N'_jN_j\). Hence
 </div>
 </div>
 
-<div id="outline-container-orgfcd55c8" class="outline-3">
-<h3 id="orgfcd55c8">Exercise 10.34</h3>
-<div class="outline-text-3" id="text-orgfcd55c8">
+<div id="outline-container-orgbafe823" class="outline-3">
+<h3 id="orgbafe823">Exercise 10.34</h3>
+<div class="outline-text-3" id="text-orgbafe823">
 <p>
 Let \(S=\langle\?g_1,\ldots,g_l\rangle\). Show that \(-I\) is not an element of \(S\) if and
 only if \(g_j^2=I\) for all \(j\), and \(g_j\neq-I\) for all \(j\).
@@ -2755,9 +2758,9 @@ other direction is actually wrong.</dd>
 </dl>
 </div>
 
-<div id="outline-container-org1abf8dd" class="outline-4">
-<h4 id="org1abf8dd">Counterexamples</h4>
-<div class="outline-text-4" id="text-org1abf8dd">
+<div id="outline-container-org884b13d" class="outline-4">
+<h4 id="org884b13d">Counterexamples</h4>
+<div class="outline-text-4" id="text-org884b13d">
 <p>
 The claim of the exercise is wrong. To see this consider the following counterexample. Let
 </p>
@@ -2799,9 +2802,9 @@ all \(g\in\?S\) but this is a slightly too trivial conclusion if you already ass
 </dl>
 </div>
 
-<div id="outline-container-org8595072" class="outline-4">
-<h4 id="org8595072">Proof</h4>
-<div class="outline-text-4" id="text-org8595072">
+<div id="outline-container-org8faa4d0" class="outline-4">
+<h4 id="org8faa4d0">Proof</h4>
+<div class="outline-text-4" id="text-org8faa4d0">
 <p>
 Recall that any \(g\in\?G_n\) has the form
 </p>
@@ -2818,9 +2821,9 @@ where \(N_j\in\{I,X,Y,Z\}\), and \(\alpha\in\{1,-1,\ii,-\ii\}\). Hence
 </div>
 </div>
 
-<div id="outline-container-orgeb745b7" class="outline-3">
-<h3 id="orgeb745b7">Exercise 10.36</h3>
-<div class="outline-text-3" id="text-orgeb745b7">
+<div id="outline-container-org6f79f73" class="outline-3">
+<h3 id="org6f79f73">Exercise 10.36</h3>
+<div class="outline-text-3" id="text-org6f79f73">
 <p>
 Let \(U\) be the <code>CNOT</code> gate. Explicitly verify that \(UX_1U^\dagger=X_1X_2\),
 \(UX_2U^\dagger=X_2\), \(UZ_1U^\dagger=Z_1\), and \(UZ_2U^\dagger=Z_1Z_2\). These and other
@@ -2897,17 +2900,17 @@ As you can see it shows the minus sign and we can correctly infer \(XYX=-Y\).
 </div>
 </div>
 
-<div id="outline-container-org7e7b8f0" class="outline-3">
-<h3 id="org7e7b8f0">Exercise 10.37</h3>
-<div class="outline-text-3" id="text-org7e7b8f0">
+<div id="outline-container-org0b1ebde" class="outline-3">
+<h3 id="org0b1ebde">Exercise 10.37</h3>
+<div class="outline-text-3" id="text-org0b1ebde">
 <p>
 What is \(UY_1U^\dagger\) (for \(U\) being <code>CNOT</code>)?
 </p>
 </div>
 
-<div id="outline-container-org9d22a07" class="outline-4">
-<h4 id="org9d22a07">Solution</h4>
-<div class="outline-text-4" id="text-org9d22a07">
+<div id="outline-container-orgd5d9a98" class="outline-4">
+<h4 id="orgd5d9a98">Solution</h4>
+<div class="outline-text-4" id="text-orgd5d9a98">
 <p>
 Knowing the transformation for \(Z_1\) and \(X_1\) suffices to calculate this (also note that
 \(U^\dagger=U\)):
@@ -2926,9 +2929,9 @@ Note also that this coincides with the output in the <a href="#exercise-10.36-so
 </div>
 </div>
 
-<div id="outline-container-org5c51a57" class="outline-3">
-<h3 id="org5c51a57">Exercise 10.38</h3>
-<div class="outline-text-3" id="text-org5c51a57">
+<div id="outline-container-orgc6eacba" class="outline-3">
+<h3 id="orgc6eacba">Exercise 10.38</h3>
+<div class="outline-text-3" id="text-orgc6eacba">
 <p>
 Suppose \(U\) and \(V\) are unitary operators on two qubits which transform \(Z_1\), \(Z_2\),
 \(X_1\), and \(X_2\) by conjugation in the same way. Show this implies that \(U=V\).
@@ -3018,9 +3021,9 @@ Verify (10.91):
 </p>
 </div>
 
-<div id="outline-container-org4cd926a" class="outline-4">
-<h4 id="org4cd926a">Proof</h4>
-<div class="outline-text-4" id="text-org4cd926a">
+<div id="outline-container-orgbc08b9e" class="outline-4">
+<h4 id="orgbc08b9e">Proof</h4>
+<div class="outline-text-4" id="text-orgbc08b9e">
 <p>
 The equality \(SZS^\dagger=Z\) follows from the fact that \(S=\sqrt{Z}\) is a function of \(Z\)
 (in the sense of the functional calculus for hermitian operators) and hence commutes with
@@ -3028,7 +3031,7 @@ The equality \(SZS^\dagger=Z\) follows from the fact that \(S=\sqrt{Z}\) is a fu
 </p>
 
 <p>
-The equality \(SXS^\dagger=Y\) most easily follows from the <a href="chapter_4.html#org5e5b762">bloch sphere interpretation</a>. In
+The equality \(SXS^\dagger=Y\) most easily follows from the <a href="chapter_4.html#org51ef280">bloch sphere interpretation</a>. In
 fact, \(S=\ii\?R_z(\pi/2)\) is a rotation by 90° around the z-axis. This rotation maps the
 x-axis to the y-axis.
 </p>
@@ -3040,9 +3043,9 @@ QED.
 </div>
 </div>
 
-<div id="outline-container-org6fea003" class="outline-3">
-<h3 id="org6fea003">Exercise 10.40</h3>
-<div class="outline-text-3" id="text-org6fea003">
+<div id="outline-container-org73e5b7c" class="outline-3">
+<h3 id="org73e5b7c">Exercise 10.40</h3>
+<div class="outline-text-3" id="text-org73e5b7c">
 <p>
 Provide an inductive proof of Theorem 10.6 as follows.
 </p>
@@ -3068,9 +3071,9 @@ and <code>CNOT</code> gates.</li>
 </pre>
 </div>
 
-<div id="outline-container-orgc18cc39" class="outline-4">
-<h4 id="orgc18cc39">Proof of (1)</h4>
-<div class="outline-text-4" id="text-orgc18cc39">
+<div id="outline-container-orgcb64f38" class="outline-4">
+<h4 id="orgcb64f38">Proof of (1)</h4>
+<div class="outline-text-4" id="text-orgcb64f38">
 <p>
 A single qubit normalizer gate is a gate \(U\) which satisfies
 </p>
@@ -3161,11 +3164,11 @@ To see all this also note that \(Y=SXS^\dagger\) and \(S^\dagger=S^3\). Hence
 </div>
 </div>
 
-<div id="outline-container-orgcbab93e" class="outline-4">
-<h4 id="orgcbab93e">Proof of (2)</h4>
-<div class="outline-text-4" id="text-orgcbab93e">
+<div id="outline-container-orgeb8a44b" class="outline-4">
+<h4 id="orgeb8a44b">Proof of (2)</h4>
+<div class="outline-text-4" id="text-orgeb8a44b">
 <p>
-Let us first calculate a matrix representation of the <a href="#org1d84e03">circuit</a> given in the exercise:
+Let us first calculate a matrix representation of the <a href="#orge237798">circuit</a> given in the exercise:
 </p>
 
 \begin{align*}
@@ -3250,7 +3253,7 @@ In particular \(U'=\sqrt{2}U_{00}\) is unitary. Moreover, those findings further
 </p>
 
 <p>
-<a id="org7720c33"></a>
+<a id="org3c212f9"></a>
 </p>
 \begin{align*}
   U_{10} &= gU_{00} = \frac{1}{\sqrt{2}} g U' , \\
@@ -3277,7 +3280,7 @@ where \(\overline{k}=k+1\) (in \(\BB\)). From this we deduce
 \end{align*}
 
 <p>
-The first of these two relations can be used with the <a href="#org7720c33">formulas</a> for \(U_{10}\) and \(U_{11}\)
+The first of these two relations can be used with the <a href="#org3c212f9">formulas</a> for \(U_{10}\) and \(U_{11}\)
 to deduce \(U_{00}U_{11}^\dagger=gU_{11}U_{00}^\dagger\?g\). This can be used in the second
 relation and again with said formulas (to replace \(U_{10}\)) to obtain
 </p>
@@ -3316,9 +3319,9 @@ many gates.
 </div>
 </div>
 
-<div id="outline-container-orgcdc1771" class="outline-4">
-<h4 id="orgcdc1771">Proof of (3)</h4>
-<div class="outline-text-4" id="text-orgcdc1771">
+<div id="outline-container-org0935d7a" class="outline-4">
+<h4 id="org0935d7a">Proof of (3)</h4>
+<div class="outline-text-4" id="text-org0935d7a">
 <p>
 Let \(U\) be any \(n+1\)​-qubit normalizer gate. Then we have
 </p>
@@ -3388,17 +3391,17 @@ which leaves us in the situation of case 1. QED.
 </div>
 </div>
 
-<div id="outline-container-orga7df250" class="outline-3">
-<h3 id="orga7df250">Exercise 10.41</h3>
-<div class="outline-text-3" id="text-orga7df250">
+<div id="outline-container-org9b5e865" class="outline-3">
+<h3 id="org9b5e865">Exercise 10.41</h3>
+<div class="outline-text-3" id="text-org9b5e865">
 <p>
 Verify Equations (10.92) through (10.95):
 </p>
 </div>
 
-<div id="outline-container-org41968d0" class="outline-4">
-<h4 id="org41968d0">Solution</h4>
-<div class="outline-text-4" id="text-org41968d0">
+<div id="outline-container-orgf15be21" class="outline-4">
+<h4 id="orgf15be21">Solution</h4>
+<div class="outline-text-4" id="text-orgf15be21">
 <p>
 The equations
 </p>
@@ -3467,9 +3470,9 @@ e.g. the coefficients of \(UX_1U^\dagger\) one could do the following:
 </div>
 </div>
 
-<div id="outline-container-orgeb4e342" class="outline-3">
-<h3 id="orgeb4e342"><span class="todo TODO">TODO</span> Exercise 10.42</h3>
-<div class="outline-text-3" id="text-orgeb4e342">
+<div id="outline-container-org5f3945f" class="outline-3">
+<h3 id="org5f3945f">Exercise 10.42</h3>
+<div class="outline-text-3" id="text-org5f3945f">
 <p>
 Use the stabilizer formalism to verify that the circuit of Figure 1.13 on page 27
 teleports qubits, as claimed. Note that the stabilizer formalism restricts the class of
@@ -3477,6 +3480,236 @@ states being teleported, so in some sense this is not a complete description of
 teleportation, nevertheless it does allow an understanding of the dynamics of
 teleportation.
 </p>
+
+<dl class="org-dl">
+<dt>Remark</dt><dd>Unfortunately I do not see how this exercise improves my understanding of
+teleportation. It seems to be a very complicated way to verify that the circuit actually
+teleports qubits. On the other hand it is a nice exercise to understand the (certainly
+very useful) stabilizer formalism.</dd>
+</dl>
+</div>
+
+<div id="outline-container-org601b69f" class="outline-4">
+<h4 id="org601b69f">Solution</h4>
+<div class="outline-text-4" id="text-org601b69f">
+<p>
+The circuit can be divided into three major steps:
+</p>
+<ul class="org-ul">
+<li>Unitary evolution up until the measurements,</li>
+<li>Measuring the first two qubits in the Z-basis,</li>
+<li>Performing conditioned operations on the third qubit.</li>
+</ul>
+
+<p>
+I split up the solution according to the three stages. Additionally I add a section on a
+specific example to get some feeling for how things work out.
+</p>
+</div>
+
+<div id="outline-container-orge39aa78" class="outline-5">
+<h5 id="orge39aa78">Unitary evolution</h5>
+<div class="outline-text-5" id="text-orge39aa78">
+<p>
+Let \(\ket{\psi}\) be the single qubit state to be teleported. The whole system is in the
+state \(\ket{\psi,0,0}\) initially (the circuit displayed in Figure 1.12 produces
+\(\ket{\psi,\beta_{00}}\) which feeds into the circuit in Figure 13.).
+</p>
+
+<p>
+Let \(N\in\{\pm\?X,\pm\?Y,\pm\?Z\}\) be the stabilizer of \(\ket{\psi}\). Of course this
+restricts \(\ket{\psi}\) to be an eigenstate of one of the Paulis (six possibilities up to
+global phase), but this is just the restriction of the stabilizer formalism already
+mentioned in the statement of the exercise. The stabilizer of the whole system is
+\(\langle\?N_1,Z_2,Z_3\rangle\) (where \(N_1=N\otimes\?I\otimes\?I\)).
+</p>
+
+<p>
+Let us abbreviate \(V=\cx_{12}\) and calculate the evolution by the stabilizer formalism:
+</p>
+
+\begin{align*}
+  & \langle N_1, Z_2, Z_3 \rangle & (\text{initial state } \ket{\psi,0,0}) \\
+  H_2 :\; & \langle N_1, X_2, Z_3 \rangle  \\
+  \cx_{23} :\; & \langle N_1, X_2X_3, Z_2Z_3 \rangle & (\ket{\psi,\beta_{00}}) \\
+  \cx_{12} :\; & \langle VN_1V, X_2X_3, Z_1Z_2Z_3 \rangle \\
+  H_1 :\; & \langle H_1VN_1VH_1, X_2X_3, X_1Z_2Z_3 \rangle & (\text{right before measurement}).
+\end{align*}
+
+<p>
+In the following let us denote by \(g_1\), \(g_2\), \(g_3\) the three generators from the last
+step:
+</p>
+
+<p>
+\[
+  g_1 = HVN_1VH, \quad g_2 = X_2X_3, \quad g_3 = X_1Z_2Z_3 .
+\]
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfc1274c" class="outline-5">
+<h5 id="orgfc1274c">Intermezzo: A specific example</h5>
+<div class="outline-text-5" id="text-orgfc1274c">
+<p>
+Let us look at the specific example \(N=+X\), i.e. \(\ket{\psi}=\ket{+}\) (up to global
+phase). Here we have
+</p>
+
+<p>
+\[
+  g_1 = H_1V N_1 VH_1 = Z_1X_2 .
+\]
+</p>
+
+<p>
+We have to measure \(Z_1\) and \(Z_2\). Lets do \(Z_1\) first. Clearly it anti-commutes with
+\(g_3\) and commutes with the others. This is precisely one of the two standard situations
+described in section 10.5.3 which outlines how measurements are performed in the
+stabilizer formalism. If we measure \((-1)^{m_1}\) for \(m_1\in\BB\) the post-measurment state
+is
+</p>
+
+<p>
+\[
+  S' = \langle Z_1X_2, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\]
+</p>
+
+<p>
+Next we measure \(Z_2\). Note that \(Z_2\) anti-commutes with two of the generators from the
+preciding equation. We can fix this by multiplying the second one to the first one:
+</p>
+
+<p>
+\[
+  S' = \langle Z_1X_3, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\]
+</p>
+
+<p>
+Now \(Z_2\) only anti-commutes with the second generator. If we measure \((-1)^{m_2}\) for
+\(m_2\in\BB\) the post-measurment state is
+</p>
+
+<p>
+\[
+  S'' = \langle Z_1X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle
+  = \langle (-1)^{m_1} X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\]
+</p>
+
+<p>
+For the second equality we multiplied the third generator to the first one to get rid of
+the \(Z_1\). Let us note two things here: the second and the third generator do not affect
+the third qubit and just say that the first two qubits are in the state
+\(\ket{m_1,m_2}\). On the other hand \((-1)^{m_1}X_3\) only refers to the third qubit and says
+that it is in the state \(H\ket{m_1}\in\{\ket{+},\ket{-}\}\). For teleportation to be
+succesful we thus have to get rid of the sign bit \(m_1\). This is what the conditioned
+operations accomplish.
+</p>
+
+\begin{align*}
+  & S'' = \langle (-1)^{m_1}X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  X_3^{m_2} :\; & \langle (-1)^{m_1} X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  Z_3^{m_1} :\; & \langle X_3, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+<p>
+Note that the last state is indeed \(\ket{m_1,m_2,\psi}\) as desired. Thus we have verified
+the teleportation property for the particular state stabilized by \(N=+X\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-org89d3609" class="outline-5">
+<h5 id="org89d3609">Measuring \(Z_1\) and \(Z_2\)</h5>
+<div class="outline-text-5" id="text-org89d3609">
+<p>
+More generally any (for the stabilizer formalism) possible single qubit state is
+stabilized by some \(N=(-1)^s\ii^{ab}X^aZ^b\in\{\pm\?X,\pm\?Y,\pm\?Z\}\) where
+\(s,a,b\in\BB\). Hence the state right before measurement is
+</p>
+
+\begin{align*}
+  S &= \langle H_1V (-1)^s \ii^{ab} X_1^aZ_1^b VH_1, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle H_1 (-1)^s \ii^{ab} X_1^aX_2^aZ_1^b H_1, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle (-1)^s \ii^{ab} Z_1^aX_2^aX_1^b, X_2X_3, X_1Z_2Z_3 \rangle \\
+  &= \langle (-1)^{s+ab} \ii^{ab} X_1^bX_2^aZ_1^a, X_2X_3, X_1Z_2Z_3 \rangle .
+\end{align*}
+
+<p>
+In the last equality I brought the product in the standard form so that all \(X\) precede
+all \(Z\). Doing so I had to move \(X_1^b\) past \(Z_1^a\), which introduces an additional sign
+factor \(-1\) in case \(a=b=1\).
+</p>
+
+<p>
+Let us measure \(Z_1\) now. Note that it anti-commutes with the first generator iff \(b=1\),
+and always anti-commutes with the third generator. To fix this multiply the first
+generator by the third one raised to the power \(b\) to obtain (note that this cancels the
+\((-1)^{ab}\) if we rearrange the Paulis in the "X first" order):
+</p>
+
+\begin{align*}
+  S = \langle (-1)^{s} \ii^{ab} X_2^aZ_1^aZ_2^bZ_3^b, X_2X_3, X_1Z_2Z_3 \rangle .
+\end{align*}
+
+<p>
+Now \(Z_1\) only anti-commutes with the third generator. After measuring \((-1)^{m_1}\) for
+\(m_1\in\BB\) the post-measurment state is
+</p>
+
+\begin{align*}
+  S' = \langle (-1)^{s} \ii^{ab} X_2^aZ_1^aZ_2^bZ_3^b, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+<p>
+Now let us measure \(Z_2\). Observe that \(Z_2\) anti-commutes with the first generator iff
+\(a=1\) and always with the second generator. To fix this let us multipy the first generator
+by the second raised to the power \(a\):
+</p>
+
+\begin{align*}
+  S' = \langle (-1)^{s} \ii^{ab} X_3^aZ_1^aZ_2^bZ_3^b, X_2X_3, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+<p>
+Now \(Z_2\) only anti-commutes with the second generator. Hence, aber measuring \((-1)^{m_2}\)
+for \(m_2\in\BB\) the post-measurment state is
+</p>
+
+\begin{align*}
+  S'' &= \langle (-1)^{s} \ii^{ab} X_3^aZ_1^aZ_2^bZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  &= \langle (-1)^{s+m_1a+m_2b} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+<p>
+In the second equality I multiplied the first generator by the second and third raised to
+the power \(a\).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd60dda6" class="outline-5">
+<h5 id="orgd60dda6">Apply \(Z_3^{m_1}X_3^{m_2}\)</h5>
+<div class="outline-text-5" id="text-orgd60dda6">
+<p>
+Let us finally apply the conditioned operations:
+</p>
+
+\begin{align*}
+  & S'' = \langle (-1)^{s+m_1a+m_2b} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  X_3^{m_2} :\; & \langle (-1)^{s+m_1a} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle \\
+  Z_3^{m_1} :\; & \langle (-1)^{s} \ii^{ab} X_3^aZ_3^b, (-1)^{m_2}Z_2, (-1)^{m_1}Z_1 \rangle .
+\end{align*}
+
+<p>
+The final result is the stabilizer of the state \(\ket{m_1,m_2,\psi}\) as desired.
+</p>
+</div>
+</div>
 </div>
 </div>
 </div>
