@@ -15,12 +15,12 @@ probably need [[https://www.gnu.org/software/emacs/][Emacs]] for more sophistica
 or sage code.
 
 To use the embedded code without modifying the org files you can do the following /as an
-Emacs and IPython/Sagemath user/:
+Emacs and IPython or [[https://www.sagemath.org/][Sagemath]] user/:
 
 - open one of the org files (e.g. [[./src/utils.org]]),
 - execute ~M-x org-babel-tangle~, which produces sage or python files,
-- open your =ipython= or =sage= shell and run the generated file using e.g. ~%run
-  utils.py~ (ipython) or ~attach("utils.sage")~ (sage).
+- open your =ipython= or =sage= shell and run the generated file using e.g. ~%run utils.py~
+  (ipython) or ~attach("utils.sage")~ (sage).
 
 I can't guarantee that the code does not contain bugs. For /some/ functionality I
 implemented unit tests (=pytest=) which are run by github actions right before every
