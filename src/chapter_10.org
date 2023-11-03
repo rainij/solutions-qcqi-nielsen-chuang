@@ -113,6 +113,7 @@ $$
   G_{ij} = r(g_i)_j
 $$
 
+<<theorem-simplectic-product-vs-stabilizer>>
 - Theorem :: Let $\Lambda=X\otimes\?I_n$ and let
 
   $$
@@ -1499,6 +1500,9 @@ $hg$ are the same. QED.
   $g_ja=g_jb$. But this implies $a=b$.
 
 ** Exercise 10.32
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.32-solution
+:END:
 Verify that the generators in Figure 10.6 stabilize the codewords for the Steane code, as
 described in Section 10.4.2.
 
@@ -2423,6 +2427,9 @@ single qubit error.
 | Logical X | =XXXXX=  |
 
 *** Solution
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.49-solution
+:END:
 A basis for the set $\calE$ of single qubit errors is given by all Pauli operators on five
 qubits with weight (at most) one (e.g. =XIIII=, =IIZII=, etc.).
 
@@ -2430,6 +2437,7 @@ In principle we have to check that $E^\dagger\?F\notin\?N(S)\backslash\?S$ for e
 combination of of $E,F\in\calE$. These are a lot of checks to perform. We can simplify the
 task by using the following lemma:
 
+<<exercise-10.49-lemma>>
 - Lemma :: For $E,F\in\calE$ we have
   1) $E^\dagger\?F\in\?S$ is equivalent to $E\cong\?F$, that is, they are identical if
      restricted to the stabilized subspace $V_S$.
@@ -2521,15 +2529,81 @@ This function can now be used to compute the syndromes of the five qubit code:
 1111: IIIYI
 #+end_example
 
-** TODO Exercise 10.50
+** Exercise 10.50
 Show that the five qubit code saturates the quantum Hamming bound, that is, it satisfies
 the inequality of (10.51) with equality.
 
-** TODO Exercise 10.51
+*** Solution
+The quantum hamming bound is
+
+$$
+  \sum_{j=0}^t \binom{n}{j} 3^j \leq 2^{n-k} .
+$$
+
+For the five qubit code we have $n=5$, $k=1$, and $t=1$. Plugging this in yields:
+
+$$
+  1 + \binom{5}{1} 3^1 \leq 2^{5-1} ,
+$$
+
+which is clearly satisfied with equality.
+
+Recall that the quantum hamming bound only applies to non-degenerate codes. The five qubit
+is acutally non-degenerate (we have seen in the [[#exercise-10.49-solution][solution]] of exercise 10.49 that the
+syndromes of all base errors are different). For $k=t=1$ the hamming bound says:
+
+$$
+  3n + 1 \leq 2^{n-1} ,
+$$
+
+which has $n=5$ as the smallest solution. Hence this exercise shows that the hamming bound
+is actually tight for $k=t=1$ in the sense that there really is a non-degenerate code with
+just $n=5$ qubits.
+
+** Exercise 10.51
 Verify that the check matrix defined in (10.106) corresponds to the stabilizer of the CSS
 code $\mathrm{CSS}(C_1,C_2)$, and use Theorem 10.8 to show that arbitrary errors on up to
 $t$ qubits may be corrected by this code.
 
-** TODO Exercise 10.52
+*** Proof
+In the course of solving [[#exercise-10.32-solution][exercise 10.32]] we have already seen that the check matrix looks
+like described. It remains to show that if $C_1$ and $C_2^\top$ correct $t$ (classical)
+errors then the CSS code corrects $t$ quantum errors.
+
+Let $H_1$ be the parity check matrix of $C_1$ and let $H_2$ be the parity check matrix of
+$C_2^\top$.
+
+Let $E,F$ be two phase-less Pauli errors (products of Pauli matrices, without additional
+factor $\pm1,\pm\ii$) with weight less or equal to $d$ such that $d\leq\?t$. According to
+theorem 10.8 we have to show that $E^\dagger\?F\notin\?N(S)\backslash\?S$. Without loss of
+generality we may assume that $E\neq\?F$. We will even show that
+$E^\dagger\?F\notin\?N(S)$, in other words, the syndromes of $E$ and $F$ are different
+(implying that a CSS code is non-degenerate, see the [[exercise-10.49-lemma][lemma]] in my solution of exercise
+10.49).
+
+Let us abbreviate $N=\bigotimes_{j=1}^nN_j=E^\dagger\?F$ and define $(x,z)\in\BB^{2n}$ to
+be its encoding such that $(x_j,z_j)$ tells whether $N_j$ is $I$, $X$, $Y$, or $Z$, in the
+same way as the check matrix $G$ encodes this information. Recall that $Z(S)=N(S)$
+([[#exercise-10.44][exercise 10.44]]). Hence $N\notin\?N(S)$ is the same as $Ng_j=-g_jN$ for at least one
+$j$. On the other hand the latter is [[theorem-simplectic-product-vs-stabilizer][equivalent]] to $G_j\Lambda(x,z)^T=1$ (for some $j$),
+where $G_j$ is just the $j$​th row of $G$ which encodes $g_j$. This in turn is equivalent
+to: $H_1x\neq0$ or $H_2z\neq0$.
+
+On the other hand, since $N$ has weight at most $2d$ the weights of $x$ and $z$ are at
+most $2d$ too. Moreover at least one of $x$ and $z$ has to be non-zero (because we assumed
+$E\neq\?F$, or more precisely $E^\dagger\?F$ not being a scalar multiple of the
+identity). By assumption $C_1$ and $C_2^\top$ both correct $t$ errors and $2d\?<\?2t+1$,
+hence $H_1x\neq0$ or $H_2z\neq0$ as desired. QED.
+
+** Exercise 10.52
 Verify by direct operation on the codewords that the operators of (10.107) act
 appropriately, as logical $Z$ and $X$.
+
+*** Solution
+A characteristic of the code word $\ket{0_L}$ is that each of its base-kets contains an
+/even/ number of $1$. This implies $\bar{Z}\ket{0_L}=\ket{0_L}$. Similarly $\ket{1_L}$ has
+only base kets with an odd number of ones, hence $\bar{Z}\ket{1_L}=-\ket{1_L}$.
+
+Moreover $\ket{1_L}$ can be constructed from $\ket{0_L}$ by just replacing each $1$ by a
+$0$ and vice versa. But this is just what $\bar{X}$ does. Hence
+$\bar{X}\ket{0_L}=\ket{1_L}$ and $\bar{X}\ket{1_L}=\ket{0_L}$.
