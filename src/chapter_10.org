@@ -2607,3 +2607,88 @@ only base kets with an odd number of ones, hence $\bar{Z}\ket{1_L}=-\ket{1_L}$.
 Moreover $\ket{1_L}$ can be constructed from $\ket{0_L}$ by just replacing each $1$ by a
 $0$ and vice versa. But this is just what $\bar{X}$ does. Hence
 $\bar{X}\ket{0_L}=\ket{1_L}$ and $\bar{X}\ket{1_L}=\ket{0_L}$.
+
+** Exercise 10.53
+Prove that the encoded $Z$ operators are independent of one another.
+
+<<exercise-10.53-remark>>
+- Remark ::
+  - I think the wording is sub-optimal. Independence is a property of a subset of a
+    group. The above formulation /could/ be interpreted as: every set of two $Z$ operators
+    are independent. Why does this matter? To see the difference consider
+    $\{Z_1Z_2,Z_1Z_3,Z_2Z_3\}$. The elements are pairwise independent, but
+    $Z_1Z_3=(Z_1Z_2)(Z_2Z_3)$, hence they are not independent. The same phenomen happens
+    in other contexts where the term /independent/ is used e.g.:
+    - Independence of vectors in a vector space.
+    - Inpependence of random variables in the sense of probability theory.
+  - In the light of the above remark I think it makes even sense to prove that the set
+    $M=\{g_1,\ldots,g_{n-k},\bar{Z}_1,\ldots,\bar{Z}_k\}$ is independent. This is a more
+    satisfying exercise.
+
+*** Proof
+As suggested by the remark let us prove that
+
+$$ M=\{g_1,\ldots,g_{n-k},\bar{Z}_1,\ldots,\bar{Z}_k\} $$
+
+is independent. By assumptions (made in the main text) the elements of $M$ commute and
+$-I$ is not part of the generated group $S_Z=\langle\?M\rangle$. [[characterize-r-injective][Hence]], the homomorphism
+(of groups) $r:S_Z\to\BB^{2n}$ is injective. This implies that independence is an
+invariant property, that is:
+
+$$
+  M \text{ independent} \quad \Longleftrightarrow \quad r(M) := \{r(g) \;|\; g\in M\} \text{ independent.}
+$$
+
+Moreover /independence/ in $\BB^{2n}$ as a group is the same as /independence/ in
+$\BB^{2n}$ as a vector space over $\BB$. Hence, in order prove independence we can use
+/linear/ algebra methods. Let $G$ be the check matrix (where the $j$​th row is $r(g_j)$) in
+standard form and let
+
+$$
+  G_z = \begin{bmatrix} 0 & 0 & 0 & A_2^T & 0 & I \end{bmatrix} ,
+$$
+
+be the "check matrix" for the Z operators as given by the book (which actually defines the
+Z operators by the isomorphism $r$). Note that the $I\in\BB^{k\times\?k}$ in the sixth
+block is responsible for $G_z$ having (full) rank $k$. In the same way the
+$I\in\BB^{r\times\?r}$ (first /block-column/) and $I\in\BB^{(n-k-r)\times\?(n-k-r)}$
+(fifth /block-column/) are responsible for $G$ having (full) rank $n-k$. Hence
+
+$$
+  \?\begin{bmatrix} G \\ G_z \end{bmatrix}
+$$
+
+as full rank $n-k=(n-k-r)+r$ because the three mentioned identities all live in different
+/block-columns/. This shows the independece of $r(M)$ and hence of $M$. QED.
+
+** TODO Exercise 10.54
+Prove that with the check matrix for the encoded $X$ operators defined as above, the
+encoded $X$ operators are independent of one another and of the generators, commute with
+the generators of the stabilizer, with each other, and $\bar{X}_j$ commutes with all the
+$\bar{Z}_k$ except $\bar{Z}_j$, with which it anti-commutes.
+
+** TODO Exercise 10.55
+Find the $\bar{X}$ operator for the standard form of the Steane code.
+
+** TODO Exercise 10.56
+Show that replacing an encoded $X$ or $Z$ operator by $g$ times that operator, where $g$
+is an element of the stabilizer, does not change the action of the operator on the code.
+
+** TODO Exercise 10.57
+Give the check matrices for the five and nine qubit codes in standard form.
+
+** TODO Exercise 10.58
+Verify that the circuits in Figures 10.13–10.15 work as described, and check the claimed
+circuit equivalences.
+
+** TODO Exercise 10.59
+Show that by using the identities of Figures 10.14 and 10.15, the syndrome circuit of
+Figure 10.16 can be replaced with the circuit of Figure 10.17
+
+** TODO Exercise 10.60
+Construct a syndrome measuring circuit analogous to that in Figure 10.16, but for the nine
+and five qubit codes.
+
+** TODO Exercise 10.61
+Describe explicit recovery operations $E_j^\dagger$ corresponding to the different
+possible error syndromes that may be measured using the circuit in Figure 10.16.
