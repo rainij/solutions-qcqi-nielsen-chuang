@@ -1,6 +1,8 @@
 from qiskit.quantum_info import Pauli
 
 from chapter_10 import compute_syndromes
+from chapter_10_sage import transform_check_matrix, generators_to_check_matrix, \
+    generators_steane_code_repr, generators_steane_code_standard_repr
 
 
 def test_compute_syndromes():
@@ -31,3 +33,19 @@ def test_compute_syndromes():
         "IIYII": "1110",
         "IIIYI": "1111",
     }
+
+
+def test_transform_check_matrix():
+    cm = generators_to_check_matrix(generators_steane_code_repr())
+    cm1 = transform_check_matrix(cm, [
+        # procedure according to book:
+        ["swap qubits", 0, 3],
+        ["swap qubits", 2, 3],
+        ["swap qubits", 5, 6],
+        ["add row", 5, 3], # target, source
+        ["add row", 5, 4],
+        ["add row", 3, 5],
+        ["add row", 4, 5],
+    ])
+
+    assert cm1 == generators_to_check_matrix(generators_steane_code_standard_repr())

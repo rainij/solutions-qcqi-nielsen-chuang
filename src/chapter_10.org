@@ -34,6 +34,9 @@ Python:
 #+end_src
 
 ** Utility code
+:PROPERTIES:
+:CUSTOM_ID: chapter-10-utility-code
+:END:
 #+name: chapter-10-global-vars
 #+begin_src sage
   g = SR.var("g", domain="positive")
@@ -58,6 +61,188 @@ The Pauli gates on two and three qubits:
   ZII, IZI, IIZ = make_multi(Z, 3)
   XII, IXI, IIX = make_multi(X, 3)
   YII, IYI, IIY = make_multi(Y, 3)
+#+end_src
+
+The following functions return the string representations of generators of various codes
+we encounter in the book
+
+#+name: chapter-10-generators-reprs
+#+begin_src sage
+  def generators_5qubit_code_repr():
+      return [
+          "XZZXI",
+          "IXZZX",
+          "XIXZZ",
+          "ZXIXZ",
+      ]
+
+  def generators_steane_code_repr():
+      return [
+          "IIIXXXX",
+          "IXXIIXX",
+          "XIXIXIX",
+          "IIIZZZZ",
+          "IZZIIZZ",
+          "ZIZIZIZ",
+      ]
+
+  def generators_steane_code_standard_repr():
+      return [
+          "XIIIXXX",
+          "IXIXIXX",
+          "IIXXXXI",
+          "ZIZZIIZ",
+          "IZZIZIZ",
+          "ZZZIIZI",
+      ]
+
+  def generators_shor_code_repr():
+      return [
+          "ZZIIIIIII",
+          "IZZIIIIII",
+          "IIIZZIIII",
+          "IIIIZZIII",
+          "IIIIIIZZI",
+          "IIIIIIIZZ",
+          "XXXXXXIII",
+          "IIIXXXXXX",
+      ]
+#+end_src
+
+The following code computes the check matrix from the string representation:
+
+#+name: chapter-10-generator-to-check-matrix
+#+begin_src sage
+  def generators_to_check_matrix(generators: list[str]):
+      """Taking a list of string representations of the generators for some code this
+      returns the corresponding check matrix."""
+      def xbit(pauli: str):
+          if pauli == "X" or pauli == "Y":
+              return 1
+          else:
+              return 0
+
+      def zbit(pauli: str):
+          if pauli == "Z" or pauli == "Y":
+              return 1
+          else:
+              return 0
+
+      check_matrix = []
+
+      for g in generators:
+          gj = [xbit(p) for p in g]
+          gj += [zbit(p) for p in g]
+
+          check_matrix.append(gj)
+
+      return matrix(GF(2), check_matrix)
+#+end_src
+
+The following utility function helps us in performing elementary row and column operations
+on check matrices (see [[#exercise-10.57][exercise 10.57]] on how to use it).
+
+#+name: chapter-10-transform-generator
+#+begin_src sage
+  def transform_check_matrix(check_matrix: matrix, trafos: list):
+      """Apply a list of row/column transformations to a check matrix."""
+      cm = check_matrix
+      _, nn = cm.dimensions()
+      assert nn % 2 == 0, "Expected even column dimension"
+      n = nn / 2
+
+      for t in trafos:
+          if t[0] == "swap rows":
+              i, j = t[1:]
+              assert i < n and j < n, f"Expected i, j < {n}"
+              cm = cm.with_swapped_rows(i, j)
+          elif t[0] == "swap qubits":
+              i, j = t[1:]
+              assert i < n and j < n, f"Expected i, j < {n}"
+              cm = cm.with_swapped_columns(i, j)
+              cm = cm.with_swapped_columns(n+i, n+j)
+          elif t[0] == "add row":
+              source, target = t[1:]
+              cm = cm.with_added_multiple_of_row(target, source, 1)
+          else:
+              raise Exception(f"Unknown check matrix operation '{t[0]}'")
+
+      return cm
+#+end_src
+
+The following circuit can be used to construct the syndrome measuring circuits in qiskit
+as shown in e.g. Figure 10.16:
+
+#+begin_src python :tangle yes
+  def make_syndrome_circuit(generators: list[Pauli], with_barrier=False):
+      assert len(generators) != 0, "Need at least one Pauli operator"
+
+      l = len(generators)
+      n = generators[0].num_qubits
+      k = n-l
+
+      assert all([g.num_qubits == n for g in generators]), \
+          "Generators have to be of same size"
+      assert k >= 1, "Too many generators"
+
+      qr_aux = QuantumRegister(l, name="|0>")
+      qr_phys = QuantumRegister(n, name="q")
+
+      qc = QuantumCircuit(qr_aux, qr_phys)
+
+      def barrier():
+          if with_barrier:
+              qc.barrier()
+
+      for i in range(l):
+          qc.h(i)
+
+      barrier()
+
+      for i, g in enumerate(generators):
+          G = g.to_instruction().control()
+          qc.append(G, [i] + list(range(l, l+n)))
+          barrier()
+
+      for i in range(l):
+          qc.h(i)
+
+      return qc
+#+end_src
+
+For convenience the generators of some codes in the qiskit framework:
+
+#+begin_src python :tangle yes
+  def generators_5qubit_code():
+      return [
+          Pauli("XZZXI"),
+          Pauli("IXZZX"),
+          Pauli("XIXZZ"),
+          Pauli("ZXIXZ"),
+      ]
+
+  def generators_shor_code():
+      return [
+          Pauli("ZZIIIIIII"),
+          Pauli("IZZIIIIII"),
+          Pauli("IIIZZIIII"),
+          Pauli("IIIIZZIII"),
+          Pauli("IIIIIIZZI"),
+          Pauli("IIIIIIIZZ"),
+          Pauli("XXXXXXIII"),
+          Pauli("IIIXXXXXX"),
+      ]
+
+  def generators_steane_code_standard():
+      # standard form!
+      return [
+          Pauli("XIIIXXX"),
+          Pauli("IXIXIXX"),
+          Pauli("IIXXXXI"),
+          Pauli("ZIZZIIZ"),
+          Pauli("IZZIZIZ"),
+          Pauli("ZZZIIZI"),
+      ]
 #+end_src
 
 ** Notation
@@ -868,6 +1053,7 @@ amplitude damping channel with parameter $\gamma$, is $\sqrt{1-\gamma}$.
 *** Proof
 Let us use sage to get an algebraic expression for $F$. First define amplitude damping
 
+#+name: exercise-10.13-1
 #+begin_src sage
   E0 = matrix.diagonal([1, sqrt(1-g)])
   E1 = matrix([[0, sqrt(g)], [0, 0]])
@@ -2609,6 +2795,9 @@ $0$ and vice versa. But this is just what $\bar{X}$ does. Hence
 $\bar{X}\ket{0_L}=\ket{1_L}$ and $\bar{X}\ket{1_L}=\ket{0_L}$.
 
 ** Exercise 10.53
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.53
+:END:
 Prove that the encoded $Z$ operators are independent of one another.
 
 <<exercise-10.53-remark>>
@@ -2661,34 +2850,389 @@ $$
 as full rank $n-k=(n-k-r)+r$ because the three mentioned identities all live in different
 /block-columns/. This shows the independece of $r(M)$ and hence of $M$. QED.
 
-** TODO Exercise 10.54
+** Exercise 10.54
 Prove that with the check matrix for the encoded $X$ operators defined as above, the
 encoded $X$ operators are independent of one another and of the generators, commute with
 the generators of the stabilizer, with each other, and $\bar{X}_j$ commutes with all the
 $\bar{Z}_k$ except $\bar{Z}_j$, with which it anti-commutes.
 
-** TODO Exercise 10.55
+- Remark :: Similar remarks as in [[#exercise-10.53][exercise 10.53]] apply here too.
+
+*** Proof
+Recall that within the linear algebra framework we have
+
+$$
+  \bar{X} = \left[ \begin{array}{ccc|ccc} 0 & E^T & I & C^T & 0 & 0 \end{array} \right] ,
+$$
+
+where each line corresponds to a $\bar{X}_j$ according to the homomorphism
+$r$. From
+
+$$
+  G \Lambda \bar{X}^T = \begin{bmatrix} IC + CI \\ IE + EI \end{bmatrix} = 0 \in \BB^{(n-k)\otimes k} .
+$$
+
+we [[theorem-simplectic-product-vs-stabilizer][deduce]] that all $g_i$ commute with all $\bar{X}_j$. That all $\bar{X}_j$ commute with
+each other is obvious from the structure of its matrix representation.
+
+Independence of the set of generators and X operators (as a single set) [[gj-independent-means-full-rank-check-matrix][follows]] from
+linear independence of their linear algebra representation. That the latter is true
+follows from looking where the identity matrices are because those are responsible for
+making $G$ and $\bar{X}$ into full-row-rank matrices. For the former we have identities in
+columns 1 and 5, for the latter we have it at column 3.
+
+Finally we have
+
+$$
+  \bar{Z} \Lambda \bar{X}^T = I\cdot I = I \in \BB^{k\times k} ,
+$$
+
+which precisely means that $\bar{Z}_i$ and $\bar{X}_j$ commute iff $i\neq\?j$. QED.
+
+** Exercise 10.55
 Find the $\bar{X}$ operator for the standard form of the Steane code.
 
-** TODO Exercise 10.56
+*** Solution
+This is just plugging stuff in. In the linear algebra framework we have:
+
+$$
+  \bar{X} = \left[ \begin{array}{ccccccc|ccccccc}
+  0 & 0 & 0 & 1 & 1 & 0 & 1 &
+  0 & 0 & 0 & 0 & 0 & 0 & 0 \end{array} \right] \in \BB^{1\times14} .
+$$
+
+This corresponds to a single logical X operator which equals $X_4X_5X_7$. As a bonus: in
+the same way we get $Z_1Z_2Z_7$ as the logical Z operator.
+
+** Exercise 10.56
 Show that replacing an encoded $X$ or $Z$ operator by $g$ times that operator, where $g$
 is an element of the stabilizer, does not change the action of the operator on the code.
 
-** TODO Exercise 10.57
+*** Proof
+Let $N$ be one of the logical X or Z operators. Let $g\in\?S$ and $\ket{\psi}\in\?C$ an
+element of the code. The generators let the code invariant, hence
+$g\ket{\psi}=\ket{\psi}$. On the other hand $g$ commutes with $N$ by construction of the
+logical Pauli operators. Hence
+
+$$
+  gN \ket{\psi} = Ng \ket{\psi} = N \ket{\psi} ,
+$$
+
+which is precisely the claim. QED.
+
+** Exercise 10.57
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.57
+:END:
 Give the check matrices for the five and nine qubit codes in standard form.
 
-** TODO Exercise 10.58
+*** Solution
+Let us use the code prepared in one of the [[#chapter-10-utility-code][introductory sections]] to this site. First
+consider the 5 qubit code.
+
+#+name: exercise-10.57-1
+#+begin_src sage :results replace :tangle no :cache yes
+  cm = generators_to_check_matrix(generators_5qubit_code_repr())
+  transform_check_matrix(cm, [
+      # n = 5, k = 1
+      ["add row", 0, 2],
+      ["add row", 1, 3],
+      ["add row", 3, 2],
+      ["add row", 3, 0],
+      # Now we know r = 4, Hence the middle part is trivial!
+  ])
+#+end_src
+
+#+RESULTS[eb9d349afee7d341b8762c62409fa7f40ed94291]: exercise-10.57-1
+: [1 0 0 0 1 1 1 0 1 1]
+: [0 1 0 0 1 0 0 1 1 0]
+: [0 0 1 0 1 1 1 0 0 0]
+: [0 0 0 1 1 1 0 1 1 1]
+
+Hence the 5 qubit code is an example where the the place for the matrix $A_1$ completely
+vanishes ($n-k-r=0$). Next consider Shor's nine qubit code:
+
+#+name: exercise-10.57-2
+#+begin_src sage :results replace :tangle no :cache yes
+  cm = generators_to_check_matrix(generators_shor_code_repr())
+  transform_check_matrix(cm, [
+      # n = 9, k = 1, already see that r = 2
+      ["swap rows", 0, 6],
+      ["swap rows", 1, 7],
+      ["swap qubits", 1, 3],
+      ["add row", 1, 0],
+      # X part is in standard form now. But by accident the Z part too!
+  ])
+#+end_src
+
+#+RESULTS[9b9bcf196a19578c0e8edbf994c03c5e4200367a]: exercise-10.57-2
+: [1 0 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0]
+: [0 1 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0]
+: [0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0]
+: [0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0]
+: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0]
+: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1]
+: [0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0]
+: [0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0]
+
+** Exercise 10.58
 Verify that the circuits in Figures 10.13–10.15 work as described, and check the claimed
 circuit equivalences.
 
-** TODO Exercise 10.59
+*** Solution
+The action of of the circuit in Figure 10.13 is
+
+\begin{align*}
+  \ket{0,\psi} &\stackrel{H_1}{\mapsto} \frac{1}{\sqrt{2}} \left(\ket{0} + \ket{1}\right) \ket{\psi} \\
+  &\stackrel{CM}{\mapsto}  \frac{1}{\sqrt{2}} \left(\ket{0}\ket{\psi} + \ket{1}M\ket{\psi} \right) \\
+  &\stackrel{H_1}{\mapsto} \ket{0} Q_+\ket{\psi} + \ket{1} Q_-\ket{\psi} ,
+\end{align*}
+
+where $Q_{\pm}=(I\pm\?M)/2$ are the projectors onto the eigenspaces of $M$. This shows
+that the circuits works as described (measures $M$).
+
+The LHS in Figure 10.14 and 10.15 is just a special case ($M=X$ or $M=Z$) of Figure
+10.13. The RHS in each of Figure 10.14 and 10.15 follow from two simple properties:
+
+$$
+  \cz = H_2 \cx H_2
+$$
+
+on the one hand, and that for $\cz$ the source and target play the same role (can be
+swapped without changing the action of the gate).
+
+** Exercise 10.59
 Show that by using the identities of Figures 10.14 and 10.15, the syndrome circuit of
 Figure 10.16 can be replaced with the circuit of Figure 10.17
 
-** TODO Exercise 10.60
+*** Solution
+I do not know what to say more except that it is very easy to see. You just have to do
+it. One thing to remark is maybe that the transformation behaves like a transposition of
+matrices.
+
+** Exercise 10.60
 Construct a syndrome measuring circuit analogous to that in Figure 10.16, but for the nine
 and five qubit codes.
 
-** TODO Exercise 10.61
+*** Solution
+Using the utility code we can easily construct the circuits using qiskit.
+
+#+begin_src python :results replace :cache yes
+  generators = generators_5qubit_code()
+  qc = make_syndrome_circuit(generators, with_barrier=False)
+  qc.draw()
+#+end_src
+
+#+RESULTS[ef9d9e9681f42b7e30d053b7ce315a84b5fa79f7]:
+#+begin_example
+       ┌───┐                       ┌───┐
+|0>_0: ┤ H ├────────■──────────────┤ H ├─────────────────────────────────────────────
+       ├───┤        │              └───┘            ┌───┐
+|0>_1: ┤ H ├────────┼────────────────■──────────────┤ H ├────────────────────────────
+       ├───┤        │                │              └───┘            ┌───┐
+|0>_2: ┤ H ├────────┼────────────────┼────────────────■──────────────┤ H ├───────────
+       ├───┤        │                │                │              └───┘      ┌───┐
+|0>_3: ┤ H ├────────┼────────────────┼────────────────┼────────────────■────────┤ H ├
+       └───┘┌───────┴───────┐┌───────┴───────┐┌───────┴───────┐┌───────┴───────┐└───┘
+  q_0: ─────┤0              ├┤0              ├┤0              ├┤0              ├─────
+            │               ││               ││               ││               │
+  q_1: ─────┤1              ├┤1              ├┤1              ├┤1              ├─────
+            │               ││               ││               ││               │
+  q_2: ─────┤2 Pauli(XZZXI) ├┤2 Pauli(IXZZX) ├┤2 Pauli(XIXZZ) ├┤2 Pauli(ZXIXZ) ├─────
+            │               ││               ││               ││               │
+  q_3: ─────┤3              ├┤3              ├┤3              ├┤3              ├─────
+            │               ││               ││               ││               │
+  q_4: ─────┤4              ├┤4              ├┤4              ├┤4              ├─────
+            └───────────────┘└───────────────┘└───────────────┘└───────────────┘
+#+end_example
+
+Alternatively one can decompose the controlled pauli matrices. Unfortunately this also decomposes $Z=HXH$:
+
+#+begin_src python :results replace :cache yes
+  generators = generators_5qubit_code()
+  qc = make_syndrome_circuit(generators, with_barrier=True)
+  qc.decompose(["cpauli"]).draw()
+#+end_src
+
+#+RESULTS[b4d4e75dfcdf127ed8239769e2e547b7a150eda3]:
+#+begin_example
+       ┌───┐ ░                                ░                                ░                               »
+|0>_0: ┤ H ├─░───■────■─────────■────■────────░────────────────────────────────░───────────────────────────────»
+       ├───┤ ░   │    │         │    │        ░                                ░                               »
+|0>_1: ┤ H ├─░───┼────┼─────────┼────┼────────░───■────■─────────■────■────────░───────────────────────────────»
+       ├───┤ ░   │    │         │    │        ░   │    │         │    │        ░                               »
+|0>_2: ┤ H ├─░───┼────┼─────────┼────┼────────░───┼────┼─────────┼────┼────────░────────■─────────■────■───────»
+       ├───┤ ░   │    │         │    │        ░   │    │         │    │        ░        │         │    │       »
+|0>_3: ┤ H ├─░───┼────┼─────────┼────┼────────░───┼────┼─────────┼────┼────────░────────┼─────────┼────┼───────»
+       └───┘ ░   │    │         │    │        ░ ┌─┴─┐  │         │    │        ░ ┌───┐┌─┴─┐┌───┐  │    │       »
+  q_0: ──────░───┼────┼─────────┼────┼────────░─┤ X ├──┼─────────┼────┼────────░─┤ H ├┤ X ├┤ H ├──┼────┼───────»
+             ░ ┌─┴─┐  │         │    │        ░ ├───┤┌─┴─┐┌───┐  │    │        ░ ├───┤└───┘└───┘┌─┴─┐  │  ┌───┐»
+  q_1: ──────░─┤ X ├──┼─────────┼────┼────────░─┤ H ├┤ X ├┤ H ├──┼────┼────────░─┤ H ├──────────┤ X ├──┼──┤ H ├»
+             ░ ├───┤┌─┴─┐┌───┐  │    │        ░ ├───┤└───┘└───┘┌─┴─┐  │  ┌───┐ ░ └───┘          └───┘┌─┴─┐└───┘»
+  q_2: ──────░─┤ H ├┤ X ├┤ H ├──┼────┼────────░─┤ H ├──────────┤ X ├──┼──┤ H ├─░─────────────────────┤ X ├─────»
+             ░ ├───┤└───┘└───┘┌─┴─┐  │  ┌───┐ ░ └───┘          └───┘┌─┴─┐└───┘ ░                     └───┘     »
+  q_3: ──────░─┤ H ├──────────┤ X ├──┼──┤ H ├─░─────────────────────┤ X ├──────░───────────────────────────────»
+             ░ └───┘          └───┘┌─┴─┐└───┘ ░                     └───┘      ░                               »
+  q_4: ──────░─────────────────────┤ X ├──────░────────────────────────────────░───────────────────────────────»
+             ░                     └───┘      ░                                ░                               »
+«             ░                                     ░ ┌───┐
+«|0>_0: ──────░─────────────────────────────────────░─┤ H ├
+«             ░                                     ░ ├───┤
+«|0>_1: ──────░─────────────────────────────────────░─┤ H ├
+«             ░                                     ░ ├───┤
+«|0>_2: ──■───░─────────────────────────────────────░─┤ H ├
+«         │   ░                                     ░ ├───┤
+«|0>_3: ──┼───░────────■────■─────────■────■────────░─┤ H ├
+«         │   ░ ┌───┐┌─┴─┐  │  ┌───┐  │    │        ░ └───┘
+«  q_0: ──┼───░─┤ H ├┤ X ├──┼──┤ H ├──┼────┼────────░──────
+«         │   ░ └───┘└───┘┌─┴─┐└───┘  │    │        ░
+«  q_1: ──┼───░───────────┤ X ├───────┼────┼────────░──────
+«         │   ░           └───┘       │    │        ░
+«  q_2: ──┼───░───────────────────────┼────┼────────░──────
+«         │   ░                     ┌─┴─┐  │        ░
+«  q_3: ──┼───░─────────────────────┤ X ├──┼────────░──────
+«       ┌─┴─┐ ░ ┌───┐               └───┘┌─┴─┐┌───┐ ░
+«  q_4: ┤ X ├─░─┤ H ├────────────────────┤ X ├┤ H ├─░──────
+«       └───┘ ░ └───┘                    └───┘└───┘ ░
+#+end_example
+
+For the shor code I only print the compact representations:
+
+#+begin_src python :results replace :cache yes
+  generators = generators_shor_code()
+  qc = make_syndrome_circuit(generators, with_barrier=False)
+  qc.draw()
+#+end_src
+
+#+RESULTS[1eea4459d0861c085fc35e88739ecdc328af8b80]:
+#+begin_example
+       ┌───┐                             ┌───┐                                                  »
+|0>_0: ┤ H ├──────────■──────────────────┤ H ├──────────────────────────────────────────────────»
+       ├───┤          │                  └───┘                ┌───┐                             »
+|0>_1: ┤ H ├──────────┼────────────────────■──────────────────┤ H ├─────────────────────────────»
+       ├───┤          │                    │                  └───┘                ┌───┐        »
+|0>_2: ┤ H ├──────────┼────────────────────┼────────────────────■──────────────────┤ H ├────────»
+       ├───┤          │                    │                    │                  └───┘        »
+|0>_3: ┤ H ├──────────┼────────────────────┼────────────────────┼────────────────────■──────────»
+       ├───┤          │                    │                    │                    │          »
+|0>_4: ┤ H ├──────────┼────────────────────┼────────────────────┼────────────────────┼──────────»
+       ├───┤          │                    │                    │                    │          »
+|0>_5: ┤ H ├──────────┼────────────────────┼────────────────────┼────────────────────┼──────────»
+       ├───┤          │                    │                    │                    │          »
+|0>_6: ┤ H ├──────────┼────────────────────┼────────────────────┼────────────────────┼──────────»
+       ├───┤          │                    │                    │                    │          »
+|0>_7: ┤ H ├──────────┼────────────────────┼────────────────────┼────────────────────┼──────────»
+       └───┘┌─────────┴─────────┐┌─────────┴─────────┐┌─────────┴─────────┐┌─────────┴─────────┐»
+  q_0: ─────┤0                  ├┤0                  ├┤0                  ├┤0                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_1: ─────┤1                  ├┤1                  ├┤1                  ├┤1                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_2: ─────┤2                  ├┤2                  ├┤2                  ├┤2                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_3: ─────┤3                  ├┤3                  ├┤3                  ├┤3                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_4: ─────┤4 Pauli(ZZIIIIIII) ├┤4 Pauli(IZZIIIIII) ├┤4 Pauli(IIIZZIIII) ├┤4 Pauli(IIIIZZIII) ├»
+            │                   ││                   ││                   ││                   │»
+  q_5: ─────┤5                  ├┤5                  ├┤5                  ├┤5                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_6: ─────┤6                  ├┤6                  ├┤6                  ├┤6                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_7: ─────┤7                  ├┤7                  ├┤7                  ├┤7                  ├»
+            │                   ││                   ││                   ││                   │»
+  q_8: ─────┤8                  ├┤8                  ├┤8                  ├┤8                  ├»
+            └───────────────────┘└───────────────────┘└───────────────────┘└───────────────────┘»
+«
+«|0>_0: ─────────────────────────────────────────────────────────────────────────────────────────
+«
+«|0>_1: ─────────────────────────────────────────────────────────────────────────────────────────
+«
+«|0>_2: ─────────────────────────────────────────────────────────────────────────────────────────
+«               ┌───┐
+«|0>_3: ────────┤ H ├────────────────────────────────────────────────────────────────────────────
+«               └───┘                ┌───┐
+«|0>_4: ──────────■──────────────────┤ H ├───────────────────────────────────────────────────────
+«                 │                  └───┘                ┌───┐
+«|0>_5: ──────────┼────────────────────■──────────────────┤ H ├──────────────────────────────────
+«                 │                    │                  └───┘                ┌───┐
+«|0>_6: ──────────┼────────────────────┼────────────────────■──────────────────┤ H ├─────────────
+«                 │                    │                    │                  └───┘        ┌───┐
+«|0>_7: ──────────┼────────────────────┼────────────────────┼────────────────────■──────────┤ H ├
+«       ┌─────────┴─────────┐┌─────────┴─────────┐┌─────────┴─────────┐┌─────────┴─────────┐└───┘
+«  q_0: ┤0                  ├┤0                  ├┤0                  ├┤0                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_1: ┤1                  ├┤1                  ├┤1                  ├┤1                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_2: ┤2                  ├┤2                  ├┤2                  ├┤2                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_3: ┤3                  ├┤3                  ├┤3                  ├┤3                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_4: ┤4 Pauli(IIIIIIZZI) ├┤4 Pauli(IIIIIIIZZ) ├┤4 Pauli(XXXXXXIII) ├┤4 Pauli(IIIXXXXXX) ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_5: ┤5                  ├┤5                  ├┤5                  ├┤5                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_6: ┤6                  ├┤6                  ├┤6                  ├┤6                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_7: ┤7                  ├┤7                  ├┤7                  ├┤7                  ├─────
+«       │                   ││                   ││                   ││                   │
+«  q_8: ┤8                  ├┤8                  ├┤8                  ├┤8                  ├─────
+«       └───────────────────┘└───────────────────┘└───────────────────┘└───────────────────┘
+#+end_example
+
+** Exercise 10.61
 Describe explicit recovery operations $E_j^\dagger$ corresponding to the different
 possible error syndromes that may be measured using the circuit in Figure 10.16.
+
+*** Solution
+This can easily be done using the code we have produced for previous exercises.
+
+#+begin_src python :results replace output :cache yes
+  generators = generators_steane_code_standard()
+  steane_syndromes = compute_syndromes(generators)
+
+  assert len(steane_syndromes) == 3*7, "Steane code is non-degenerate (1)"
+  assert len(set(steane_syndromes.values())) == 3*7, "Steane code is non-degenerate (2)"
+
+  def shorten(pauli_str: str):
+      ret = None
+
+      if (i := pauli_str.find('Z')) != -1:
+          ret = f"Z_{i+1}"
+      elif (i := pauli_str.find('X')) != -1:
+          ret = f"X_{i+1}"
+      elif (i := pauli_str.find('Y')) != -1:
+          ret = f"Y_{i+1}"
+
+      s = pauli_str[:i] + "I" + pauli_str[i+1:]
+      assert s == "I" * len(pauli_str), "Invalid input"
+
+      return ret
+
+  # This prints the syndromes and their error E (note: E=E.H)
+  for error, syndrome in sorted(steane_syndromes.items(), key=(lambda x: x[1])):
+      print(f"{syndrome}: {error}, {shorten(error)}")
+#+end_src
+
+#+RESULTS[841a57325b45dcec592e50649073c06af4606b86]:
+#+begin_example
+000001: IIIIIXI, X_6
+000010: IIIIXII, X_5
+000011: IXIIIII, X_2
+000100: IIIXIII, X_4
+000101: XIIIIII, X_1
+000110: IIIIIIX, X_7
+000111: IIXIIII, X_3
+001000: IIZIIII, Z_3
+001111: IIYIIII, Y_3
+010000: IZIIIII, Z_2
+010011: IYIIIII, Y_2
+011000: IIIZIII, Z_4
+011100: IIIYIII, Y_4
+100000: ZIIIIII, Z_1
+100101: YIIIIII, Y_1
+101000: IIIIZII, Z_5
+101010: IIIIYII, Y_5
+110000: IIIIIIZ, Z_7
+110110: IIIIIIY, Y_7
+111000: IIIIIZI, Z_6
+111001: IIIIIYI, Y_6
+#+end_example
