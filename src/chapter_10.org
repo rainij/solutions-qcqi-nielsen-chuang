@@ -3202,6 +3202,7 @@ This can easily be done using the code we have produced for previous exercises.
       elif (i := pauli_str.find('Y')) != -1:
           ret = f"Y_{i+1}"
 
+      assert ret != None
       s = pauli_str[:i] + "I" + pauli_str[i+1:]
       assert s == "I" * len(pauli_str), "Invalid input"
 
@@ -3212,7 +3213,7 @@ This can easily be done using the code we have produced for previous exercises.
       print(f"{syndrome}: {error}, {shorten(error)}")
 #+end_src
 
-#+RESULTS[841a57325b45dcec592e50649073c06af4606b86]:
+#+RESULTS[ea047ca6bd3c992b59e959c4c8aca5937cdcec7e]:
 #+begin_example
 000001: IIIIIXI, X_6
 000010: IIIIXII, X_5
