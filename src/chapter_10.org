@@ -30,7 +30,7 @@ Python:
 # Hidden imports
 #+name: chapter-10-hidden-imports
 #+begin_src python :exports none
-  from qiskit.circuit import QuantumCircuit, QuantumRegister, Parameter as Param
+  from qiskit.circuit import QuantumCircuit, QuantumRegister, ClassicalRegister, Parameter as Param
 #+end_src
 
 ** Utility code
@@ -3237,3 +3237,225 @@ This can easily be done using the code we have produced for previous exercises.
 111000: IIIIIZI, Z_6
 111001: IIIIIYI, Y_6
 #+end_example
+
+** Exercise 10.62
+Show by explicit construction of generators for the stabilizer that concatenating an
+$[n_1,1]$ stabilizer code with an $[n_2,1]$ stabilizer code gives an $[n_1n_2,1]$
+stabilizer code.
+
+*** Solution
+Let us assume that we first encode everything with $C_1$ and then, on top of this, we
+encode every of the resulting $n_1$ qubits with $C_2$. Clearly this leads to a space with
+$n_1n_2$ dimensions which we use to encode a single logical qubit.
+
+What are the generators of the concatenated code $C_2\circ\?C_1$? Therefore let
+$(g^{(1)}_i)_{i\in1..n_1}$ and $(g^{(2)}_i)_{i\in1..n_2}$ be the generators of $C_1$ and
+$C_2$ (individually). The stabilizer of $C_2\circ\?C_1$ has two responsibilities
+
+1. Stabilize each of the $n_2$ copies of $C_1$ (one for each qubit of $C_2$).
+2. On top of that, stabilize $C_2$ relative to $C_1$.
+
+For the first responsibility we use the following $n_2(n_1-1)$ generators:
+
+$$
+  \tilde{g}_{l,k} = I \ldots \otimes g_k^{(1)} \otimes \ldots I ,
+$$
+
+for $k=1..n_1$ and $l=1..n_2$ and the factor $g_k^{(1)}$ sits at position $l$ in the
+tensor product. For the second set of stabilizer generators let us first write
+
+$$
+  g_k^{(2)} = \bigotimes_{j=1}^{n_2} N_{k,j} ,
+$$
+
+where $N_{k,j}\in\{I,X,Y,Z\}$. Moreover let $\bar{N}_{kj}$ be the "lifting" of $N_{kj}$ to
+$C_1$. Then the second set of stabilizer generators (containing $n_2-1$ elements) are
+
+$$
+  \bar{g}_k = \bigotimes_{j=1}^{n_2} \bar{N}_{k,j} ,
+$$
+
+where $k=1..n_2$. Note that by construction of the lifted operators the $\bar{N}_{kj}$
+commute with all generators from the first set. Overall we found the $n_1n_2-1$ generators
+of $C_2\circ\?C_1$!
+
+** Exercise 10.63
+Suppose $U$ is any unitary operation mapping the Steane code into itself, and such that
+$U\bar{Z}U^\dagger=\bar{X}$ and $U\bar{X}U^\dagger=\bar{Z}$. Prove that up to a global
+phase the action of $U$ on the encoded states $\ket{0_L}$ and $\ket{1_L}$ is
+$\ket{0_L}\mapsto(\ket{0_L}+\ket{1_L})/\sqrt{2}$ and
+$\ket{1_L}\mapsto(\ket{0_L}-\ket{1_L})/\sqrt{2}$.
+
+*** Proof
+Let $\ket{\pm_L}=(\ket{0_L}\pm\ket{1_L})/\sqrt(2)$ be the eigenstates of $\bar{X}$. From
+$\bar{X}\ket{+_L}=\ket{+_L}$ and $\bar{X}=U\bar{Z}U^\dagger$ we obtain
+
+$$
+  U^\dagger \ket{+_L} = \bar{Z} U^\dagger \ket{+_L} .
+$$
+
+Hence $U^\dagger\ket{+_L}$ is a $+1$ eigenstate of $\bar{Z}$. Hence
+
+$$ U^\dagger\ket{+_L} = e^{\ii\varphi_{0}} \ket{0_L} . $$
+
+In the same way (using $\bar{X}\ket{-_L}=-\ket{-_L}$ and again
+$\bar{X}=U\bar{Z}U^\dagger$) we obtain
+
+$$ U^\dagger\ket{-_L} = e^{\ii\varphi_{1}} \ket{1_L} . $$
+
+It remains to show that $\varphi_0=\varphi_1=:\varphi$. Note that it is not possible to
+show that $\varphi=0$ (simply because it is wrong in general).
+
+From $\bar{Z}\ket{-_L}=\ket{+_L}$ and $U\ket{X}U^\dagger=\bar{Z}$ we deduce
+
+$$
+  \ket{-_L} = U\bar{X}U^\dagger \ket{+_L} = U\bar{X} e^{\ii\varphi_0} \ket{0_L}
+  = U e^{\ii\varphi_0} \ket{1_L} = e^{\ii(\varphi_0-\varphi_1)} \ket{-_L} .
+$$
+
+Hence $\varphi_0=\varphi_1$ as desired. QED.
+
+** Exercise 10.64 (Back propagation of errors)
+It is clear that an $X$ error on the control of a =CNOT= gate propagates to the target
+qubit. In addition, it turns out that a $Z$ error on the target propagates back to the
+control! Show this using the stabilizer formalism, and also directly using quantum circuit
+identities. You may find Exercise 4.20 on page 179 useful.
+
+*** Solution
+As mentioned we already know the following propagation rule
+$\cx_{12}X_1=X_1X_2\cx_{12}$. Moreover, from [[file:chapter_4.org::#exercise-4-20][exercise 4.20]] we know that
+
+$$
+  \cx_{21} = H_1H_2 \cx_{12} H_1H_2 .
+$$
+
+Hence
+
+\begin{align*}
+  \cx_{12} Z_2 &= H_1H_2 \cx_{21} H_1H_2 Z_2 \\
+  &= H_1H_2 \cx_{21} X_2 H_1H_2 \\
+  &= H_1H_2 X_1X_2 \cx_{21} H_1H_2 \\
+  &= Z_1Z_2 H_1H_2 \cx_{21} H_1H_2 \\
+  &= Z_1Z_2 \cx_{12} .
+\end{align*}
+
+Hence a $Z$ error at the control of $\cx$ progagates as two $Z$, one at control and one at
+the target.
+
+** Exercise 10.65
+An unknown qubit in the state $\ket{\psi}$ can be swapped with a second qubit which is
+prepared in the state $\ket{0}$ using only two =CNOT= gates using the circuit
+
+# NOTE: I modified the output manually (output states)
+#+RESULTS[401756f2ce55970a615e92672093ce82fbf7a55d]: exercise-10.65-circuit
+:             ┌───┐
+:   |0>: ──■──┤ X ├ |psi>
+:        ┌─┴─┐└─┬─┘
+: |psi>: ┤ X ├──■── |0>
+:        └───┘
+
+
+Show that the two circuits below, which use only a single =CNOT= gate, with measurement
+and a classically controlled single qubit operation, also accomplish the same task:
+
+# NOTE: I modified the output manually (output states, classical control)
+#+RESULTS[5769c793c4a9675e3410f7b0ec815b85e1639908]: exercise-10.65-circuit-2
+:        ┌───┐         ┌───┐
+:   |0>: ┤ X ├─────────┤ Z ├ |psi>
+:        └─┬─┘┌───┐┌─┐ └─╥─┘
+: |psi>: ──■──┤ H ├┤M├───║──
+:             └───┘└╥┘   ║
+:   c: 1/═══════════╩════╩══
+:                   0
+
+# NOTE: I modified the output manually (output states, classical control)
+#+RESULTS[a7b8d84ec0cb9c90373f9fb30b2c90d859ffcc9c]: exercise-10.65-circuit-3
+:        ┌───┐         ┌───┐
+:   |0>: ┤ H ├──■──────┤ X ├ |psi>
+:        └───┘┌─┴─┐┌─┐ └─╥─┘
+: |psi>: ─────┤ X ├┤M├───║──
+:             └───┘└╥┘   ║
+:   c: 1/═══════════╩════╩═
+:                   0
+
+#+name: exercise-10.65-circuit
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "|0>")
+  qr1 = QuantumRegister(1, "|psi>")
+
+  qc = QuantumCircuit(qr0, qr1)
+  qc.cx(0, 1)
+  qc.cx(1, 0)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-10.65-circuit-2
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "|0>")
+  qr1 = QuantumRegister(1, "|psi>")
+  cr = ClassicalRegister(1, "c")
+
+  qc = QuantumCircuit(qr0, qr1, cr)
+  qc.cx(1, 0)
+  qc.h(1)
+
+  qc.measure(1, 0)
+  qc.barrier()
+  qc.z(0)
+
+  qc.draw(plot_barriers=False, vertical_compression="high")
+#+end_src
+
+#+name: exercise-10.65-circuit-3
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "|0>")
+  qr1 = QuantumRegister(1, "|psi>")
+  cr = ClassicalRegister(1, "c")
+
+  qc = QuantumCircuit(qr0, qr1, cr)
+  qc.h(0)
+  qc.cx(0, 1)
+
+  qc.measure(1, 0)
+  qc.barrier()
+  qc.x(0)
+
+  qc.draw(plot_barriers=False, vertical_compression="high")
+#+end_src
+
+*** Solution
+Let $\ket{\psi}=a\ket{0}+\ket{1}$. Let us track the action of the first circuit:
+
+\begin{align*}
+  \ket{0}\ket{\psi} &\stackrel{\cx_{12}}{\mapsto} a\ket{00} + b\ket{11} \\
+  &\stackrel{H_2}{\mapsto} \frac{1}{\sqrt{2}} \left(a\ket{00} + a\ket{01} + b\ket{10} - b\ket{11} \right) \\
+  &= \frac{1}{\sqrt{2}} \left[
+    (a\ket{0} + b\ket{1})\ket{0} +
+    (a\ket{0} - b\ket{1})\ket{1}
+  \right]
+\end{align*}
+
+Hence measuring $0$ or $1$ occurs with probability 50% (which is not important but nice to
+know) and after measuring $0$ the state in the first wire is already $\ket{\psi}$. If $1$
+is measured only a $Z$ is needed to transform the state into $\ket{\psi}$.
+
+For the second circuit we proceed analogously:
+
+\begin{align*}
+  \ket{0}\ket{\psi} &\stackrel{H_1}{\mapsto} \frac{1}{\sqrt{2}}
+    (a\ket{00} + b\ket{01} + a\ket{10} + b\ket{11}) \\
+  &\stackrel{\cx_{12}}{\mapsto} \frac{1}{\sqrt{2}}
+    (a\ket{00} + b\ket{01} + a\ket{11} + b\ket{10}) \\
+  &= \frac{1}{\sqrt{2}} \left[
+    (a\ket{0} + b\ket{1}) \ket{0} +
+    (a\ket{1} + b\ket{0}) \ket{1}
+  \right]
+\end{align*}
+
+After measuring $0$ the state in the first wire is already $\ket{\psi}$. If $1$ is
+measured only a $X$ is needed to transform the state into $\ket{\psi}$.
+
+** TODO Exercise 10.66
+** TODO Exercise 10.67
+** TODO Exercise 10.68
