@@ -1687,7 +1687,7 @@ $hg$ are the same. QED.
 
 ** Exercise 10.32
 :PROPERTIES:
-:CUSTOM_ID: exercise-10.32-solution
+:CUSTOM_ID: exercise-10.32
 :END:
 Verify that the generators in Figure 10.6 stabilize the codewords for the Steane code, as
 described in Section 10.4.2.
@@ -3343,6 +3343,9 @@ Hence a $Z$ error at the control of $\cx$ progagates as two $Z$, one at control 
 the target.
 
 ** Exercise 10.65
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.65
+:END:
 An unknown qubit in the state $\ket{\psi}$ can be swapped with a second qubit which is
 prepared in the state $\ket{0}$ using only two =CNOT= gates using the circuit
 
@@ -3359,6 +3362,7 @@ Show that the two circuits below, which use only a single =CNOT= gate, with meas
 and a classically controlled single qubit operation, also accomplish the same task:
 
 # NOTE: I modified the output manually (output states, classical control)
+#+name: exercise-10.65-circuit-2-name
 #+RESULTS[5769c793c4a9675e3410f7b0ec815b85e1639908]: exercise-10.65-circuit-2
 :        ┌───┐         ┌───┐
 :   |0>: ┤ X ├─────────┤ Z ├ |psi>
@@ -3369,6 +3373,7 @@ and a classically controlled single qubit operation, also accomplish the same ta
 :                   0
 
 # NOTE: I modified the output manually (output states, classical control)
+#+name: exercise-10.65-circuit-3-name
 #+RESULTS[a7b8d84ec0cb9c90373f9fb30b2c90d859ffcc9c]: exercise-10.65-circuit-3
 :        ┌───┐         ┌───┐
 :   |0>: ┤ H ├──■──────┤ X ├ |psi>
@@ -3456,6 +3461,203 @@ For the second circuit we proceed analogously:
 After measuring $0$ the state in the first wire is already $\ket{\psi}$. If $1$ is
 measured only a $X$ is needed to transform the state into $\ket{\psi}$.
 
-** TODO Exercise 10.66
-** TODO Exercise 10.67
-** TODO Exercise 10.68
+** Exercise 10.66 (Fault-tolerant $\pi/8$ gate construction)
+One way to implement a π/8 gate is to first swap the qubit state $\ket{\psi}$ you wish to
+transform with some known state $\ket{0}$, then to apply a π/8 gate to the resulting
+qubit. Here is a quantum circuit which does that:
+
+#+RESULTS[4d3457de3f5e2b88ee7839946b19f9d141339af4]: exercise-10.66-circuit
+:        ┌───┐         ┌───┐┌───┐
+:   |0>: ┤ H ├──■──────┤ X ├┤ T ├ T|psi>
+:        └───┘┌─┴─┐┌─┐ └─╥─┘└───┘
+: |psi>: ─────┤ X ├┤M├───║───────
+:             └───┘└╥┘   ║
+:   c: 1/═══════════╩════╩═══════
+:                   0
+
+Doing this does not seem particularly useful, but actually it leads to something which is!
+Show that by using the relations $TX=\exp(−\ii\pi/4)SXT$ and $TU=UT$ ($U$ is the =CNOT=
+gate and $T$ acts on the control qubit) me may obtain the circuit from Figure 10.25.
+
+#+name: exercise-10.66-circuit
+#+begin_src python :results replace :cache yes :exports results
+  qr0 = QuantumRegister(1, "|0>")
+  qr1 = QuantumRegister(1, "|psi>")
+  cr = ClassicalRegister(1, "c")
+
+  qc = QuantumCircuit(qr0, qr1, cr)
+  qc.h(0)
+  qc.cx(0, 1)
+
+  qc.measure(1, 0)
+  qc.barrier()
+  qc.x(0)
+  qc.t(0)
+
+  qc.draw(plot_barriers=False, vertical_compression="high")
+#+end_src
+
+*** Solution
+That $T$ commutes with $U$ follows from the fact that $T\equiv\?R_z(\pi/4)$ is a function
+of the $Z$ operator whose eigenstates form the decision states of the =CNOT= gate
+($U$). Here with $\equiv$ I mean /equality up to global phase/. That
+$TX=\exp(−\ii\pi/4)SXT$ follows essentially from the bloch sphere interpretation:
+
+$$
+  XTX \equiv X R_z(\pi/4) X = R_z(-\pi/4) \equiv S^\dagger T \equiv XSXT .
+$$
+
+The correct phase is not really important here but could also be recovered because there
+are transparent rules to translate between $T,S,Z$ on the one hand and $R_z(\theta)$
+/including/ phase on the other hand. For example:
+
+$$
+  T = \sqrt[4]{Z} = e^{i\pi/8} R_z(\pi/4) .
+$$
+
+Having this commutation relation at hand it is easy to commute $T$ from the end to the
+desired place near the beginning of the circuit.
+
+** Exercise 10.67
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.67
+:END:
+Show that the following circuit identities
+
+- (1) ::
+  #+RESULTS[45b2ba5c6691fd0e3c622937f7a08f38b752aa2a]: exercise-10.67-circuit-1
+  :      ┌───┐
+  : q_0: ┤ X ├──■──
+  :      └───┘  │
+  : q_1: ───────■──
+  :           ┌─┴─┐
+  : q_2: ─────┤ X ├
+  :           └───┘
+
+  equals
+
+  #+RESULTS[6161bac2c05e542905231e275e107a0e7ad4cca2]: exercise-10.67-circuit-2
+  :           ┌───┐
+  : q_0: ──■──┤ X ├
+  :        │  └───┘
+  : q_1: ──■────■──
+  :      ┌─┴─┐┌─┴─┐
+  : q_2: ┤ X ├┤ X ├
+  :      └───┘└───┘
+
+- (2) ::
+  #+RESULTS[4905f09d73779b7835629d7948ecf5c77ea9d0c4]: exercise-10.67-circuit-3
+  :
+  : q_0: ───────■──
+  :             │
+  : q_1: ───────■──
+  :      ┌───┐┌─┴─┐
+  : q_2: ┤ Z ├┤ X ├
+  :      └───┘└───┘
+
+  equals
+
+  #+RESULTS[917d897c6c7cdadf521ea96c82f42165c344bc42]: exercise-10.67-circuit-4
+  :
+  : q_0: ──■────■──
+  :        │    │
+  : q_1: ──■────■──
+  :      ┌─┴─┐┌───┐
+  : q_2: ┤ X ├┤ Z ├
+  :      └───┘└───┘
+
+#+name: exercise-10.67-circuit-1
+#+begin_src python :results replace :cache yes :exports results
+  qr = QuantumRegister(3, "q")
+
+  qc = QuantumCircuit(qr)
+  qc.x(0)
+  qc.ccx(0, 1, 2)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-10.67-circuit-2
+#+begin_src python :results replace :cache yes :exports results
+  qr = QuantumRegister(3, "q")
+
+  qc = QuantumCircuit(qr)
+  qc.ccx(0, 1, 2)
+  qc.x(0)
+  qc.cx(1, 2)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-10.67-circuit-3
+#+begin_src python :results replace :cache yes :exports results
+  qr = QuantumRegister(3, "q")
+
+  qc = QuantumCircuit(qr)
+  qc.z(2)
+  qc.ccx(0, 1, 2)
+
+  qc.draw()
+#+end_src
+
+#+name: exercise-10.67-circuit-4
+#+begin_src python :results replace :cache yes :exports results
+  qr = QuantumRegister(3, "q")
+
+  qc = QuantumCircuit(qr)
+  qc.ccx(0, 1, 2)
+  qc.z(2)
+  qc.cz(0, 1)
+
+  qc.draw()
+#+end_src
+
+*** Solution
+There are several simple ways to see these identities. The most straightforward way is to
+check that the circuits act the same on the eight basis states $\ket{ijk}$
+($i,j,k\in\{0,1\}$). This is /essentially/ what we do in the following, but we take some
+simple shortcuts which save us from tabulating eight possibilities for each identity
+(instead we only have to consider two carefully chosen cases).
+
+Consider identity (1). Clearly both circuits act the same way on the first two
+circuits. For the first circuit we see that it only acts non-trivially (with an $X$) on
+the third qubit if $i=0$, $j=1$. It is not hard to see that the second circuit does the
+same.
+
+Consider identity (2). It is not hard to see that both circuits map $\ket{11k}$ to
+$(-1)^k\ket{11\bar{k}}$, where $k=k+1\mod2$. On the other hand, if at least one of $i$,
+$j$ is not $1$, then both circuits act as $\ket{ijk}\mapsto(-1)^{k}\ket{ijk}$.
+
+** Exercise 10.68 (Fault-tolerant Toffoli gate construction)
+A procedure similar to the above sequence of exercises for the π/8 gate gives a
+fault-tolerant Toffoli gate
+
+1) First, swap the three qubit state $\ket{xyz}$ you wish to transform with some known
+   state $\ket{000}$, then apply a Toffoli gate to the resulting qubits. Show that the
+   following circuit accomplishes this task:
+
+   : The book contains a circuit here.
+
+2) Using the commutation rules from [[#exercise-10.67][Exercise 10.67]], show that moving the final Toffoli
+   gate all the way back to the left side gives the circuit
+
+   : The book contains a circuit here.
+
+3) Assuming the ancilla preparation shown in the leftmost dotted box can be done
+   fault-tolerantly, show that this circuit can be used to give a fault-tolerant
+   implementation of the Toffoli gate using the Steane code.
+#
+#
+- Remark :: This [[https://arxiv.org/abs/1212.5069v1][arxiv paper]] might be and interesting read on the topic of this exercise.
+
+*** Solution
+Part (1) is really just two times the [[exercise-10.65-circuit-2-name][second]] circuit and one time the [[exercise-10.65-circuit-3-name][third]] circuit from
+[[#exercise-10.65][exercise 10.65]].
+
+For part (2) there isn't much to say. The exercise statement already explained that this
+follows from the identities from [[#exercise-10.67][exercise 10.67]].
+
+For part (3) observe that the non-ancilla part of the circuit only contains Clifford gates
+(some of which are classically controlled). In the main text we have already seen how to
+implement those in the Steane code. So assuming the ancilla can also be prepared so that
+it is already Steane-encoded the whole circuit can be implemented in a fault tolerant way.
