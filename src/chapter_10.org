@@ -3183,6 +3183,9 @@ Describe explicit recovery operations $E_j^\dagger$ corresponding to the differe
 possible error syndromes that may be measured using the circuit in Figure 10.16.
 
 *** Solution
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.61-solution
+:END:
 This can easily be done using the code we have produced for previous exercises.
 
 #+begin_src python :results replace output :cache yes
@@ -3661,3 +3664,297 @@ For part (3) observe that the non-ancilla part of the circuit only contains Clif
 (some of which are classically controlled). In the main text we have already seen how to
 implement those in the Steane code. So assuming the ancilla can also be prepared so that
 it is already Steane-encoded the whole circuit can be implemented in a fault tolerant way.
+
+** Exercise 10.69
+Show that a single failure anywhere in the ancilla preparation and verification can lead
+to at most one $X$ or $Y$ error in the ancilla output.
+
+*** Proof
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.69-solution
+:END:
+The following argumentation is designed to work with the 7-qubit Steane code. However, it
+is generic as it applies to any $[n,1]$ stabilizer code showing that the arguments also
+apply to e.g. the 5-qubit code. Note however that strictly speaking several assumptions go
+into the construction of the schematic circuit from Firgure 10.28. For example we assume
+that the controlled-​$M$ operation can be implemented in a transversal way. For this
+exercise we are only concerned about the Prepare-Verify part of the circuit allowing us to
+be more general. But you can always set $n=7$ to restrict everything to the Steane code
+and keep things simple.
+
+Let us distinguish two cases:
+
+1. A single error in the preparation stage (and no error in verification stage).
+2. A single error in the verification stage (and no error in preparation stage).
+
+Consider *case 1* (error in preparation stage). Let us briefly show that multiple $X$
+errors are possible directly after the preparation stage even if /only/ one of its
+components fails. To see this assume that the first =CNOT= between the first and second
+ancilla produces a single $X$ error at its control qubit (ancilla 1). By the propagation
+rules for =CNOT= this error gets distributed (by the following =CNOT= gates) to almost all
+ancilla qubits, leading to the following total error after preparation:
+
+$$X\otimes I \otimes X^{\otimes n-2}$$
+
+For that reason we assume that the error after the preparation stage is in the most
+general form according to the error model from the main text
+
+$$
+E = \bigotimes_{j=1}^n N_j, \text{ where } N_j \in \{I,X,Y,Z\} .
+$$
+
+Recall that this error model says that a component fails with a certain probability $p$
+and produces only Pauli errors at its outputs. If no errors would have occured the output
+of the preparation stage is a cat state:
+
+$$
+  \cat = \frac{1}{\sqrt{2}} (\ket{0^n} + \ket{1^n}) .
+$$
+
+With error the output is $E\cat$. Now we show that the verification stage detects if any
+$X$ or $Y$ errors are present (but it does not see $Z$ errors). In fact, the verification
+stage can be implemented as a series of $n-1$ pairs of =CNOT= gates
+
+$$
+  G_j = \cx_{j,x} \cx_{j+1,x}, \quad (j=1..n-1),
+$$
+
+($x$ being an additional ancilla outside the "main" ancillas initialized to $\ket{0}$ for
+each $G_j$) which are followed by a measurement (each). It is not hard to see that the
+verification step implements the measurement of all $g_j=Z_jZ_{j+1}$ for $j=1..n-1$. These
+operators can be seen as the stabilizer of the two dimensional subspace spanned by
+
+$$
+  \ket{0^n}, \ket{1^n} ,
+$$
+
+which contains $\cat$. Thus applying verification to $E\cat$ the verification either
+detects an error (which saves us) or it says "OK" and the final state is one of two
+possibilities
+
+$$
+  \catp{\pm} = \frac{1}{\sqrt{2}} (\ket{0^n} \pm \ket{1^n}) ,
+$$
+
+Note that $\catp{+}=\cat$ is the cat state and contains /effectively/ no errors but
+could be the result of an /even/ number of $Z$ errors (which do not affect the cat
+state). In case of an /odd/ number of $Z$ errors we get $\catp{-}$. This would be a
+"proper" error. It does not propagate into the data qubits (because $Z$ commutes with the
+control of any controlled gate) but it would be /decoded/ into $\ket{10^{n-1}}$ which
+would be measured as $1$ at the first ancilla. Hence this error would basically swap the
+measurement result for the overall procedure (whose goal is to measure an operator $M$
+whose eigenvalues are $\pm1$). This concludes case 1, as we have seen that actually /no/
+$X$ or $Y$ errors can hide from the verification procedure.
+
+Consider *case 2* (verification fails). In that case, by assumption, the preparation stage
+correctly produces $\cat$. Any error ($X,Y,Z$) originating from a control of the $G_j$
+(see above) can only propagate into the additional ancillas and hence not into the rest of
+the $n$ "main" ancillas. Moreover, although a $Z$ error in the additional ancillas can
+propagate into the main ancillas, but $X$ cannot. Similarly a $Y=\ii\?ZX$ error in the
+additional ancillas can only propagate a $Z$ error into the main ancillas.
+
+Hence, in this case, a $X$ or $Y$ error can only be produced if it originates from a part
+of a component (a control of the =CNOT= gates) which is attached to the main ancillas and
+furthermore it cannot further propagate into the other main ancillas. QED.
+
+** Exercise 10.70
+Show that $Z$ errors in the ancilla do not propagate to affect the encoded data, but result
+in an incorrect measurement result being observed.
+
+*** Solution
+In this solution we do not need to restrict to the Steane code. Instead we consider a
+general stabilizer code on $n$ qubits (Steane has $n=7$) for which the transversal
+construction for the controlled $M$ operator works as outlined and such that $n$ is
+odd. See also the first paragraph of the [[#exercise-10.69-solution][solution]] of exercise 10.69.
+
+Let us briefly recall that $Z$ errors commute with the control of any controlled gate
+$C(U)$. In fact, we have
+
+$$
+  C(U) = P_0\otimes I + P_1\otimes U .
+$$
+
+Note that the projections $P_j=\proj{j}$ onto the standard basis actually commute with $Z$
+because the standard basis /is/ the eigenbasis of $Z$ (by definition). For that reason we
+have
+
+$$
+  C(U) \cdot Z\otimes I = (P_0 Z) \otimes I + (P_1 Z) \otimes U
+  = (Z P_0) \otimes I + (Z P_1) \otimes U
+  = Z\otimes I \cdot C(U) .
+$$
+
+This implies that $Z$ errors in the ancillas cannot propagate into the data qubits because
+ancillas and data are only connected via =CNOT= gates (with controls in the
+ancillas). This shows the first part of the claim.
+
+Now let us check how $Z$ errors affect the measurement. For that purpose let us define
+
+$$
+  \catp{\pm} = \frac{1}{\sqrt{2}} ( \ket{0^n} \pm \ket{1^n} )
+$$
+
+and first consider the working of the operator measurement in case no error happens. Let
+$\ket{\psi}$ be the encoded data and decompose it into
+
+$$
+  \ket{\psi} = a\ket{\psi_+} + b\ket{\psi_-} ,
+$$
+
+where $\ket{\psi_{\pm}}$ are the encoded eigenstates of $M$ (with eigenvalues
+$\pm1$). Right before applying the controlled $M$ the state is $\cat\ket{\psi}$. After
+applying the (encoded) controlled $M$ operator we get (after reordering terms)
+
+\begin{align*}
+  & a \catp{+} \ket{\psi_+} + b\catp{-} \ket{\psi_-} .
+\end{align*}
+
+Here at this point we need that the transversal construction of the encoded controlled $M$
+gate looks like in Figure 10.28 (see also Figure 10.24) and the coded uses an odd number
+$n$ of qubits (so that $(-1)^n=-1$). Decoding transforms it into
+
+\begin{align*}
+  & a \ket{00^{n-1}} \ket{\psi_+} + b\ket{10^{n-1}} \ket{\psi_-} .
+\end{align*}
+
+Hence, measuring $0$ (in the first ancilla) yields $\ket{\psi_+}$ in the data qubits, and
+measuring $1$ yields $\ket{\psi_-}$ in the data qubit. This is as desired.
+
+What happens if we get $r\geq1$ many $Z$ errors after the prepare-verify stages? If $r$ is
+even this does not affect the cat state and the procedure works as expected. If $r$ is odd
+the cat state $\cat=\catp{\?+}$ is replaced by $\catp{-}$. In essence, in the above
+derivation $\catp{+}$ and $\catp{-}$ swap their roles. Hence, right before measurement we
+get the state
+
+\begin{align*}
+  & a \ket{10^{n-1}} \ket{\psi_+} + b\ket{00^{n-1}} \ket{\psi_-} .
+\end{align*}
+
+This implies that we infer the wrong eigenvalue in this case (with 100% probability). QED.
+
+** Exercise 10.71
+Verify that when $M=e^{-\ii\pi/4}SX$ the procedure we have described gives a
+fault-tolerant method for measuring $M$.
+
+- Remark :: If I did no mistake in the proof below the $\pi/8$ gates at the ancillas are
+  not needed.
+
+*** Proof
+Let us consider this exercise for the 7-qubit Steane code. Let us denote the ancilla
+qubits by the labels $a_i$ and the qubits for the data by $d_i$ ($i=1..7$). We show that
+the encoded controlled $M$ operator is given by a product of controlled $V=ZSX$ gates with
+controls and targets as in Figure 10.24 (where the first block are the ancillas and the
+second block the data):
+
+$$
+  \prod_{i=1}^{7} C(ZSX)_{a_i,d_i}
+$$
+
+First of all observe that
+
+\begin{align*}
+  M Z M^\dagger &= SX Z XS^\dagger = -Z , \\
+  M X M^\dagger &= SX X XS^\dagger = Y .
+\end{align*}
+
+This is the behaviour we want to have on the encoded qubits (logical qubits). On the other
+hand we have (on the physical qubits)
+
+\begin{align*}
+  V Z V^\dagger &= ZSX Z XS^\dagger Z = -Z , \\
+  V X V^\dagger &= ZSX X XS^\dagger Z = -Y .
+\end{align*}
+
+This is exactly what we want for the Steane code! In fact, the logical Pauli operators are
+$\bar{Z}=Z^{\otimes7}$, $\bar{X}=X^{\otimes7}$, and $\bar{Y}=-Y^{\otimes7}$. The formula
+for $\bar{Y}$ follows from $Y=\ii\?XZ$. So the minus sign in front of $Y$ is exactly what
+we want. QED.
+
+** WIP Exercise 10.72 (Fault-tolerant Toffoli ancilla state construction)
+Show how to fault-tolerantly prepare the state created by the circuit in the dotted box of
+Exercise 10.68, that is,
+
+$$
+  \ket{\Theta} = \frac{1}{2}( \ket{000} + \ket{100} + \ket{010} + \ket{111} )
+$$
+
+You may find it helpful to first give the stabilizer generators for this state.
+
+- Remark :: Since I couldn't solve the exercise in the way suggested I searched for a
+  solution elsewhere. In section 6.2 of [cite:@Shor1996] ([[https://doi.org/10.1109/SFCS.1996.548464][link]]) I found a nice and
+  transparent construction which does not take the approach suggested here (but it is
+  still based on cat states). I didn't read the whole paper but it seems to have had a big
+  influence on the contents of chapter 10 (it is also cited by the book).
+
+*** Attempted solution
+By construction we have
+
+$$
+  \ket{\Theta} = \mathrm{CCX} H_1 H_2 \ket{000} .
+$$
+
+So in order to find generators of the stabilizer of $\ket{\Theta}$ we start with the generators
+
+$$ \langle Z_1, Z_2, Z_3 \rangle $$
+
+of $\ket{000}$ and apply the stabilizer formalism. Applying the two Hadamard gates
+according to the stabilizer formalism (every generator gets conjugated by the gates:
+$g\mapsto\?UgU^\dagger$) yields
+
+$$ \langle X_1, X_2, Z_3 \rangle . $$
+
+The interesting thing happens when we apply the Toffoli gate (a non-clifford gate). In
+that case we leave the Pauli group and get:
+
+$$ \langle X_1\cx_{23}, X_2\cx_{13}, Z_3\cz_{12} \rangle . $$
+
+To see this use [[#exercise-10.67][exercise 10.67]]. All three generators are three qubit gates, but they still
+have eigenvalues $\pm1$ (as they are produced by conjugation).
+
+Now I would like to use the construction from 10.28. However there are several problems I
+cannot solve at the moment. For example the construction requires to put yet another layer
+of /control/ to the generators. Since the generators already contain controlled gates this
+requires doubly controlled gates (a priori at least). This does not look like a promising
+approach to me. So I leave this solution open ended ...
+
+** Exercise 10.73 (Fault-tolerant encoded state construction)
+:PROPERTIES:
+:CUSTOM_ID: exercise-10.73
+:END:
+Show that the Steane code encoded $\ket{0}$ state can be constructed fault-tolerantly in
+the following manner.
+
+1. Begin with the circuit of Figure 10.16, and replace the measurement of each generator,
+   as shown in Figure 10.30, with each ancilla qubit becoming a cat state
+   $(\ket{0^7}+\ket{1^7})/\sqrt{2}$, and the operations rearranged to have their controls
+   on different qubits, so that errors do not propagate within the code block.
+2. Add a stage to fault-tolerantly measure $Z$.
+3. Calculate the error probability of this circuit, and of the circuit when the generator
+   measurements are repeated three times and majority voting is done.
+4. Enumerate the operations which should be performed conditioned on the measurement
+   results and show that they can be done fault-tolerantly.
+
+*** Solution
+The construction which is described above is just a variation of the schematic given in
+Figure 10.28. Each of the six measurements (one for each generator) has its own block of
+seven ancilla qubits (but the same data block). Measuring them in a row implies that we
+get a state $\ket{\psi}$ (in the data block) which is a simultaneous eigenstate of the six
+generators. Repeating this procedure three times and taking majority votes ensures a
+success probability for a correct measurement of $O(p^2)$ (NOTE: this is not explicitly
+mentioned in the book but each repetition reuses the data-block output from the previous
+iteration. This works because errors do not propagate in the data block and hence at most
+one qubit is corrupted in case a single component fails).
+
+As already mentioned, after all this the state $\ket{\psi}$ is a simultaneous eigenstate
+of the six generators. Let us denote the measurement result by a bit vector
+$b\in\BB^6$. The state $\ket{\psi}$ is $\ket{0_L}$ iff $b=0^6$. Otherwise we can /correct/
+the state by treating $b$ as a syndrome and apply operators according to the table
+produced in the [[#exercise-10.61-solution][solution]] of exercise 10.61.
+
+** Exercise 10.74
+Construct a quantum circuit to fault-tolerantly generate the encoded $\ket{0}$ state for
+the five qubit code (Section 10.5.6).
+
+*** Sketch of a solution
+Conceptually one does exactly the same as for the Steane code. Just have a look into
+[[#exercise-10.73][exercise 10.73]]. I see no benefit in repeating it here.
