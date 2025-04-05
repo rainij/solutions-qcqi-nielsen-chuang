@@ -1179,14 +1179,15 @@ $1$. QED.
 Explicitly compute the Fourier transform of the $n$ qubit state $|00\ldots0\rangle$.
 
 *** Solution
-We have
+Plugging $j=0$ and $N=2^n$ into formula (5.2) we get
 
 $$
-  \FT |00\ldots0\rangle = \frac{1}{2 ^{n/2}} \sum_{k=0}^{2^n-1} e^{\frac{2\pi\ii}{2^n}k} |k\rangle ,
+  \FT |00\ldots0\rangle = \frac{1}{2 ^{n/2}} \sum_{k=0}^{2^n-1} e^{\frac{2\pi\ii}{2^n}jk} \ket{k} =
+  \frac{1}{2 ^{n/2}} \sum_{k=0}^{2^n-1} \ket{k},
 $$
 
 where we identify the (non-negative) integers $k$ with their (standard) binary representation (as
-usual).
+usual). Note that this corresponds to applying the Hadamard gate to each of the $n$ qubits.
 
 ** Exercise 5.3 (Classical fast Fourier transform)
 Suppose we wish to perform a Fourier transform of a vector containing $2^n$ complex numbers on a
