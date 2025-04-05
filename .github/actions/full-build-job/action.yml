@@ -8,7 +8,7 @@ runs:
     - name: Docker Buildx
       uses: ./.github/actions/docker-buildx
     - run: ./bin/run-build-in-docker.sh
-      Shell: bash
+      shell: bash
     - run: ./bin/run-tests-in-docker.sh
       shell: bash
     - name: Upload artifacts
